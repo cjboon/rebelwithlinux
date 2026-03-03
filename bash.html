@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="onion-location" content="http://yppxyvqzw3lcpkjqpbm24ugbpqibke45bkrqzatsy3asoa377urir3yd.onion/bash.html">
+    <title>Bash Scripting - Automate Everything with Shell Scripts | REBEL WITH LINUX</title>
+    <meta name="description" content="Master bash scripting from beginner to advanced. Learn variables, loops, functions, conditionals, and automation. Write powerful shell scripts to control your system.">
+    <meta name="keywords" content="bash, bash scripting, shell script, automation, Linux, terminal, command line, script tutorial, bash tutorial, shell programming, cron, cron jobs">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Theme persistence - check and apply immediately in head
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #4AF626;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="index.html">HOME</a>
+                    <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#guides">GUIDES</a>
+                    <a href="index.html#projects">PROJECTS</a>
+                    <a href="index.html#blog">BLOG</a>
+                    <a href="index.html#contact">CONTACT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>BASH<br>SCRIPTING</h1>
+        <p class="tagline">// Automate everything. Own your shell.</p>
+        
+        <div class="manifesto">
+            <p><strong>THE SHELL IS YOUR POWERHOUSE.</strong></p>
+            <p>While others click around their GUIs, you'll be orchestrating your entire system with a few keystrokes. Bash scripts turn repetitive tasks into single commands. Your time is too valuable to waste on manual work.</p>
+            <p><strong>AUTOMATION IS FREEDOM.</strong></p>
+            <p>Write a script once, run it forever. Schedule backups, monitor systems, process files, deploy applications—all automatically. When your computer works for you, you're finally in control.</p>
+            <p><strong>THE UNIX PHILOSOPHY LIVES IN BASH.</strong></p>
+            <p>Small tools, combined beautifully. Pipes that transform data like magic. This is how the original hackers built the internet—and how you can too.</p>
+        </div>
+        
+        <a href="#guides" class="cta-button">START SCRIPTING</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// Your Training Path</h2>
+            <p>Click a lesson to begin</p>
+        </div>
+
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Your First Script</h3>
+                <p class="lesson-desc">Create and execute your first bash script. Learn the shebang and basic script structure.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+            <div class="lesson-number">LESSON 02</div>
+            <h3 class="lesson-title">Variables and Parameters</h3>
+            <p class="lesson-desc">Store data in variables, work with command-line arguments, and understand environment variables.</p>
+            <span class="badge badge-beginner">Beginner</span>
+        </a>
+
+        <a href="#lesson3" class="lesson-card" data-lesson="3">
+            <div class="lesson-number">LESSON 03</div>
+            <h3 class="lesson-title">Conditionals</h3>
+            <p class="lesson-desc">Make decisions with if/else statements, test conditions, and boolean logic.</p>
+            <span class="badge badge-beginner">Beginner</span>
+        </a>
+
+        <a href="#lesson4" class="lesson-card" data-lesson="4">
+            <div class="lesson-number">LESSON 04</div>
+            <h3 class="lesson-title">Loops</h3>
+            <p class="lesson-desc">Iterate with for and while loops. Process multiple files and automate repetitive tasks.</p>
+            <span class="badge badge-beginner">Beginner</span>
+        </a>
+
+        <a href="#lesson5" class="lesson-card" data-lesson="5">
+            <div class="lesson-number">LESSON 05</div>
+            <h3 class="lesson-title">Functions</h3>
+            <p class="lesson-desc">Organize code with functions, pass parameters, and return values.</p>
+            <span class="badge badge-beginner">Beginner</span>
+        </a>
+
+        <a href="#lesson6" class="lesson-card" data-lesson="6">
+            <div class="lesson-number">LESSON 06</div>
+            <h3 class="lesson-title">Arrays and Strings</h3>
+            <p class="lesson-desc">Work with arrays, manipulate strings, and use advanced text processing.</p>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </a>
+
+        <a href="#lesson7" class="lesson-card" data-lesson="7">
+            <div class="lesson-number">LESSON 07</div>
+            <h3 class="lesson-title">Exit Codes and Error Handling</h3>
+            <p class="lesson-desc">Check command success, handle errors gracefully, and debug your scripts.</p>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </a>
+
+        <a href="#lesson8" class="lesson-card" data-lesson="8">
+            <div class="lesson-number">LESSON 08</div>
+            <h3 class="lesson-title">Real-World Automation</h3>
+            <p class="lesson-desc">Build practical scripts for backups, monitoring, and system administration.</p>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </a>
+
+        <a href="#lesson9" class="lesson-card" data-lesson="9">
+            <div class="lesson-number">LESSON 09</div>
+            <h3 class="lesson-title">Input/Output Redirection</h3>
+            <p class="lesson-desc">Master stdin, stdout, stderr, pipes, and here documents.</p>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </a>
+
+        <a href="#lesson10" class="lesson-card" data-lesson="10">
+            <div class="lesson-number">LESSON 10</div>
+            <h3 class="lesson-title">Text Processing Tools</h3>
+            <p class="lesson-desc">Use sed, awk, and grep for powerful text manipulation.</p>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </a>
+
+        <a href="#lesson11" class="lesson-card" data-lesson="11">
+            <div class="lesson-number">LESSON 11</div>
+            <h3 class="lesson-title">Advanced Arguments</h3>
+            <p class="lesson-desc">Parse command-line options with getopts and manage arguments.</p>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </a>
+
+        <a href="#lesson12" class="lesson-card" data-lesson="12">
+            <div class="lesson-number">LESSON 12</div>
+            <h3 class="lesson-title">Debugging & Best Practices</h3>
+            <p class="lesson-desc">Debug scripts, optimize performance, and write production-ready code.</p>
+            <span class="badge badge-advanced">Advanced</span>
+        </a>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>GNU Bash Reference</h3>
+                <p>Official Bash Documentation</p>
+                <a href="https://www.gnu.org/software/bash/manual/" target="_blank">bash manual</a>
+            </div>
+            <div class="resource-card">
+                <h3>ShellCheck</h3>
+                <p>Static Analysis Tool</p>
+                <a href="https://www.shellcheck.net/" target="_blank">shellcheck.net</a>
+            </div>
+            <div class="resource-card">
+                <h3>Advanced Bash Scripting</h3>
+                <p>Free Online Book</p>
+                <a href="https://tldp.org/LDP/abs/html/" target="_blank">ABS Guide</a>
+            </div>
+            <div class="resource-card">
+                <h3>Bash Hackers Wiki</h3>
+                <p>Human-readable Bash Docs</p>
+                <a href="https://wiki.bash-hackers.org/" target="_blank">bash-hackers.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>explainshell</h3>
+                <p>Parse Shell Commands</p>
+                <a href="https://explainshell.com/" target="_blank">explainshell.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>TLDP Bash Guide</h3>
+                <p>Beginner to Advanced</p>
+                <a href="https://tldp.org/LDP/Bash-Beginners-Guide/html/" target="_blank">Bash Beginners</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p>contact: busydrama @ proton.me</p>
+    </footer>
+
+    <!-- Lesson 1: Your First Script -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: Your First Script</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>The Shebang</h3>
+                <p>Every bash script starts with a shebang—the magic line that tells the system which interpreter to use:</p>
+                <div class="terminal-block">
+<span class="comment"># This tells Linux to use bash to run this script</span>
+<span class="keyword">#!/bin/bash</span>
+                </div>
+
+                <h3>Creating Your First Script</h3>
+                <p>Let's create a simple script that greets you:</p>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat > hello.sh << 'EOF'</span>
+<span class="comment">#!/bin/bash</span>
+<span class="comment"># My first bash script</span>
+
+<span class="keyword">echo</span> "Hello, rebel! Welcome to bash scripting."
+<span class="keyword">echo</span> "Today is $(date)"
+EOF</span>
+                </div>
+
+                <p>Now make it executable and run it:</p>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">chmod +x hello.sh</span>
+<span class="prompt">$</span> <span class="command">./hello.sh</span>
+<span class="output">Hello, rebel! Welcome to bash scripting.
+Today is Tue Feb 24 12:00:00 EST 2026</span>
+                </div>
+
+                <h3>Comments</h3>
+                <p>Lines starting with <code>#</code> are comments. Use them liberally—your future self will thank you:</p>
+                <div class="terminal-block">
+<span class="comment"># This script backs up my documents folder</span>
+<span class="comment"># It creates a timestamped archive</span>
+<span class="comment"># Usage: ./backup.sh</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Pro Tip:</strong> The shebang line <code>#!/bin/bash</code> must be the very first line of your script. No blank lines before it!
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does the shebang line do?</p>
+                        <input type="text" class="quiz-input" data-answer="tells the system which interpreter to use" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: It tells Linux how to run the script.</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What command makes a script executable?</p>
+                        <input type="text" class="quiz-input" data-answer="chmod +x" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: change mode + execute</p>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>tells the system which interpreter to use</li>
+                                <li>chmod +x</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2: Variables and Parameters -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: Variables and Parameters</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Creating Variables</h3>
+                <p>Variables store data for later use. No dollar sign when assigning, but use $ when reading:</p>
+                <div class="terminal-block">
+<span class="comment"># Assign a value (no $)</span>
+<span class="variable">name</span>=<span class="command">"Rebel"</span>
+<span class="variable">count</span>=<span class="command">42</span>
+
+<span class="comment"># Read the value (with $)</span>
+<span class="keyword">echo</span> <span class="variable">$name</span>
+<span class="keyword">echo</span> <span class="variable">$count</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Critical:</strong> There must be NO spaces around the = sign. <code>name="Rebel"</code> works, but <code>name = "Rebel"</code> does not!
+                </div>
+
+                <h3>Command Substitution</h3>
+                <p>Capture command output into variables using <code>$(command)</code> or backticks:</p>
+                <div class="terminal-block">
+<span class="comment"># Get current date</span>
+<span class="variable">today</span>=<span class="command">$(date +%Y-%m-%d)</span>
+<span class="keyword">echo</span> <span class="variable">$today</span>
+
+<span class="comment"># Count files in current directory</span>
+<span class="variable">file_count</span>=<span class="command">$(ls -1 | wc -l)</span>
+<span class="keyword">echo</span> <span class="variable">$file_count</span> files found
+                </div>
+
+                <h3>Command-Line Arguments</h3>
+                <p>Scripts can accept arguments passed from the command line:</p>
+                <div class="terminal-block">
+<span class="comment"># script.sh arg1 arg2 arg3</span>
+<span class="variable">$0</span>        <span class="comment"># script.sh (the script name)</span>
+<span class="variable">$1</span>        <span class="comment"># arg1 (first argument)</span>
+<span class="variable">$2</span>        <span class="comment"># arg2 (second argument)</span>
+<span class="variable">$@</span>        <span class="comment"># all arguments as a list</span>
+<span class="variable">$#</span>        <span class="comment"># number of arguments</span>
+                </div>
+
+                <p>Example script:</p>
+                <div class="terminal-block">
+<span class="keyword">#!/bin/bash</span>
+<span class="keyword">echo</span> "Script: <span class="variable">$0</span>"
+<span class="keyword">echo</span> "First arg: <span class="variable">$1</span>"
+<span class="keyword">echo</span> "Second arg: <span class="variable">$2</span>"
+<span class="keyword">echo</span> "Total args: <span class="variable">$#</span>"
+                </div>
+
+                <h3>Environment Variables</h3>
+                <p>Access system information through environment variables:</p>
+                <div class="terminal-block">
+<span class="keyword">echo</span> <span class="variable">$HOME</span>      <span class="comment"># Your home directory</span>
+<span class="keyword">echo</span> <span class="variable">$USER</span>       <span class="comment"># Your username</span>
+<span class="keyword">echo</span> <span class="variable">$PATH</span>       <span class="comment"># Executable search path</span>
+<span class="keyword">echo</span> <span class="variable">$PWD</span>       <span class="comment"># Current directory</span>
+<span class="keyword">echo</span> <span class="variable">$HOSTNAME</span>   <span class="comment"># Computer name</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you read a variable value in bash?</p>
+                        <input type="text" class="quiz-input" data-answer="$" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: It starts with a dollar sign.</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What variable holds all command-line arguments?</p>
+                        <input type="text" class="quiz-input" data-answer="$@" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>$</li>
+                                <li>$@</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3: Conditionals -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Conditionals</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>The if Statement</h3>
+                <p>Make decisions based on conditions:</p>
+                <div class="terminal-block">
+<span class="keyword">if</span> [ <span class="variable">$age</span> -ge <span class="command">18</span> ]; <span class="keyword">then</span>
+    <span class="keyword">echo</span> "You are an adult"
+<span class="keyword">fi</span>
+                </div>
+
+                <h3>Comparison Operators</h3>
+                <p>Numbers use these operators:</p>
+                <div class="terminal-block">
+-eq  <span class="comment"># equal</span>
+-ne  <span class="comment"># not equal</span>
+-lt  <span class="comment"># less than</span>
+-le  <span class="comment"># less than or equal</span>
+-gt  <span class="comment"># greater than</span>
+-ge  <span class="comment"># greater than or equal</span>
+                </div>
+
+                <p>Strings use these operators:</p>
+                <div class="terminal-block">
+=       <span class="comment"># equal (single =)</span>
+!=      <span class="comment"># not equal</span>
+-z      <span class="comment"># is empty</span>
+-n      <span class="comment"># is not empty</span>
+                </div>
+
+                <h3>if/else</h3>
+                <div class="terminal-block">
+<span class="keyword">if</span> [ <span class="variable">$1</span> = <span class="command">"admin"</span> ]; <span class="keyword">then</span>
+    <span class="keyword">echo</span> "Welcome, Administrator"
+<span class="keyword">else</span>
+    <span class="keyword">echo</span> "Welcome, <span class="variable">$1</span>"
+<span class="keyword">fi</span>
+                </div>
+
+                <h3>elif (Else If)</h3>
+                <div class="terminal-block">
+<span class="keyword">if</span> [ <span class="variable">$score</span> -ge <span class="command">90</span> ]; <span class="keyword">then</span>
+    <span class="keyword">echo</span> "Grade: A"
+<span class="keyword">elif</span> [ <span class="variable">$score</span> -ge <span class="command">80</span> ]; <span class="keyword">then</span>
+    <span class="keyword">echo</span> "Grade: B"
+<span class="keyword">elif</span> [ <span class="variable">$score</span> -ge <span class="command">70</span> ]; <span class="keyword">then</span>
+    <span class="keyword">echo</span> "Grade: C"
+<span class="keyword">else</span>
+    <span class="keyword">echo</span> "Grade: F"
+<span class="keyword">fi</span>
+                </div>
+
+                <h3>File Tests</h3>
+                <p>Check file properties:</p>
+                <div class="terminal-block">
+-e  <span class="comment"># file exists</span>
+-f  <span class="comment"># regular file exists</span>
+-d  <span class="comment"># directory exists</span>
+-r  <span class="comment"># file is readable</span>
+-w  <span class="comment"># file is writable</span>
+-x  <span class="comment"># file is executable</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Example:</strong> Check if a file exists before deleting:
+                    <pre>
+if [ -f "$filename" ]; then
+    rm "$filename"
+    echo "Deleted $filename"
+else
+    echo "File not found"
+fi
+                    </pre>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What operator checks if two strings are equal?</p>
+                        <input type="text" class="quiz-input" data-answer="=" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What flag checks if a file is a directory?</p>
+                        <input type="text" class="quiz-input" data-answer="-d" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>=</li>
+                                <li>-d</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4: Loops -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: Loops</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>For Loops</h3>
+                <p>Iterate over a list of items:</p>
+                <div class="terminal-block">
+<span class="keyword">for</span> color <span class="keyword">in</span> red green blue; <span class="keyword">do</span>
+    <span class="keyword">echo</span> "Color: <span class="variable">$color</span>"
+<span class="keyword">done</span>
+                </div>
+
+                <p>Output:</p>
+                <div class="terminal-block">
+<span class="output">Color: red
+Color: green
+Color: blue</span>
+                </div>
+
+                <h3>Loop Over Files</h3>
+                <p>Process all files in a directory:</p>
+                <div class="terminal-block">
+<span class="keyword">for</span> file <span class="keyword">in</span> *.txt; <span class="keyword">do</span>
+    <span class="keyword">echo</span> "Processing: <span class="variable">$file</span>"
+<span class="keyword">done</span>
+                </div>
+
+                <h3>For Loop with Sequence</h3>
+                <p>Use brace expansion for number ranges:</p>
+                <div class="terminal-block">
+<span class="comment"># Count from 1 to 5</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> {1..5}; <span class="keyword">do</span>
+    <span class="keyword">echo</span> "Number: <span class="variable">$i</span>"
+<span class="keyword">done</span>
+                </div>
+
+                <h3>While Loops</h3>
+                <p>Loop while a condition is true:</p>
+                <div class="terminal-block">
+<span class="variable">count</span>=<span class="command">1</span>
+
+<span class="keyword">while</span> [ <span class="variable">$count</span> -le <span class="command">5</span> ]; <span class="keyword">do</span>
+    <span class="keyword">echo</span> "Count: <span class="variable">$count</span>"
+    <span class="variable">count</span>=<span class="command">$((count + 1))</span>
+<span class="keyword">done</span>
+                </div>
+
+                <h3>Reading Input</h3>
+                <p>Read file line by line:</p>
+                <div class="terminal-block">
+<span class="keyword">while</span> read line; <span class="keyword">do</span>
+    <span class="keyword">echo</span> "Line: <span class="variable">$line</span>"
+<span class="keyword">done</span> < file.txt
+                </div>
+
+                <h3>Loop Control</h3>
+                <div class="terminal-block">
+<span class="keyword">break</span>    <span class="comment"># exit the loop entirely</span>
+<span class="keyword">continue</span> <span class="comment"># skip to next iteration</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Example:</strong> Find first file containing "error":
+                    <pre>
+for file in *.log; do
+    if grep -q "error" "$file"; then
+        echo "Found error in: $file"
+        break
+    fi
+done
+                    </pre>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What command skips to the next iteration of a loop?</p>
+                        <input type="text" class="quiz-input" data-answer="continue" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What syntax loops from 1 to 10?</p>
+                        <input type="text" class="quiz-input" data-answer="{1..10}" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>continue</li>
+                                <li>{1..10}</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5: Functions -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Functions</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Defining Functions</h3>
+                <p>Two ways to define functions in bash:</p>
+                <div class="terminal-block">
+<span class="comment"># Method 1: name() syntax</span>
+<span class="keyword">greet</span>() {
+    <span class="keyword">echo</span> "Hello!"
+}
+
+<span class="comment"># Method 2: function keyword</span>
+<span class="keyword">function</span> farewell {
+    <span class="keyword">echo</span> "Goodbye!"
+}
+                </div>
+
+                <h3>Calling Functions</h3>
+                <div class="terminal-block">
+<span class="keyword">greet</span>        <span class="comment"># calls the greet function</span>
+<span class="keyword">farewell</span>     <span class="comment"># calls the farewell function</span>
+                </div>
+
+                <h3>Function Parameters</h3>
+                <p>Functions use $1, $2, etc. just like scripts:</p>
+                <div class="terminal-block">
+<span class="keyword">greet_user</span>() {
+    <span class="keyword">echo</span> "Hello, <span class="variable">$1</span>!"
+}
+
+<span class="keyword">greet_user</span> Alice    <span class="comment"># Output: Hello, Alice!</span>
+<span class="keyword">greet_user</span> Bob      <span class="comment"># Output: Hello, Bob!</span>
+                </div>
+
+                <h3>Return Values</h3>
+                <p>Bash functions return exit codes (0 = success, non-zero = error):</p>
+                <div class="terminal-block">
+<span class="keyword">is_admin</span>() {
+    <span class="keyword">if</span> [ <span class="variable">$1</span> = <span class="command">"admin"</span> ]; <span class="keyword">then</span>
+        <span class="keyword">return</span> 0    <span class="comment"># success</span>
+    <span class="keyword">else</span>
+        <span class="keyword">return</span> 1    <span class="comment"># failure</span>
+    <span class="keyword">fi</span>
+}
+
+<span class="keyword">is_admin</span> <span class="variable">$user</span>
+<span class="keyword">if</span> [ <span class="variable">$?</span> -eq <span class="command">0</span> ]; <span class="keyword">then</span>
+    <span class="keyword">echo</span> "User is admin"
+<span class="keyword">fi</span>
+                </div>
+
+                <h3>Scope: Local Variables</h3>
+                <p>Use <code>local</code> to keep variables from leaking:</p>
+                <div class="terminal-block">
+<span class="keyword">calculate</span>() {
+    <span class="keyword">local</span> <span class="variable">result</span>=<span class="command">$(( $1 * $2 ))</span>
+    <span class="keyword">echo</span> <span class="variable">$result</span>
+}
+
+<span class="variable">result</span>=<span class="command">100</span>  <span class="comment"># global variable</span>
+<span class="keyword">calculate</span> 5 10  <span class="comment"># echoes 50, doesn't change global</span>
+<span class="keyword">echo</span> <span class="variable">$result</span>  <span class="comment"># still 100</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Best Practice:</strong> Always use <code>local</code> for variables inside functions unless you intentionally want them to be global.
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you keep a variable local inside a function?</p>
+                        <input type="text" class="quiz-input" data-answer="local" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What does $? contain after a function returns?</p>
+                        <input type="text" class="quiz-input" data-answer="exit code" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>local</li>
+                                <li>exit code</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6: Arrays and Strings -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Arrays and Strings</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Arrays</h3>
+                <p>Store multiple values in a single variable:</p>
+                <div class="terminal-block">
+<span class="comment"># Create an array</span>
+<span class="variable">fruits</span>=(<span class="command">"apple" "banana" "cherry" "date"</span>)
+
+<span class="comment"># Access elements (0-indexed)</span>
+<span class="keyword">echo</span> <span class="variable">${fruits[0]}</span>   <span class="comment"># apple</span>
+<span class="keyword">echo</span> <span class="variable">${fruits[2]}</span>   <span class="comment"># cherry</span>
+
+<span class="comment"># Get all elements</span>
+<span class="keyword">echo</span> <span class="variable">${fruits[@]}</span>   <span class="comment"># all fruits</span>
+
+<span class="comment"># Get array length</span>
+<span class="keyword">echo</span> <span class="variable">${#fruits[@]}</span>   <span class="comment"># 4</span>
+                </div>
+
+                <h3>Array Operations</h3>
+                <div class="terminal-block">
+<span class="comment"># Add element</span>
+<span class="variable">fruits</span>+=(<span class="command">"elderberry"</span>)
+
+<span class="comment"># Remove element (by index)</span>
+<span class="keyword">unset</span> <span class="variable">fruits[1]</span>
+
+<span class="comment"># Slice (elements 1-3)</span>
+<span class="keyword">echo</span> <span class="variable">${fruits[@]:1:3}</span>
+                </div>
+
+                <h3>String Operations</h3>
+                <div class="terminal-block">
+<span class="variable">str</span>=<span class="command">"Hello, Rebel!"</span>
+
+<span class="comment"># String length</span>
+<span class="keyword">echo</span> <span class="variable">${#str}</span>       <span class="comment"># 13</span>
+
+<span class="comment"># Substring</span>
+<span class="keyword">echo</span> <span class="variable">${str:0:5}</span>     <span class="comment"># Hello</span>
+
+<span class="comment"># Replace</span>
+<span class="keyword">echo</span> <span class="variable">${str/Rebel/World}</span>  <span class="comment"># Hello, World!</span>
+                </div>
+
+                <h3>Pattern Matching</h3>
+                <div class="terminal-block">
+<span class="variable">file</span>=<span class="command">"document.pdf"</span>
+
+<span class="comment"># Remove shortest match from beginning</span>
+<span class="keyword">echo</span> <span class="variable">${file#*.}</span>     <span class="comment"># pdf</span>
+
+<span class="comment"># Remove longest match from beginning</span>
+<span class="keyword">echo</span> <span class="variable">${file##*.}</span>    <span class="comment"># pdf</span>
+
+<span class="comment"># Remove shortest match from end</span>
+<span class="keyword">echo</span> <span class="variable">${file%.*}</span>     <span class="comment"># document</span>
+
+<span class="comment"># Remove longest match from end</span>
+<span class="keyword">echo</span> <span class="variable">${file%%.*}</span>    <span class="comment"># document</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Practical use:</strong> Get file extensions and names:
+                    <pre>
+filename="report.2024.pdf"
+ext="${filename##*.}"     # pdf
+base="${filename%.*}"     # report.2024
+                    </pre>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you get the length of an array?</p>
+                        <input type="text" class="quiz-input" data-answer="${#array[@]}" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What removes the shortest match from the end of a string?</p>
+                        <input type="text" class="quiz-input" data-answer="%" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>${#array[@]}</li>
+                                <li>%</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7: Exit Codes and Error Handling -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: Exit Codes and Error Handling</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Exit Codes</h3>
+                <p>Every command returns an exit code: 0 = success, non-zero = failure:</p>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls /valid/path</span>
+<span class="prompt">$</span> <span class="command">echo $?</span>
+<span class="output">0</span>
+
+<span class="prompt">$</span> <span class="command">ls /invalid/path</span>
+<span class="prompt">$</span> <span class="command">echo $?</span>
+<span class="output">2</span>
+                </div>
+
+                <h3>Checking Exit Codes</h3>
+                <div class="terminal-block">
+<span class="keyword">if</span> <span class="variable">$command</span>; <span class="keyword">then</span>
+    <span class="keyword">echo</span> "Command succeeded"
+<span class="keyword">else</span>
+    <span class="keyword">echo</span> "Command failed with code <span class="variable">$?</span>"
+<span class="keyword">fi</span>
+                </div>
+
+                <h3>set Options</h3>
+                <p>Automatically handle errors in scripts:</p>
+                <div class="terminal-block">
+<span class="keyword">set</span> -e          <span class="comment"># Exit on any error</span>
+<span class="keyword">set</span> -u          <span class="comment"># Exit on undefined variable</span>
+<span class="keyword">set</span> -o pipefail <span class="comment"># Catch errors in pipelines</span>
+                </div>
+
+                <p>Add at the top of your script:</p>
+                <div class="terminal-block">
+<span class="keyword">#!/bin/bash</span>
+<span class="keyword">set</span> -euo pipefail
+                </div>
+
+                <h3>Custom Exit Codes</h3>
+                <p>Return specific codes for different errors:</p>
+                <div class="terminal-block">
+<span class="keyword">#!/bin/bash</span>
+
+<span class="keyword">if</span> [ <span class="variable">$#</span> -lt <span class="command">1</span> ]; <span class="keyword">then</span>
+    <span class="keyword">echo</span> "Usage: <span class="variable">$0</span> <filename>" >&2
+    <span class="keyword">exit</span> 1    <span class="comment"># Usage error</span>
+<span class="keyword">fi</span>
+
+<span class="keyword">if</span> [ ! -f <span class="variable">$1</span> ]; <span class="keyword">then</span>
+    <span class="keyword">echo</span> "Error: File not found" >&2
+    <span class="keyword">exit</span> 2    <span class="comment"># File not found</span>
+<span class="keyword">fi</span>
+
+<span class="keyword">exit</span> 0    <span class="comment"># Success</span>
+                </div>
+
+                <h3>Trap Errors</h3>
+                <p>Execute cleanup code when script exits:</p>
+                <div class="terminal-block">
+<span class="keyword">cleanup</span>() {
+    <span class="keyword">echo</span> "Cleaning up..."
+    <span class="keyword">rm</span> -f /tmp/tempfile
+}
+
+<span class="keyword">trap</span> cleanup EXIT
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Standard Exit Codes:</strong><br>
+                    0 = success<br>
+                    1 = general error<br>
+                    2 = misuse of command<br>
+                    126 = command not executable<br>
+                    127 = command not found
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What exit code means success?</p>
+                        <input type="text" class="quiz-input" data-answer="0" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What option makes the script exit on any command failure?</p>
+                        <input type="text" class="quiz-input" data-answer="set -e" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>0</li>
+                                <li>set -e</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8: Real-World Automation -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Real-World Automation</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Automated Backup Script</h3>
+                <div class="terminal-block">
+<span class="comment">#!/bin/bash</span>
+<span class="keyword">set</span> -euo pipefail
+
+<span class="variable">SOURCE</span>=<span class="command">"/home/user/documents"</span>
+<span class="variable">BACKUP_DIR</span>=<span class="command">"/backup"</span>
+<span class="variable">DATE</span>=<span class="command">$(date +%Y-%m-%d)</span>
+
+<span class="keyword">mkdir</span> -p <span class="variable">$BACKUP_DIR</span>
+
+<span class="keyword">echo</span> "Starting backup of <span class="variable">$SOURCE</span>..."
+
+<span class="keyword">if</span> tar -czf <span class="variable">$BACKUP_DIR</span>/backup-<span class="variable">$DATE</span>.tar.gz <span class="variable">$SOURCE</span>; <span class="keyword">then</span>
+    <span class="keyword">echo</span> "Backup completed successfully"
+    <span class="keyword">exit</span> 0
+<span class="keyword">else</span>
+    <span class="keyword">echo</span> "Backup failed!" >&2
+    <span class="keyword">exit</span> 1
+<span class="keyword">fi</span>
+                </div>
+
+                <h3>System Monitor Script</h3>
+                <div class="terminal-block">
+<span class="comment">#!/bin/bash</span>
+<span class="keyword">set</span> -euo pipefail
+
+<span class="variable">CPU</span>=<span class="command">$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d'%' -f1)</span>
+<span class="variable">MEM</span>=<span class="command">$(free | grep Mem | awk '{printf "%.1f", $3/$2 * 100}')</span>
+<span class="variable">DISK</span>=<span class="command">$(df -h / | tail -1 | awk '{print $5}' | cut -d'%' -f1)</span>
+
+<span class="keyword">echo</span> "=== System Status ==="</span>
+<span class="keyword">echo</span> "CPU: <span class="variable">$CPU</span>%"</span>
+<span class="keyword">echo</span> "Memory: <span class="variable">$MEM</span>%"</span>
+<span class="keyword">echo</span> "Disk: <span class="variable">$DISK</span>%"</span>
+
+<span class="comment"># Alert if usage is high</span>
+<span class="keyword">if</span> [ <span class="variable">$CPU</span> -gt <span class="command">90</span> ] || [ <span class="variable">$MEM</span> -gt <span class="command">90</span> ]; <span class="keyword">then</span>
+    <span class="keyword">echo</span> "WARNING: High resource usage!" >&2
+<span class="keyword">fi</span>
+                </div>
+
+                <h3>Batch File Processor</h3>
+                <div class="terminal-block">
+<span class="comment">#!/bin/bash</span>
+<span class="keyword">set</span> -euo pipefail
+
+<span class="variable">PROCESSED</span>=<span class="command">0</span>
+
+<span class="keyword">for</span> file <span class="keyword">in</span> *.csv; <span class="keyword">do</span>
+    <span class="keyword">echo</span> "Processing <span class="variable">$file</span>..."
+    
+    <span class="comment"># Skip if not a file</span>
+    [ -f <span class="variable">$file</span> ] || <span class="keyword">continue</span>
+    
+    <span class="comment"># Process the file</span>
+    <span class="keyword">tail</span> -n +2 <span class="variable">$file</span> | sort > processed/<span class="variable">$file</span>
+    
+    <span class="variable">PROCESSED</span>=<span class="command">$((PROCESSED + 1))</span>
+<span class="keyword">done</span>
+
+<span class="keyword">echo</span> "Processed <span class="variable">$PROCESSED</span> files"
+                </div>
+
+                <h3>Scheduling with Cron</h3>
+                <p>Make scripts run automatically:</p>
+                <div class="terminal-block">
+<span class="comment"># Edit crontab</span>
+<span class="prompt">$</span> <span class="command">crontab -e</span>
+
+<span class="comment"># Add lines like:</span>
+<span class="comment"># Run backup every day at 2am</span>
+0 2 * * * /home/user/scripts/backup.sh
+
+<span class="comment"># Run every hour</span>
+0 * * * * /home/user/scripts/monitor.sh
+
+<span class="comment"># Run every Monday at 9am</span>
+0 9 * * 1 /home/user/scripts/weekly-report.sh
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Crontab Format:</strong><br>
+                    ┌───────────── minute (0-59)<br>
+                    │ ┌─────────── hour (0-23)<br>
+                    │ │ ┌───────── day of month (1-31)<br>
+                    │ │ │ ┌─────── month (1-12)<br>
+                    │ │ │ │ ┌───── day of week (0-6, Sunday=0)<br>
+                    │ │ │ │ │<br>
+                    * * * * * command
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does "0 2 * * *" mean in crontab?</p>
+                        <input type="text" class="quiz-input" data-answer="2am" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: minute hour day month weekday</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What does set -euo pipefail do?</p>
+                        <input type="text" class="quiz-input" data-answer="exit on error" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-hint">Hint: It makes the script stop on errors and undefined variables.</p>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>2am</li>
+                                <li>exit on error</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9: Input/Output Redirection -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Input/Output Redirection</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Standard Streams</h3>
+                <p>Every process has three standard streams:</p>
+                <div class="terminal-block">
+<span class="variable">stdin</span>  (0)  <span class="comment"># Standard input - keyboard</span>
+<span class="variable">stdout</span> (1)  <span class="comment"># Standard output - screen</span>
+<span class="variable">stderr</span> (2)  <span class="comment"># Standard error - screen</span>
+                </div>
+
+                <h3>Output Redirection</h3>
+                <div class="terminal-block">
+<span class="comment"># Redirect stdout to file (overwrite)</span>
+<span class="keyword">echo</span> "hello" > output.txt
+
+<span class="comment"># Redirect stdout to file (append)</span>
+<span class="keyword">echo</span> "world" >> output.txt
+
+<span class="comment"># Redirect stderr to file</span>
+<span class="command">ls /invalid 2> errors.txt</span>
+
+<span class="comment"># Redirect both stdout and stderr</span>
+<span class="command">command > all.txt 2>&1</span>
+                </div>
+
+                <h3>Input Redirection</h3>
+                <div class="terminal-block">
+<span class="comment"># Read from file instead of keyboard</span>
+<span class="keyword">while</span> read line; <span class="keyword">do</span>
+    <span class="keyword">echo</span> "Line: <span class="variable">$line</span>"
+<span class="keyword">done</span> < input.txt
+
+<span class="comment"># Here document (inline input)</span>
+<span class="keyword">cat</span> << 'EOF'
+This is line 1
+This is line 2
+This is line 3
+EOF
+                </div>
+
+                <h3>Pipes</h3>
+                <p>Connect commands together - output of one becomes input of another:</p>
+                <div class="terminal-block">
+<span class="comment"># Chain commands</span>
+<span class="command">ls -la | grep ".txt" | wc -l</span>
+
+<span class="comment"># Count lines in file</span>
+<span class="command">cat file.txt | wc -l</span>
+
+<span class="comment"># Sort unique count</span>
+<span class="command">cat data.txt | sort | uniq -c</span>
+                </div>
+
+                <h3>Process Substitution</h3>
+                <div class="terminal-block">
+<span class="comment"># Compare two file listings</span>
+<span class="command">diff <(ls dir1) <(ls dir2)</span>
+
+<span class="comment"># Read from multiple sources</span>
+<span class="command">cat <(echo "header") file.txt <(echo "footer")</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What file descriptor is stderr?</p>
+                        <input type="text" class="quiz-input" data-answer="2" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What operator appends output to a file?</p>
+                        <input type="text" class="quiz-input" data-answer=">>" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>2</li>
+                                <li>>></li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10: Text Processing Tools -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: Text Processing Tools</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>grep - Pattern Matching</h3>
+                <p>Search for patterns in text:</p>
+                <div class="terminal-block">
+<span class="comment"># Basic search</span>
+<span class="command">grep "error" logfile.txt</span>
+
+<span class="comment"># Case-insensitive</span>
+<span class="command">grep -i "error" logfile.txt</span>
+
+<span class="comment"># Show line numbers</span>
+<span class="command">grep -n "error" logfile.txt</span>
+
+<span class="comment"># Invert match (lines WITHOUT error)</span>
+<span class="command">grep -v "error" logfile.txt</span>
+
+<span class="comment"># Recursive search</span>
+<span class="command">grep -r "function" src/</span>
+                </div>
+
+                <h3>sed - Stream Editor</h3>
+                <p>Find and replace text:</p>
+                <div class="terminal-block">
+<span class="comment"># Replace first occurrence per line</span>
+<span class="command">sed 's/old/new/' file.txt</span>
+
+<span class="comment"># Replace all occurrences</span>
+<span class="command">sed 's/old/new/g' file.txt</span>
+
+<span class="comment"># Replace on specific line number</span>
+<span class="command">sed '5s/old/new/' file.txt</span>
+
+<span class="comment"># Delete lines matching pattern</span>
+<span class="command">sed '/^$/d' file.txt</span>
+
+<span class="comment"># Edit file in place</span>
+<span class="command">sed -i 's/old/new/g' file.txt</span>
+                </div>
+
+                <h3>awk - Text Processing</h3>
+                <p>Powerful column-based processing:</p>
+                <div class="terminal-block">
+<span class="comment"># Print first column</span>
+<span class="command">awk '{print $1}' data.txt</span>
+
+<span class="comment"># Print specific columns</span>
+<span class="command">awk -F: '{print $1, $3}' /etc/passwd</span>
+
+<span class="comment"># Print lines longer than 80 chars</span>
+<span class="command">awk 'length > 80' file.txt</span>
+
+<span class="comment"># Sum column</span>
+<span class="command">awk '{sum+=$1} END {print sum}' numbers.txt</span>
+
+<span class="comment"># Conditional printing</span>
+<span class="command">awk '$3 > 50 {print $1, $3}' data.txt</span>
+                </div>
+
+                <h3>Combining Tools</h3>
+                <div class="terminal-block">
+<span class="comment"># Real-world: Find errors, show context</span>
+<span class="command">grep -n "ERROR" app.log | awk -F: '{print "Line " $1 ": " $2}'</span>
+
+<span class="comment"># Process CSV data</span>
+<span class="command">awk -F, '$3 > 1000 {print $1 " owes $" $3}' customers.csv</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Pro Tip:</strong> These tools are designed to work together. Pipe them to build powerful data processing pipelines.
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Which flag makes grep case-insensitive?</p>
+                        <input type="text" class="quiz-input" data-answer="-i" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What sed command replaces all occurrences?</p>
+                        <input type="text" class="quiz-input" data-answer="s/old/new/g" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>-i</li>
+                                <li>s/old/new/g</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11: Advanced Arguments -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: Advanced Arguments</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>The shift Command</h3>
+                <p>Process arguments one by one:</p>
+                <div class="terminal-block">
+<span class="keyword">#!/bin/bash</span>
+<span class="keyword">while</span> [ <span class="variable">$#</span> -gt <span class="command">0</span> ]; <span class="keyword">do</span>
+    <span class="keyword">echo</span> "Processing: <span class="variable">$1</span>"
+    <span class="keyword">shift</span>
+<span class="keyword">done</span>
+                </div>
+
+                <h3>getopts - Option Parsing</h3>
+                <p>Handle command-line flags properly:</p>
+                <div class="terminal-block">
+<span class="keyword">#!/bin/bash</span>
+
+<span class="keyword">while</span> getopts <span class="command">":vhf:o:"</span> opt; <span class="keyword">do</span>
+    <span class="keyword">case</span> <span class="variable">$opt</span> <span class="keyword">in</span>
+        v)
+            <span class="variable">VERBOSE</span>=<span class="command">1</span>
+            ;;
+        f)
+            <span class="variable">FILE</span>=<span class="command">$OPTARG</span>
+            ;;
+        o)
+            <span class="variable">OUTPUT</span>=<span class="command">$OPTARG</span>
+            ;;
+        \?)
+            <span class="keyword">echo</span> "Invalid option: -<span class="variable">$OPTARG</span>" >&2
+            ;;
+        :)
+            <span class="keyword">echo</span> "Option -<span class="variable">$OPTARG</span> requires an argument." >&2
+            ;;
+    <span class="keyword">esac</span>
+<span class="keyword">done</span>
+
+<span class="keyword">echo</span> "File: <span class="variable">$FILE</span>, Output: <span class="variable">$OUTPUT</span>, Verbose: <span class="variable">$VERBOSE</span>"
+                </div>
+
+                <p>Usage:</p>
+                <div class="terminal-block">
+<span class="command">./script.sh -f input.txt -o result.txt -v</span>
+<span class="comment"># -f requires argument, -v is a flag</span>
+                </div>
+
+                <h3>Argument Validation</h3>
+                <div class="terminal-block">
+<span class="keyword">if</span> [ <span class="variable">$#</span> -lt <span class="command">2</span> ]; <span class="keyword">then</span>
+    <span class="keyword">echo</span> "Usage: <span class="variable">$0</span> <input> <output>" >&2
+    <span class="keyword">exit</span> 1
+<span class="keyword">fi</span>
+
+<span class="keyword">if</span> [ ! -f <span class="variable">$1</span> ]; <span class="keyword">then</span>
+    <span class="keyword">echo</span> "Error: Input file '<span class="variable">$1</span>' not found" >&2
+    <span class="keyword">exit</span> 2
+<span class="keyword">fi</span>
+                </div>
+
+                <h3>Default Values</h3>
+                <div class="terminal-block">
+<span class="variable">OUTPUT</span>=${<span class="variable">OUTPUT</span>:-<span class="command">"output.txt"</span>}
+<span class="comment"># Uses "output.txt" if OUTPUT is empty</span>
+
+<span class="variable">MAX</span>=${<span class="variable">MAX</span>:-<span class="command">100</span>}
+<span class="comment"># Uses 100 if MAX is empty</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What command moves to the next argument?</p>
+                        <input type="text" class="quiz-input" data-answer="shift" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. In getopts, what stores the option letter?</p>
+                        <input type="text" class="quiz-input" data-answer="opt" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>shift</li>
+                                <li>opt</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12: Debugging & Best Practices -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: Debugging & Best Practices</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Debug Mode</h3>
+                <p>Use -x to trace execution:</p>
+                <div class="terminal-block">
+<span class="comment"># Run script in debug mode</span>
+<span class="command">bash -x script.sh</span>
+
+<span class="comment"># Add to script for debugging section</span>
+<span class="keyword">set</span> -x
+<span class="comment"># your code here</span>
+<span class="keyword">set</span> +x
+                </div>
+
+                <h3>Debug Options</h3>
+                <div class="terminal-block">
+<span class="keyword">set</span> -x          <span class="comment"># Print commands before execution</span>
+<span class="keyword">set</span> -v          <span class="comment"># Print input lines as read</span>
+<span class="keyword">set</span> -e          <span class="comment"># Exit on error</span>
+<span class="keyword">set</span> -u          <span class="comment"># Exit on undefined variable</span>
+<span class="keyword">set</span> -o pipefail <span class="comment"># Exit if any command in pipe fails</span>
+<span class="keyword">set</span> -n          <span class="comment"># Syntax check only (no execution)</span>
+                </div>
+
+                <h3>Common Pitfalls</h3>
+                <div class="terminal-block">
+<span class="comment"># WRONG: Spaces around =</span>
+<span class="variable">name</span> = <span class="command">"value"</span>
+
+<span class="comment"># RIGHT: No spaces</span>
+<span class="variable">name</span>=<span class="command">"value"</span>
+
+<span class="comment"># WRONG: Glob expands</span>
+<span class="command">ls *.txt</span>     <span class="comment"># Fails if no txt files</span>
+
+<span class="comment"># RIGHT: Quote variables</span>
+<span class="command">ls "*.txt"</span>
+<span class="command">ls "$file"</span>
+                </div>
+
+                <h3>Best Practices</h3>
+                <div class="terminal-block">
+<span class="comment"># Always use these at the top</span>
+<span class="keyword">#!/bin/bash</span>
+<span class="keyword">set</span> -euo pipefail
+<span class="keyword">IFS</span>=<span class="command">$'\n\t'</span>
+
+<span class="comment"># Always quote variables</span>
+<span class="keyword">echo</span> "<span class="variable">$var</span>"   <span class="comment"># Safe</span>
+<span class="keyword">echo</span> <span class="variable">$var</span>       <span class="comment"># Dangerous</span>
+
+<span class="comment"># Use descriptive names</span>
+<span class="variable">BACKUP_SOURCE</span>=<span class="command">"/home/data"</span>  <span class="comment"># Clear</span>
+<span class="variable">bs</span>=<span class="command">"/home/data"</span>            <span class="comment"># Unclear</span>
+
+<span class="comment"># Use functions for organization</span>
+<span class="keyword">main</span>() {
+    <span class="keyword">parse_args</span> <span class="variable">$@</span>
+    <span class="keyword">validate</span>
+    <span class="keyword">run_backup</span>
+}
+                </div>
+
+                <h3>Testing Scripts</h3>
+                <div class="terminal-block">
+<span class="comment"># Syntax check</span>
+<span class="command">bash -n script.sh</span>
+
+<span class="comment"># Dry run (echo commands)</span>
+<span class="command">bash -n script.sh && echo "OK"</span>
+
+<span class="comment"># Check for unset variables</span>
+<span class="command">bash -u script.sh</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>Production Script Template:</strong>
+                    <pre>
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+log() { echo "[$(date)] $*"; }
+error() { echo "[ERROR] $*" >&2; exit 1; }
+
+main() {
+    log "Starting"
+    # your code here
+    log "Done"
+}
+
+main "$@"
+                    </pre>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What flag enables command tracing?</p>
+                        <input type="text" class="quiz-input" data-answer="-x" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Why quote variables?</p>
+                        <input type="text" class="quiz-input" data-answer="prevent word splitting" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>-x</li>
+                                <li>prevent word splitting</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="nav.js" defer></script>
+</body>
+</html>

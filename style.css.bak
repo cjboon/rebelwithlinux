@@ -1,0 +1,1365 @@
+/* =============================================================================
+   CSS (Cascading Style Sheets) - STYLESHEET FILE
+   =============================================================================
+   CSS is what makes websites look good! It controls:
+   - Colors, fonts, spacing
+   - Layout (how elements are arranged)
+   - Animations and transitions
+   - Responsive design (how it looks on different screen sizes)
+   
+   KEY CONCEPTS FOR BEGINNERS:
+   - SELECTORS: Target HTML elements to style (e.g., 'nav', '.lesson-card')
+   - PROPERTIES: What to change (e.g., 'color', 'background', 'margin')
+   - VALUES: The actual values (e.g., 'red', '10px', 'bold')
+   - CASCADE: Multiple styles can apply to one element - later ones win!
+   - SPECIFICITY: More specific selectors override general ones
+   ============================================================================= */
+
+/* =============================================================================
+   BLOCK 1: CSS CUSTOM PROPERTIES (CSS VARIABLES)
+   =============================================================================
+   CSS Variables (also called "Custom Properties") are like reusable values.
+   They start with -- and can be used throughout the file.
+   
+   Benefits:
+   - Easy to change colors across entire site
+   - Consistent theming
+   - Dark mode support (just change the values)
+   
+   Here we define our color palette:
+   - ivory: Off-white background
+   - white: Pure white
+   - black: Near-black for text
+   - charcoal: Dark gray
+   - beige: Warm light gray
+   - dark-red: For errors/alerts
+   - dark-green: For success states
+   ============================================================================= */
+:root {
+    --ivory: #FFFFF0;
+    --white: #FFFFFF;
+    --black: #0A0A0A;
+    --charcoal: #2A2A2A;
+    --beige: #F5F5DC;
+    --dark-red: #8B0000;
+    --dark-green: #006400;
+    --nav-color: #FFFFFF;
+}
+
+/* =============================================================================
+   BLOCK 2: ACCESSIBILITY STYLES
+   =============================================================================
+   These styles help users navigate using keyboards instead of mice.
+   
+   .skip-link: Hidden by default (positioned off-screen), appears when tabbed to
+   This is critical for screen reader users and keyboard-only navigation.
+   ============================================================================= */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--black);
+    color: var(--white);
+    padding: 8px 16px;
+    z-index: 10000;
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* =============================================================================
+   BLOCK 3: FOCUS STATES
+   =============================================================================
+   :focus-visible shows a visible outline when using keyboard navigation.
+   This is better than :focus alone because mouse users don't see it.
+   The outline helps users know which element is currently selected.
+   ============================================================================= */
+*:focus-visible {
+    outline: 3px solid var(--nav-color);
+    outline-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--nav-color);
+    outline-offset: 2px;
+}
+
+/* =============================================================================
+   BLOCK 4: GLOBAL RESET
+   =============================================================================
+   The universal selector (*) targets ALL elements.
+   RESET: Removes default browser margins/padding that vary between browsers.
+   box-sizing: border-box makes width/height include padding and borders
+   (instead of adding them on top), which makes layout calculations easier.
+   ============================================================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* =============================================================================
+   BLOCK 5: BASE TYPOGRAPHY
+   =============================================================================
+   Base styles for the entire page:
+   - font-family: Which font to use (with fallbacks)
+   - background-color: Page background
+   - color: Default text color
+   - line-height: Space between lines (1.6 = 160% of font size)
+   ============================================================================= */
+body {
+    font-family: 'IBM Plex Mono', monospace;
+    background-color: var(--ivory);
+    color: var(--black);
+    line-height: 1.6;
+}
+
+/* =============================================================================
+   BLOCK 6: HEADING STYLES
+   =============================================================================
+   All heading tags (h1-h6) get the same styling:
+   - Monospace font (like code)
+   - Bold weight
+   - Uppercase transformation
+   - Slight letter spacing adjustment
+   ============================================================================= */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+}
+
+/* Code-related elements also use monospace */
+code, pre, .terminal {
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+/* =============================================================================
+   BLOCK 7: NAVIGATION BAR
+   =============================================================================
+   The fixed header that stays at the top of the page:
+   
+   position: fixed - Stays in place when scrolling
+   top/left/right: 0 - Sticks to all edges
+   z-index: 1000 - Ensures it stays above other content
+   display: flex - Enables flexbox layout
+   justify-content: space-between - Pushes title and links to opposite ends
+   align-items: center - Vertically centers content
+   ============================================================================= */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--black);
+    color: var(--white);
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    border-bottom: 4px solid var(--white);
+}
+
+.nav-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.nav-links {
+    display: flex;
+    gap: 32px;
+}
+
+.nav-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    position: relative;
+}
+
+/* =============================================================================
+   BLOCK 8: NAVIGATION HOVER EFFECTS
+   =============================================================================
+   ::after creates a pseudo-element (invisible by default)
+   On hover, it becomes visible and expands as an underline animation.
+   
+   transition: Makes the animation smooth over 0.2 seconds
+   width: 0 → width: 100% creates the growing line effect
+   ============================================================================= */
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--white);
+    transition: width 0.2s;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+/* =============================================================================
+   BLOCK 9: PROGRESS BAR (FOR FUTURE USE)
+   =============================================================================
+   A fixed bar below navigation that could show page load progress
+   or user progress through a course.
+   ============================================================================= */
+.progress-container {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--charcoal);
+    z-index: 999;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--black);
+    width: 0%;
+    transition: width 0.3s;
+}
+
+/* =============================================================================
+   BLOCK 10: HERO SECTION
+   =============================================================================
+   The main banner area with the headline and manifesto.
+   
+   padding: 120px top accounts for the fixed nav bar
+   max-width: 1200px - Prevents it from getting too wide on large screens
+   margin: 0 auto - Centers it horizontally
+   border-bottom: Creates visual separation from next section
+   ============================================================================= */
+.hero {
+    padding: 120px 32px 64px;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-bottom: 4px solid var(--black);
+    background: var(--ivory);
+    color: var(--black);
+}
+
+.hero h1 {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    line-height: 1.1;
+    margin-bottom: 24px;
+    color: var(--black);
+}
+
+.hero .tagline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.25rem;
+    margin-bottom: 32px;
+    color: var(--charcoal);
+}
+
+/* =============================================================================
+   BLOCK 11: MANIFESTO BOX
+   =============================================================================
+   A highlighted box containing the site's core message.
+   
+   background: white - Contrasts with page background
+   border: 3px solid black - Thick border for emphasis
+   box-shadow: 8px 8px 0 black - Creates "brutalist" offset shadow effect
+   ============================================================================= */
+.manifesto {
+    background: var(--white);
+    border: 3px solid var(--black);
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: 8px 8px 0 var(--black);
+    color: var(--black);
+}
+
+.manifesto p {
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+    color: var(--black);
+}
+
+.manifesto strong {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--black);
+}
+
+/* =============================================================================
+   BLOCK 12: CALL-TO-ACTION BUTTON
+   =============================================================================
+   Buttons that stand out and encourage clicking.
+   
+   display: inline-block - Allows margin/padding but doesn't fill container
+   transition: all 0.1s - Animates all property changes smoothly
+   transform: translate(-4px, -4px) - Moves button up-left on hover
+   box-shadow expansion gives "lifting" effect
+   ============================================================================= */
+.cta-button {
+    display: inline-block;
+    background: var(--black);
+    color: var(--white);
+    padding: 16px 32px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 3px solid var(--black);
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.cta-button:hover {
+    background: var(--white);
+    color: var(--black);
+    box-shadow: 8px 8px 0 var(--black);
+    transform: translate(-4px, -4px);
+}
+
+/* =============================================================================
+   BLOCK 13: LESSONS/guides SECTION
+   =============================================================================
+   Container for tutorial cards.
+   
+   max-width: 1400px - Slightly wider for more cards
+   margin: 0 auto - Centers the section
+   ============================================================================= */
+.lessons-section {
+    padding: 64px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.section-header {
+    margin-bottom: 48px;
+}
+
+.section-header h2 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.section-header p {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--charcoal);
+}
+
+/* =============================================================================
+   BLOCK 14: CSS GRID FOR LESSON CARDS
+   =============================================================================
+   display: grid - Enables CSS Grid layout!
+   
+   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr))
+   This is powerful! It means:
+   - Create as many columns as will fit
+   - Each column must be at least 320px wide
+   - If there's leftover space, distribute it equally (1fr)
+   
+   This creates a RESPONSIVE layout automatically!
+   ============================================================================= */
+.lessons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+/* =============================================================================
+   BLOCK 15: LESSON CARD STYLING
+   =============================================================================
+   Each tutorial card is a clickable box:
+   
+   position: relative - Allows positioning child elements absolutely
+   cursor: pointer - Shows hand cursor on hover
+   transition: all 0.1s - Smooth hover animation
+   ============================================================================= */
+.lesson-card {
+    background: var(--white);
+    border: 3px solid var(--black);
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.1s;
+    position: relative;
+    text-decoration: none;
+    color: var(--black);
+}
+
+.lesson-card:link,
+.lesson-card:visited {
+    color: var(--black);
+}
+
+.lesson-card:hover {
+    background: var(--nav-color);
+    color: var(--black);
+    box-shadow: 8px 8px 0 var(--black);
+    transform: translate(-4px, -4px);
+}
+
+.lesson-card:hover .lesson-number,
+.lesson-card:hover .lesson-title,
+.lesson-card:hover .lesson-desc {
+    color: var(--black);
+}
+
+.lesson-card:hover .badge {
+    background: var(--white);
+    color: var(--black);
+}
+
+/* =============================================================================
+   BLOCK 16: COMPLETED LESSON INDICATOR
+   =============================================================================
+   When a user completes a lesson, we add the 'completed' class.
+   This changes the border color and adds a checkmark.
+   
+   ::after creates the checkmark content
+   position: absolute places it in the corner
+   ============================================================================= */
+.lesson-card.completed {
+    border-color: var(--dark-green);
+}
+
+.lesson-card.completed::after {
+    content: '✓';
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 1.5rem;
+    color: var(--dark-green);
+    font-weight: bold;
+}
+
+.lesson-card h3 {
+    color: var(--black);
+}
+
+.lesson-number {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    color: var(--charcoal);
+    margin-bottom: 8px;
+}
+
+.lesson-title {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+    line-height: 1.3;
+    color: var(--black);
+}
+
+.lesson-desc {
+    font-size: 0.9rem;
+    color: var(--charcoal);
+    margin-bottom: 16px;
+}
+
+/* =============================================================================
+   BLOCK 17: BADGES (DIFFICULTY LEVELS)
+   =============================================================================
+   Small tags showing beginner/intermediate/advanced.
+   Different styling for different levels.
+   ============================================================================= */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    border: 2px solid var(--black);
+    text-transform: uppercase;
+}
+
+.badge-beginner {
+    background: var(--ivory);
+}
+
+.badge-intermediate {
+    background: var(--black);
+    color: var(--white);
+}
+
+.badge-advanced {
+    background: var(--white);
+    color: var(--black);
+}
+
+/* =============================================================================
+   BLOCK 18: MODAL (POPUP) STYLES
+   =============================================================================
+   Modal overlay covers the entire screen:
+   - display: none (hidden by default)
+   - position: fixed with top/left/right/bottom: 0 (fullscreen)
+   - background: rgba(0, 0, 0, 0.8) - Semi-transparent black
+   - z-index: 2000 - Above everything else
+   
+   .active class makes it visible (display: block or flex)
+   ============================================================================= */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    overflow-y: auto;
+}
+
+.modal-overlay.active {
+    display: block;
+}
+
+/* =============================================================================
+   LESSON MODAL STYLES (for pages using lesson-modal class)
+   ============================================================================= */
+.lesson-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    overflow-y: auto;
+}
+
+.lesson-modal.active {
+    display: block;
+}
+
+.lesson-modal > .lesson-header {
+    background: var(--nav-color);
+    color: var(--black);
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    max-width: 900px;
+    margin: 40px auto 0;
+    border: 4px solid var(--black);
+    border-bottom: none;
+}
+
+.lesson-modal > .lesson-header h2 {
+    font-size: 1.5rem;
+}
+
+.lesson-modal .lesson-content {
+    background: var(--ivory);
+    max-width: 900px;
+    margin: 0 auto 40px;
+    border: 4px solid var(--black);
+    box-shadow: 12px 12px 0 var(--black);
+}
+
+.lesson-modal .lesson-body {
+    padding: 32px;
+}
+
+.modal {
+    background: var(--ivory);
+    max-width: 900px;
+    margin: 40px auto;
+    border: 4px solid var(--black);
+    box-shadow: 12px 12px 0 var(--black);
+    padding: 0;
+}
+
+.modal-header {
+    background: var(--nav-color);
+    color: var(--black);
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+}
+
+.close-btn {
+    background: var(--white);
+    color: var(--black);
+    border: 2px solid var(--white);
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background: var(--black);
+    color: var(--white);
+}
+
+.modal-content {
+    padding: 32px;
+}
+
+/* =============================================================================
+   BLOCK 19: LESSON CONTENT STYLING
+   =============================================================================
+   Styles for the actual tutorial content within modals:
+   - Headings with bottom borders
+   - Proper spacing for paragraphs and lists
+    ============================================================================= */
+.lesson-content {
+    margin-bottom: 48px;
+    padding: 0 32px;
+}
+
+.lesson-content h3 {
+    font-size: 1.25rem;
+    margin: 32px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--black);
+}
+
+.lesson-content p {
+    margin-bottom: 16px;
+}
+
+.lesson-content ul, .lesson-content ol {
+    margin-bottom: 16px;
+    padding-left: 24px;
+}
+
+.lesson-content li {
+    margin-bottom: 8px;
+}
+
+.lesson-content pre {
+    background: var(--black);
+    color: var(--ivory);
+    padding: 20px;
+    margin: 16px 0;
+    border: 3px solid var(--black);
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    white-space: pre;
+}
+
+.lesson-content pre .prompt {
+    color: #2ECC71;
+}
+
+.lesson-content pre .command {
+    color: var(--ivory);
+}
+
+.lesson-content pre .output {
+    color: #3498DB;
+}
+
+.lesson-content pre .comment {
+    color: #aaaaaa;
+}
+
+.lesson-content pre .variable {
+    color: #9cdcfe;
+}
+
+.lesson-content pre .keyword {
+    color: #569cd6;
+}
+
+/* =============================================================================
+   BLOCK 20: TERMINAL/CODE BLOCK STYLING
+   =============================================================================
+   Dark background for terminal output and code examples.
+   Different colors for prompts, commands, and output help readability.
+   
+   overflow-x: auto - Horizontal scroll if code is too wide
+   ============================================================================= */
+.terminal-block {
+    background: var(--black);
+    color: var(--ivory);
+    padding: 20px;
+    margin: 16px 0;
+    border: 3px solid var(--black);
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    white-space: pre;
+}
+
+.terminal-block .prompt {
+    color: #2ECC71;
+}
+
+.terminal-block .command {
+    color: var(--white);
+}
+
+.terminal-block .output {
+    color: var(--beige);
+}
+
+.terminal-block .comment {
+    color: #aaaaaa !important;
+}
+
+.config-block {
+    background: var(--black);
+    color: var(--ivory);
+    padding: 20px;
+    margin: 16px 0;
+    border: 3px solid var(--black);
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.code-block {
+    background: #1e1e1e;
+    color: var(--ivory);
+    padding: 20px;
+    margin: 16px 0;
+    border: 3px solid var(--black);
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    font-family: 'Courier New', monospace;
+    white-space: pre;
+}
+
+.code-block .keyword { color: #569cd6; }
+.code-block .function { color: #dcdcaa; }
+.code-block .string { color: #ce9178; }
+.code-block .number { color: #b5cea8; }
+.code-block .comment { color: #6a9955; }
+.code-block .variable { color: #9cdcfe; }
+.code-block .operator { color: #d4d4d4; }
+
+/* =============================================================================
+   BLOCK 21: HIGHLIGHT BOX
+   =============================================================================
+   A box to highlight important information or tips.
+   Uses a left border for visual emphasis.
+   ============================================================================= */
+.highlight-box {
+    background: var(--beige);
+    border-left: 4px solid var(--black);
+    padding: 16px;
+    margin: 16px 0;
+    font-style: italic;
+}
+
+/* =============================================================================
+   BLOCK 22: QUIZ SECTION STYLING
+   =============================================================================
+   Interactive quiz components:
+   - Question containers
+   - Input fields with focus states
+   - Correct/incorrect feedback styling
+   - Score display
+   ============================================================================= */
+.quiz-section {
+    background: var(--white);
+    border: 3px solid var(--black);
+    padding: 32px;
+    margin-top: 32px;
+}
+
+.quiz-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--black);
+}
+
+.quiz-question {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px dashed var(--charcoal);
+}
+
+.quiz-question:last-child {
+    border-bottom: none;
+}
+
+.question-text {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+}
+
+.question-text .blank {
+    display: inline-block;
+    min-width: 120px;
+    border-bottom: 2px solid var(--black);
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--charcoal);
+}
+
+.quiz-input {
+    width: 100%;
+    max-width: 300px;
+    padding: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+    border: 2px solid var(--black);
+    background: var(--white);
+    margin-bottom: 12px;
+}
+
+.quiz-input:focus {
+    outline: none;
+    box-shadow: 4px 4px 0 var(--black);
+}
+
+.quiz-input.correct {
+    border-color: var(--dark-green);
+    background: #f0fff0;
+}
+
+.quiz-input.incorrect {
+    border-color: var(--dark-red);
+    background: #fff0f0;
+}
+
+.quiz-feedback {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    margin-top: 8px;
+    display: none;
+}
+
+.quiz-feedback.correct {
+    color: var(--dark-green);
+    display: block;
+}
+
+.quiz-feedback.incorrect {
+    color: var(--dark-red);
+    display: block;
+}
+
+.quiz-hint {
+    font-size: 0.85rem;
+    color: var(--charcoal);
+    margin-top: 8px;
+    display: none;
+}
+
+.quiz-hint.visible {
+    display: block;
+}
+
+.quiz-answer {
+    display: none;
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--beige);
+    border: 2px solid var(--nav-color);
+    font-weight: bold;
+}
+
+.quiz-answer.visible {
+    display: block;
+}
+
+.quiz-options {
+    margin: 16px 0;
+}
+
+.quiz-options label {
+    display: block;
+    padding: 8px 12px;
+    margin: 8px 0;
+    background: var(--white);
+    border: 2px solid var(--charcoal);
+    cursor: pointer;
+}
+
+.quiz-options label:hover {
+    border-color: var(--nav-color);
+    background: var(--beige);
+}
+
+.quiz-submit {
+    background: var(--black);
+    color: var(--white);
+    padding: 12px 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    border: 2px solid var(--black);
+    cursor: pointer;
+    margin-right: 12px;
+}
+
+.quiz-submit:hover {
+    background: var(--white);
+    color: var(--black);
+}
+
+.quiz-score {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+    margin-top: 24px;
+    padding: 16px;
+    background: var(--beige);
+    border: 2px solid var(--black);
+    display: none;
+}
+
+.quiz-score.visible {
+    display: block;
+}
+
+/* =============================================================================
+   BLOCK 23: ABOUT AND RESOURCES SECTIONS
+   =============================================================================
+   Styling for informational sections:
+   - About section with white background
+   - Resources grid for tool links
+   ============================================================================= */
+.about-section {
+    padding: 64px 32px;
+    background: var(--white);
+    border-top: 4px solid var(--black);
+    border-bottom: 4px solid var(--black);
+}
+
+.about-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.about-content h2 {
+    font-size: 2rem;
+    margin-bottom: 24px;
+}
+
+.about-content p {
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+}
+
+.resources-section {
+    padding: 64px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.resources-section h2 {
+    font-size: 2rem;
+    margin-bottom: 32px;
+}
+
+.resources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.resource-card {
+    background: var(--white);
+    border: 3px solid var(--black);
+    padding: 24px;
+}
+
+.resource-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+}
+
+.resource-card a {
+    color: var(--black);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+}
+
+/* =============================================================================
+   BLOCK 24: FOOTER STYLING
+   =============================================================================
+   Dark footer with centered content.
+   The copyleft symbol (reversed C) represents the philosophy
+   that free software should remain free.
+   ============================================================================= */
+footer {
+    background: var(--black);
+    color: var(--white);
+    padding: 48px 32px;
+    text-align: center;
+}
+
+footer p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    margin-bottom: 8px;
+}
+
+footer .copyleft {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+}
+
+/* =============================================================================
+   BLOCK 25: RESPONSIVE DESIGN (MEDIA QUERIES)
+   =============================================================================
+   Media queries change styles based on screen size.
+   This is how we make sites work on phones and tablets!
+   
+   @media (max-width: 768px) means:
+   "When the screen is 768px OR SMALLER, apply these styles"
+   
+   Common breakpoints:
+   - 768px: Tablets
+   - 480px: Mobile phones
+   ============================================================================= */
+@media (max-width: 768px) {
+    nav {
+        padding: 12px 16px;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .nav-links {
+        gap: 16px;
+    }
+
+    .hero {
+        padding: 100px 16px 48px;
+    }
+
+    .manifesto {
+        padding: 20px;
+    }
+
+    .lessons-section {
+        padding: 48px 16px;
+    }
+
+    .modal {
+        margin: 20px;
+    }
+
+    .modal-content {
+        padding: 20px;
+    }
+
+    .quiz-section {
+        padding: 20px;
+    }
+}
+
+/* =============================================================================
+   BLOCK 26: ANIMATIONS (KEYFRAMES)
+   =============================================================================
+   @keyframes define an animation sequence.
+   fadeIn makes elements gradually appear:
+   - Start: opacity 0, translated down 20px
+   - End: opacity 1, at normal position
+   
+   This creates a nice entrance effect for lesson cards.
+   ============================================================================= */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.lesson-card {
+    animation: fadeIn 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+/* animation-delay: Stagger the cards for a cascading effect */
+.lesson-card:nth-child(1) { animation-delay: 0.05s; }
+.lesson-card:nth-child(2) { animation-delay: 0.1s; }
+.lesson-card:nth-child(3) { animation-delay: 0.15s; }
+.lesson-card:nth-child(4) { animation-delay: 0.2s; }
+.lesson-card:nth-child(5) { animation-delay: 0.25s; }
+.lesson-card:nth-child(6) { animation-delay: 0.3s; }
+.lesson-card:nth-child(7) { animation-delay: 0.35s; }
+.lesson-card:nth-child(8) { animation-delay: 0.4s; }
+.lesson-card:nth-child(9) { animation-delay: 0.45s; }
+.lesson-card:nth-child(10) { animation-delay: 0.5s; }
+.lesson-card:nth-child(11) { animation-delay: 0.55s; }
+.lesson-card:nth-child(12) { animation-delay: 0.6s; }
+
+/* =============================================================================
+   BLOCK 27: AUTH MODAL STYLING
+   =============================================================================
+   The login/register popup modal:
+   - display: flex when active (for centering)
+   - Dark semi-transparent background
+   - White box with thick border
+   ============================================================================= */
+.auth-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-modal.active {
+    display: flex;
+}
+
+.auth-box {
+    background: var(--white);
+    border: 4px solid var(--black);
+    padding: 32px;
+    max-width: 400px;
+    width: 90%;
+    position: relative;
+    box-shadow: 12px 12px 0 var(--black);
+}
+
+.close-auth {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--black);
+}
+
+.close-auth:hover {
+    color: var(--charcoal);
+}
+
+.auth-tabs {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.auth-tab {
+    background: var(--white);
+    border: 2px solid var(--black);
+    padding: 8px 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    cursor: pointer;
+    color: var(--black);
+}
+
+.auth-tab.active {
+    background: var(--black);
+    color: var(--white);
+}
+
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    margin-bottom: 4px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--black);
+    background: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    box-shadow: 4px 4px 0 var(--black);
+}
+
+/* Error and success messages */
+.auth-error {
+    color: var(--dark-red);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+    display: none;
+}
+
+.auth-error.show {
+    display: block;
+}
+
+.auth-success {
+    color: var(--dark-green);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+    display: none;
+}
+
+.auth-success.show {
+    display: block;
+}
+
+/* User avatar and logout button */
+.user-avatar {
+    background: var(--black);
+    color: var(--white);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.logout-btn:hover {
+    text-decoration: underline;
+}
+
+/* =============================================================================
+   BLOCK 28: PROJECTS SECTION
+   =============================================================================
+   Larger cards for project tutorials.
+   minmax(400px, 1fr) - Projects need more width than lessons.
+   ============================================================================= */
+.projects-section {
+    padding: 64px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.projects-section h2 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.section-subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--charcoal);
+    margin-bottom: 32px;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 24px;
+}
+
+@media (max-width: 500px) {
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.project-card {
+    background: var(--white);
+    border: 3px solid var(--black);
+    padding: 32px;
+    text-decoration: none;
+    color: var(--black);
+    transition: all 0.1s;
+    box-shadow: 8px 8px 0 var(--black);
+}
+
+.project-card:hover {
+    background: var(--black);
+    color: var(--white);
+    transform: translate(-4px, -4px);
+    box-shadow: 12px 12px 0 var(--black);
+}
+
+.project-card:hover .project-icon,
+.project-card:hover h3,
+.project-card:hover p,
+.project-card:hover .project-level {
+    color: var(--white);
+}
+
+.project-card:hover .project-level {
+    border-color: var(--white);
+}
+
+.project-card:hover .stack-item {
+    background: var(--white);
+    color: var(--black);
+}
+
+.project-icon {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+}
+
+.project-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+}
+
+.project-card p {
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.project-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.stack-item {
+    background: var(--black);
+    color: var(--white);
+    padding: 4px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    border: 1px solid var(--black);
+}
+
+.project-level {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    border: 2px solid var(--black);
+    padding: 4px 12px;
+    display: inline-block;
+}

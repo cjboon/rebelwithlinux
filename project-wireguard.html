@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="onion-location" content="http://yppxyvqzw3lcpkjqpbm24ugbpqibke45bkrqzatsy3asoa377urir3yd.onion/project-wireguard.html">
+    <title>Set Up Your Own WireGuard VPN - Complete Tutorial | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn how to set up your own WireGuard VPN server using Docker. Secure your internet traffic, access your home network remotely, and reclaim your privacy.">
+    <meta name="keywords" content="WireGuard, VPN, self-hosted, privacy, Docker, VPS, network security, VPN server, Linux">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Theme persistence - check and apply immediately in head
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #2ECC71;
+        }
+        
+        nav .nav-title a {
+            color: var(--white);
+            text-decoration: none;
+        }
+        
+        .lesson-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 32px;
+        }
+        
+        .lesson-content h2 {
+            font-size: 2rem;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--black);
+        }
+        
+        .lesson-content h3 {
+            font-size: 1.5rem;
+            margin: 32px 0 16px;
+        }
+        
+        .lesson-content p {
+            margin-bottom: 16px;
+        }
+        
+        .lesson-content ul, .lesson-content ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+        
+        .lesson-content li {
+            margin-bottom: 8px;
+        }
+        
+        footer {
+            padding: 48px 32px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+            width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            nav {
+                justify-content: center;
+            }
+        }
+
+        .project-nav {
+            background: #eeeeee;
+            border-bottom: 2px solid #000000;
+            border-top: 2px solid #000000;
+            padding: 12px 16px;
+            display: flex !important;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 100;
+            margin-top: 52px;
+        }
+
+        .hero {
+            padding-top: 80px;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding-top: 100px !important;
+            }
+        }
+
+        .project-nav a {
+            color: #000000;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .project-nav a::after {
+            content: " |";
+            margin-left: 8px;
+            opacity: 0.5;
+        }
+
+        .project-nav a:last-child::after {
+            content: "";
+        }
+
+        [data-theme="dark"] .project-nav {
+            background: #333333;
+        }
+
+        [data-theme="dark"] .project-nav a {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="index.html">HOME</a>
+                    <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#guides">GUIDES</a>
+                    <a href="index.html#projects">PROJECTS</a>
+                    <a href="index.html#blog">BLOG</a>
+                    <a href="index.html#contact">CONTACT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="project-nav">
+        <a href="#overview">OVERVIEW</a>
+        <a href="#server">SERVER</a>
+        <a href="#client">CLIENT</a>
+        <a href="#mobile">MOBILE</a>
+    </div>
+
+    <header class="hero">
+        <h1>SET UP YOUR OWN WIREGUARD VPN</h1>
+        <p class="tagline">// Reclaim your digital sovereignty.</p>
+        
+        <div class="manifesto">
+            <p><strong>// WHAT WE'RE BUILDING</strong></p>
+            <p>In this tutorial, you'll set up your own WireGuard VPN server. WireGuard is a modern, fast, and secure VPN protocol that uses cutting-edge cryptography. Unlike older VPNs that are complex and slow, WireGuard is lightweight - the entire codebase is only about 4,000 lines. This makes it faster, more secure, and easier to audit.</p>
+            <p><strong>// WHY THIS MATTERS</strong></p>
+            <p>Every time you connect to public WiFi at a coffee shop, airport, or hotel, you're trusting that network with all your traffic. Anyone on that network can potentially intercept your passwords, emails, and browsing activity. A VPN encrypts all your traffic, making it unreadable to eavesdroppers. But commercial VPNs have a problem - they can see all your traffic too. When you run your own VPN, only you control it. No logs, no data sharing, no subscriptions.</p>
+        </div>
+    </header>
+
+    <section class="lesson-content" id="overview">
+        <h2>// What You'll Learn</h2>
+        
+        <p>This project teaches you about:</p>
+        
+        <ul>
+            <li><strong>WireGuard</strong> - The VPN protocol that is changing how we think about privacy</li>
+            <li><strong>Docker</strong> - Containerize your VPN server for easy deployment</li>
+            <li><strong>Networking</strong> - Understand VPN concepts, routing, and port forwarding</li>
+            <li><strong>VPS</strong> - Host your VPN on a server in the cloud</li>
+            <li><strong>Client Configuration</strong> - Connect devices (laptop, phone, tablet) to your VPN</li>
+        </ul>
+
+        <h3>Why WireGuard?</h3>
+        <p>WireGuard was designed to be simpler and faster than existing VPN solutions. Here's why it matters:</p>
+        
+        <ul>
+            <li><strong>Speed</strong> - WireGuard is significantly faster than OpenVPN and IPSec in most benchmarks</li>
+            <li><strong>Simplicity</strong> - The entire protocol is about 4,000 lines of code, compared to OpenVPN's 600,000+</li>
+            <li><strong>Security</strong> - Uses modern cryptography (Curve25519, ChaCha20, Poly1305) that hasn't been broken</li>
+            <li><strong>Kernel Integration</strong> - Built into Linux kernel 5.6+, making it incredibly efficient</li>
+        </ul>
+
+        <div class="highlight-box">
+            <p><strong>Prerequisites</strong></p>
+            <p>Before starting this tutorial, make sure you've completed:</p>
+            <ul>
+                <li>Linux Fundamentals - Comfortable with the command line</li>
+                <li>Docker Containers - Understand Docker basics</li>
+                <li>VPS Hosting - Know how to connect to a server</li>
+                <li>Git Version Control - Basic Git usage</li>
+            </ul>
+            <p>If you haven't completed these, check out our other tutorials first!</p>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="concepts">
+        <h2>// Understanding VPN Concepts</h2>
+        
+        <h3>What is a VPN?</h3>
+        <p>A VPN (Virtual Private Network) creates an encrypted tunnel between your device and a server. All your internet traffic flows through this tunnel, making it invisible to anyone on your local network or your ISP (Internet Service Provider).</p>
+        
+        <p>When you use a VPN, websites see the VPN server's IP address instead of your real IP address. This provides two key benefits:</p>
+        
+        <ul>
+            <li><strong>Privacy</strong> - Your ISP can't see what websites you visit (they only see encrypted traffic to the VPN)</li>
+            <li><strong>Security</strong> - Anyone on your local network can't intercept your traffic</li>
+        </ul>
+
+        <h3>How WireGuard Works</h3>
+        <p>WireGuard uses a simple but powerful architecture:</p>
+        
+        <ul>
+            <li><strong>Public/Private Key Pairs</strong> - Each device has a cryptographic key pair</li>
+            <li><strong>Peer-to-Peer</strong> - WireGuard treats all connections as peer-to-peer, not client-server</li>
+            <li><strong>UDP Only</strong> - WireGuard uses UDP (not TCP) for better performance</li>
+            <li><strong>Roaming</strong> - Connections persist even if IP addresses change</li>
+        </ul>
+
+        <h3>Architecture</h3>
+        <p>Your VPN will work like this:</p>
+        
+        <pre style="background: var(--black); color: var(--ivory); padding: 20px; margin: 16px 0; border: 3px solid var(--black); overflow-x: auto; white-space: pre;">
+┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+│   Your      │         │   VPS       │         │   Internet  │
+│   Device    │────VPN──│   Server    │─────────│   World     │
+│             │  Tunnel  │  (WireGuard)│         │             │
+└─────────────┘         └─────────────┘         └─────────────┘
+        </pre>
+
+        <p>All your traffic goes from your device → VPN server → internet. The return traffic comes back the same way. To the website you're visiting, the request appears to come from your VPS.</p>
+
+        <h3>WireGuard vs Other VPNs</h3>
+        <p>Let's compare WireGuard to other popular VPN solutions:</p>
+        
+        <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+            <tr style="background: var(--black); color: var(--white);">
+                <th style="padding: 12px; text-align: left;">Feature</th>
+                <th style="padding: 12px; text-align: left;">WireGuard</th>
+                <th style="padding: 12px; text-align: left;">OpenVPN</th>
+                <th style="padding: 12px; text-align: left;">Commercial VPN</th>
+            </tr>
+            <tr style="background: var(--white); border: 2px solid var(--black);">
+                <td style="padding: 12px;">Speed</td>
+                <td style="padding: 12px;">Very Fast</td>
+                <td style="padding: 12px;">Moderate</td>
+                <td style="padding: 12px;">Varies</td>
+            </tr>
+            <tr style="background: var(--white); border: 2px solid var(--black);">
+                <td style="padding: 12px;">Code Size</td>
+                <td style="padding: 12px;">~4,000 lines</td>
+                <td style="padding: 12px;">~600,000 lines</td>
+                <td style="padding: 12px;">Proprietary</td>
+            </tr>
+            <tr style="background: var(--white); border: 2px solid var(--black);">
+                <td style="padding: 12px;">Security</td>
+                <td style="padding: 12px;">Excellent</td>
+                <td style="padding: 12px;">Good</td>
+                <td style="padding: 12px;">Unknown</td>
+            </tr>
+            <tr style="background: var(--white); border: 2px solid var(--black);">
+                <td style="padding: 12px;">Setup Difficulty</td>
+                <td style="padding: 12px;">Easy</td>
+                <td style="padding: 12px;">Hard</td>
+                <td style="padding: 12px;">Very Easy</td>
+            </tr>
+            <tr style="background: var(--white); border: 2px solid var(--black);">
+                <td style="padding: 12px;">Privacy</td>
+                <td style="padding: 12px;">You control</td>
+                <td style="padding: 12px;">You control</td>
+                <td style="padding: 12px;">Provider sees all</td>
+            </tr>
+        </table>
+    </section>
+
+    <section class="lesson-content" id="local">
+        <h2>// Part 1: Set Up Local Development</h2>
+        
+        <p>First, let's set up the project on your local machine. We'll use Docker to run WireGuard locally for testing.</p>
+
+        <h3>1.1 Create Project Directory</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">mkdir -p ~/projects/wireguard-vpn</span>
+<span class="comment"># Create project folder</span>
+<span class="prompt">$</span> <span class="command">cd ~/projects/wireguard-vpn</span>
+<span class="prompt">$</span> <span class="command">mkdir -p config</span>
+<span class="comment"># Create config directory for persistent data</span></pre>
+        </div>
+
+        <h3>1.2 Initialize Git</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">git init</span>
+<span class="prompt">$</span> <span class="command">git config user.name "Your Name"</span>
+<span class="prompt">$</span> <span class="command">git config user.email "you@example.com"</span></pre>
+        </div>
+
+        <h3>1.3 Create .gitignore</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat > .gitignore << 'EOF'
+# Configuration files with secrets
+config/peer*.conf
+config/server*.json
+
+# Environment files
+.env
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+EOF</span></pre>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="docker">
+        <h2>// Part 2: Dockerize Your VPN Server</h2>
+        
+        <p>We'll use linuxserver/wireguard, a well-maintained Docker image that makes WireGuard easy to set up. It handles all the complex key generation for you.</p>
+
+        <h3>2.1 Create docker-compose.yml</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat > docker-compose.yml << 'EOF'
+version: '3.8'
+
+services:
+  wireguard:
+    image: linuxserver/wireguard:latest
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - SERVERURL=auto
+      - SERVERPORT=51820
+      - PEERS=5
+      - PEERDNS=auto
+      - INTERNAL_SUBNET=10.13.13.0
+      - ALLOWEDIPS=0.0.0.0/0
+    volumes:
+      - ./config:/config
+      - /lib/modules:/lib/modules
+    ports:
+      - "51820:51820/udp"
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
+EOF</span></pre>
+        </div>
+
+        <div class="highlight-box">
+            <p><strong>Understanding the Configuration</strong></p>
+            <ul>
+                <li><code>cap_add: NET_ADMIN, SYS_MODULE</code> - Required for WireGuard to create network interfaces</li>
+                <li><code>SERVERURL=auto</code> - Automatically detects your VPS IP address</li>
+                <li><code>SERVERPORT=51820</code> - Default WireGuard port (you can change this)</li>
+                <li><code>PEERS=5</code> - Number of client configurations to generate</li>
+                <li><code>ALLOWEDIPS=0.0.0.0/0</code> - Route all traffic through VPN (full tunnel)</li>
+                <li><code>/lib/modules</code> - Kernel modules needed for WireGuard</li>
+            </ul>
+        </div>
+
+        <h3>2.2 Run WireGuard Locally</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">docker-compose up -d</span>
+<span class="comment"># Start the WireGuard container</span>
+<span class="output">Creating network "wireguard-vpn_default" with the default driver
+Creating wireguard ... done</span></pre>
+        </div>
+
+        <p>Give it a few seconds to generate keys, then check the logs:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">docker-compose logs -f wireguard</span>
+<span class="comment"># Watch the logs</span></pre>
+        </div>
+
+        <p>You'll see the server keys being generated. Once it's ready, check the config folder:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">ls -la config/</span>
+<span class="output">drwxr-xr-x  5 user user  4096 Feb 25 10:00 .
+drwxr-xr-x  1 user user  4096 Feb 25 10:00 ..
+drownied.srht.site/
+peer1/
+peer2/
+peer3/
+peer4/
+peer5/
+server.conf
+wg0.conf</span></pre>
+        </div>
+
+        <h3>2.3 Understanding the Generated Files</h3>
+        
+        <p>The container generates several important files:</p>
+
+        <ul>
+            <li><code>server.conf</code> - Your server's WireGuard configuration</li>
+            <li><code>wg0.conf</code> - The active network interface configuration</li>
+            <li><code>peer1/</code> through <code>peer5/</code> - Client configurations</li>
+        </ul>
+
+        <p>Let's look at the server configuration:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat config/server.conf</span>
+<span class="output">[Interface]
+Address = 10.13.13.1
+PrivateKey = SERVER_PRIVATE_KEY_HERE
+ListenPort = 51820
+
+[Peer]
+# peer1
+PublicKey = PEER_PUBLIC_KEY_HERE
+AllowedIPs = 10.13.13.2/32
+... (more peers)
+</span></pre>
+        </div>
+
+        <h3>2.4 Client Configuration</h3>
+        
+        <p>Each peer folder contains a QR code (for mobile) and a .conf file (for desktop). Let's look at peer1:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">ls -la config/peer1/</span>
+<span class="output">peer1.conf
+peer1.png  (QR code for mobile)
+peer1-preshared.key
+peer1.public.key
+peer1.private.key</span></pre>
+        </div>
+
+        <p>Here's what a client config looks like:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat config/peer1/peer1.conf</span>
+<span class="output">[Interface]
+PrivateKey = PEER_PRIVATE_KEY
+Address = 10.13.13.2/32
+DNS = 1.1.1.1
+
+[Peer]
+PublicKey = SERVER_PUBLIC_KEY
+Endpoint = your-server-ip:51820
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25
+</span></pre>
+        </div>
+
+        <div class="highlight-box">
+            <p><strong>Client Configuration Explained</strong></p>
+            <ul>
+                <li><code>PrivateKey</code> - The client's private key (keep secret!)</li>
+                <li><code>Address</code> - IP address inside the VPN network</li>
+                <li><code>DNS</code> - DNS server to use (1.1.1.1 is Cloudflare)</li>
+                <li><code>PublicKey</code> - The server's public key</li>
+                <li><code>Endpoint</code> - Your server's IP and port</li>
+                <li><code>AllowedIPs</code> - What traffic to route through VPN (0.0.0.0/0 = everything)</li>
+                <li><code>PersistentKeepalive</code> - Keep connection alive every 25 seconds (helps with NAT)</li>
+            </ul>
+        </div>
+
+        <h3>2.5 Stop the Container</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">docker-compose down</span>
+<span class="comment"># Stop the container</span></pre>
+        </div>
+
+        <p>Your configuration is saved in the config folder. When you run this on your VPS, the same configuration will persist.</p>
+    </section>
+
+    <section class="lesson-content" id="vps">
+        <h2>// Part 3: Deploy to Your VPS</h2>
+        
+        <p>Now let's put your VPN on the internet. You'll need a VPS with at least 1GB RAM and a static IP address.</p>
+
+        <h3>3.1 Connect to Your VPS</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">ssh your-username@your-vps-ip</span></pre>
+        </div>
+
+        <h3>3.2 Install Docker on Your VPS</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">sudo apt update</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin</span></pre>
+        </div>
+
+        <h3>3.3 Configure Firewall</h3>
+        
+        <p>WireGuard uses UDP port 51820 by default. Let's open that port:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">sudo ufw allow 22/tcp</span>
+<span class="comment"># Allow SSH</span>
+<span class="prompt">your-username@vps:~$</span> <span class="command">sudo ufw allow 51820/udp</span>
+<span class="comment"># Allow WireGuard</span>
+<span class="prompt">your-username@vps:~$</span> <span class="command">sudo ufw enable</span></pre>
+        </div>
+
+        <h3>3.4 Transfer Your Code</h3>
+        
+        <p>On your local machine, commit and push to GitHub:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cd ~/projects/wireguard-vpn</span>
+<span class="prompt">$</span> <span class="command">git add . && git commit -m "Add WireGuard VPN configuration"</span>
+<span class="prompt">$</span> <span class="command">git remote add origin git@github.com:yourusername/wireguard-vpn.git</span>
+<span class="prompt">$</span> <span class="command">git push -u origin main</span></pre>
+        </div>
+
+        <p>On your VPS, clone the repository:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">cd ~ && git clone git@github.com:yourusername/wireguard-vpn.git wireguard</span></pre>
+        </div>
+
+        <h3>3.5 Configure Environment</h3>
+        
+        <p>Before running, let's customize the configuration for your VPS. You'll want to set the SERVERURL to your actual IP or domain:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">cd ~/wireguard</span>
+<span class="prompt">your-username@vps:~$</span> <span class="command">nano docker-compose.yml</span></pre>
+        </div>
+
+        <p>Change <code>SERVERURL=auto</code> to your actual domain or IP:</p>
+
+        <pre>      - SERVERURL=your-domain.com</pre>
+
+        <p>If you don't have a domain, use your VPS IP address:</p>
+
+        <pre>      - SERVERURL=your-vps-ip-address</pre>
+
+        <h3>3.6 Start WireGuard</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">docker-compose up -d</span>
+<span class="comment"># Start WireGuard</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">docker-compose logs -f wireguard</span>
+<span class="comment"># Watch the logs to see peer configurations being generated</span></pre>
+        </div>
+
+        <p>Wait a moment for the keys to generate, then check the config:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">ls -la config/peer1/</span></pre>
+        </div>
+
+        <h3>3.7 Get Your Client Configuration</h3>
+        
+        <p>Copy the peer1.conf file to your local machine. You can use SCP:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">scp your-username@your-vps-ip:~/wireguard/config/peer1/peer1.conf ~/Downloads/wg0.conf</span>
+<span class="comment"># Copy the config file to your Downloads folder</span></pre>
+        </div>
+
+        <div class="highlight-box">
+            <p><strong>Important Security Note</strong></p>
+            <p>Keep your peer configuration files private! They contain the private key that gives access to your VPN. Never share them or commit them to Git.</p>
+            <p>Make sure the config/peer*.conf entries in your .gitignore are correct before pushing to GitHub.</p>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="clients">
+        <h2>// Part 4: Connect Your Devices</h2>
+        
+        <p>Now let's connect your devices to your new VPN. WireGuard is available for all major platforms.</p>
+
+        <h3>4.1 Linux Desktop</h3>
+        
+        <p>Install WireGuard:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install wireguard</span>
+<span class="comment"># Debian/Ubuntu</span>
+<span class="prompt">$</span> <span class="command">sudo pacman -S wireguard-tools</span>
+<span class="comment"># Arch Linux</span>
+<span class="prompt">$</span> <span class="command">sudo dnf install wireguard-tools</span>
+<span class="comment"># Fedora</span></pre>
+        </div>
+
+        <p>Copy your configuration file to the WireGuard directory:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo cp ~/Downloads/wg0.conf /etc/wireguard/wg0.conf</span>
+<span class="prompt">$</span> <span class="command">sudo chmod 600 /etc/wireguard/wg0.conf</span>
+<span class="comment"># Secure the private key</span></pre>
+        </div>
+
+        <p>Start WireGuard:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo wg-quick up wg0</span>
+<span class="comment"># Connect to VPN</span></pre>
+        </div>
+
+        <p>Check your connection:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo wg</span>
+<span class="output">interface: wg0
+  public key: YOUR_PUBLIC_KEY
+  private key: (hidden)
+  listening port: 51820
+
+  peer: SERVER_PUBLIC_KEY
+    endpoint: your-vps-ip:51820
+    allowed ips: 0.0.0.0/0
+    latest handshake: 1 minute ago
+    transfer: 1.2 KiB received, 1.4 KiB sent
+</span></pre>
+        </div>
+
+        <p>Verify your IP changed:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">curl ipinfo.io</span>
+<span class="comment"># Check your IP - should show your VPS location</span></pre>
+        </div>
+
+        <p>To disconnect:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo wg-quick down wg0</span></pre>
+        </div>
+
+        <h3>4.2 macOS</h3>
+        
+        <p>Install WireGuard from Homebrew:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">brew install wireguard-tools</span></pre>
+        </div>
+
+        <p>Or download the official app from the App Store or wireguard.com.</p>
+        
+        <p>Import your configuration:</p>
+        
+        <ul>
+            <li>Open the WireGuard app</li>
+            <li>Click the "+" button</li>
+            <li>Select "Import from file"</li>
+            <li>Choose your peer1.conf file</li>
+        </ul>
+
+        <p>Toggle the switch to connect.</p>
+
+        <h3>4.3 Windows</h3>
+        
+        <p>Download WireGuard from <a href="https://www.wireguard.com/install/" target="_blank">wireguard.com</a>.</p>
+        
+        <p>Install and open the application:</p>
+        
+        <ul>
+            <li>Click "Add Tunnel"</li>
+            <li>Select "Import from file"</li>
+            <li>Choose your peer1.conf file</li>
+            <li>Click "Activate" to connect</li>
+        </ul>
+
+        <h3>4.4 iOS (iPhone/iPad)</h3>
+        
+        <p>Install the WireGuard app from the App Store.</p>
+        
+        <p>To import your config:</p>
+        
+        <ul>
+            <li>Email the peer1.conf file to yourself</li>
+            <li>Open the email on your iOS device</li>
+            <li>Tap the attachment</li>
+            <li>Select "Copy to WireGuard"</li>
+        </ul>
+
+        <p>Or use the QR code:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">ls config/peer1/peer1.png</span>
+<span class="comment"># The QR code is stored here</span></pre>
+        </div>
+
+        <p>On your iOS device:</p>
+        
+        <ul>
+            <li>Open WireGuard app</li>
+            <li>Tap the "+" button</li>
+            <li>Select "Scan from QR code"</li>
+            <li>Scan the QR code from peer1.png</li>
+        </ul>
+
+        <h3>4.5 Android</h3>
+        
+        <p>Install WireGuard from Google Play Store or F-Droid.</p>
+        
+        <p>Import your configuration the same way as iOS - either by QR code or by importing the .conf file.</p>
+
+        <h3>4.6 Testing Your VPN</h3>
+        
+        <p>Once connected, verify your IP address changed:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">curl ipinfo.io</span>
+<span class="output">{
+  "ip": "your-vps-ip-address",
+  "city": "New York",
+  "region": "New York",
+  "country": "US",
+  "org": "AS-EXAMPLE-VPS-PROVIDER"
+}</span></pre>
+        </div>
+
+        <p>The IP should now show your VPS location instead of your actual location!</p>
+
+        <h3>4.7 Testing DNS Leak Protection</h3>
+        
+        <p>Let's verify your DNS requests are going through the VPN:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">curl https://dns.google/resolve?name=example.com</span>
+<span class="comment"># Test DNS resolution through VPN</span></pre>
+        </div>
+
+        <p>Or visit <a href="https://dnsleaktest.com" target="_blank">dnsleaktest.com</a> to check for DNS leaks.</p>
+    </section>
+
+    <section class="lesson-content">
+        <h2>// Part 5: Advanced Configuration</h2>
+        
+        <h3>5.1 Split Tunneling</h3>
+        
+        <p>By default, we're routing all traffic through the VPN (0.0.0.0/0). This is the most secure option, but you might want to only route specific traffic through the VPN.</p>
+        
+        <p>Edit your peer configuration to only route specific IPs:</p>
+
+        <pre>AllowedIPs = 10.13.13.0/24, 192.168.1.0/24</pre>
+        
+        <p>This would only route:</p>
+        <ul>
+            <li>Traffic to the VPN network (10.13.13.0/24)</li>
+            <li>Traffic to your home network (192.168.1.0/24)</li>
+        </ul>
+
+        <p>Regular internet traffic would go through your normal connection.</p>
+
+        <h3>5.2 Kill Switch</h3>
+        
+        <p>WireGuard can automatically disconnect if the VPN connection drops, preventing your real IP from being exposed:</p>
+
+        <pre># Add to your client config
+[Interface]
+...
+PostUp = iptables -I OUTPUT ! -o wg0 -j DROP
+PostDown = iptables -D OUTPUT ! -o wg0 -j DROP</pre>
+        
+        <p>This drops all traffic that doesn't go through WireGuard when the VPN is active.</p>
+
+        <h3>5.3 Adding More Peers</h3>
+        
+        <p>Need more than 5 client connections? Edit docker-compose.yml:</p>
+
+        <pre>      - PEERS=10</pre>
+        
+        <p>Then restart:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">docker-compose down && docker-compose up -d</span></pre>
+        </div>
+
+        <p>New peer configurations will be generated in peer6/, peer7/, etc.</p>
+
+        <h3>5.4 Using a Domain Name</h3>
+        
+        <p>If your VPS IP changes (dynamic IP), use a dynamic DNS service. Many providers offer free dynamic DNS:</p>
+        
+        <ul>
+            <li>No-IP (noip.com)</li>
+            <li>Cloudflare (if you have a domain)</li>
+            <li>DuckDNS (duckdns.org)</li>
+        </ul>
+
+        <p>Once you have a domain, update your peer's endpoint:</p>
+
+        <pre>Endpoint = your-domain.ddns.net:51820</pre>
+
+        <h3>5.5 Mobile Data</h3>
+        
+        <p>WireGuard works great over mobile data. The PersistentKeepalive setting (25 seconds) helps maintain the connection through NAT.</p>
+        
+        <p>For best results on mobile:</p>
+        
+        <ul>
+            <li>Keep PersistentKeepalive enabled</li>
+            <li>Use a domain name for the endpoint (handles IP changes)</li>
+            <li>Consider using split tunneling to save battery</li>
+        </ul>
+    </section>
+
+    <section class="lesson-content">
+        <h2>// Part 6: Maintenance</h2>
+        
+        <h3>6.1 Updating WireGuard</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">cd ~/wireguard && docker-compose down</span>
+<span class="prompt">your-username@vps:~$</span> <span class="command">docker-compose pull</span>
+<span class="prompt">your-username@vps:~$</span> <span class="command">docker-compose up -d</span></pre>
+        </div>
+
+        <h3>6.2 Viewing Connection Status</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">docker-compose exec wireguard wg</span>
+<span class="output">interface: wg0
+  public key: SERVER_PUBLIC_KEY
+  private key: (hidden)
+  listening port: 51820
+
+  peer: PEER1_PUBLIC_KEY
+    endpoint: 123.45.67.89:51820
+    allowed ips: 10.13.13.2/32
+    latest handshake: 15 seconds ago
+    transfer: 1.2 MiB received, 3.4 MiB sent
+
+  peer: PEER2_PUBLIC_KEY
+    endpoint: 98.76.54.32:51820
+    allowed ips: 10.13.13.3/32
+    latest handshake: 2 minutes ago
+    transfer: 500 KiB received, 1.1 MiB sent
+</span></pre>
+        </div>
+
+        <p>The "latest handshake" shows when each peer last successfully communicated. If it says "0 seconds ago" or very recent, the connection is active.</p>
+
+        <h3>6.3 Troubleshooting</h3>
+        
+        <p><strong>Can't connect?</strong></p>
+        <ul>
+            <li>Check that port 51820/UDP is open on your firewall</li>
+            <li>Verify the server is running: <code>docker-compose ps</code></li>
+            <li>Check server logs: <code>docker-compose logs -f wireguard</code></li>
+        </ul>
+
+        <p><strong>Connection drops?</strong></p>
+        <ul>
+            <li>Increase PersistentKeepalive to 30 or 60 seconds</li>
+            <li>Check your internet connection stability</li>
+        </ul>
+
+        <p><strong>Slow speeds?</strong></p>
+        <ul>
+            <li>Test your VPS bandwidth with speedtest-cli</li>
+            <li>Try a different VPS provider or location</li>
+            <li>Check if your VPS is CPU-constrained</li>
+        </ul>
+
+        <h3>6.4 Backup Your Keys</h3>
+        
+        <p>Back up your configuration regularly:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">tar -czf wireguard-backup-$(date +%Y%m%d).tar.gz config/</span></pre>
+        </div>
+
+        <p>Store this backup securely. If you lose your keys, you'll need to regenerate them.</p>
+    </section>
+
+    <section class="lesson-content">
+        <h2>// Summary</h2>
+        
+        <p>Congratulations! You've set up your own VPN server!</p>
+        
+        <ul>
+            <li><strong>WireGuard</strong> - Modern, fast, secure VPN protocol</li>
+            <li><strong>Docker</strong> - Easy deployment and management</li>
+            <li><strong>Self-hosted</strong> - Complete control over your privacy</li>
+            <li><strong>Multi-platform</strong> - Works on Linux, macOS, Windows, iOS, Android</li>
+        </ul>
+
+        <h3>What You Can Do Now</h3>
+        
+        <ul>
+            <li><strong>Secure public WiFi</strong> - Use your VPN at coffee shops and airports</li>
+            <li><strong>Access home network</strong> - Connect to devices at home from anywhere</li>
+            <li><strong>Bypass geo-restrictions</strong> - Access content from different regions</li>
+            <li><strong>Hide from ISP</strong> - Prevent your ISP from seeing your browsing</li>
+        </ul>
+
+        <div class="highlight-box">
+            <p><strong>Next Steps:</strong></p>
+            <ul>
+                <li>Set up a second VPN server in a different location</li>
+                <li>Configure peer-to-peer mode (WireGuard allows this)</li>
+                <li>Add mobile device management for family members</li>
+                <li>Set up dual-factor authentication for the server</li>
+            </ul>
+        </div>
+
+        <p>You now have complete control over your internet connection. No subscriptions, no logs, no tracking. Just secure, private internet access anywhere in the world.</p>
+        
+        <p><strong>The revolution will not be proprietary.</strong></p>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p>contact: busydrama @ proton.me</p>
+    </footer>
+
+    <script>
+        }
+    </script>
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    <script src="nav.js" defer></script>
+</body>
+</html>

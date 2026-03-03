@@ -1,0 +1,327 @@
+const ACHIEVEMENTS = {
+    first_lesson: {
+        id: 'first_lesson',
+        name: 'First Steps',
+        description: 'Complete your first guide',
+        icon: '🎯',
+        requirement: 1,
+        xp: 50
+    },
+    linux_novice: {
+        id: 'linux_novice',
+        name: 'Linux Novice',
+        description: 'Complete Linux Fundamentals',
+        icon: '🐧',
+        requirement: 1,
+        xp: 100
+    },
+    bash_beginner: {
+        id: 'bash_beginner',
+        name: 'Shell Scripting Rookie',
+        description: 'Complete Bash Scripting guide',
+        icon: '💻',
+        requirement: 1,
+        xp: 100
+    },
+    git_user: {
+        id: 'git_user',
+        name: 'Version Control User',
+        description: 'Complete Git guide',
+        icon: '🔀',
+        requirement: 1,
+        xp: 100
+    },
+    web_dev: {
+        id: 'web_dev',
+        name: 'Web Developer',
+        description: 'Complete HTML, CSS, and JavaScript',
+        icon: '🌐',
+        requirement: 3,
+        xp: 200
+    },
+    python_coder: {
+        id: 'python_coder',
+        name: 'Python Coder',
+        description: 'Complete Python guide',
+        icon: '🐍',
+        requirement: 1,
+        xp: 100
+    },
+    server_admin: {
+        id: 'server_admin',
+        name: 'Server Admin',
+        description: 'Complete 3 server guides',
+        icon: '🖥️',
+        requirement: 3,
+        xp: 250
+    },
+    docker_master: {
+        id: 'docker_master',
+        name: 'Container Master',
+        description: 'Complete Docker guide',
+        icon: '📦',
+        requirement: 1,
+        xp: 150
+    },
+    project_builder: {
+        id: 'project_builder',
+        name: 'Project Builder',
+        description: 'Complete your first project',
+        icon: '🔨',
+        requirement: 1,
+        xp: 200
+    },
+    homelabber: {
+        id: 'homelabber',
+        name: 'Homelabber',
+        description: 'Complete a homelab project',
+        icon: '🏠',
+        requirement: 1,
+        xp: 300
+    },
+    privacy_advocate: {
+        id: 'privacy_advocate',
+        name: 'Privacy Advocate',
+        description: 'Complete all security guides',
+        icon: '🛡️',
+        requirement: 3,
+        xp: 350
+    },
+    full_stack: {
+        id: 'full_stack',
+        name: 'Full Stack Rebel',
+        description: 'Complete 10 guides',
+        icon: '⭐',
+        requirement: 10,
+        xp: 500
+    },
+    k8s_ninja: {
+        id: 'k8s_ninja',
+        name: 'Kubernetes Ninja',
+        description: 'Complete Kubernetes guide',
+        icon: '☸️',
+        requirement: 1,
+        xp: 400
+    },
+    hard_way: {
+        id: 'hard_way',
+        name: 'Learned It The Hard Way',
+        description: 'Complete Arch Linux or build from scratch guides',
+        icon: '🔥',
+        requirement: 1,
+        xp: 300
+    },
+    vpn_warrior: {
+        id: 'vpn_warrior',
+        name: 'VPN Warrior',
+        description: 'Set up WireGuard VPN',
+        icon: '🔒',
+        requirement: 1,
+        xp: 200
+    }
+};
+
+const LEVELS = [
+    { level: 1, title: 'Newbie', xpRequired: 0 },
+    { level: 2, title: 'Apprentice', xpRequired: 100 },
+    { level: 3, title: 'Learner', xpRequired: 300 },
+    { level: 4, title: 'Contributor', xpRequired: 600 },
+    { level: 5, title: 'Practitioner', xpRequired: 1000 },
+    { level: 6, title: 'Specialist', xpRequired: 1500 },
+    { level: 7, title: 'Expert', xpRequired: 2200 },
+    { level: 8, title: 'Master', xpRequired: 3000 },
+    { level: 9, title: 'Guru', xpRequired: 4000 },
+    { level: 10, title: 'Legend', xpRequired: 5500 }
+];
+
+let userAchievements = {
+    completed: [],
+    xp: 0
+};
+
+function loadAchievements() {
+    const saved = localStorage.getItem('rebel_achievements');
+    if (saved) {
+        userAchievements = JSON.parse(saved);
+    }
+}
+
+function saveAchievements() {
+    localStorage.setItem('rebel_achievements', JSON.stringify(userAchievements));
+}
+
+function addXP(amount) {
+    userAchievements.xp += amount;
+    checkLevelUp();
+    saveAchievements();
+    updateAchievementUI();
+}
+
+function unlockAchievement(achievementId) {
+    if (!userAchievements.completed.includes(achievementId)) {
+        userAchievements.completed.push(achievementId);
+        const achievement = ACHIEVEMENTS[achievementId];
+        addXP(achievement.xp);
+        showAchievementPopup(achievement);
+        return true;
+    }
+    return false;
+}
+
+function getCurrentLevel() {
+    let currentLevel = LEVELS[0];
+    for (const level of LEVELS) {
+        if (userAchievements.xp >= level.xpRequired) {
+            currentLevel = level;
+        }
+    }
+    return currentLevel;
+}
+
+function getNextLevel() {
+    const currentLevel = getCurrentLevel();
+    const currentIndex = LEVELS.indexOf(currentLevel);
+    return currentIndex < LEVELS.length - 1 ? LEVELS[currentIndex + 1] : null;
+}
+
+function getProgressToNextLevel() {
+    const currentLevel = getCurrentLevel();
+    const nextLevel = getNextLevel();
+    if (!nextLevel) return 100;
+    
+    const xpInCurrentLevel = userAchievements.xp - currentLevel.xpRequired;
+    const xpNeeded = nextLevel.xpRequired - currentLevel.xpRequired;
+    return Math.floor((xpInCurrentLevel / xpNeeded) * 100);
+}
+
+function checkLevelUp() {
+    const newLevel = getCurrentLevel();
+    const savedLevel = localStorage.getItem('rebel_level');
+    if (savedLevel && parseInt(savedLevel) < newLevel.level) {
+        showLevelUpPopup(newLevel);
+    }
+    localStorage.setItem('rebel_level', newLevel.level);
+}
+
+function checkAchievements(completedCourses) {
+    const completed = new Set(completedCourses);
+    
+    if (completed.size >= 1) unlockAchievement('first_lesson');
+    if (completed.has('linux.html')) unlockAchievement('linux_novice');
+    if (completed.has('bash.html')) unlockAchievement('bash_beginner');
+    if (completed.has('git.html')) unlockAchievement('git_user');
+    if (completed.has('python.html')) unlockAchievement('python_coder');
+    if (completed.has('docker.html')) unlockAchievement('docker_master');
+    if (completed.has('kubernetes.html')) unlockAchievement('k8s_ninja');
+    
+    const webDevCount = ['hyper.html', 'css.html', 'javascript.html'].filter(c => completed.has(c)).length;
+    if (webDevCount >= 3) unlockAchievement('web_dev');
+    
+    const serverCount = ['nginx.html', 'apache2.html', 'vps.html'].filter(c => completed.has(c)).length;
+    if (serverCount >= 3) unlockAchievement('server_admin');
+    
+    const securityCount = ['hardening.html', 'networking.html', 'dns.html'].filter(c => completed.has(c)).length;
+    if (securityCount >= 3) unlockAchievement('privacy_advocate');
+    
+    if (completed.size >= 10) unlockAchievement('full_stack');
+    
+    const projects = ['project-homelab.html', 'project-wireguard.html', 'project-blog.html', 'project-paste.html', 'project-fileshare.html'];
+    const completedProjects = projects.filter(c => completed.has(c));
+    if (completedProjects.length >= 1) unlockAchievement('project_builder');
+    if (completed.has('project-homelab.html')) unlockAchievement('homelabber');
+    if (completed.has('project-wireguard.html')) unlockAchievement('vpn_warrior');
+}
+
+function showAchievementPopup(achievement) {
+    const popup = document.createElement('div');
+    popup.className = 'achievement-popup';
+    popup.innerHTML = `
+        <div class="achievement-icon">${achievement.icon}</div>
+        <div class="achievement-info">
+            <div class="achievement-title">Achievement Unlocked!</div>
+            <div class="achievement-name">${achievement.name}</div>
+            <div class="achievement-desc">${achievement.description}</div>
+            <div class="achievement-xp">+${achievement.xp} XP</div>
+        </div>
+    `;
+    document.body.appendChild(popup);
+    setTimeout(() => popup.classList.add('show'), 10);
+    setTimeout(() => {
+        popup.classList.remove('show');
+        setTimeout(() => popup.remove(), 300);
+    }, 4000);
+}
+
+function showLevelUpPopup(level) {
+    const popup = document.createElement('div');
+    popup.className = 'achievement-popup level-popup';
+    popup.innerHTML = `
+        <div class="achievement-icon level-icon">⬆️</div>
+        <div class="achievement-info">
+            <div class="achievement-title">Level Up!</div>
+            <div class="achievement-name">${level.title}</div>
+            <div class="achievement-desc">You are now level ${level.level}</div>
+        </div>
+    `;
+    document.body.appendChild(popup);
+    setTimeout(() => popup.classList.add('show'), 10);
+    setTimeout(() => {
+        popup.classList.remove('show');
+        setTimeout(() => popup.remove(), 4000);
+    }, 4000);
+}
+
+function updateAchievementUI() {
+    if (!currentUser) return;
+    
+    const level = getCurrentLevel();
+    const nextLevel = getNextLevel();
+    const progress = getProgressToNextLevel();
+    
+    const container = document.querySelector('.user-avatar-container');
+    if (!container) return;
+    
+    const existingPanel = container.querySelector('.achievement-panel');
+    if (existingPanel) {
+        existingPanel.innerHTML = generateAchievementPanelHTML(level, nextLevel, progress);
+        return;
+    }
+}
+
+function generateAchievementPanelHTML(level, nextLevel, progress) {
+    const unlockedCount = userAchievements.completed.length;
+    const totalCount = Object.keys(ACHIEVEMENTS).length;
+    
+    return `
+        <div class="level-info">
+            <div class="level-badge">${level.level}</div>
+            <div class="level-details">
+                <span class="level-title">${level.title}</span>
+                <span class="xp-text">${userAchievements.xp} XP</span>
+                ${nextLevel ? `<div class="progress-bar"><div class="progress-fill" style="width: ${progress}%"></div></div>` : '<span class="max-level">MAX LEVEL</span>'}
+            </div>
+        </div>
+        <div class="achievements-summary" onclick="toggleAchievementsList()">
+            <span>🏆 ${unlockedCount}/${totalCount} Achievements</span>
+        </div>
+        <div class="achievements-list" id="achievementsList">
+            ${Object.values(ACHIEVEMENTS).map(a => `
+                <div class="achievement-item ${userAchievements.completed.includes(a.id) ? 'unlocked' : 'locked'}">
+                    <span class="achievement-item-icon">${a.icon}</span>
+                    <div class="achievement-item-info">
+                        <span class="achievement-item-name">${a.name}</span>
+                        <span class="achievement-item-desc">${a.description}</span>
+                    </div>
+                    <span class="achievement-item-xp">+${a.xp}</span>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function toggleAchievementsList() {
+    const list = document.getElementById('achievementsList');
+    list.classList.toggle('expanded');
+}
+
+loadAchievements();

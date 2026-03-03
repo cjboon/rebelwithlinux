@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="onion-location" content="http://yppxyvqzw3lcpkjqpbm24ugbpqibke45bkrqzatsy3asoa377urir3yd.onion/project-i3.html">
+    <title>Set Up i3 Window Manager on Debian - Complete Tutorial | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn how to install Debian Linux CLI and set up i3 window manager. A minimalist desktop for power users who prefer the command line.">
+    <meta name="keywords" content="Debian, i3, window manager, xinit, xfce4-terminal, tiling window manager, Linux desktop, minimalist, command line">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Theme persistence - check and apply immediately in head
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #2ECC71;
+        }
+        
+        nav .nav-title a {
+            color: var(--white);
+            text-decoration: none;
+        }
+        
+        .lesson-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 32px;
+        }
+        
+        .lesson-content h2 {
+            font-size: 2rem;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--black);
+        }
+        
+        .lesson-content h3 {
+            font-size: 1.5rem;
+            margin: 32px 0 16px;
+        }
+        
+        .lesson-content p {
+            margin-bottom: 16px;
+        }
+        
+        .lesson-content ul, .lesson-content ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+        
+        .lesson-content li {
+            margin-bottom: 8px;
+        }
+        
+        footer {
+            padding: 48px 32px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+            width: 100%;
+        }
+        
+        .warning-box {
+            background: #FFF0F0;
+            border-left: 4px solid var(--dark-red);
+            padding: 16px;
+            margin: 16px 0;
+        }
+        
+        .tip-box {
+            background: #F0FFF0;
+            border-left: 4px solid var(--dark-green);
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .project-nav {
+            background: #eeeeee;
+            border-bottom: 2px solid #000000;
+            border-top: 2px solid #000000;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 100;
+            margin-top: 52px;
+        }
+
+        .project-nav a {
+            color: #000000;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .project-nav a::after {
+            content: " |";
+            margin-left: 8px;
+            opacity: 0.5;
+        }
+
+        .project-nav a:last-child::after {
+            content: "";
+        }
+
+        [data-theme="dark"] .project-nav {
+            background: #333333;
+        }
+
+        [data-theme="dark"] .project-nav a {
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding-top: 100px !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                justify-content: center;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .project-nav {
+                margin-top: 52px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="index.html">HOME</a>
+                    <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#guides">GUIDES</a>
+                    <a href="index.html#projects">PROJECTS</a>
+                    <a href="index.html#blog">BLOG</a>
+                    <a href="index.html#contact">CONTACT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="project-nav">
+        <a href="#overview">OVERVIEW</a>
+        <a href="#install">INSTALL</a>
+        <a href="#i3">I3 SETUP</a>
+        <a href="#cli-tasks">CLI TASKS</a>
+        <a href="#daily">DAILY USE</a>
+    </div>
+
+    <header class="hero">
+        <h1>I3 WINDOW MANAGER ON DEBIAN</h1>
+        <p class="tagline">// Master the keyboard. Reject bloat.</p>
+        
+        <div class="manifesto">
+            <p><strong>// WHAT WE'RE BUILDING</strong></p>
+            <p>In this tutorial, you'll install Debian Linux (CLI only) and set up i3, a tiling window manager. i3 is fast, lightweight, and completely keyboard-driven. You'll learn to do everything without a mouse - because reaching for a mouse slows you down.</p>
+            <p><strong>// WHY THIS MATTERS</strong></p>
+            <p>Most Linux distributions ship with bloated desktop environments that consume gigabytes of RAM and CPU. i3 is different - it uses a fraction of the resources and forces you to learn the keyboard. Once you master i3, you'll never want to go back. You'll be faster, more efficient, and your computer will run cooler and faster.</p>
+        </div>
+    </header>
+
+    <section class="lesson-content" id="overview">
+        <h2>// What You'll Learn</h2>
+        
+        <p>This project teaches you:</p>
+        
+        <ul>
+            <li><strong>Debian Linux</strong> - The universal operating system, CLI edition</li>
+            <li><strong>i3 Window Manager</strong> - A fast, tiling window manager</li>
+            <li><strong>xinit</strong> - Start X11 without a display manager</li>
+            <li><strong>xfce4-terminal</strong> - A capable terminal emulator</li>
+            <li><strong>CLI Tools</strong> - Text editors, file managers, and productivity without GUI</li>
+        </ul>
+
+        <h3>What is i3?</h3>
+        <p>i3 is a tiling window manager for X11. Unlike traditional desktop environments (GNOME, KDE, XFCE), i3 doesn't have panels, docks, or desktop icons. It simply manages windows - and it does it brilliantly.</p>
+        
+        <p>"Tiling" means i3 automatically arranges your windows to fill the screen. No dragging, resizing, or maximizing. When you open a new window, i3 decides where it goes based on which mode you're in.</p>
+
+        <h3>Why No Display Manager?</h3>
+        <p>A display manager (GDM, SDDM, LightDM) shows you a login screen and starts your desktop. But if you have only one user and boot to console, you don't need one. <code>startx</code> does the job - it starts X11 and launches i3 directly.</p>
+
+        <div class="highlight-box">
+            <p><strong>Prerequisites</strong></p>
+            <ul>
+                <li>Linux Fundamentals - Comfortable with the command line</li>
+                <li>Bash Scripting - Basic scripting helps</li>
+                <li>No prior desktop Linux experience needed!</li>
+            </ul>
+        </div>
+
+        <h3>System Requirements</h3>
+        <p>Debian with i3 is incredibly lightweight:</p>
+        
+        <ul>
+            <li><strong>RAM</strong> - 512MB minimum, 1GB recommended</li>
+            <li><strong>Storage</strong> - 5GB minimum, 10GB recommended</li>
+            <li><strong>CPU</strong> - Any 64-bit processor</li>
+        </ul>
+    </section>
+
+    <section class="lesson-content" id="install">
+        <h2>// Part 1: Install Debian CLI</h2>
+        
+        <p>We'll install Debian with no desktop environment - just the base system and SSH server.</p>
+
+        <h3>1.1 Download Debian</h3>
+        <p>Download the Debian netinst ISO (small installer that downloads packages):</p>
+        
+        <p>Visit <a href="https://www.debian.org/distrib/" target="_blank">debian.org/distrib</a> and download "Small CD" or "netinst" for your architecture (amd64 for most modern computers).</p>
+
+        <h3>1.2 Create a Bootable USB</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">lsblk</span>
+<span class="comment"># Find your USB drive (likely /dev/sdX)</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo dd if=debian-12.x.x-amd64-netinst.iso of=/dev/sdX bs=4M status=progress</span>
+<span class="comment"># Replace sdX with your USB device</span></pre>
+        </div>
+
+        <h3>1.3 Boot and Install</h3>
+        
+        <p>Boot from USB and follow these steps:</p>
+        
+        <ol>
+            <li><strong>Install</strong> - Choose "Install"</li>
+            <li><strong>Language</strong> - Choose English</li>
+            <li><strong>Location</strong> - Choose your country</li>
+            <li><strong>Keyboard</strong> - Choose your keyboard layout</li>
+            <li><strong>Hostname</strong> - Enter something short (e.g., "desktop")</li>
+            <li><strong>Domain</strong> - Leave blank or enter "localdomain"</li>
+            <li><strong>Root Password</strong> - Set a strong password (or skip for sudo)</li>
+            <li><strong>Full Name</strong> - Enter your name</li>
+            <li><strong>Username</strong> - Choose a username</li>
+            <li><strong>Password</strong> - Set a password</li>
+            <li><strong>Clock</strong> - Choose "UTC" or your timezone</li>
+        </ol>
+
+        <h3>1.4 Partitioning</h3>
+        
+        <p>For a simple desktop, use the guided partitioner:</p>
+        
+        <ol>
+            <li><strong>Partitioning Method</strong> - Choose "Guided - use entire disk"</li>
+            <li><strong>Select Disk</strong> - Choose your main disk</li>
+            <li><strong>Partition Scheme</strong> - Choose "All files in one partition"</li>
+            <li><strong>Finish</strong> - Choose "Finish partitioning and write changes to disk"</li>
+            <li><strong>Write</strong> - Choose "Yes" to write changes</li>
+        </ol>
+
+        <h3>1.5 Software Selection</h3>
+        
+        <p>This is crucial - don't select any desktop environment:</p>
+        
+        <ul>
+            <li>☐ Debian desktop environment</li>
+            <li>☐ ... GNOME</li>
+            <li>☐ ... XFCE</li>
+            <li>☐ ... GNOME Flashback</li>
+            <li>☐ ... KDE Plasma</li>
+            <li>☐ ... Cinnamon</li>
+            <li>☐ ... MATE</li>
+            <li>☐ ... LXDE</li>
+            <li>☐ ... LXQt</li>
+            <li>☑ ssh server</li>
+            <li>☐ standard system utilities</li>
+        </ul>
+
+        <p>Only check "ssh server" and "standard system utilities".</p>
+
+        <h3>1.6 Complete Installation</h3>
+        
+        <p>Wait for the installation to complete, then reboot. You'll see a login prompt - you've got a minimal Debian system!</p>
+
+        <h3>1.7 First Boot</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">debian login:</span> <span class="command">your-username</span>
+<span class="prompt">Password:</span> <span class="command">your-password</span>
+<span class="output">Linux debian 6.1.0-21-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.90-1 x86_64
+
+The programs included with the Debian GNU/Linux are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+
+Last login: Wed Feb 25 10:00:00 from 192.168.1.1
+user@debian:~$</span></pre>
+        </div>
+
+        <h3>1.8 Initial Setup</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt update</span>
+<span class="comment"># Update package lists</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt upgrade</span>
+<span class="comment"># Install updates</span></pre>
+        </div>
+
+        <h3>1.9 Add sudo (if you skipped root)</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">su -</span>
+<span class="prompt">Password:</span> <span class="command">root-password</span>
+<span class="prompt">root@debian:~#</span> <span class="command">apt install sudo</span>
+<span class="prompt">root@debian:~#</span> <span class="command">usermod -aG sudo username</span>
+<span class="prompt">root@debian:~#</span> <span class="command">exit</span></pre>
+        </div>
+
+        <div class="warning-box">
+            <p><strong>Important</strong></p>
+            <p>Log out and log back in for sudo group membership to take effect!</p>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="i3">
+        <h2>// Part 2: Install i3 and X11</h2>
+        
+        <p>Now let's install the graphical stack: X11, i3, and a terminal.</p>
+
+        <h3>2.1 Install X11</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install xorg</span>
+<span class="comment"># X11 windowing system</span></pre>
+        </div>
+
+        <h3>2.2 Install i3</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install i3</span>
+<span class="comment"># i3 window manager</span></pre>
+        </div>
+
+        <h3>2.3 Install xinit</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install xinit</span>
+<span class="comment"># Start X without display manager</span></pre>
+        </div>
+
+        <h3>2.4 Install Terminal</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install xfce4-terminal</span>
+<span class="comment"># A good terminal emulator</span></pre>
+        </div>
+
+        <div class="highlight-box">
+            <p><strong>Recommended Additional Packages</strong></p>
+            <p>Install these for a better experience:</p>
+            
+            <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install feh nitrogen rxvt-unicode rofi dmenu scrot compton lm-sensors</span>
+<span class="comment"># feh: wallpaper | nitrogen: wallpaper manager | rofi/dmenu: app launcher | scrot: screenshots | compton: transparency | lm-sensors: hardware monitoring</span></pre>
+            </div>
+        </div>
+
+        <h3>2.5 Install Basic Fonts</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install fonts-terminus fonts-firacode</span>
+<span class="comment"># Nice monospace fonts</span></pre>
+        </div>
+
+        <h3>2.6 Configure xinit</h3>
+        
+        <p>Create ~/.xinitrc to tell xinit what to start:</p>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">nano ~/.xinitrc</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre># ~/.xinitrc
+
+# Set background color (fallback if no wallpaper)
+xsetroot -solid "#1a1a1a"
+
+# Start i3
+exec i3</pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">chmod +x ~/.xinitrc</span></pre>
+        </div>
+
+        <h3>2.7 Start i3</h3>
+        
+        <p>Logout or switch to a virtual terminal (Ctrl+Alt+F2), then:</p>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">startx</span>
+<span class="comment"># Launch i3!</span></pre>
+        </div>
+
+        <div class="warning-box">
+            <p><strong>First Launch</strong></p>
+            <p>On first launch, i3 will ask if you want to generate a config file. Choose "Yes" and press Enter.</p>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="cli-tasks">
+        <h2>// Part 3: CLI Tasks Without GUI</h2>
+        
+        <p>Without a file manager or graphical text editor, you'll need to learn command-line alternatives. This section covers everything you need.</p>
+
+        <h3>3.1 Text Editing Without GUI</h3>
+        
+        <p>You have several options, from easiest to most powerful:</p>
+
+        <h4>Nano - Easiest for Beginners</h4>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">nano filename.txt</span>
+<span class="comment"># Simple text editor</span></pre>
+        </div>
+
+        <p>Controls:</p>
+        <ul>
+            <li><strong>Ctrl+O</strong> - Save (WriteOut)</li>
+            <li><strong>Ctrl+X</strong> - Exit</li>
+            <li><strong>Ctrl+W</strong> - Search</li>
+            <li><strong>Ctrl+K</strong> - Cut line</li>
+            <li><strong>Ctrl+U</strong> - Paste (Uncut)</li>
+        </ul>
+
+        <h4>Vim - Most Powerful</h4>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">vim filename.txt</span>
+<span class="comment"># Or vi</span></pre>
+        </div>
+
+        <p>Vim has two modes:</p>
+        <ul>
+            <li><strong>Normal mode</strong> - Press keys to run commands</li>
+            <li><strong>Insert mode</strong> - Type to insert text</li>
+        </ul>
+
+        <p>Basic Vim commands:</p>
+        <ul>
+            <li><strong>i</strong> - Enter insert mode</li>
+            <li><strong>Esc</strong> - Return to normal mode</li>
+            <li><strong>:w</strong> - Save (write)</li>
+            <li><strong>:q</strong> - Quit</li>
+            <li><strong>:q!</strong> - Quit without saving</li>
+            <li><strong>:wq</strong> - Save and quit</li>
+            <li><strong>/search</strong> - Search</li>
+            <li><strong>n</strong> - Next search result</li>
+            <li><strong>dd</strong> - Delete line</li>
+            <li><strong>p</strong> - Paste</li>
+            <li><strong>u</strong> - Undo</li>
+            <li><strong>Ctrl+r</strong> - Redo</li>
+        </ul>
+
+        <div class="tip-box">
+            <p><strong>Tip</strong></p>
+            <p>Run <code>vimtutor</code> to learn Vim in 30 minutes. It's the best way to learn!</p>
+        </div>
+
+        <h4>Emacs - Most Features</h4>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install emacs-nox</span>
+<span class="prompt">$</span> <span class="command">emacs -nw filename.txt</span>
+<span class="comment"># -nw = no window (terminal mode)</span></pre>
+        </div>
+
+        <h3>3.2 File Management Without GUI</h3>
+        
+        <p>Instead of a file manager, use the command line:</p>
+
+        <h4>List Files</h4>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">ls</span>
+<span class="comment"># List files</span>
+<span class="prompt">$</span> <span class="command">ls -la</span>
+<span class="comment"># List with details</span>
+<span class="prompt">$</span> <span class="command">ls -lh</span>
+<span class="comment"># Human-readable sizes</span>
+<span class="prompt">$</span> <span class="command">ls -la | head -20</span>
+<span class="comment"># First 20 files</span></pre>
+        </div>
+
+        <h4>Navigate Directories</h4>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cd /path/to/dir</span>
+<span class="comment"># Change directory</span>
+<span class="prompt">$</span> <span class="command">cd ~</span>
+<span class="comment"># Go home</span>
+<span class="prompt">$</span> <span class="command">cd -</span>
+<span class="comment"># Go to previous directory</span>
+<span class="prompt">$</span> <span class="command">pwd</span>
+<span class="comment"># Print working directory</span></pre>
+        </div>
+
+        <h4>View File Contents</h4>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat file.txt</span>
+<span class="comment"># Print entire file</span>
+<span class="prompt">$</span> <span class="command">less file.txt</span>
+<span class="comment"># View file with scrolling (q to quit)</span>
+<span class="prompt">$</span> <span class="command">head -20 file.txt</span>
+<span class="comment"># First 20 lines</span>
+<span class="prompt">$</span> <span class="command">tail -20 file.txt</span>
+<span class="comment"># Last 20 lines</span>
+<span class="prompt">$</span> <span class="command">tail -f /var/log/syslog</span>
+<span class="comment"># Follow log file</span></pre>
+        </div>
+
+        <h4>Create Files and Directories</h4>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">touch file.txt</span>
+<span class="comment"># Create empty file</span>
+<span class="prompt">$</span> <span class="command">mkdir newdir</span>
+<span class="comment"># Create directory</span>
+<span class="prompt">$</span> <span class="command">mkdir -p dir1/dir2/dir3</span>
+<span class="comment"># Create nested directories</span>
+<span class="prompt">$</span> <span class="command">echo "text" > file.txt</span>
+<span class="comment"># Write text to file (overwrites)</span>
+<span class="prompt">$</span> <span class="command">echo "text" >> file.txt</span>
+<span class="comment"># Append text to file</span></pre>
+        </div>
+
+        <h4>Copy, Move, Delete</h4>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cp source.txt dest.txt</span>
+<span class="comment"># Copy file</span>
+<span class="prompt">$</span> <span class="command">cp -r dir/ backup/</span>
+<span class="comment"># Copy directory recursively</span>
+<span class="prompt">$</span> <span class="command">mv oldname.txt newname.txt</span>
+<span class="comment"># Rename/move file</span>
+<span class="prompt">$</span> <span class="command">rm file.txt</span>
+<span class="comment"># Delete file</span>
+<span class="prompt">$</span> <span class="command">rm -r dir/</span>
+<span class="comment"># Delete directory</span>
+<span class="prompt">$</span> <span class="command">rm -rf dir/</span>
+<span class="comment"># Force delete (be careful!)</span></pre>
+        </div>
+
+        <div class="warning-box">
+            <p><strong>DANGER</strong></p>
+            <p><code>rm -rf /</code> will destroy your system! Never run commands you don't understand.</p>
+        </div>
+
+        <h4>Find Files</h4>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">find /home -name "*.txt"</span>
+<span class="comment"># Find all .txt files in home</span>
+<span class="prompt">$</span> <span class="command">find / -type d -name "Documents"</span>
+<span class="comment"># Find directories named Documents</span>
+<span class="prompt">$</span> <span class="command">locate filename</span>
+<span class="comment"># Quick search (needs updatedb first)</span></pre>
+        </div>
+
+        <h4>Permissions</h4>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">chmod +x script.sh</span>
+<span class="comment"># Make executable</span>
+<span class="prompt">$</span> <span class="command">chmod 755 file</span>
+<span class="comment"># rwxr-xr-x permissions</span>
+<span class="prompt">$</span> <span class="command">chown user:group file</span>
+<span class="comment"># Change owner</span></pre>
+        </div>
+
+        <h3>3.3 Package Management</h3>
+        
+        <p>Debian uses APT (Advanced Package Tool):</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt update</span>
+<span class="comment"># Update package lists</span>
+<span class="prompt">$</span> <span class="command">sudo apt upgrade</span>
+<span class="comment"># Upgrade all packages</span>
+<span class="prompt">$</span> <span class="command">sudo apt install packagename</span>
+<span class="comment"># Install package</span>
+<span class="prompt">$</span> <span class="command">sudo apt remove packagename</span>
+<span class="comment"># Remove package</span>
+<span class="prompt">$</span> <span class="command">apt search term</span>
+<span class="comment"># Search for packages</span>
+<span class="prompt">$</span> <span class="command">apt show packagename</span>
+<span class="comment"># Show package info</span>
+<span class="prompt">$</span> <span class="command">dpkg -l</span>
+<span class="comment"># List installed packages</span></pre>
+        </div>
+
+        <h3>3.4 Process Management</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">top</span>
+<span class="comment"># Interactive process viewer</span>
+<span class="prompt">$</span> <span class="command">htop</span>
+<span class="comment"># Better process viewer (install first)</span>
+<span class="prompt">$</span> <span class="command">ps aux</span>
+<span class="comment"># List all processes</span>
+<span class="prompt">$</span> <span class="command">pkill processname</span>
+<span class="comment"># Kill process by name</span>
+<span class="prompt">$</span> <span class="command">kill 1234</span>
+<span class="comment"># Kill process by PID</span>
+<span class="prompt">$</span> <span class="command">kill -9 1234</span>
+<span class="comment"># Force kill</span></pre>
+        </div>
+
+        <h3>3.5 System Information</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">uname -a</span>
+<span class="comment"># Kernel info</span>
+<span class="prompt">$</span> <span class="command">free -h</span>
+<span class="comment"># Memory usage</span>
+<span class="prompt">$</span> <span class="command">df -h</span>
+<span class="comment"># Disk usage</span>
+<span class="prompt">$</span> <span class="command">lsblk</span>
+<span class="comment"># Block devices</span>
+<span class="prompt">$</span> <span class="command">ip addr</span>
+<span class="comment"># Network addresses</span>
+<span class="prompt">$</span> <span class="command">uptime</span>
+<span class="comment"># How long running</span>
+<span class="prompt">$</span> <span class="command">cat /proc/cpuinfo</span>
+<span class="comment"># CPU info</span>
+<span class="prompt">$</span> <span class="command">sudo sensors</span>
+<span class="comment"># Temperature (if lm-sensors installed)</span></pre>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="daily">
+        <h2>// Part 4: Daily Use with i3</h2>
+        
+        <p>Now you have i3 running. Let's make it productive.</p>
+
+        <h3>4.1 i3 Basics</h3>
+        
+        <p>i3 uses a "mod" key (usually Mod4 = Windows key, or Mod1 = Alt):</p>
+
+        <h4>Window Management</h4>
+        <ul>
+            <li><strong>Mod+Enter</strong> - Open new terminal</li>
+            <li><strong>Mod+d</strong> - Open program launcher (dmenu)</li>
+            <li><strong>Mod+Shift+q</strong> - Close window</li>
+            <li><strong>Mod+j</strong> - Focus left</li>
+            <li><strong>Mod+k</strong> - Focus up</li>
+            <li><strong>Mod+l</strong> - Focus down</li>
+            <li><strong>Mod+;</strong> - Focus right</li>
+            <li><strong>Mod+Shift+j</strong> - Move window left</li>
+            <li><strong>Mod+Shift+k</strong> - Move window up</li>
+            <li><strong>Mod+Shift+l</strong> - Move window down</li>
+            <li><strong>Mod+Shift+;</strong> - Move window right</li>
+        </ul>
+
+        <h4>Layout Modes</h4>
+        <ul>
+            <li><strong>Mod+t</strong> - Toggle split (horizontal/vertical)</li>
+            <li><strong>Mod+f</strong> - Fullscreen</li>
+            <li><strong>Mod+s</strong> - Stacking layout</li>
+            <li><strong>Mod+e</strong> - Default (split) layout</li>
+            <li><strong>Mod+w</strong> - Tabbed layout</li>
+        </ul>
+
+        <h4>Workspace Management</h4>
+        <ul>
+            <li><strong>Mod+1-9,0</strong> - Switch to workspace</li>
+            <li><strong>Mod+Shift+1-9,0</strong> - Move window to workspace</li>
+            <li><strong>Mod+r</strong> - Resize mode (exit with Esc)</li>
+        </ul>
+
+        <h3>4.2 Launching Programs</h3>
+        
+        <p>Press <strong>Mod+d</strong> to open dmenu - a minimal application launcher. Start typing the name of the program you want to launch:</p>
+
+        <ul>
+            <li><strong>xfce4-terminal</strong> - Terminal</li>
+            <li><strong>firefox</strong> - Web browser</li>
+            <li><strong>geany</strong> - Graphical text editor</li>
+            <li><strong>thunar</strong> - File manager</li>
+            <li><strong>chromium</strong> - Web browser</li>
+        </ul>
+
+        <h3>4.3 Essential Keyboard Shortcuts</h3>
+        
+        <h4>Terminal (xfce4-terminal)</h4>
+        <ul>
+            <li><strong>Ctrl+Shift+t</strong> - New tab</li>
+            <li><strong>Ctrl+Shift+w</strong> - Close tab</li>
+            <li><strong>Ctrl+Page Up/Down</strong> - Switch tabs</li>
+            <li><strong>Ctrl++/-</strong> - Zoom in/out</li>
+            <li><strong>Ctrl+0</strong> - Reset zoom</li>
+            <li><strong>F11</strong> - Fullscreen</li>
+        </ul>
+
+        <h4>Copy/Paste in Terminal</h4>
+        <ul>
+            <li><strong>Ctrl+Shift+c</strong> - Copy</li>
+            <li><strong>Ctrl+Shift+v</strong> - Paste</li>
+            <li><strong>Ctrl+u</strong> - Cut to cursor</li>
+            <li><strong>Ctrl+k</strong> - Cut after cursor</li>
+            <li><strong>Ctrl+y</strong> - Paste what's in buffer</li>
+        </ul>
+
+        <h3>4.4 Customizing i3</h3>
+        
+        <p>Edit ~/.config/i3/config to customize i3:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">mkdir -p ~/.config/i3</span>
+<span class="prompt">$</span> <span class="command">cp /etc/i3/config ~/.config/i3/config</span>
+<span class="comment"># Copy default config</span></pre>
+        </div>
+
+        <h4>Change Mod Key</h4>
+        
+        <pre># Find this line and change it:
+set $mod Mod1
+
+# Or use Windows key:
+set $mod Mod4</pre>
+
+        <h4>Add Custom Keybindings</h4>
+        
+        <pre># Launch terminal with Mod+Enter
+bindsym $mod+Return exec xfce4-terminal
+
+# Launch browser with Mod+b
+bindsym $mod+b exec firefox
+
+# Screenshot with Print key
+bindsym Print exec scrot ~/screenshot-%Y%m%d-%H%M%S.png</pre>
+
+        <h4>Status Bar Configuration</h4>
+        
+        <p>Install i3status for a status bar:</p>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install i3status</span></pre>
+        </div>
+
+        <p>Configure in ~/.config/i3status/config or use i3blocks for more options.</p>
+
+        <h3>4.5 Multi-Monitor Setup</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">xrandr</span>
+<span class="comment"># List monitors and outputs</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">xrandr --output HDMI-1 --mode 1920x1080 --right-of DP-1</span>
+<span class="comment"># Set up dual monitors</span></pre>
+        </div>
+
+        <p>Add this to ~/.xinitrc to make it permanent.</p>
+
+        <h3>4.6 Managing Audio</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install alsa-utils</span>
+<span class="comment"># Basic audio tools</span>
+<span class="prompt">$</span> <span class="command">alsamixer</span>
+<span class="comment"># Interactive mixer (ncurses)</span></pre>
+        </div>
+
+        <h4>Volume Controls</h4>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">amixer sset Master 50%</span>
+<span class="comment"># Set volume to 50%</span>
+<span class="prompt">$</span> <span class="command">amixer sset Master toggle</span>
+<span class="comment"># Mute/unmute</span>
+<span class="prompt">$</span> <span class="command">amixer sset Master 5%+</span>
+<span class="comment"># Increase volume</span>
+<span class="prompt">$</span> <span class="command">amixer sset Master 5%-</span>
+<span class="comment"># Decrease volume</span></pre>
+        </div>
+
+        <h3>4.7 Screen Brightness</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">xbacklight -set 50</span>
+<span class="comment"># Set brightness to 50%</span>
+<span class="prompt">$</span> <span class="command">xbacklight -inc 10</span>
+<span class="comment"># Increase by 10%</span>
+<span class="prompt">$</span> <span class="command">xbacklight -dec 10</span>
+<span class="comment"># Decrease by 10%</span></pre>
+        </div>
+
+        <h3>4.8 Installing Software</h3>
+        
+        <p>Some recommended packages to install:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install firefox-esr chromium</span>
+<span class="comment"># Web browsers</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install vim-gtk3 curl wget git htop</span>
+<span class="comment"># CLI essentials</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install zathura zathura-pdf-poppler</span>
+<span class="comment"># PDF viewer</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install mpv</span>
+<span class="comment"># Video player</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install imagemagick</span>
+<span class="comment"># Image tools (convert, etc)</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install ranger</span>
+<span class="comment"># CLI file manager (optional)</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install network-manager-gnome</span>
+<span class="comment"># WiFi GUI (if needed)</span></pre>
+        </div>
+    </section>
+
+    <section class="lesson-content">
+        <h2>// Part 5: Troubleshooting</h2>
+        
+        <h3>5.1 Can't Connect to WiFi?</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">ip link</span>
+<span class="comment"># Check network interfaces</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install firmware-iwlwifi</span>
+<span class="comment"># Intel WiFi firmware</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo systemctl restart NetworkManager</span></pre>
+        </div>
+
+        <h3>5.2 No Sound?</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">pavucontrol</span>
+<span class="comment"># PulseAudio volume control (install first)</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo usermod -aG audio username</span>
+<span class="comment"># Add user to audio group</span></pre>
+        </div>
+
+        <h3>5.3 i3 Not Starting?</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">startx 2>&1 | tee ~/xlog</span>
+<span class="comment"># Start and save errors</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat ~/xlog</span>
+<span class="comment"># Check for errors</span></pre>
+        </div>
+
+        <h3>5.4 Return to Console</h3>
+        
+        <p>If i3 freezes or you need to get out:</p>
+        
+        <ul>
+            <li><strong>Ctrl+Alt+F1-F6</strong> - Switch to virtual terminal</li>
+            <li><strong>Ctrl+Alt+F7</strong> - Return to X11/i3</li>
+            <li><strong>Mod+Shift+e</strong> - Exit i3 (in normal mode)</li>
+        </ul>
+
+        <h3>5.5 Get Help</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">man command</span>
+<span class="comment"># Read manual</span>
+<span class="prompt">$</span> <span class="command">command --help</span>
+<span class="comment"># Quick help</span>
+<span class="prompt">$</span> <span class="command">info command</span>
+<span class="comment"># Detailed info</span></pre>
+        </div>
+    </section>
+
+    <section class="lesson-content">
+        <h2>// Summary</h2>
+        
+        <p>You've installed a minimal Debian system with i3 window manager!</p>
+        
+        <ul>
+            <li><strong>Debian CLI</strong> - Lightweight base system</li>
+            <li><strong>i3</strong> - Fast, keyboard-driven window manager</li>
+            <li><strong>xinit</strong> - Start X without bloat</li>
+            <li><strong>CLI tools</strong> - Everything you need without GUI</li>
+        </ul>
+
+        <h3>What You Can Do Now</h3>
+        
+        <ul>
+            <li><strong>Work faster</strong> - Keyboard-driven workflow</li>
+            <li><strong>Use minimal resources</strong> - Run on old hardware</li>
+            <li><strong>Customize everything</strong> - Your setup, your rules</li>
+            <li><strong>Learn Linux</strong> - Understand how your system works</li>
+        </ul>
+
+        <div class="highlight-box">
+            <p><strong>Next Steps:</strong></p>
+            <ul>
+                <li>Try other window managers (dwm, bspwm, awesome)</li>
+                <li>Set up dotfiles for easy configuration backup</li>
+                <li>Learn tmux for terminal multiplexing</li>
+                <li>Explore suckless.org software (st, dmenu, surf)</li>
+            </ul>
+        </div>
+
+        <p>You've taken back control of your computer. No bloat, no unnecessary features, no sluggish performance. Just you and your keyboard.</p>
+        
+        <p><strong>The revolution will not be proprietary.</strong></p>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p>contact: busydrama @ proton.me</p>
+    </footer>
+
+    <script>
+        }
+    </script>
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    <script src="nav.js" defer></script>
+</body>
+</html>

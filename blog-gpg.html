@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="onion-location" content="http://yppxyvqzw3lcpkjqpbm24ugbpqibke45bkrqzatsy3asoa377urir3yd.onion/blog-gpg.html">
+
+    <title>Mastering GPG: Encryption for the Command Line - REBEL WITH LINUX</title>
+    <meta name="description" content="Learn to use GPG encryption on Debian. Generate keys, encrypt files, sign messages, and take control of your own communication security.">
+    <meta name="keywords" content="GPG, OpenPGP, encryption, privacy, security, Debian, Linux, command line, PGP">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Mastering GPG: Encryption for the Command Line">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog-gpg.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog-gpg.html">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Theme persistence - check and apply immediately in head
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+
+    <style>
+        .blog-header {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 32px 60px;
+            text-align: center;
+        }
+        .blog-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .blog-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--gray);
+        }
+        .blog-nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 16px;
+            border-bottom: 2px solid var(--black);
+            background: var(--white);
+        }
+        .blog-nav a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--black);
+            text-decoration: none;
+        }
+        .blog-nav a:hover {
+            text-decoration: underline;
+        }
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+        .blog-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 16px;
+        }
+        .blog-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+        .blog-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        .blog-content p {
+            margin-bottom: 24px;
+        }
+        .blog-content h2 {
+            font-size: 1.5rem;
+            margin: 40px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--black);
+        }
+        .blog-content h3 {
+            font-size: 1.25rem;
+            margin: 32px 0 12px;
+        }
+        .blog-content ul, .blog-content ol {
+            margin-bottom: 24px;
+            padding-left: 24px;
+        }
+        .blog-content li {
+            margin-bottom: 8px;
+        }
+        .blog-content blockquote {
+            border-left: 4px solid var(--black);
+            padding-left: 20px;
+            margin: 24px 0;
+            font-style: italic;
+            color: var(--gray);
+        }
+        .blog-content code {
+            background: var(--beige);
+            padding: 2px 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95rem;
+        }
+        .blog-content pre {
+            background: var(--black);
+            color: var(--ivory);
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            border: 3px solid var(--black);
+        }
+        .blog-content pre code {
+            background: transparent;
+            padding: 0;
+            color: var(--ivory);
+        }
+        .tip-box {
+            background: #F0FFF0;
+            border-left: 4px solid var(--dark-green);
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .warning-box {
+            background: #FFF0F0;
+            border-left: 4px solid var(--dark-red);
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: var(--black);
+            text-decoration: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        footer {
+            padding: 48px 32px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="index.html">HOME</a>
+                    <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#guides">GUIDES</a>
+                    <a href="index.html#projects">PROJECTS</a>
+                    <a href="index.html#resources">RESOURCES</a>
+                    <a href="index.html#blog">BLOG</a>
+                    <a href="index.html#contact">CONTACT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="blog-header">
+        <h1>// THE REBEL BLOG</h1>
+        <p>Thoughts on free software, privacy, and taking back control</p>
+    </header>
+
+    <nav class="blog-nav">
+        <a href="index.html#blog">← Back to Blog</a>
+    </nav>
+
+    <main class="blog-container" id="main-content">
+        <article>
+            <div class="blog-meta">
+                <span>2026-03-01</span> • <span>12 min read</span> • <span>Security</span>
+            </div>
+            <h1 class="blog-title">Mastering GPG: Encryption for the Command Line</h1>
+
+            <div class="blog-content">
+                <p>Every encryption system relies on keys. In the world of asymmetric cryptography, you have two keys: a public key that you share with everyone, and a private key that you keep secret. This is the foundation of GPG (GNU Privacy Guard), and once you understand it, you have true digital sovereignty.</p>
+
+                <p>In this guide, we'll walk through installing GPG on Debian and mastering the essential commands for file encryption, message signing, and key management.</p>
+
+                <h2>What is GPG?</h2>
+
+                <p>GPG (GNU Privacy Guard) is a free and open source implementation of the OpenPGP standard. It's been around since 1997 and is the backbone of encrypted communication for journalists, activists, developers, and anyone who values privacy.</p>
+
+                <p>Unlike symmetric encryption where one key does everything, GPG uses public-key cryptography. You encrypt with someone's public key, and only they can decrypt with their private key. You sign with your private key, and anyone can verify with your public key.</p>
+
+                <div class="tip-box">
+                    <strong>Pro Tip:</strong> Your private key is only as secure as your passphrase and your storage. Never share it. Never lose it. If you lose your private key, anything encrypted to it is gone forever.
+                </div>
+
+                <h2>Installation</h2>
+
+                <p>On Debian, GPG is likely already installed. Let's verify:</p>
+
+<pre><code>which gpg
+gpg --version</code></pre>
+
+                <p>If not installed, get it:</p>
+
+<pre><code>sudo apt update
+sudo apt install gnupg</code></pre>
+
+                <h2>Generating Your First Key Pair</h2>
+
+                <p>Before you can encrypt or sign anything, you need keys. Let's generate your master key:</p>
+
+<pre><code>gpg --full-generate-key</code></pre>
+
+                <p>You'll be prompted through several questions:</p>
+
+                <ol>
+                    <li><strong>Key type</strong> — Choose <code>(1) RSA and RSA (default)</code></li>
+                    <li><strong>Key size</strong> — <code>4096</code> bits (yes, go big)</li>
+                    <li><strong>Key validity</strong> — <code>0</code> = never expires (or set your preference)</li>
+                    <li><strong>Your name</strong> — Real name for key identification</li>
+                    <li><strong>Email address</strong> — Use a dedicated email if possible</li>
+                    <li><strong>Passphrase</strong> — Use a strong, unique passphrase. Write it down and store it safely.</li>
+                </ol>
+
+                <div class="warning-box">
+                    <strong>Important:</strong> Your passphrase protects your private key on disk. Use a password manager to generate a long, random passphrase. This is not a password you'll memorize—it's too long for that.
+                </div>
+
+                <h2>Listing Your Keys</h2>
+
+                <p>View your keys:</p>
+
+<pre><code># List secret keys
+gpg -K
+gpg --list-secret-keys
+
+# List public keys
+gpg -k
+gpg --list-keys</code></pre>
+
+                <p>Each key has a fingerprint—a long string that uniquely identifies it. Note the 8-character key ID at the end (the last 8 digits of the fingerprint).</p>
+
+                <h2>Exporting Your Public Key</h2>
+
+                <p>To receive encrypted messages or files, others need your public key. Export it:</p>
+
+<pre><code># Export to file (armored/ASCII)
+gpg --armor --export YOUR_KEY_ID > mypubkey.asc
+
+# Or output to stdout
+gpg --armor --export your@email.com</code></pre>
+
+                <p>The <code>--armor</code> flag outputs ASCII-armored text instead of binary, making it safe to copy-paste or embed in emails.</p>
+
+                <h3>Publishing to a Keyserver</h3>
+
+                <p>Keyervers let others find your public key by email:</p>
+
+<pre><code>gpg --keyserver keyserver.ubuntu.com --send-keys YOUR_KEY_ID</code></pre>
+
+                <p>Popular keyservers include:</p>
+                <ul>
+                    <li><code>keyserver.ubuntu.com</code></li>
+                    <li><code>keys.openpgp.org</code></li>
+                    <li><code>pgp.mit.edu</code></li>
+                </ul>
+
+                <h2>Importing Someone's Public Key</h2>
+
+                <p>To encrypt files for someone else, you need their public key:</p>
+
+<pre><code># From file
+gpg --import theirkey.asc
+
+# From keyserver (by email)
+gpg --keyserver keyserver.ubuntu.com --search-keys person@email.com
+
+# From keyserver (by fingerprint)
+gpg --keyserver keyserver.ubuntu.com --recv-keys ABCD1234EFGH5678</code></pre>
+
+                <div class="tip-box">
+                    <strong>Verify fingerprints!</strong> Always verify you've imported the correct key by checking the fingerprint with the owner through another channel (in person, Signal, etc.).
+                </div>
+
+                <h2>Encrypting Files</h2>
+
+                <p>Now the good stuff—actual encryption:</p>
+
+                <h3>Encrypt for yourself (symmetric)</h3>
+
+<pre><code>gpg --symmetric --armor secret.txt</code></pre>
+
+                <p>This prompts for a passphrase and creates <code>secret.txt.asc</code>.</p>
+
+                <h3>Encrypt for someone else (asymmetric)</h3>
+
+<pre><code>gpg --encrypt --armor --recipient their@email.com secret.txt</code></pre>
+
+                <p>Creates <code>secret.txt.asc</code> that only they can decrypt.</p>
+
+                <h3>Encrypt for multiple recipients</h3>
+
+<pre><code>gpg --encrypt --armor --recipient alice@email.com --recipient bob@email.com secret.txt</code></pre>
+
+                <h3>Encrypt for yourself AND others</h3>
+
+<pre><code>gpg --encrypt --armor --recipient your@email.com --recipient their@email.com secret.txt</code></pre>
+
+                <h2>Decrypting Files</h2>
+
+                <p>Decryption is simple:</p>
+
+<pre><code># Decrypt to stdout
+gpg --decrypt secret.txt.asc
+
+# Decrypt to file (GPG auto-detects filename)
+gpg --decrypt secret.txt.asc --output secret.txt
+
+# Short form
+gpg -d secret.txt.asc</code></pre>
+
+                <p>GPG will prompt for your passphrase if the file was encrypted to your key.</p>
+
+                <h2>Signing Messages</h2>
+
+                <p>Signing proves a message came from you and wasn't tampered with:</p>
+
+                <h3>Clear-sign (for emails)</h3>
+
+<pre><code>gpg --clearsign message.txt</code></pre>
+
+                <p>Creates <code>message.txt.asc</code>—readable text with signature attached.</p>
+
+                <h3>Detached signature</h3>
+
+<pre><code>gpg --armor --detach-sign document.pdf</code></pre>
+
+                <p>Creates <code>document.pdf.sig</code>—a separate signature file. Useful for software releases.</p>
+
+                <h3>Inline signing</h3>
+
+<pre><code>gpg --sign message.txt</code></pre>
+
+                <p>Creates a binary <code>message.txt.gpg</code>—encrypted AND signed.</p>
+
+                <h2>Verifying Signatures</h2>
+
+<pre><code># Verify inline signature
+gpg --verify message.txt.asc
+
+# Verify detached signature
+gpg --verify document.pdf.sig document.pdf</code></pre>
+
+                <p>You'll see "Good signature" if valid, or warnings if the signature is bad or from an unknown key.</p>
+
+                <h2>Key Management Essentials</h2>
+
+                <h3>Edit your key</h3>
+
+<pre><code>gpg --edit-key YOUR_KEY_ID</code></pre>
+
+                <p>This opens an interactive menu where you can:</p>
+                <ul>
+                    <li><code>passwd</code> — Change your passphrase</li>
+                    <li><code>uid</code> — Add/edit user IDs</li>
+                    <li><code>expire</code> — Set expiration</li>
+                    <li><code>trust</code> — Set trust level for other keys</li>
+                    <li><code>quit</code> — Save and exit</li>
+                </ul>
+
+                <h3>Revoke your key</h3>
+
+                <p>If your key is compromised, generate a revocation certificate NOW—before you need it:</p>
+
+<pre><code>gpg --gen-revoke YOUR_KEY_ID > revoke.asc</code></pre>
+
+                <p>Store this safely. If you lose access to your key, upload this to keyervers to invalidate it.</p>
+
+                <h3>Backup your keys</h3>
+
+                <p>Export your secret keys to encrypted backups:</p>
+
+<pre><code># Export secret master key
+gpg --export-secret-keys YOUR_KEY_ID > master.key
+
+# Export secret subkeys
+gpg --export-secret-subkeys YOUR_KEY_ID > subkeys.key</code></pre>
+
+                <div class="warning-box">
+                    <strong>Store backups securely!</strong> These files are encrypted with your passphrase, but treat them like the keys themselves. Keep offline, in a safe place.
+                </div>
+
+                <h2>Web of Trust</h2>
+
+                <p>GPG isn't just encryption—it's identity verification. When you sign someone's key, you're vouching for their identity:</p>
+
+<pre><code>gpg --edit-key THEIR_KEY_ID
+# In interactive mode:
+sign
+save</code></pre>
+
+                <p>After signing, you can send their key back (or to a keyserver) so others trust your vouch:</p>
+
+<pre><code>gpg --send-keys THEIR_KEY_ID</code></pre>
+
+                <p>This is the decentralized trust model. You don't need a CA (Certificate Authority)—you build trust through connections.</p>
+
+                <h2>Tors and Common Errors</h2>
+
+                <h3>"No secret key"</h3>
+                <p>You're trying to decrypt something encrypted to a different key, or you haven't imported your secret key.</p>
+
+                <h3>"Untrusted key"</h3>
+                <p>GPG won't encrypt to an untrusted key by default. Use <code>--trust-model always</code> to override, or sign the key first.</p>
+
+                <h3>"Key expired"</h3>
+                <p>Extend expiration or generate a new key. This is why short expiration (1-2 years) is recommended.</p>
+
+                <h2>Automation Scripts</h2>
+
+                <p>Here are quick aliases for your <code>~/.bashrc</code>:</p>
+
+<pre><code># Encrypt file to self
+alias gpg-encrypt='gpg --symmetric --armor'
+
+# Encrypt file to recipient
+alias gpg-encrypt-to='gpg --encrypt --armor --recipient'
+
+# Decrypt file
+alias gpg-decrypt='gpg --decrypt --output'
+
+# Sign file
+alias gpg-sign='gpg --armor --detach-sign'</code></pre>
+
+                <h2>The Bigger Picture</h2>
+
+                <p>GPG is powerful, but it's just one tool in the privacy toolkit. For complete communication security, consider:</p>
+
+                <ul>
+                    <li><strong>Email encryption:</strong> Mailvelope, Gpg4win, or full email client integration</li>
+                    <li><strong>File encryption:</strong> Use GPG for sensitive files before cloud storage</li>
+                    <li><strong>Code signing:</strong> Sign your commits with GPG for verified authorship</li>
+                    <li><strong>Passwords:</strong> Combine GPG with a password manager</li>
+                </ul>
+
+                <p>The goal isn't perfect security—no such thing exists. The goal is making yourself a harder target. Most surveillance is automated. If your messages are encrypted with GPG, they bounce off automated collection systems. A human has to specifically target you to read them.</p>
+
+                <p>That's the difference between mass surveillance and targeted surveillance. That's the difference between being data and being a person.</p>
+
+                <blockquote>"Encryption works. Properly implemented strong crypto systems are one of the few things that you can rely on." — Edward Snowden</blockquote>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p>contact: busydrama @ proton.me</p>
+    </footer>
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    
+    <script src="nav.js" defer></script>
+</body>
+</html>

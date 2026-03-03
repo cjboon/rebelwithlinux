@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="onion-location" content="http://yppxyvqzw3lcpkjqpbm24ugbpqibke45bkrqzatsy3asoa377urir3yd.onion/project-fileshare.html">
+    <title>Build a Private File Share - Encrypted File Transfer Tutorial | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn how to build your own encrypted file sharing tool. Client-side encryption, auto-delete after download, self-hosted. Complete tutorial for Debian Linux users.">
+    <meta name="keywords" content="file sharing, encrypted file transfer, PrivateBin alternative, Firefox Send, WeTransfer, client-side encryption, privacy, self-hosted">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Theme persistence - check and apply immediately in head
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #2ECC71;
+        }
+        
+        nav .nav-title a {
+            color: var(--white);
+            text-decoration: none;
+        }
+        
+        .lesson-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 32px;
+        }
+        
+        .lesson-content h2 {
+            font-size: 2rem;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--black);
+        }
+        
+        .lesson-content h3 {
+            font-size: 1.5rem;
+            margin: 32px 0 16px;
+        }
+        
+        .lesson-content p {
+            margin-bottom: 16px;
+        }
+        
+        .lesson-content ul, .lesson-content ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+        
+        .lesson-content li {
+            margin-bottom: 8px;
+        }
+        
+        footer {
+            padding: 48px 32px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+            width: 100%;
+        }
+
+        .project-nav {
+            background: #eeeeee;
+            border-bottom: 2px solid #000000;
+            border-top: 2px solid #000000;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 100;
+            margin-top: 52px;
+        }
+
+        .project-nav a {
+            color: #000000;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .project-nav a::after {
+            content: " |";
+            margin-left: 8px;
+            opacity: 0.5;
+        }
+
+        .project-nav a:last-child::after {
+            content: "";
+        }
+
+        [data-theme="dark"] .project-nav {
+            background: #333333;
+        }
+
+        [data-theme="dark"] .project-nav a {
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding-top: 100px !important;
+            }
+
+            nav {
+                justify-content: center;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .project-nav {
+                margin-top: 52px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="index.html">HOME</a>
+                    <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#guides">GUIDES</a>
+                    <a href="index.html#projects">PROJECTS</a>
+                    <a href="index.html#blog">BLOG</a>
+                    <a href="index.html#contact">CONTACT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="project-nav">
+        <a href="#overview">OVERVIEW</a>
+        <a href="#setup">SETUP</a>
+        <a href="#code">CODE</a>
+        <a href="#deploy">DEPLOY</a>
+    </div>
+
+    <header class="hero">
+        <h1>BUILD A PRIVATE FILE SHARE</h1>
+        <p class="tagline">// Send files that vanish after download</p>
+        
+        <div class="manifesto">
+            <p><strong>// WHAT WE'RE BUILDING</strong></p>
+            <p>In this tutorial, you'll create your own encrypted file sharing tool - similar to Firefox Send or WeTransfer, but self-hosted and privacy-focused. Files are encrypted in your browser, uploaded to your server, and automatically deleted after download (or after a time limit). The server never sees your files unencrypted.</p>
+            <p><strong>// WHY THIS MATTERS</strong></p>
+            <p>When you use services like WeTransfer or Dropbox, your files pass through their servers. They can see what you're sharing, and they keep copies. With client-side encryption, only the recipient can decrypt what you send. And with auto-delete, there's no trace left behind. Perfect for sharing sensitive documents, passwords, or anything you don't want lingering on a server.</p>
+        </div>
+    </header>
+
+    <section class="lesson-content" id="overview">
+        <h2>// What You'll Learn</h2>
+        
+        <p>This project builds on what you learned in the pastebin tutorial and adds file handling:</p>
+        
+        <ul>
+            <li><strong>PHP</strong> - Handle file uploads and downloads</li>
+            <li><strong>MariaDB</strong> - Store file metadata (not the files themselves)</li>
+            <li><strong>JavaScript</strong> - Client-side file encryption using Web Crypto API</li>
+            <li><strong>File System</strong> - Store encrypted files on disk</li>
+            <li><strong>Docker</strong> - Containerize your file sharing app</li>
+            <li><strong>VPS</strong> - Host your private file share</li>
+        </ul>
+
+        <h3>How It All Works</h3>
+        
+        <ol>
+            <li><strong>You select a file</strong> - Choose a file from your computer</li>
+            <li><strong>Browser encrypts it</strong> - JavaScript encrypts the file with AES-256-GCM before upload</li>
+            <li><strong>Upload to server</strong> - Encrypted file is sent to your VPS</li>
+            <li><strong>Server stores file + metadata</strong> - Saves encrypted file and creates a unique download ID</li>
+            <li><strong>Share link with key</strong> - Recipient gets a link containing the decryption key</li>
+            <li><strong>One download then delete</strong> - File is served once, then permanently deleted</li>
+        </ol>
+
+        <p>The magic is that the encryption key is in the URL fragment (after #), so it's never sent to the server. The server stores only encrypted blobs.</p>
+
+        <div class="highlight-box">
+            <p><strong>Prerequisites</strong></p>
+            <p>Complete these guides first:</p>
+            <ul>
+                <li>Encrypted Pastebin tutorial (you just built this!)</li>
+                <li>Linux Fundamentals</li>
+                <li>Git Version Control</li>
+                <li>Docker Containers</li>
+                <li>PHP Programming</li>
+                <li>VPS Hosting</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="local">
+        <h2>// Part 1: Set Up Local Development</h2>
+
+        <h3>1.1 Create Project Directory</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">mkdir -p ~/projects/private-fileshare</span>
+<span class="prompt">$</span> <span class="command">cd ~/projects/private-fileshare</span>
+<span class="prompt">$</span> <span class="command">mkdir -p nginx php/uploads php/api</span>
+<span class="comment"># uploads folder will store encrypted files</span></pre>
+        </div>
+
+        <h3>1.2 Initialize Git</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">git init</span>
+<span class="prompt">$</span> <span class="command">git config user.name "Your Name"</span>
+<span class="prompt">$</span> <span class="command">git config user.email "you@example.com"</span></pre>
+        </div>
+
+        <h3>1.3 Create .gitignore</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat > .gitignore << 'EOF'
+# Uploaded files (these can be large and are regenerated)
+php/uploads/*
+
+# Environment
+.env
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+EOF</span></pre>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="code">
+        <h2>// Part 2: Create the File Share Code</h2>
+
+        <h3>2.1 Database Schema</h3>
+        <p>We need to track file metadata: original name, unique ID, encryption info, download count.</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat > php/schema.sql << 'EOF'
+CREATE TABLE IF NOT EXISTS files (
+    id VARCHAR(16) PRIMARY KEY,
+    original_name VARCHAR(255) NOT NULL,
+    iv VARCHAR(32) NOT NULL,
+    downloads_remaining INT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NULL,
+    INDEX idx_expires (expires_at),
+    INDEX idx_downloads (downloads_remaining)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+EOF</span></pre>
+        </div>
+
+        <h3>2.2 Database Connection</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat > php/db.php << 'EOF'
+<?php
+class Database {
+    private $host;
+    private $db;
+    private $user;
+    private $pass;
+    private $pdo;
+
+    public function __construct() {
+        $this->host = getenv('DB_HOST') ?: 'mariadb';
+        $this->db = getenv('DB_NAME') ?: 'fileshare';
+        $this->user = getenv('DB_USER') ?: 'fileuser';
+        $this->pass = getenv('DB_PASS') ?: 'filepass';
+    }
+
+    public function getConnection() {
+        if ($this->pdo === null) {
+            try {
+                $dsn = "mysql:host={$this->host};dbname={$this->db};charset=utf8mb4";
+                $this->pdo = new PDO($dsn, $this->user, $this->pass, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                ]);
+            } catch (PDOException $e) {
+                http_response_code(500);
+                die("Database error");
+            }
+        }
+        return $this->pdo;
+    }
+
+    public function query($sql, $params = []) {
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
+    }
+
+    public function fetchOne($sql, $params = []) {
+        return $this->query($sql, $params)->fetch();
+    }
+}
+
+$db = new Database();
+EOF</span></pre>
+        </div>
+
+        <h3>2.3 Upload API (upload.php)</h3>
+        <p>Handles encrypted file uploads. Receives encrypted data and stores it.</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat > php/api/upload.php << 'EOF'
+<?php
+require_once '../db.php';
+
+header('Content-Type: application/json');
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['error' => 'Method not allowed']);
+    exit;
+}
+
+$data = json_decode(file_get_contents('php://input'), true);
+
+if (!isset($data['encrypted_data']) || !isset($data['iv']) || !isset($data['filename'])) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Missing data']);
+    exit;
+}
+
+// Generate unique ID
+$id = substr(str_replace(['+', '/', '='], '', base64_encode(random_bytes(12))), 0, 12);
+
+// Save encrypted file to disk
+$uploadDir = __DIR__ . '/../uploads/';
+$filename = $id . '.enc';
+file_put_contents($uploadDir . $filename, base64_decode($data['encrypted_data']));
+
+// Calculate expiration (default: 24 hours)
+$expires_at = date('Y-m-d H:i:s', strtotime('+24 hours'));
+
+// Insert metadata to database
+$db->query(
+    "INSERT INTO files (id, original_name, iv, downloads_remaining, expires_at) VALUES (?, ?, ?, 1, ?)",
+    [$id, $data['filename'], $data['iv'], $expires_at]
+);
+
+// Clean up expired files
+$db->query("DELETE FROM files WHERE expires_at < NOW()");
+
+echo json_encode(['id' => $id]);
+EOF</span></pre>
+        </div>
+
+        <h3>2.4 Download API (download.php)</h3>
+        <p>Serves encrypted file once, then deletes it.</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat > php/api/download.php << 'EOF'
+<?php
+require_once '../db.php';
+
+$id = $_GET['id'] ?? '';
+
+if (empty($id) || strlen($id) > 16) {
+    http_response_code(400);
+    echo 'Invalid ID';
+    exit;
+}
+
+$file = $db->fetchOne(
+    "SELECT * FROM files WHERE id = ?",
+    [$id]
+);
+
+if (!$file) {
+    http_response_code(404);
+    echo 'File not found';
+    exit;
+}
+
+// Check if expired
+if ($file['expires_at'] && strtotime($file['expires_at']) < time()) {
+    @unlink(__DIR__ . '/../uploads/' . $id . '.enc');
+    $db->query("DELETE FROM files WHERE id = ?", [$id]);
+    http_response_code(404);
+    echo 'File expired';
+    exit;
+}
+
+// Check downloads remaining
+if ($file['downloads_remaining'] <= 0) {
+    http_response_code(410);
+    echo 'Download limit reached';
+    exit;
+}
+
+// Read and output encrypted file
+$filepath = __DIR__ . '/../uploads/' . $id . '.enc';
+if (!file_exists($filepath)) {
+    http_response_code(404);
+    echo 'File not found on disk';
+    exit;
+}
+
+$encryptedData = file_get_contents($filepath);
+
+// Set headers
+header('Content-Type: application/octet-stream');
+header('Content-Disposition: attachment; filename="' . $file['original_name'] . '.enc"');
+header('Content-Length: ' . strlen($encryptedData));
+echo $encryptedData;
+
+// Delete after one download
+@unlink($filepath);
+$db->query("DELETE FROM files WHERE id = ?", [$id]);
+EOF</span></pre>
+        </div>
+
+        <h3>2.5 Get File Info API (info.php)</h3>
+        <p>Returns file metadata (not the file itself) for the decryption process.</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat > php/api/info.php << 'EOF'
+<?php
+require_once '../db.php';
+
+header('Content-Type: application/json');
+
+$id = $_GET['id'] ?? '';
+
+if (empty($id)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Invalid ID']);
+    exit;
+}
+
+$file = $db->fetchOne(
+    "SELECT original_name, iv FROM files WHERE id = ?",
+    [$id]
+);
+
+if (!$file) {
+    http_response_code(404);
+    echo json_encode(['error' => 'File not found']);
+    exit;
+}
+
+echo json_encode([
+    'filename' => $file['original_name'],
+    'iv' => $file['iv']
+]);
+EOF</span></pre>
+        </div>
+
+        <h3>2.6 Frontend (index.php)</h3>
+        <p>Upload and download interface with client-side encryption.</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat > php/index.php << 'EOF'
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Private File Share&lt;/title&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;h1&gt;📁 Private File Share&lt;/h1&gt;
+        &lt;p&gt;Files are encrypted in your browser. Auto-delete after download.&lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;main&gt;
+        &lt;div id="upload-section"&gt;
+            &lt;h2&gt;Upload a File&lt;/h2&gt;
+            &lt;input type="file" id="file-input"&gt;
+            &lt;button id="upload-btn" class="btn"&gt;Encrypt &amp; Upload&lt;/button&gt;
+            &lt;p id="upload-status"&gt;&lt;/p&gt;
+        &lt;/div&gt;
+
+        &lt;div id="result-section" style="display:none;"&gt;
+            &lt;h2&gt;File Ready!&lt;/h2&gt;
+            &lt;p&gt;Share this link (the key is in the URL after #):&lt;/p&gt;
+            &lt;input type="text" id="share-link" readonly&gt;
+            &lt;button id="copy-btn" class="btn"&gt;Copy Link&lt;/button&gt;
+            &lt;p class="warning"&gt;⚠️ This file will be deleted after one download!&lt;/p&gt;
+        &lt;/div&gt;
+
+        &lt;div id="download-section" style="display:none;"&gt;
+            &lt;h2&gt;Download File&lt;/h2&gt;
+            &lt;p id="filename-display"&gt;&lt;/p&gt;
+            &lt;button id="download-btn" class="btn"&gt;Decrypt &amp; Download&lt;/button&gt;
+            &lt;p id="download-status"&gt;&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/main&gt;
+
+    &lt;script&gt;
+        // Generate encryption key
+        async function generateKey() {
+            return await crypto.subtle.generateKey(
+                { name: 'AES-GCM', length: 256 },
+                true,
+                ['encrypt', 'decrypt']
+            );
+        }
+
+        // Export key to base64
+        async function exportKey(key) {
+            const exported = await crypto.subtle.exportKey('raw', key);
+            return btoa(String.fromCharCode(...new Uint8Array(exported)));
+        }
+
+        // Import key from base64
+        async function importKey(base64Key) {
+            const keyData = Uint8Array.from(atob(base64Key), c => c.charCodeAt(0));
+            return await crypto.subtle.importKey(
+                'raw', keyData, 'AES-GCM', true, ['decrypt']
+            );
+        }
+
+        // Encrypt file
+        async function encryptFile(file, key) {
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            
+            const encrypted = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv: iv },
+                key,
+                await file.arrayBuffer()
+            );
+
+            return {
+                encrypted_data: btoa(String.fromCharCode(...new Uint8Array(encrypted))),
+                iv: btoa(String.fromCharCode(...iv))
+            };
+        }
+
+        // Decrypt file
+        async function decryptFile(encryptedData, iv, key) {
+            return await crypto.subtle.decrypt(
+                { name: 'AES-GCM', iv: Uint8Array.from(atob(iv), c => c.charCodeAt(0)) },
+                key,
+                Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0))
+            );
+        }
+
+        // Upload handler
+        document.getElementById('upload-btn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            if (!filePlease select a file) return alert('');
+
+            document.getElementById('upload-status').textContent = 'Encrypting...';
+
+            const key = await generateKey();
+            const { encrypted_data, iv } = await encryptFile(file, key);
+            const keyBase64 = await exportKey(key);
+
+            document.getElementById('upload-status').textContent = 'Uploading...';
+
+            const response = await fetch('api/upload.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    encrypted_data: encrypted_data, 
+                    iv: iv,
+                    filename: file.name
+                })
+            });
+
+            const result = await response.json();
+            
+            const shareUrl = window.location.origin + window.location.pathname + '#' + result.id + '|' + keyBase64;
+            document.getElementById('share-link').value = shareUrl;
+            
+            document.getElementById('upload-section').style.display = 'none';
+            document.getElementById('result-section').style.display = 'block';
+        });
+
+        // Copy button
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const input = document.getElementById('share-link');
+            input.select();
+            document.execCommand('copy');
+            alert('Link copied!');
+        });
+
+        // Check for download in URL
+        const hash = window.location.hash.slice(1);
+        if (hash) {
+            const [id, keyBase64] = hash.split('|');
+            
+            document.getElementById('upload-section').style.display = 'none';
+            document.getElementById('download-section').style.display = 'block';
+
+            // Get file info
+            fetch('api/info.php?id=' + encodeURIComponent(id))
+                .then(r => r.json())
+                .then(info => {
+                    document.getElementById('filename-display').textContent = 
+                        'File: ' + info.filename;
+                });
+
+            // Download button
+            document.getElementById('download-btn').addEventListener('click', async () => {
+                document.getElementById('download-status').textContent = 'Downloading & decrypting...';
+
+                // Download encrypted file
+                const response = await fetch('api/download.php?id=' + encodeURIComponent(id));
+                if (!response.ok) {
+                    document.getElementById('download-status').textContent = 'Error: ' + response.statusText;
+                    return;
+                }
+
+                const encryptedBlob = await response.blob();
+                const encryptedArray = await encryptedBlob.arrayBuffer();
+                const encryptedBase64 = btoa(String.fromCharCode(...new Uint8Array(encryptedArray)));
+
+                // Get IV from info endpoint
+                const info = await fetch('api/info.php?id=' + encodeURIComponent(id)).then(r => r.json());
+
+                // Decrypt
+                const key = await importKey(keyBase64);
+                const decrypted = await decryptFile(encryptedBase64, info.iv, key);
+
+                // Create download
+                const blob = new Blob([decrypted]);
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = info.filename;
+                a.click();
+                URL.revokeObjectURL(url);
+
+                document.getElementById('download-status').textContent = 'Download complete! File has been deleted.';
+            });
+        }
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+EOF</span></pre>
+        </div>
+
+        <h3>2.7 CSS Styling</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat > php/style.css << 'EOF'
+:root {
+    --ivory: #FFFFF0;
+    --white: #FFFFFF;
+    --black: #0A0A0A;
+    --charcoal: #2A2A2A;
+    --dark-red: #8B0000;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--ivory);
+    color: var(--black);
+    line-height: 1.6;
+    margin: 0;
+}
+
+header {
+    background: var(--black);
+    color: var(--white);
+    padding: 2rem;
+    text-align: center;
+}
+
+header h1 { margin: 0; }
+
+main {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+input[type="file"] {
+    display: block;
+    margin: 1rem 0;
+    padding: 1rem;
+    border: 2px dashed var(--black);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn {
+    background: var(--black);
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--black);
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: var(--white);
+    color: var(--black);
+}
+
+#share-link {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px solid var(--black);
+    font-family: monospace;
+    margin: 1rem 0;
+}
+
+.warning {
+    color: var(--dark-red);
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+footer {
+    background: var(--black);
+    color: var(--white);
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+EOF</span></pre>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="docker">
+        <h2>// Part 3: Dockerize Your File Share</h2>
+
+        <h3>3.1 Create docker-compose.yml</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat > docker-compose.yml << 'EOF'
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: fileshare-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./php:/var/www/html
+    depends_on:
+      - php-fpm
+    restart: unless-stopped
+
+  php-fpm:
+    image: php:8.2-fpm-alpine
+    container_name: fileshare-php
+    volumes:
+      - ./php:/var/www/html
+    depends_on:
+      - mariadb
+    environment:
+      - DB_HOST=mariadb
+      - DB_NAME=fileshare
+      - DB_USER=fileuser
+      - DB_PASS=filepass
+    restart: unless-stopped
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: fileshare-mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=fileshare
+      - MYSQL_USER=fileuser
+      - MYSQL_PASSWORD=filepass
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  mariadb-data:
+EOF</span></pre>
+        </div>
+
+        <h3>3.2 nginx Configuration</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cat > nginx/default.conf << 'EOF'
+server {
+    listen 80;
+    server_name localhost;
+    root /var/www/html;
+    index index.php index.html;
+
+    client_max_body_size 100M;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass php-fpm:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\. {
+        deny all;
+    }
+}
+EOF</span></pre>
+        </div>
+
+        <div class="highlight-box">
+            <p><strong>Important: client_max_body_size</strong></p>
+            <p>This nginx setting allows large file uploads. Set to 100M (100 megabytes). If you need larger files, increase this value.</p>
+        </div>
+
+        <h3>3.3 Run Locally</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">docker-compose up -d</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">docker-compose exec mariadb mysql -ufileuser -pfilepass fileshare < php/schema.sql</span></pre>
+        </div>
+
+        <p>Visit <strong>http://localhost</strong>. Upload a file, get the link, and try downloading it. The file will vanish after one download!</p>
+
+        <h3>3.4 Stop</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">docker-compose down</span></pre>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="vps">
+        <h2>// Part 4: Deploy to Your VPS</h2>
+
+        <h3>4.1 Connect</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">ssh your-username@your-vps-ip</span></pre>
+        </div>
+
+        <h3>4.2 Install Docker</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">sudo apt update && sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin</span></pre>
+        </div>
+
+        <h3>4.3 Add User to Docker</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">sudo usermod -aG docker $USER && newgrp docker</span></pre>
+        </div>
+
+        <h3>4.4 Firewall</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">sudo ufw allow 22/tcp && sudo ufw allow 80/tcp && sudo ufw allow 443/tcp && sudo ufw enable</span></pre>
+        </div>
+
+        <h3>4.5 Transfer Code</h3>
+        <p>On your local machine:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">cd ~/projects/private-fileshare</span>
+<span class="prompt">$</span> <span class="command">git add . && git commit -m "Initial file share project"</span>
+<span class="prompt">$</span> <span class="command">git remote add origin git@github.com:yourusername/private-fileshare.git</span>
+<span class="prompt">$</span> <span class="command">git push -u origin main</span></pre>
+        </div>
+
+        <p>On your VPS:</p>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">cd ~ && git clone git@github.com:yourusername/private-fileshare.git fileshare</span></pre>
+        </div>
+
+        <h3>4.6 Run</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">cd ~/fileshare && docker-compose up -d</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">docker-compose exec mariadb mysql -ufileuser -pfilepass fileshare < php/schema.sql</span></pre>
+        </div>
+
+        <h3>4.7 SSL</h3>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">sudo apt install -y certbot python3-certbot-nginx</span></pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">your-username@vps:~$</span> <span class="command">sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com</span></pre>
+        </div>
+    </section>
+
+    <section class="lesson-content">
+        <h2>// Summary</h2>
+        
+        <p>You've built a private, encrypted file sharing tool!</p>
+        
+        <ul>
+            <li><strong>Client-side encryption</strong> - Files encrypted before upload</li>
+            <li><strong>AES-256-GCM</strong> - Military-grade security</li>
+            <li><strong>One-time download</strong> - File vanishes after download</li>
+            <li><strong>Auto-expiration</strong> - Files deleted after 24 hours</li>
+            <li><strong>Self-hosted</strong> - You control the infrastructure</li>
+        </ul>
+
+        <div class="highlight-box">
+            <p><strong>Next Steps:</strong></p>
+            <ul>
+                <li>Add password protection for files</li>
+                <li>Add multiple download limit option</li>
+                <li>Add larger file support</li>
+                <li>Add email notification when downloaded</li>
+                <li>Add QR codes for mobile sharing</li>
+            </ul>
+        </div>
+
+        <p>This is a genuinely useful tool. No accounts, no tracking, no retention. Just secure file transfer.</p>
+        
+        <p><strong>The revolution will not be proprietary.</strong></p>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p>contact: busydrama @ proton.me</p>
+    </footer>
+
+    <script>
+        }
+    </script>
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    <script src="nav.js" defer></script>
+</body>
+</html>

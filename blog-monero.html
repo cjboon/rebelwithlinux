@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="onion-location" content="http://yppxyvqzw3lcpkjqpbm24ugbpqibke45bkrqzatsy3asoa377urir3yd.onion/blog-monero.html">
+
+    <title>Monero on the Command Line: A Privacy-First Guide - REBEL WITH LINUX</title>
+    <meta name="description" content="Learn to use Monero cryptocurrency on Debian command line. Generate wallets, send/receive XMR, and mine your own currency with full privacy.">
+    <meta name="keywords" content="Monero, XMR, cryptocurrency, privacy, Linux, command line, CLI, mining, Bitcoin alternatives">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Monero on the Command Line: A Privacy-First Guide">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog-monero.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog-monero.html">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Theme persistence - check and apply immediately in head
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+
+    <style>
+        .blog-header {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 32px 60px;
+            text-align: center;
+        }
+        .blog-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .blog-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--gray);
+        }
+        .blog-nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 16px;
+            border-bottom: 2px solid var(--black);
+            background: var(--white);
+        }
+        .blog-nav a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--black);
+            text-decoration: none;
+        }
+        .blog-nav a:hover {
+            text-decoration: underline;
+        }
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+        .blog-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 16px;
+        }
+        .blog-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+        .blog-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        .blog-content p {
+            margin-bottom: 24px;
+        }
+        .blog-content h2 {
+            font-size: 1.5rem;
+            margin: 40px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--black);
+        }
+        .blog-content h3 {
+            font-size: 1.25rem;
+            margin: 32px 0 12px;
+        }
+        .blog-content ul, .blog-content ol {
+            margin-bottom: 24px;
+            padding-left: 24px;
+        }
+        .blog-content li {
+            margin-bottom: 8px;
+        }
+        .blog-content blockquote {
+            border-left: 4px solid var(--black);
+            padding-left: 20px;
+            margin: 24px 0;
+            font-style: italic;
+            color: var(--gray);
+        }
+        .blog-content code {
+            background: var(--beige);
+            padding: 2px 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95rem;
+        }
+        .blog-content pre {
+            background: var(--black);
+            color: var(--ivory);
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            border: 3px solid var(--black);
+        }
+        .blog-content pre code {
+            background: transparent;
+            padding: 0;
+            color: var(--ivory);
+        }
+        .tip-box {
+            background: #F0FFF0;
+            border-left: 4px solid var(--dark-green);
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .warning-box {
+            background: #FFF0F0;
+            border-left: 4px solid var(--dark-red);
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: var(--black);
+            text-decoration: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        footer {
+            padding: 48px 32px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="index.html">HOME</a>
+                    <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#guides">GUIDES</a>
+                    <a href="index.html#projects">PROJECTS</a>
+                    <a href="index.html#resources">RESOURCES</a>
+                    <a href="index.html#blog">BLOG</a>
+                    <a href="index.html#contact">CONTACT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="blog-header">
+        <h1>// THE REBEL BLOG</h1>
+        <p>Thoughts on free software, privacy, and taking back control</p>
+    </header>
+
+    <nav class="blog-nav">
+        <a href="index.html#blog">← Back to Blog</a>
+    </nav>
+
+    <main class="blog-container" id="main-content">
+        <article>
+            <div class="blog-meta">
+                <span>2026-03-01</span> • <span>15 min read</span> • <span>Privacy</span>
+            </div>
+            <h1 class="blog-title">Monero on the Command Line: A Privacy-First Guide</h1>
+
+            <div class="blog-content">
+                <p>Bitcoin isn't private. It's pseudonymous at best, and with blockchain analysis, transactions can often be traced. Enter Monero (XMR)—a cryptocurrency built from the ground up for privacy. Ring signatures, stealth addresses, and RingCT ensure that your transactions are untraceable and unlinkable.</p>
+
+                <p>In this guide, we'll set up Monero on Debian using only the command line. No GUIs, no exchanges required.</p>
+
+                <div class="warning-box">
+                    <strong>Disclaimer:</strong> This is for educational purposes. Cryptocurrency involves risk. Never invest more than you can afford to lose. Research local laws regarding crypto.
+                </div>
+
+                <h2>What Makes Monero Private?</h2>
+
+                <p>Monero uses three key technologies:</p>
+
+                <ul>
+                    <li><strong>Ring Signatures</strong> — Mix your transaction with others' (decoys) so outside observers can't tell who signed</li>
+                    <li><strong>Stealth Addresses</strong> — Each payment goes to a one-time address, unlinkable to your wallet</li>
+                    <li><strong>RingCT</strong> — Hides transaction amounts</li>
+                </ul>
+
+                <p>The result? Complete financial privacy. Even if someone knows your address, they can't see your balance or trace your transactions.</p>
+
+                <h2>Installation</h2>
+
+                <h3>Option 1: Official Binaries (Recommended)</h3>
+
+<pre><code># Download the latest Monero CLI
+wget https://downloads.getmonero.org/cli/monero-linux-x64-v0.18.3.4.tar.bz2
+
+# Extract
+tar -xvf monero-linux-x64-v0.18.3.4.tar.bz2
+
+# Move to your binaries folder
+sudo mv monero-x86_64-v0.18.3.4/ /opt/monero
+sudo ln -s /opt/monero/monero /usr/local/bin/monero</code></pre>
+
+                <div class="tip-box">
+                    <strong>Verify the download:</strong> Always verify hashes! Check getmonero.org for the SHA256 hash and verify with <code>sha256sum</code>.
+                </div>
+
+                <h3>Option 2: Build from Source</h3>
+
+<pre><code># Install dependencies
+sudo apt update
+sudo apt install build-essential cmake pkg-config libssl-dev libboost-all-dev libunbound-dev libsodium-dev libunwind-dev libhidapi-dev libusb-1.0-0-dev
+
+# Clone the repo
+git clone --recursive https://github.com/monero-project/monero.git
+cd monero
+
+# Build (this takes a while)
+make -j$(nproc)</code></pre>
+
+                <h2>Synchronizing the Blockchain</h2>
+
+                <p>Monero needs to download the entire blockchain (~100GB). This takes time but is essential for full privacy:</p>
+
+<pre><code># Start daemon - it will sync in background
+monerod
+
+# Or run in background with logs
+monerod --detach
+
+# Check sync status
+monerod status</code></pre>
+
+                <div class="tip-box">
+                    <strong>Bootstrap node:</strong> To speed up initial sync, add a few public nodes:
+                    <br><code>monerod --add-peer nodes.hashvault.pro:18081 --add-peer xmr-node-eu.cakewallet.com:18081</code>
+                </div>
+
+                <h2>Creating Your Wallet</h2>
+
+                <p>Now create a wallet. This generates your keys:</p>
+
+<pre><code># Create new wallet
+monero-wallet-cli
+
+# You'll see:
+# 1. Create new wallet
+# 2. Restore from keys
+# 3. Restore from mnemonic seed
+# 4. View existing wallet
+
+# Choose 1, then enter a name
+Wallet name: mywallet
+
+# Enter a strong passphrase twice
+# (Write this down - it's your spending key!)
+# 
+# Then you'll see your recovery seed (25 words)
+# WRITE THIS DOWN - it's your only backup!</code></pre>
+
+                <div class="warning-box">
+                    <strong>CRITICAL:</strong> Your 25-word mnemonic seed is your wallet. If you lose it, you lose your funds forever. Store it offline, in a safe place. Anyone with this seed can access your funds.
+                </div>
+
+                <h3>Understanding Your Keys</h3>
+
+                <p>Your wallet generates three keys:</p>
+
+                <ul>
+                    <li><strong>Public View Key</strong> — Share this to receive funds (others can verify incoming, but not balance)</li>
+                    <li><strong>Public Spend Key</strong> — Share this to receive funds</li>
+                    <li><strong>Private View Key</strong> — Lets you view incoming transactions</li>
+                    <li><strong>Private Spend Key</strong> — Your password. NEVER share.</li>
+                    <li><strong>Mnemonic Seed</strong> — Master backup of all above</li>
+                </ul>
+
+                <h2>Basic Wallet Commands</h2>
+
+                <p>Open your wallet:</p>
+
+<pre><code>monero-wallet-cli --wallet-file mywallet</code></pre>
+
+                <p>Inside the wallet CLI, common commands:</p>
+
+<pre><code># Check balance
+balance
+
+# Check recent transactions
+show_transfers
+
+# Generate a new receiving address
+address
+
+# Generate sub-address (for better privacy)
+make_integrated_address
+
+# Incoming transfers only
+incoming_transfers
+
+# Outgoing transfers
+outgoing_transfers</code></pre>
+
+                <h2>Receiving XMR</h2>
+
+                <p>Get your address:</p>
+
+<pre><code>address</code></pre>
+
+                <p>You'll see two addresses:</p>
+                <ul>
+                    <li><strong>Primary address</strong> — Keep for general use</li>
+                    <li><strong>Sub-addresses</strong> — Create new ones for each person/transaction for better privacy</li>
+                </ul>
+
+                <p>Share your address. The sender can check it exists on the blockchain, but can't see your balance.</p>
+
+                <h2>Sending XMR</h2>
+
+                <p>To send, you need the recipient's address:</p>
+
+<pre><code># Inside wallet CLI
+transfer ADDRESS AMOUNT
+
+# Example: send 0.5 XMR
+transfer 44AFFq5gn9vB43f4JdXzB5aZZiGd2VJcgkGJ6Gs4zDMrz12BbmCMak2m4WHGZ5YHRYPLPzdHmKuLCR33jY8n7YG8oK43v2s 0.5</code></pre>
+
+                <p>You'll be prompted for your password, then shown the transaction details including fee. Confirm with <code>y</code>.</p>
+
+                <h3>Transaction Privacy Level</h3>
+
+                <p>Monero defaults to high privacy (mixin of 16). You can adjust:</p>
+
+<pre><code># Send with custom mixin (minimum 10 for good privacy)
+transfer ADDRESS AMOUNT 10
+
+# Send to multiple recipients
+transfer ADDRESS1,ADDRESS2 AMOUNT1,AMOUNT2</code></pre>
+
+                <div class="tip-box">
+                    <strong>Fee priority:</strong> Use <code>set priority high</code> for faster confirmation during congestion.
+                </div>
+
+                <h2>Sub-Addresses</h2>
+
+                <p>Sub-addresses improve privacy by making each payment unlinkable:</p>
+
+<pre><code># Create new sub-address
+make_integrated_address
+
+# Or with custom payment ID
+make_integrated_address PAYMENT_ID
+
+# List all addresses
+address all</code></pre>
+
+                <h2>Cold Wallet Setup</h2>
+
+                <p>For maximum security, use a cold wallet:</p>
+
+                <ol>
+                    <li>Create wallet on air-gapped machine</li>
+                    <li>Export view key to online machine</li>
+                    <li>Online machine can view but not spend</li>
+                    <li>Sign transactions on cold machine, broadcast from online</li>
+                </ol>
+
+<pre><code># On cold machine - generate unsigned transaction
+# In wallet CLI:
+sign_transfer
+
+# Export to file
+export_raw_multisig_tx unsigned.tx
+
+# Transfer via USB to online machine
+
+# On online machine - broadcast
+submit_multisig_tx unsigned.tx</code></pre>
+
+                <h2>Mining Monero</h2>
+
+                <p>Monero uses RandomX, CPU-friendly mining. You can mine with your CPU to support the network (and earn some XMR):</p>
+
+                <h3>Solo Mining</h3>
+
+<pre><code># Start mining to your address
+start_mining YOUR_ADDRESS threads
+
+# Example: 4 threads
+start_mining 44AFFq5gn9vB43f4JdXzB5aZZiGd2VJcgkGJ6Gs4zDMrz12BbmCMak2m4WHGZ5YHRYPLPzdHmKuLCR33jY8n7YG8oK43v2s 4
+
+# Stop mining
+stop_mining</code></pre>
+
+                <div class="warning-box">
+                    <strong>Solo mining</strong> is only profitable with significant hashpower. Most miners join pools.
+                </div>
+
+                <h3>Mining Pools</h3>
+
+                <p>Join a pool for more consistent rewards:</p>
+
+<pre><code># Using monero-pool (built-in)
+# Start pool miner
+xmrig -o pool.hashvault.pro:3333 -u YOUR_ADDRESS -p x --pass x
+
+# Or use the wallet's built-in pool miner
+start_mining pool_address threads</code></pre>
+
+                <h3>Check Mining Status</h2>
+
+<pre><code># In wallet CLI
+status</code></pre>
+
+                <h2>Remote Node</h2>
+
+                <p>Don't want to sync the full blockchain? Use a remote node:</p>
+
+<pre><code># Connect to public node
+monero-wallet-cli --wallet-file mywallet --daemon-address node.xmr.to:18081
+
+# List of public nodes:
+# node.xmr.to:18081
+# nodes.hashvault.pro:18081
+# xmr-node-eu.cakewallet.com:18081</code></pre>
+
+                <div class="warning-box">
+                    <strong>Privacy tradeoff:</strong> Remote nodes see your IP and which addresses you query. For full privacy, run your own node.
+                </div>
+
+                <h2>Backup and Security</h2>
+
+                <h3>Backup Your Seed</h3>
+
+                <p>Write down your 25-word seed and store it:</p>
+                <ul>
+                    <li>Offline (paper, metal)</li>
+                    <li>In multiple safe locations</li>
+                    <li>Never digital (no screenshots, no cloud)</li>
+                </ul>
+
+                <h3>Encrypt Your Wallet</h3>
+
+<pre><code># Set/change password in wallet CLI
+password</code></pre>
+
+                <h3>View-Only Wallet</h3>
+
+                <p>Create a view-only wallet for monitoring without risk:</p>
+
+<pre><code># In wallet CLI
+export_view_key
+
+# Then on another machine
+monero-wallet-cli --view-key PRIVATE_VIEW_KEY --wallet-file view-only</code></pre>
+
+                <h2>Tor/I2P Integration</h2>
+
+                <p>Route your Monero traffic through Tor for enhanced privacy:</p>
+
+<pre><code># Use Tor proxy
+monerod --proxy 127.0.0.1:9050
+
+# Or use i2p
+monerod --proxy 127.0.0.1:7656</code></pre>
+
+                <h2>Troubleshooting</h2>
+
+                <h3>Wallet out of sync</h3>
+<pre><code># Refresh
+refresh
+
+# Or check daemon status
+monerod status</code></pre>
+
+                <h3>Transaction stuck</h3>
+<pre><code># Check if confirmed
+show_transfers
+
+# If unconfirmed for too long, resend with higher fee
+# (Monero has tx pool, not replace-by-fee)</code></pre>
+
+                <h3>Lost password</h3>
+                <p>If you have your seed, restore:</p>
+<pre><code>monero-wallet-cli --restore-deterministic-wallet</code></pre>
+
+                <h2>Why Monero Matters</h2>
+
+                <p>Financial privacy isn't about having something to hide. It's about:</p>
+
+                <ul>
+                    <li><strong>Business confidentiality</strong> — Don't reveal your revenue to competitors</li>
+                    <li><strong>Personal safety</strong> — Don't advertise your wealth to criminals</li>
+                    <li><strong>Financial freedom</strong> — No bank account needed, no KYC for basic use</li>
+                    <li><strong>Censorship resistance</strong> — No central authority can freeze your funds</li>
+                </ul>
+
+                <p>Bitcoin is great for transparency. Monero is great for privacy. Choose the right tool for the job.</p>
+
+                <blockquote>"Privacy is not about something to hide. Privacy is about something to protect."</blockquote>
+
+                <p>Use Monero. Take back your financial privacy.</p>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p>contact: busydrama @ proton.me</p>
+    </footer>
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    
+    <script src="nav.js" defer></script>
+</body>
+</html>

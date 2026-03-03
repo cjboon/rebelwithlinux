@@ -1,0 +1,2718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="onion-location" content="http://yppxyvqzw3lcpkjqpbm24ugbpqibke45bkrqzatsy3asoa377urir3yd.onion/linux.html">
+    <title>Linux Fundamentals - Master the Command Line | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn Linux from scratch. Master the terminal, file system navigation, permissions, process management, and text manipulation. Free interactive lessons with quizzes.">
+    <meta name="keywords" content="Linux, Linux tutorial, learn Linux, command line, terminal, bash, file system, Linux permissions, process management, FOSS, open source, Linux commands">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Theme persistence - check and apply immediately in head
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="terminal-select.js"></script>
+    <script>
+        // Theme toggle functionality - defined early
+        function toggleThemeLinux(e) {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            console.log('Before - data-theme:', currentTheme);
+            
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+            console.log('After - data-theme:', document.documentElement.getAttribute('data-theme'));
+        }
+    </script>
+    <style>
+        :root {
+            --nav-color: #FCC624;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="index.html" style="color: inherit; text-decoration: none;">LINUX MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="index.html">HOME</a>
+                    <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#guides">GUIDES</a>
+                    <a href="index.html#projects">PROJECTS</a>
+                    <a href="index.html#blog">BLOG</a>
+                    <a href="index.html#contact">CONTACT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>OWN YOUR<br>SYSTEM</h1>
+        <p class="tagline">// The foundation of modern computing.</p>
+        
+        <div class="manifesto">
+            <p><strong>LINUX IS EVERYWHERE.</strong></p>
+            <p>From servers powering the internet to Android phones, smart devices, and supercomputers, Linux runs the world. Understanding Linux gives you control over the infrastructure that powers our digital lives.</p>
+            <p><strong>WHY LINUX?</strong></p>
+            <p>Linux is free and open source. You can inspect every line of code, modify it for your needs, and share your changes. No vendor lock-in, no forced updates, no surveillance.</p>
+            <p><strong>TAKE BACK CONTROL.</strong></p>
+            <p>The terminal isn't scary—it's empowering. When you understand Linux, you understand how computers actually work. You become the master, not the user.</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to Mastery</h2>
+            <p>12 lessons. Complete system control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Linux & FOSS Philosophy</h3>
+                <p class="lesson-desc">History, philosophy, and why Linux matters</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">The Terminal - Your Command Center</h3>
+                <p class="lesson-desc">Navigate and control your system via CLI</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">File System Navigation</h3>
+                <p class="lesson-desc">cd, ls, pwd, and directory structure</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">File Permissions & Ownership</h3>
+                <p class="lesson-desc">chmod, chown, and access control</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Process Management</h3>
+                <p class="lesson-desc">ps, top, kill, and managing running processes</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Text Manipulation & Pipelines</h3>
+                <p class="lesson-desc">grep, sed, awk, and pipe operations</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Shell Scripting Basics</h3>
+                <p class="lesson-desc">Variables, loops, and writing automation scripts</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">System Services</h3>
+                <p class="lesson-desc">systemd, service management, and cron jobs</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Networking Tools</h3>
+                <p class="lesson-desc">ip, ss, curl, and network configuration</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Storage Management</h3>
+                <p class="lesson-desc">df, du, mounting, and disk management</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">System Monitoring</h3>
+                <p class="lesson-desc">htop, vmstat, iostat, and log analysis</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Linux Security</h3>
+                <p class="lesson-desc">SELinux, permissions, and security hardening</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why Linux</h2>
+            <p>Linux was created by Linus Torvalds in 1991 as a free alternative to UNIX. Today, it's the backbone of the internet—over 96% of the world's top web servers run Linux.</p>
+            <p>But Linux isn't just for servers. It's for anyone who wants true ownership of their computing. Whether you're a developer, system administrator, security researcher, or curious learner, Linux gives you freedom.</p>
+            <p><strong>The four freedoms of free software:</strong> Run the program for any purpose, study how it works, redistribute copies, and distribute your modified versions. This is the philosophy that powers the open source world.</p>
+            <p><strong>Your computer, your rules. Learn Linux.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>📖 Linux Documentation</h3>
+                <p>Official Linux documentation</p>
+                <a href="https://www.kernel.org/doc/html/latest/" target="_blank">kernel.org/doc</a>
+            </div>
+            <div class="resource-card">
+                <h3>🐧 Ubuntu Docs</h3>
+                <p>Ubuntu community documentation</p>
+                <a href="https://help.ubuntu.com/" target="_blank">help.ubuntu.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>📚 Linux From Scratch</h3>
+                <p>Build your own Linux distribution</p>
+                <a href="https://www.linuxfromscratch.org/" target="_blank">linuxfromscratch.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔧 Arch Wiki</h3>
+                <p>Excellent community wiki</p>
+                <a href="https://wiki.archlinux.org/" target="_blank">wiki.archlinux.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>📜 GNU Coreutils</h3>
+                <p>Documentation for core utilities</p>
+                <a href="https://www.gnu.org/software/coreutils/manual/" target="_blank">gnu.org/software/coreutils</a>
+            </div>
+            <div class="resource-card">
+                <h3>🖥️ Explainshell</h3>
+                <p>Parse and explain shell commands</p>
+                <a href="https://explainshell.com/" target="_blank">explainshell.com</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p>contact: busydrama @ proton.me</p>
+    </footer>
+
+        <div class="modal-content" id="modalContent"></div>
+        </div>
+    </div>
+
+        <script>
+        /* ========================================================================
+           BLOCK 11A: LESSON DATA STRUCTURE
+           ========================================================================
+           This array contains ALL the lesson content for this course.
+           Each object represents one lesson with:
+           - id: Unique identifier (1, 2, 3, etc.)
+           - title: Display name of the lesson
+           - difficulty: 'beginner', 'intermediate', or 'advanced'
+           - content: HTML string with the lesson text, code examples
+           - quiz: Array of quiz questions with answer and hint
+           
+           Why store content in JavaScript instead of HTML?
+           - Single page application feel (no page reloads)
+           - Dynamic loading (faster initial page load)
+           - Easy to update content without editing HTML
+        ======================================================================== */
+        const lessons = [
+            {
+                id: 1,
+                title: "Introduction to Linux & FOSS Philosophy",
+                difficulty: "beginner",
+                content: `
+                    <h3>What is Linux?</h3>
+                    <p>Linux is a free and open-source operating system kernel first released by Linus Torvalds in 1991. Unlike Windows or macOS, Linux is not a single product—it's a kernel that forms the foundation of hundreds of unique distributions (distros).</p>
+                    
+                    <h3>The FOSS Philosophy</h3>
+                    <p><strong>Free</strong> in FOSS means freedom, not price. The four essential freedoms are:</p>
+                    <ul>
+                        <li><strong>Freedom 0:</strong> Run the program as you wish, for any purpose</li>
+                        <li><strong>Freedom 1:</strong> Study how the program works, and change it</li>
+                        <li><strong>Freedom 2:</strong> Redistribute copies so you can help others</li>
+                        <li><strong>Freedom 3:</strong> Distribute copies of your modified versions</li>
+                    </ul>
+                    
+                    <div class="highlight-box">
+                        <strong>WHY THIS MATTERS:</strong> When you run proprietary software, you're trusting the vendor blindly. With FOSS, anyone can inspect the code for backdoors, vulnerabilities, or spyware. This is essential for true privacy and security.
+                    </div>
+
+                    <h3>Popular Linux Distributions</h3>
+                    <ul>
+                        <li><strong>Ubuntu:</strong> User-friendly, great for beginners</li>
+                        <li><strong>Debian:</strong> The foundation of many distros, rock-stable</li>
+                        <li><strong>Fedora:</strong> Cutting-edge, community-driven</li>
+                        <li><strong>Arch Linux:</strong> Rolling release, build from scratch</li>
+                        <li><strong>Linux Mint:</strong> Extremely beginner-friendly</li>
+                        <li><strong>Tails:</strong> Privacy-focused, runs from USB</li>
+                    </ul>
+
+                    <h3>Getting Started</h3>
+                    <p>You don't need to replace your OS to learn Linux. Options include:</p>
+                    <ul>
+                        <li><strong>Live USB:</strong> Boot Linux from a USB without installing</li>
+                        <li><strong>Virtual Machine:</strong> Run Linux inside your current OS</li>
+                        <li><strong>WSL:</strong> Linux on Windows (limited but useful)</li>
+                        <li><strong>Dual Boot:</strong> Install alongside your existing OS</li>
+                    </ul>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat /etc/os-release</span>
+<span class="output">NAME="Ubuntu"
+VERSION="22.04.1 LTS (Jammy Jellyfish)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 22.04.1 LTS"</span>
+                    </div>
+                `,
+                quiz: [
+                    { question: "Linux was first released by _____ in 1991.", answer: "linus torvalds", hint: "The Finnish developer who created the Linux kernel" },
+                    { question: "FOSS stands for _____ and Open Source Software.", answer: "free", hint: "Think 'freedom' not 'free beer'" },
+                    { question: "A Linux _____ is a complete operating system built on the Linux kernel.", answer: "distribution", hint: "Often abbreviated as 'distro'" },
+                    { question: "The _____ philosophy emphasizes freedom to run, study, redistribute, and modify software.", answer: "foss", hint: "Free and Open Source Software" }
+                ]
+            },
+            {
+                id: 2,
+                title: "The Terminal - Your Command Center",
+                difficulty: "beginner",
+                content: `
+                    <h3>Why Use the Terminal?</h3>
+                    <p>The terminal (or shell) is your direct interface with Linux. While graphical interfaces are nice, the terminal offers:</p>
+                    <ul>
+                        <li><strong>Speed:</strong> Accomplish tasks faster than clicking through menus</li>
+                        <li><strong>Power:</strong> Access functionality unavailable in GUIs</li>
+                        <li><strong>Automation:</strong> Script repetitive tasks</li>
+                        <li><strong>Control:</strong> Know exactly what your computer is doing</li>
+                    </ul>
+                    
+                    <div class="highlight-box">
+                        <strong>PRIVACY NOTE:</strong> The terminal doesn't send your data to corporate servers. It doesn't track your usage. It's just you and your computer.
+                    </div>
+
+                    <h3>Basic Commands</h3>
+                    
+                    <h4>The Echo Command</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">echo "Hello, rebel!"</span>
+<span class="output">Hello, rebel!</span>
+                    </div>
+
+                    <h4>Date and Time</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">date</span>
+<span class="output">Mon Feb 23 12:00:00 UTC 2026</span>
+                    </div>
+
+                    <h4>Who Am I?</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">whoami</span>
+<span class="output">user</span>
+                    </div>
+
+                    <h4>View System Information</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">uname -a</span>
+<span class="output">Linux rebel 5.15.0-91-generic #101-Ubuntu SMP x86_64 GNU/Linux</span>
+                    </div>
+
+                    <h3>Getting Help</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">man echo</span>
+<span class="output">ECHO(1) User Commands ECHO(1)
+
+NAME
+       echo - display a line of text
+
+SYNOPSIS
+       echo [STRING]...
+
+DESCRIPTION
+       The echo command writes arguments to standard output.</span>
+                    </div>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">echo --help</span>
+<span class="output">Usage: echo [OPTION]... [STRING]...
+Echo the STRING(s) to standard output.</span>
+                    </div>
+
+                    <h3>Command Structure</h3>
+                    <p>Most commands follow this pattern: <code>command [options] [arguments]</code></p>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls -l /home</span>
+<span class="output">-rw-r--r-- 1 user user  4096 Feb 23 12:00 /home/user</span>
+                    </div>
+                    <p>Here, <code>ls</code> is the command, <code>-l</code> is an option (flag), and <code>/home</code> is the argument.</p>
+                `,
+                quiz: [
+                    { question: "The command to display text is _____.", answer: "echo", hint: "Like shouting in a canyon" },
+                    { question: "To see your username, use the _____ command.", answer: "whoami", hint: "It literally asks 'who am I?'" },
+                    { question: "The _____ command displays the manual for another command.", answer: "man", hint: "Short for 'manual'" },
+                    { question: "In 'ls -l /home', -l is an _____.", answer: "option", hint: "Also called a flag" }
+                ]
+            },
+            {
+                id: 3,
+                title: "File System Navigation",
+                difficulty: "beginner",
+                content: `
+                    <h3>Understanding the Linux File System</h3>
+                    <p>Linux organizes everything under a single directory tree. Unlike Windows (C:, D:, etc.), Linux has one unified hierarchy.</p>
+                    
+                    <h3>Key Directories</h3>
+                    <ul>
+                        <li><strong>/</strong> - Root (the top of the tree)</li>
+                        <li><strong>/home</strong> - User home directories</li>
+                        <li><strong>/etc</strong> - System configuration files</li>
+                        <li><strong>/bin</strong> - Essential binaries (programs)</li>
+                        <li><strong>/usr</strong> - User programs</li>
+                        <li><strong>/var</strong> - Variable data (logs, caches)</li>
+                        <li><strong>/tmp</strong> - Temporary files</li>
+                        <li><strong>/root</strong> - Root user's home</li>
+                        <li><strong>/boot</strong> - Boot files</li>
+                        <li><strong>/dev</strong> - Device files</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <strong>SECURITY NOTE:</strong> The /etc directory contains sensitive configuration files. Only modify these when you understand what you're doing. Many are readable by anyone but writable only by root.
+                    </div>
+
+                    <h3>Navigation Commands</h3>
+                    
+                    <h4>Print Working Directory</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">pwd</span>
+<span class="output">/home/user</span>
+                    </div>
+
+                    <h4>List Files</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls</span>
+<span class="output">Documents Downloads Pictures Music</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls -la</span>
+<span class="output">total 64
+drwxr-xr-x 1 user user 4096 Feb 23 12:00 Documents
+drwxr-xr-x 1 user user 4096 Feb 23 12:00 Downloads
+-rw-r--r-- 1 user user  1024 Feb 23 12:00 readme.txt</span>
+                    </div>
+
+                    <h4>Change Directory</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cd Documents</span>
+<span class="prompt">$</span> <span class="command">pwd</span>
+<span class="output">/home/user/Documents</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cd ..</span>
+<span class="prompt">$</span> <span class="command">pwd</span>
+<span class="output">/home/user</span>
+                    </div>
+
+                    <h4>Special Directories</h4>
+                    <ul>
+                        <li><strong>.</strong> - Current directory</li>
+                        <li><strong>..</strong> - Parent directory</li>
+                        <li><strong>~</strong> - Home directory</li>
+                        <li><strong>-</strong> - Previous directory</li>
+                    </ul>
+
+                    <h3>Creating and Removing</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">mkdir myproject</span>
+<span class="prompt">$</span> <span class="command">touch readme.txt</span>
+<span class="prompt">$</span> <span class="command">rm readme.txt</span>
+<span class="prompt">$</span> <span class="command">rmdir myproject</span>
+                    </div>
+                `,
+                quiz: [
+                    { question: "The top of the Linux directory tree is called _____.", answer: "root", hint: "Represented by /" },
+                    { question: "User home directories are located in _____.", answer: "/home", hint: "Like C:\\Users on Windows" },
+                    { question: "The command to change directories is _____.", answer: "cd", hint: "Short for 'change directory'" },
+                    { question: "The _____ character represents your home directory.", answer: "~", hint: "Tilde" }
+                ]
+            },
+            {
+                id: 4,
+                title: "File Permissions & Ownership",
+                difficulty: "intermediate",
+                content: `
+                    <h3>Understanding Permissions</h3>
+                    <p>In Linux, every file and directory has permissions that control who can read, write, or execute it. This is fundamental to Linux security.</p>
+                    
+                    <div class="highlight-box">
+                        <strong>PRIVACY CONNECTION:</strong> Proper permissions ensure your personal files remain private. Without them, other users on your system could read your sensitive documents or encryption keys.
+                    </div>
+
+                    <h3>Permission Types</h3>
+                    <ul>
+                        <li><strong>r (read)</strong> - View file contents or list directory</li>
+                        <li><strong>w (write)</strong> - Modify file or add/remove files in directory</li>
+                        <li><strong>x (execute)</strong> - Run file as program or access directory</li>
+                    </ul>
+
+                    <h3>Viewing Permissions</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls -l /etc/passwd</span>
+<span class="output">-rw-r--r-- 1 root root 1234 Feb 23 12:00 /etc/passwd</span>
+                    </div>
+                    <p>The string <code>-rw-r--r--</code> breaks down as:</p>
+                    <ul>
+                        <li><strong>-</strong> - File type (- = regular file, d = directory)</li>
+                        <li><strong>rw-</strong> - Owner permissions (read, write, no execute)</li>
+                        <li><strong>r--</strong> - Group permissions (read only)</li>
+                        <li><strong>r--</strong> - Other permissions (read only)</li>
+                    </ul>
+
+                    <h3>Permission Numbers</h3>
+                    <p>Permissions can also be represented numerically:</p>
+                    <ul>
+                        <li><strong>r = 4</strong></li>
+                        <li><strong>w = 2</strong></li>
+                        <li><strong>x = 1</strong></li>
+                    </ul>
+                    <p>So <code>rw-r--r--</code> = 644 (owner has 4+2=6, others have 4)</p>
+                    <p>And <code>rwxr-xr-x</code> = 755 (owner has all, others can read/execute)</p>
+                    <p>And <code>rwx------</code> = 700 (only owner can do anything)</p>
+
+                    <h3>Changing Permissions</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">chmod 700 secret.txt</span>
+<span class="prompt">$</span> <span class="command">chmod +x script.sh</span>
+<span class="prompt">$</span> <span class="command">chmod go-w file.txt</span>
+                    </div>
+                    <p>Flags: u=user (owner), g=group, o=others, a=all</p>
+
+                    <h3>Ownership</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls -l /var/log/syslog</span>
+<span class="output">-rw-r----- 1 syslog adm 12345 Feb 23 12:00 /var/log/syslog</span>
+                    </div>
+                    
+                    <p>File ownership is shown as <code>user:group</code>. The syslog file is owned by syslog user, adm group.</p>
+                    
+                    <h3>Changing Ownership</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">chown user:group file.txt</span>
+<span class="prompt">$</span> <span class="command">chown -R user:group directory/</span>
+                    </div>
+
+                    <h3>Special Permissions</h3>
+                    <ul>
+                        <li><strong>SetUID (4000)</strong> - Run as file owner</li>
+                        <li><strong>SetGID (2000)</strong> - Run as group owner</li>
+                        <li><strong>Sticky Bit (1000)</strong> - Only owner can delete</li>
+                    </ul>
+                `,
+                quiz: [
+                    { question: "The permission to view file contents is _____.", answer: "read", hint: "Represented by 'r'" },
+                    { question: "The command to change ownership is _____.", answer: "chown", hint: "CHange OWNership" },
+                    { question: "To make a file private, use chmod _____.", answer: "700", hint: "Only owner can access" },
+                    { question: "In -rwxr-xr-x, the owner's permissions are _____.", answer: "rwx", hint: "Read, write, execute" }
+                ]
+            },
+            {
+                id: 5,
+                title: "Process Management",
+                difficulty: "intermediate",
+                content: `
+                    <h3>What is a Process?</h3>
+                    <p>A process is a running program. Every command you execute starts one or more processes. Understanding processes gives you complete control over your system.</p>
+
+                    <h3>Viewing Processes</h3>
+                    
+                    <h4>Process Status (ps)</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ps</span>
+<span class="output">  PID TTY          TIME CMD
+   1234 pts/0    00:00:00 bash
+   5678 pts/0    00:00:00 ps</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ps aux</span>
+<span class="output">USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.0   2384  1504 ?        Ss   12:00   0:02 /sinit
+root       234  0.0  0.0   4321  2800 ?        S    12:00   0:00 /bin/bash
+user       567  0.0  0.1  12345  6789 pts/0   Ss   12:00   0:00 bash</span>
+                    </div>
+
+                    <h4>Top - Real-time Process Monitor</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">top</span>
+<span class="output">top - 12:00:00 up 5 days,  1:23,  1 user,  load average: 0.52, 0.58, 0.59
+Tasks: 245 total,   1 running, 244 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  5.2 us,  1.3 sy,  0.0 ni, 93.5 id,  0.0 wa
+MiB Mem :  8192.0 total,  2048.0 free,  3072.0 used,  3072.0 buff/cache
+MiB Swap:  2048.0 total,  2048.0 free,    0.0 used.  4096.0 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+  1234 root      20   0  512344  45000  12000 S   2.0   0.5   0:05.32 Xorg</span>
+                    </div>
+
+                    <h3>Process IDs (PID)</h3>
+                    <p>Every process has a unique Process ID. The first process (init/systemd) is always PID 1.</p>
+                    
+                    <h3>Signals - Controlling Processes</h3>
+                    <p>Signals are how you communicate with processes:</p>
+                    <ul>
+                        <li><strong>SIGTERM (15)</strong> - Graceful termination (recommended)</li>
+                        <li><strong>SIGKILL (9)</strong> - Force kill (emergency only)</li>
+                        <li><strong>SIGSTOP (19)</strong> - Pause process</li>
+                        <li><strong>SIGCONT (18)</strong> - Resume paused process</li>
+                    </ul>
+
+                    <h3>Killing Processes</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">kill 12345</span>
+<span class="comment"># Send SIGTERM to process 12345</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">kill -9 12345</span>
+<span class="comment"># Force kill process 12345 (SIGKILL)</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">pkill firefox</span>
+<span class="comment"># Kill all processes named firefox</span>
+                    </div>
+
+                    <h3>Background Processes</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sleep 100 &</span>
+<span class="comment"># Run sleep in background (&)</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">jobs</span>
+<span class="comment"># List background jobs</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">fg %1</span>
+<span class="comment"># Bring job 1 to foreground</span>
+                    </div>
+
+                    <h3>Priority (Nice Values)</h3>
+                    <p>Process priority ranges from -20 (highest) to +19 (lowest). Higher priority = more CPU time.</p>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">nice -n 10 ./script.sh</span>
+<span class="comment"># Run script with lower priority</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">renice +5 12345</span>
+<span class="comment"># Change priority of running process</span>
+                    </div>
+                `,
+                quiz: [
+                    { question: "Every process has a unique _____.", answer: "pid", hint: "Process ID" },
+                    { question: "Signal _____ forces immediate termination.", answer: "sigkill", hint: "Signal number 9" },
+                    { question: "The _____ command shows real-time process activity.", answer: "top", hint: "Like Task Manager on Windows" },
+                    { question: "To run a command in the background, add _____.", answer: "&", hint: "Ampersand" }
+                ]
+            },
+            {
+                id: 6,
+                title: "Text Manipulation & Pipelines",
+                difficulty: "intermediate",
+                content: `
+                    <h3>The Power of Text</h3>
+                    <p>In Linux, text is king. Most configuration is done through text files, and the tools to manipulate text are incredibly powerful. This is why FOSS is so powerful—you can understand and modify everything.</p>
+
+                    <h3>Viewing Files</h3>
+                    
+                    <h4>cat - Concatenate and Display</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat /etc/hostname</span>
+<span class="output">rebel</span>
+                    </div>
+
+                    <h4>head - First Lines</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">head -n 5 /etc/passwd</span>
+<span class="output">root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync</span>
+                    </div>
+
+                    <h4>tail - Last Lines</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">tail -f /var/log/syslog</span>
+<span class="comment"># Follow the log file in real-time</span>
+                    </div>
+
+                    <h3>Searching Text</h3>
+                    
+                    <h4>grep - Pattern Matching</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">grep "root" /etc/passwd</span>
+<span class="output">root:x:0:0:root:/root:/bin/bash</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ps aux | grep firefox</span>
+<span class="comment"># Find firefox process</span>
+                    </div>
+
+                    <h4>Case-Insensitive Search</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">grep -i "error" logfile.txt</span>
+<span class="comment"># Find all error variations (ERROR, Error, error)</span>
+                    </div>
+
+                    <h3>Pipes - Connecting Commands</h3>
+                    <p>Pipes (|) send the output of one command as input to another. This is called composition.</p>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls -la /etc | grep ".conf"</span>
+<span class="comment"># List config files in /etc</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ps aux | sort -k4 -r | head -10</span>
+<span class="comment"># Top 10 memory-consuming processes</span>
+                    </div>
+
+                    <h3>Text Processing</h3>
+                    
+                    <h4>wc - Word Count</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">wc -l /etc/passwd</span>
+<span class="output">42</span>
+                    </div>
+
+                    <h4>cut - Extract Columns</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cut -d: -f1 /etc/passwd</span>
+<span class="comment"># Extract usernames (first field, colon-delimited)</span>
+                    </div>
+
+                    <h4>sort - Sort Lines</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ps aux | sort -k4 -r</span>
+<span class="comment"># Sort by memory usage, descending</span>
+                    </div>
+
+                    <h4>uniq - Remove Duplicates</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sort file.txt | uniq</span>
+<span class="comment"># Unique lines in sorted order</span>
+                    </div>
+
+                    <h4>awk - Advanced Text Processing</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">df -h | awk '{print $1 ": " $5}'</span>
+<span class="comment"># Show filesystem and usage</span>
+                    </div>
+
+                    <h4>sed - Stream Editor</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sed 's/old/new/g' file.txt</span>
+<span class="comment"># Replace all occurrences of 'old' with 'new'</span>
+                    </div>
+                `,
+                quiz: [
+                    { question: "The _____ command searches for patterns in text.", answer: "grep", hint: "Global Regular Expression Print" },
+                    { question: "The _____ symbol (|) sends output from one command to another.", answer: "pipe", hint: "It connects commands together" },
+                    { question: "To view the first 10 lines of a file, use the _____ command.", answer: "head", hint: "Opposite of 'tail'" },
+                    { question: "The _____ command counts lines, words, and characters.", answer: "wc", hint: "Word Count" }
+                ]
+            }
+        ];
+
+        /* ========================================================================
+           BLOCK 11B: VARIABLES AND STATE
+           ========================================================================
+           - courseName: Identifies this course in the database
+           - completedLessons: Array tracking which lessons the user has finished
+           
+           localStorage: Browser's built-in storage that persists even after
+           closing the browser. We use it to remember progress.
+        ======================================================================== */
+        const courseName = 'linux';
+        let completedLessons = [];
+
+        /* ========================================================================
+           BLOCK 11C: RENDER LESSONS
+           ========================================================================
+           renderLessons() creates the lesson cards grid dynamically.
+           
+           How it works:
+           1. Get reference to the grid container (lessonsGrid div)
+           2. Use .map() to transform each lesson into an HTML string
+           3. Add 'completed' class if user finished that lesson
+           4. Join all strings together and set as innerHTML
+           
+           Template literal features used:
+           - ${} to insert variables
+           - Ternary operator (condition ? true : false) for completed class
+        ======================================================================== */
+        function renderLessons() {
+            const grid = document.getElementById('lessonsGrid');
+            grid.innerHTML = lessons.map(lesson => `
+                <div class="lesson-card ${completedLessons.includes(lesson.id) ? 'completed' : ''}" onclick="openLesson(${lesson.id})">
+                    <div class="lesson-number">LESSON ${lesson.id}</div>
+                    <div class="lesson-title">${lesson.title}</div>
+                    <p class="lesson-desc">Master ${lesson.title.toLowerCase()} and take control of your system.</p>
+                    <span class="badge badge-${lesson.difficulty}">${lesson.difficulty}</span>
+                </div>
+            `).join('');
+            updateProgress();
+        }
+
+        /* ========================================================================
+           BLOCK 11D: UPDATE PROGRESS BAR
+           ========================================================================
+           Calculates and displays the user's progress as a percentage.
+           The progress bar is the thin line below the navigation.
+        ======================================================================== */
+        function updateProgress() {
+            const progress = (completedLessons.length / lessons.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        /* ========================================================================
+           BLOCK 11E: OPEN LESSON MODAL
+           ========================================================================
+           When a user clicks a lesson card, this function:
+           1. Finds the lesson data in the lessons array
+           2. Populates the modal with lesson content
+           3. Renders the quiz for that lesson
+           4. Shows the modal (adds 'active' class)
+           5. Disables page scrolling (overflow: hidden)
+        ======================================================================== */
+        function openLesson(id) {
+            const lesson = lessons.find(l => l.id === id);
+            const overlay = document.getElementById('modalOverlay');
+            const titleEl = document.getElementById('modalTitle');
+            const contentEl = document.getElementById('modalContent');
+            
+            titleEl.textContent = `Lesson ${id}: ${lesson.title}`;
+            contentEl.innerHTML = `
+                <div class="lesson-content">${lesson.content}</div>
+                ${renderQuiz(lesson)}
+            `;
+            
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        /* ========================================================================
+           BLOCK 11F: CLOSE LESSON MODAL
+           ========================================================================
+           Hides the modal and re-enables page scrolling.
+        ======================================================================== */
+        function closeLesson() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        /* ========================================================================
+           BLOCK 11G: RENDER QUIZ
+           ========================================================================
+           Creates HTML for the quiz section dynamically.
+           
+           For each question, it creates:
+           - The question text with a blank (_____) placeholder
+           - An input field for the user's answer
+           - A submit button
+           - A hidden hint (shown after wrong answer)
+           - A feedback div (shows correct/incorrect)
+        ======================================================================== */
+        function renderQuiz(lesson) {
+            const questions = lesson.quiz;
+            return `
+                <div class="quiz-section" id="quiz-${lesson.id}">
+                    <h3>// Knowledge Check</h3>
+                    ${questions.map((q, i) => `
+                        <div class="quiz-question" data-question="${i}" data-answer="${q.answer.toLowerCase()}">
+                            <div class="question-text">${q.question.replace('_____', '<span class="blank"></span>')}</div>
+                            <input type="text" class="quiz-input" placeholder="Type your answer..." data-hint="${q.hint}">
+                            <button class="quiz-submit">Check</button>
+                            <div class="quiz-hint">Hint: ${q.hint}</div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    `).join('')}
+                    <div class="quiz-score" id="score-${lesson.id}">
+                        Score: <span class="score-value">0</span> / ${questions.length}
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ========================================================================
+           BLOCK 11H: CHECK ANSWER
+           ========================================================================
+           Validates user's quiz answer and handles completion:
+           
+           Steps:
+           1. Get the question element and user's input
+           2. Compare input to correct answer (case-insensitive)
+           3. If correct: Mark input as correct, disable it, check if all done
+           4. If wrong: Show error, reveal hint after 2 attempts
+           5. Update the score display
+           6. If all questions correct: Mark lesson complete, save to storage/server
+        ======================================================================== */
+        function checkAnswer(lessonId, questionIndex) {
+            const questionEl = document.querySelector(`#quiz-${lessonId} .quiz-question[data-question="${questionIndex}"]`);
+            const input = questionEl.querySelector('.quiz-input');
+            const feedback = questionEl.querySelector('.quiz-feedback');
+            const hint = questionEl.querySelector('.quiz-hint');
+            const correctAnswer = questionEl.dataset.answer;
+            const userAnswer = input.value.trim().toLowerCase();
+            
+            let attempts = parseInt(questionEl.dataset.attempts || '0');
+            questionEl.dataset.attempts = attempts + 1;
+            
+            if (userAnswer === correctAnswer) {
+                input.classList.add('correct');
+                input.classList.remove('incorrect');
+                feedback.textContent = '✓ Correct!';
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                input.disabled = true;
+                
+                // Check if ALL questions in this lesson are correct
+                if (!completedLessons.includes(lessonId)) {
+                    const allQuestions = document.querySelectorAll(`#quiz-${lessonId} .quiz-question`);
+                    const correctCount = Array.from(allQuestions).filter(q => q.querySelector('.quiz-input').disabled).length;
+                    if (correctCount === allQuestions.length) {
+                        completedLessons.push(lessonId);
+                        localStorage.setItem('completedLessons_linux', JSON.stringify(completedLessons));
+                        updateProgress();
+                        saveProgress('linux', lessonId, true);
+                    }
+                }
+            } else {
+                input.classList.add('incorrect');
+                input.classList.remove('correct');
+                feedback.textContent = '✗ Incorrect. Try again.';
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                
+                // Show hint after 2 wrong attempts
+                if (attempts >= 1) {
+                    hint.classList.add('visible');
+                }
+            }
+            
+            updateScore(lessonId);
+        }
+
+        /* ========================================================================
+           BLOCK 11I: UPDATE SCORE DISPLAY
+           ========================================================================
+           Counts how many questions user got right and updates the score display.
+        ======================================================================== */
+        function updateScore(lessonId) {
+            const questions = document.querySelectorAll(`#quiz-${lessonId} .quiz-question`);
+            let correct = 0;
+            questions.forEach(q => {
+                if (q.querySelector('.quiz-input').disabled) correct++;
+            });
+            
+            const scoreEl = document.getElementById(`score-${lessonId}`);
+            scoreEl.querySelector('.score-value').textContent = correct;
+            scoreEl.classList.add('visible');
+        }
+
+        /* ========================================================================
+           BLOCK 11J: EVENT LISTENERS
+           ========================================================================
+           Set up click handlers for:
+           - Close button: Closes the modal
+           - Modal overlay: Closes when clicking outside the content box
+        ======================================================================== */
+        document.getElementById('closeModal').addEventListener('click', closeLesson);
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeLesson();
+        });
+
+        /* ========================================================================
+           BLOCK 11K: SAVE PROGRESS TO SERVER
+           ========================================================================
+           saveProgress() sends progress data to the PHP API.
+           
+           This allows users to:
+           - Log in on any device and see their progress
+           - Sync progress between browsers
+           
+           Uses fetch() with async/await for clean asynchronous code.
+        ======================================================================== */
+        async function saveProgress(course, lessonId, completed) {
+            try {
+                await fetch('api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        course: course,
+                        lesson_id: parseInt(lessonId),
+                        completed: completed
+                    }),
+                    credentials: 'include'
+                });
+            } catch (e) {
+                console.log('Could not save progress');
+            }
+        }
+
+        /* ========================================================================
+           BLOCK 11L: LOAD SAVED PROGRESS
+           ========================================================================
+           When page loads, check localStorage for previously completed lessons.
+           
+           localStorage stores strings, so we use JSON.parse() to convert
+           back to a JavaScript array.
+           
+           This happens BEFORE renderLessons() so completed status shows immediately.
+        ======================================================================== */
+        const storageKey = 'completedLessons_linux';
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+            try {
+                completedLessons = JSON.parse(saved);
+            } catch (e) {
+                completedLessons = [];
+            }
+        }
+
+        /* ========================================================================
+           BLOCK 11M: INITIALIZE PAGE
+           ========================================================================
+           Finally, render the lessons grid!
+           This is called after everything is set up.
+        ======================================================================== */
+        renderLessons();
+
+    </script>
+
+    <!-- Lesson 1 --><div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Introduction to Linux & FOSS Philosophy</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>What is Linux?</h3>
+                    <p>Linux is a free and open-source operating system kernel first released by Linus Torvalds in 1991. Unlike Windows or macOS, Linux is not a single product—it's a kernel that forms the foundation of hundreds of unique distributions (distros).</p>
+                    
+                    <h3>The FOSS Philosophy</h3>
+                    <p><strong>Free</strong> in FOSS means freedom, not price. The four essential freedoms are:</p>
+                    <ul>
+                        <li><strong>Freedom 0:</strong> Run the program as you wish, for any purpose</li>
+                        <li><strong>Freedom 1:</strong> Study how the program works, and change it</li>
+                        <li><strong>Freedom 2:</strong> Redistribute copies so you can help others</li>
+                        <li><strong>Freedom 3:</strong> Distribute copies of your modified versions</li>
+                    </ul>
+                    
+                    <div class="highlight-box">
+                        <strong>WHY THIS MATTERS:</strong> When you run proprietary software, you're trusting the vendor blindly. With FOSS, anyone can inspect the code for backdoors, vulnerabilities, or spyware. This is essential for true privacy and security.
+                    </div>
+
+                    <h3>Popular Linux Distributions</h3>
+                    <ul>
+                        <li><strong>Ubuntu:</strong> User-friendly, great for beginners</li>
+                        <li><strong>Debian:</strong> The foundation of many distros, rock-stable</li>
+                        <li><strong>Fedora:</strong> Cutting-edge, community-driven</li>
+                        <li><strong>Arch Linux:</strong> Rolling release, build from scratch</li>
+                        <li><strong>Linux Mint:</strong> Extremely beginner-friendly</li>
+                        <li><strong>Tails:</strong> Privacy-focused, runs from USB</li>
+                    </ul>
+
+                    <h3>Getting Started</h3>
+                    <p>You don't need to replace your OS to learn Linux. Options include:</p>
+                    <ul>
+                        <li><strong>Live USB:</strong> Boot Linux from a USB without installing</li>
+                        <li><strong>Virtual Machine:</strong> Run Linux inside your current OS</li>
+                        <li><strong>WSL:</strong> Linux on Windows (limited but useful)</li>
+                        <li><strong>Dual Boot:</strong> Install alongside your existing OS</li>
+                    </ul>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat /etc/os-release</span>
+<span class="output">NAME="Ubuntu"
+VERSION="22.04.1 LTS (Jammy Jellyfish)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 22.04.1 LTS"</span>
+                    </div>
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Linux was first released by _____ in 1991.</p>
+                        <input type="text" class="quiz-input" data-answer="linus torvalds" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: The Finnish developer who created the Linux kernel</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. FOSS stands for _____ and Open Source Software.</p>
+                        <input type="text" class="quiz-input" data-answer="free" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Think </p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. A Linux _____ is a complete operating system built on the Linux kernel.</p>
+                        <input type="text" class="quiz-input" data-answer="distribution" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Often abbreviated as </p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. The _____ philosophy emphasizes freedom to run, study, redistribute, and modify software.</p>
+                        <input type="text" class="quiz-input" data-answer="foss" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Free and Open Source Software</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>linus torvalds</li>
+                                <li>free</li>
+                                <li>distribution</li>
+                                <li>foss</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Lesson 2 --><div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// The Terminal - Your Command Center</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Why Use the Terminal?</h3>
+                    <p>The terminal (or shell) is your direct interface with Linux. While graphical interfaces are nice, the terminal offers:</p>
+                    <ul>
+                        <li><strong>Speed:</strong> Accomplish tasks faster than clicking through menus</li>
+                        <li><strong>Power:</strong> Access functionality unavailable in GUIs</li>
+                        <li><strong>Automation:</strong> Script repetitive tasks</li>
+                        <li><strong>Control:</strong> Know exactly what your computer is doing</li>
+                    </ul>
+                    
+                    <div class="highlight-box">
+                        <strong>PRIVACY NOTE:</strong> The terminal doesn't send your data to corporate servers. It doesn't track your usage. It's just you and your computer.
+                    </div>
+
+                    <h3>Basic Commands</h3>
+                    
+                    <h4>The Echo Command</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">echo "Hello, rebel!"</span>
+<span class="output">Hello, rebel!</span>
+                    </div>
+
+                    <h4>Date and Time</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">date</span>
+<span class="output">Mon Feb 23 12:00:00 UTC 2026</span>
+                    </div>
+
+                    <h4>Who Am I?</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">whoami</span>
+<span class="output">user</span>
+                    </div>
+
+                    <h4>View System Information</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">uname -a</span>
+<span class="output">Linux rebel 5.15.0-91-generic #101-Ubuntu SMP x86_64 GNU/Linux</span>
+                    </div>
+
+                    <h3>Getting Help</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">man echo</span>
+<span class="output">ECHO(1) User Commands ECHO(1)
+
+NAME
+       echo - display a line of text
+
+SYNOPSIS
+       echo [STRING]...
+
+DESCRIPTION
+       The echo command writes arguments to standard output.</span>
+                    </div>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">echo --help</span>
+<span class="output">Usage: echo [OPTION]... [STRING]...
+Echo the STRING(s) to standard output.</span>
+                    </div>
+
+                    <h3>Command Structure</h3>
+                    <p>Most commands follow this pattern: <code>command [options] [arguments]</code></p>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls -l /home</span>
+<span class="output">-rw-r--r-- 1 user user  4096 Feb 23 12:00 /home/user</span>
+                    </div>
+                    <p>Here, <code>ls</code> is the command, <code>-l</code> is an option (flag), and <code>/home</code> is the argument.</p>
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. The command to display text is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="echo" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Like shouting in a canyon</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. To see your username, use the _____ command.</p>
+                        <input type="text" class="quiz-input" data-answer="whoami" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: It literally asks </p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. The _____ command displays the manual for another command.</p>
+                        <input type="text" class="quiz-input" data-answer="man" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Short for </p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. In </p>
+                        <input type="text" class="quiz-input" data-answer="option" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Also called a flag</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>echo</li>
+                                <li>whoami</li>
+                                <li>man</li>
+                                <li>option</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Lesson 3 --><div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// File System Navigation</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Understanding the Linux File System</h3>
+                    <p>Linux organizes everything under a single directory tree. Unlike Windows (C:, D:, etc.), Linux has one unified hierarchy.</p>
+                    
+                    <h3>Key Directories</h3>
+                    <ul>
+                        <li><strong>/</strong> - Root (the top of the tree)</li>
+                        <li><strong>/home</strong> - User home directories</li>
+                        <li><strong>/etc</strong> - System configuration files</li>
+                        <li><strong>/bin</strong> - Essential binaries (programs)</li>
+                        <li><strong>/usr</strong> - User programs</li>
+                        <li><strong>/var</strong> - Variable data (logs, caches)</li>
+                        <li><strong>/tmp</strong> - Temporary files</li>
+                        <li><strong>/root</strong> - Root user's home</li>
+                        <li><strong>/boot</strong> - Boot files</li>
+                        <li><strong>/dev</strong> - Device files</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <strong>SECURITY NOTE:</strong> The /etc directory contains sensitive configuration files. Only modify these when you understand what you're doing. Many are readable by anyone but writable only by root.
+                    </div>
+
+                    <h3>Navigation Commands</h3>
+                    
+                    <h4>Print Working Directory</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">pwd</span>
+<span class="output">/home/user</span>
+                    </div>
+
+                    <h4>List Files</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls</span>
+<span class="output">Documents Downloads Pictures Music</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls -la</span>
+<span class="output">total 64
+drwxr-xr-x 1 user user 4096 Feb 23 12:00 Documents
+drwxr-xr-x 1 user user 4096 Feb 23 12:00 Downloads
+-rw-r--r-- 1 user user  1024 Feb 23 12:00 readme.txt</span>
+                    </div>
+
+                    <h4>Change Directory</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cd Documents</span>
+<span class="prompt">$</span> <span class="command">pwd</span>
+<span class="output">/home/user/Documents</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cd ..</span>
+<span class="prompt">$</span> <span class="command">pwd</span>
+<span class="output">/home/user</span>
+                    </div>
+
+                    <h4>Special Directories</h4>
+                    <ul>
+                        <li><strong>.</strong> - Current directory</li>
+                        <li><strong>..</strong> - Parent directory</li>
+                        <li><strong>~</strong> - Home directory</li>
+                        <li><strong>-</strong> - Previous directory</li>
+                    </ul>
+
+                    <h3>Creating and Removing</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">mkdir myproject</span>
+<span class="prompt">$</span> <span class="command">touch readme.txt</span>
+<span class="prompt">$</span> <span class="command">rm readme.txt</span>
+<span class="prompt">$</span> <span class="command">rmdir myproject</span>
+                    </div>
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. The top of the Linux directory tree is called _____.</p>
+                        <input type="text" class="quiz-input" data-answer="root" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Represented by /</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. User home directories are located in _____.</p>
+                        <input type="text" class="quiz-input" data-answer="/home" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Like C:\Users on Windows</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. The command to change directories is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="cd" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Short for </p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. The _____ character represents your home directory.</p>
+                        <input type="text" class="quiz-input" data-answer="~" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Tilde</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>root</li>
+                                <li>/home</li>
+                                <li>cd</li>
+                                <li>~</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Lesson 4 --><div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// File Permissions & Ownership</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Understanding Permissions</h3>
+                    <p>In Linux, every file and directory has permissions that control who can read, write, or execute it. This is fundamental to Linux security.</p>
+                    
+                    <div class="highlight-box">
+                        <strong>PRIVACY CONNECTION:</strong> Proper permissions ensure your personal files remain private. Without them, other users on your system could read your sensitive documents or encryption keys.
+                    </div>
+
+                    <h3>Permission Types</h3>
+                    <ul>
+                        <li><strong>r (read)</strong> - View file contents or list directory</li>
+                        <li><strong>w (write)</strong> - Modify file or add/remove files in directory</li>
+                        <li><strong>x (execute)</strong> - Run file as program or access directory</li>
+                    </ul>
+
+                    <h3>Viewing Permissions</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls -l /etc/passwd</span>
+<span class="output">-rw-r--r-- 1 root root 1234 Feb 23 12:00 /etc/passwd</span>
+                    </div>
+                    <p>The string <code>-rw-r--r--</code> breaks down as:</p>
+                    <ul>
+                        <li><strong>-</strong> - File type (- = regular file, d = directory)</li>
+                        <li><strong>rw-</strong> - Owner permissions (read, write, no execute)</li>
+                        <li><strong>r--</strong> - Group permissions (read only)</li>
+                        <li><strong>r--</strong> - Other permissions (read only)</li>
+                    </ul>
+
+                    <h3>Permission Numbers</h3>
+                    <p>Permissions can also be represented numerically:</p>
+                    <ul>
+                        <li><strong>r = 4</strong></li>
+                        <li><strong>w = 2</strong></li>
+                        <li><strong>x = 1</strong></li>
+                    </ul>
+                    <p>So <code>rw-r--r--</code> = 644 (owner has 4+2=6, others have 4)</p>
+                    <p>And <code>rwxr-xr-x</code> = 755 (owner has all, others can read/execute)</p>
+                    <p>And <code>rwx------</code> = 700 (only owner can do anything)</p>
+
+                    <h3>Changing Permissions</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">chmod 700 secret.txt</span>
+<span class="prompt">$</span> <span class="command">chmod +x script.sh</span>
+<span class="prompt">$</span> <span class="command">chmod go-w file.txt</span>
+                    </div>
+                    <p>Flags: u=user (owner), g=group, o=others, a=all</p>
+
+                    <h3>Ownership</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls -l /var/log/syslog</span>
+<span class="output">-rw-r----- 1 syslog adm 12345 Feb 23 12:00 /var/log/syslog</span>
+                    </div>
+                    
+                    <p>File ownership is shown as <code>user:group</code>. The syslog file is owned by syslog user, adm group.</p>
+                    
+                    <h3>Changing Ownership</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">chown user:group file.txt</span>
+<span class="prompt">$</span> <span class="command">chown -R user:group directory/</span>
+                    </div>
+
+                    <h3>Special Permissions</h3>
+                    <ul>
+                        <li><strong>SetUID (4000)</strong> - Run as file owner</li>
+                        <li><strong>SetGID (2000)</strong> - Run as group owner</li>
+                        <li><strong>Sticky Bit (1000)</strong> - Only owner can delete</li>
+                    </ul>
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. The permission to view file contents is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="read" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Represented by </p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. The command to change ownership is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="chown" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: CHange OWNership</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. To make a file private, use chmod _____.</p>
+                        <input type="text" class="quiz-input" data-answer="700" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Only owner can access</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. In -rwxr-xr-x, the owner</p>
+                        <input type="text" class="quiz-input" data-answer="rwx" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Read, write, execute</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>read</li>
+                                <li>chown</li>
+                                <li>700</li>
+                                <li>rwx</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Lesson 5 --><div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Process Management</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>What is a Process?</h3>
+                    <p>A process is a running program. Every command you execute starts one or more processes. Understanding processes gives you complete control over your system.</p>
+
+                    <h3>Viewing Processes</h3>
+                    
+                    <h4>Process Status (ps)</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ps</span>
+<span class="output">  PID TTY          TIME CMD
+   1234 pts/0    00:00:00 bash
+   5678 pts/0    00:00:00 ps</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ps aux</span>
+<span class="output">USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.0   2384  1504 ?        Ss   12:00   0:02 /sinit
+root       234  0.0  0.0   4321  2800 ?        S    12:00   0:00 /bin/bash
+user       567  0.0  0.1  12345  6789 pts/0   Ss   12:00   0:00 bash</span>
+                    </div>
+
+                    <h4>Top - Real-time Process Monitor</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">top</span>
+<span class="output">top - 12:00:00 up 5 days,  1:23,  1 user,  load average: 0.52, 0.58, 0.59
+Tasks: 245 total,   1 running, 244 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  5.2 us,  1.3 sy,  0.0 ni, 93.5 id,  0.0 wa
+MiB Mem :  8192.0 total,  2048.0 free,  3072.0 used,  3072.0 buff/cache
+MiB Swap:  2048.0 total,  2048.0 free,    0.0 used.  4096.0 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+  1234 root      20   0  512344  45000  12000 S   2.0   0.5   0:05.32 Xorg</span>
+                    </div>
+
+                    <h3>Process IDs (PID)</h3>
+                    <p>Every process has a unique Process ID. The first process (init/systemd) is always PID 1.</p>
+                    
+                    <h3>Signals - Controlling Processes</h3>
+                    <p>Signals are how you communicate with processes:</p>
+                    <ul>
+                        <li><strong>SIGTERM (15)</strong> - Graceful termination (recommended)</li>
+                        <li><strong>SIGKILL (9)</strong> - Force kill (emergency only)</li>
+                        <li><strong>SIGSTOP (19)</strong> - Pause process</li>
+                        <li><strong>SIGCONT (18)</strong> - Resume paused process</li>
+                    </ul>
+
+                    <h3>Killing Processes</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">kill 12345</span>
+<span class="comment"># Send SIGTERM to process 12345</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">kill -9 12345</span>
+<span class="comment"># Force kill process 12345 (SIGKILL)</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">pkill firefox</span>
+<span class="comment"># Kill all processes named firefox</span>
+                    </div>
+
+                    <h3>Background Processes</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sleep 100 &</span>
+<span class="comment"># Run sleep in background (&)</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">jobs</span>
+<span class="comment"># List background jobs</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">fg %1</span>
+<span class="comment"># Bring job 1 to foreground</span>
+                    </div>
+
+                    <h3>Priority (Nice Values)</h3>
+                    <p>Process priority ranges from -20 (highest) to +19 (lowest). Higher priority = more CPU time.</p>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">nice -n 10 ./script.sh</span>
+<span class="comment"># Run script with lower priority</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">renice +5 12345</span>
+<span class="comment"># Change priority of running process</span>
+                    </div>
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Every process has a unique _____.</p>
+                        <input type="text" class="quiz-input" data-answer="pid" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Process ID</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Signal _____ forces immediate termination.</p>
+                        <input type="text" class="quiz-input" data-answer="sigkill" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Signal number 9</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. The _____ command shows real-time process activity.</p>
+                        <input type="text" class="quiz-input" data-answer="top" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Like Task Manager on Windows</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. To run a command in the background, add _____.</p>
+                        <input type="text" class="quiz-input" data-answer="&" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Ampersand</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>pid</li>
+                                <li>sigkill</li>
+                                <li>top</li>
+                                <li>&</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Lesson 6 --><div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Text Manipulation & Pipelines</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>The Power of Text</h3>
+                    <p>In Linux, text is king. Most configuration is done through text files, and the tools to manipulate text are incredibly powerful. This is why FOSS is so powerful—you can understand and modify everything.</p>
+
+                    <h3>Viewing Files</h3>
+                    
+                    <h4>cat - Concatenate and Display</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat /etc/hostname</span>
+<span class="output">rebel</span>
+                    </div>
+
+                    <h4>head - First Lines</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">head -n 5 /etc/passwd</span>
+<span class="output">root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync</span>
+                    </div>
+
+                    <h4>tail - Last Lines</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">tail -f /var/log/syslog</span>
+<span class="comment"># Follow the log file in real-time</span>
+                    </div>
+
+                    <h3>Searching Text</h3>
+                    
+                    <h4>grep - Pattern Matching</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">grep "root" /etc/passwd</span>
+<span class="output">root:x:0:0:root:/root:/bin/bash</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ps aux | grep firefox</span>
+<span class="comment"># Find firefox process</span>
+                    </div>
+
+                    <h4>Case-Insensitive Search</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">grep -i "error" logfile.txt</span>
+<span class="comment"># Find all error variations (ERROR, Error, error)</span>
+                    </div>
+
+                    <h3>Pipes - Connecting Commands</h3>
+                    <p>Pipes (|) send the output of one command as input to another. This is called composition.</p>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls -la /etc | grep ".conf"</span>
+<span class="comment"># List config files in /etc</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ps aux | sort -k4 -r | head -10</span>
+<span class="comment"># Top 10 memory-consuming processes</span>
+                    </div>
+
+                    <h3>Text Processing</h3>
+                    
+                    <h4>wc - Word Count</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">wc -l /etc/passwd</span>
+<span class="output">42</span>
+                    </div>
+
+                    <h4>cut - Extract Columns</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cut -d: -f1 /etc/passwd</span>
+<span class="comment"># Extract usernames (first field, colon-delimited)</span>
+                    </div>
+
+                    <h4>sort - Sort Lines</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ps aux | sort -k4 -r</span>
+<span class="comment"># Sort by memory usage, descending</span>
+                    </div>
+
+                    <h4>uniq - Remove Duplicates</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sort file.txt | uniq</span>
+<span class="comment"># Unique lines in sorted order</span>
+                    </div>
+
+                    <h4>awk - Advanced Text Processing</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">df -h | awk '{print $1 ": " $5}'</span>
+<span class="comment"># Show filesystem and usage</span>
+                    </div>
+
+                    <h4>sed - Stream Editor</h4>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sed 's/old/new/g' file.txt</span>
+<span class="comment"># Replace all occurrences of 'old' with 'new'</span>
+                    </div>
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. The _____ command searches for patterns in text.</p>
+                        <input type="text" class="quiz-input" data-answer="grep" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Global Regular Expression Print</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. The _____ symbol (|) sends output from one command to another.</p>
+                        <input type="text" class="quiz-input" data-answer="pipe" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: It connects commands together</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. To view the first 10 lines of a file, use the _____ command.</p>
+                        <input type="text" class="quiz-input" data-answer="head" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Opposite of </p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. The _____ command counts lines, words, and characters.</p>
+                        <input type="text" class="quiz-input" data-answer="wc" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Word Count</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>grep</li>
+                                <li>pipe</li>
+                                <li>head</li>
+                                <li>wc</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 --><div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Shell Scripting Basics</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Why Learn Shell Scripting?</h3>
+                <p>Shell scripting allows you to automate repetitive tasks, combine multiple commands into single operations, and create powerful system administration tools. It's the foundation of system automation on Linux.</p>
+                
+                <div class="highlight-box">
+                    <strong>AUTOMATION POWER:</strong> A well-written script can replace hours of manual work. System administrators use scripts to deploy servers, monitor systems, backup data, and manage user accounts—all automatically.
+                </div>
+
+                <h3>Creating Your First Script</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat > hello.sh << 'EOF'</span>
+<span class="output">#!/bin/bash
+# This is my first script
+echo "Hello, Linux World!"
+echo "Today's date is: $(date)"
+EOF</span>
+                </div>
+
+                <h3>Making Scripts Executable</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">chmod +x hello.sh</span>
+<span class="prompt">$</span> <span class="command">./hello.sh</span>
+<span class="output">Hello, Linux World!
+Today's date is: Mon Feb 23 12:00:00 UTC 2026</span>
+                </div>
+
+                <h3>Variables</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat > variables.sh << 'EOF'</span>
+<span class="output">#!/bin/bash
+NAME="Rebel"
+YEAR=2026
+echo "Hello, $NAME!"
+echo "Current year: ${YEAR}"
+EOF</span>
+                </div>
+
+                <h3>User Input</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat > input.sh << 'EOF'</span>
+<span class="output">#!/bin/bash
+read -p "Enter your name: " USERNAME
+echo "Welcome, $USERNAME!"
+EOF</span>
+                </div>
+
+                <h3>Conditional Statements</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat > check_file.sh << 'EOF'</span>
+<span class="output">#!/bin/bash
+if [ -f "$1" ]; then
+    echo "File exists: $1"
+else
+    echo "File does not exist: $1"
+fi</span>
+                </div>
+
+                <h3>Loops</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat > loop.sh << 'EOF'</span>
+<span class="output">#!/bin/bash
+# For loop
+for i in {1..5}; do
+    echo "Iteration: $i"
+done
+
+# While loop
+count=1
+while [ $count -le 3 ]; do
+    echo "Count: $count"
+    ((count++))
+done</span>
+                </div>
+
+                <h3>Functions</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat > functions.sh << 'EOF'</span>
+<span class="output">#!/bin/bash
+my_function() {
+    echo "Parameter 1: $1"
+    echo "Parameter 2: $2"
+}
+
+my_function "Hello" "World"</span>
+                </div>
+
+                <h3>Exit Codes</h3>
+                <p>Every command returns an exit code: 0 means success, non-zero means failure.</p>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls /tmp; echo "Exit code: $?"</span>
+<span class="output">Exit code: 0</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. The first line of a bash script is called the _____.</p>
+                        <input type="text" class="quiz-input" data-answer="shebang" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Starts with #!/bin/bash</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. To make a script executable, use chmod _____.</p>
+                        <input type="text" class="quiz-input" data-answer="+x" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Add execute permission</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. The _____ command reads user input into a variable.</p>
+                        <input type="text" class="quiz-input" data-answer="read" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Like reading from stdin</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. An exit code of _____ indicates success.</p>
+                        <input type="text" class="quiz-input" data-answer="0" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Zero means no errors</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>shebang</li>
+                                <li>+x</li>
+                                <li>read</li>
+                                <li>0</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 --><div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// System Services</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Understanding systemd</h3>
+                <p>systemd is the system and service manager for most modern Linux distributions. It manages startup processes, services, and system states. Understanding systemd is essential for system administration.</p>
+                
+                <div class="highlight-box">
+                    <strong>SYSTEM CONTROL:</strong> systemd replaced the traditional init system and provides parallelized startup, on-demand daemon activation, and powerful dependency management. It controls everything from networking to logging.
+                </div>
+
+                <h3>Checking Service Status</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">systemctl status sshd</span>
+<span class="output">● sshd.service - OpenSSH server daemon
+   Loaded: loaded (/lib/systemd/system/sshd.service; enabled; vendor preset: enabled)
+   Active: active (running) since Mon 2026-02-23 10:00:00 UTC
+ Main PID: 1234 (sshd)</span>
+                </div>
+
+                <h3>Starting and Stopping Services</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo systemctl start nginx</span>
+<span class="comment"># Start the nginx service</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo systemctl stop nginx</span>
+<span class="comment"># Stop the nginx service</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo systemctl restart nginx</span>
+<span class="comment"># Restart the nginx service</span>
+                </div>
+
+                <h3>Enabling and Disabling Services</h3>
+                <p>Enable means the service starts automatically at boot. Disable prevents auto-start.</p>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo systemctl enable sshd</span>
+<span class="output">Created symlink /etc/systemd/system/multi-user.target.wants/sshd.service...</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo systemctl disable sshd</span>
+<span class="comment"># Remove from auto-start</span>
+                </div>
+
+                <h3>Listing All Services</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">systemctl list-units --type=service</span>
+<span class="output">UNIT                      LOAD   ACTIVE SUB     DESCRIPTION
+sshd.service              loaded active running OpenSSH server daemon
+nginx.service             loaded active running A high performance web server
+cron.service              loaded active running Regular background program processing</span>
+                </div>
+
+                <h3>Systemd Timers (Cron Replacement)</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">systemctl list-timers</span>
+<span class="output">NEXT                        LEFT          LAST                        PASSED       UNIT
+Mon 2026-02-23 00:00:00 UTC 11h left      Sun 2026-02-22 00:00:00 UTC 13h ago      apt-daily.timer</span>
+                </div>
+
+                <h3>Traditional Cron Jobs</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">crontab -l</span>
+<span class="output"># Edit with: crontab -e
+0 2 * * * /usr/local/bin/backup.sh
+*/5 * * * * /usr/local/bin/monitor.sh</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>CRON SYNTAX:</strong> Minute Hour Day Month DayOfWeek. * means "every". 0 2 * * * means "2:00 AM daily". */5 means "every 5 minutes".
+                </div>
+
+                <h3>System Targets (Runlevels)</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">systemctl get-default</span>
+<span class="output">graphical.target</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo systemctl isolate multi-user.target</span>
+<span class="comment"># Switch to multi-user mode (no GUI)</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. The command to manage systemd services is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="systemctl" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: System Control</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. To start a service at boot, use systemctl _____.</p>
+                        <input type="text" class="quiz-input" data-answer="enable" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Opposite of disable</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. The traditional job scheduler in Linux is called _____.</p>
+                        <input type="text" class="quiz-input" data-answer="cron" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Chronological</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. The command to view your cron jobs is crontab _____.</p>
+                        <input type="text" class="quiz-input" data-answer="-l" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: List/Show</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>systemctl</li>
+                                <li>enable</li>
+                                <li>cron</li>
+                                <li>-l</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 --><div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Networking Tools</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Modern Networking Commands</h3>
+                <p>Linux provides powerful networking tools for diagnostics, monitoring, and configuration. The `ip` command has replaced deprecated tools like ifconfig, route, and arp.</p>
+                
+                <div class="highlight-box">
+                    <strong>NETWORK DIAGNOSTICS:</strong> Understanding networking tools is crucial for troubleshooting connectivity, analyzing traffic, and securing your system. These are essential skills for any Linux administrator.
+                </div>
+
+                <h3>ip Command - Modern Network Tool</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ip addr show</span>
+<span class="output">1: lo: <LOOPBACK,UP> mtu 65536 ...
+    inet 127.0.0.1/8 scope host lo
+2: eth0: <BROADCAST,MULTICAST,UP> mtu 1500 ...
+    inet 192.168.1.100/24 brd 192.168.1.255 scope global dynamic eth0</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ip link show</span>
+<span class="output">2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
+    link/ether 00:1a:2b:3c:4d:5e brd ff:ff:ff:ff:ff:ff</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ip route show</span>
+<span class="output">default via 192.168.1.1 dev eth0 proto dhcp metric 100
+192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.100</span>
+                </div>
+
+                <h3>Socket Statistics (ss)</h3>
+                <p>The `ss` command replaces netstat and provides faster, more detailed socket information.</p>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ss -tuln</span>
+<span class="output">Netid  State   Recv-Q  Send-Q  Local Address:Port  Peer Address:Port
+udp    UNCONN  0       0       0.0.0.0:68          0.0.0.0:*
+tcp    LISTEN  0       128     0.0.0.0:22          0.0.0.0:*
+tcp    LISTEN  0       128     0.0.0.0:80          0.0.0.0:*
+tcp    LISTEN  0       128     0.0.0.0:443         0.0.0.0:*</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>SS OPTIONS:</strong> -t = TCP, -u = UDP, -l = listening sockets, -n = numeric (no DNS lookup), -p = show processes.
+                </div>
+
+                <h3>Ping - Test Connectivity</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ping -c 4 google.com</span>
+<span class="output">PING google.com (142.250.80.46) 56(84) bytes of data.
+64 bytes from google.com: icmp_seq=1 ttl=117 time=15.2 ms
+64 bytes from google.com: icmp_seq=2 ttl=117 time=14.8 ms
+4 packets transmitted, 4 received, 0% packet loss</span>
+                </div>
+
+                <h3>curl - Transfer Data</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">curl -I https://example.com</span>
+<span class="output">HTTP/2 200
+content-type: text/html; charset=UTF-8
+server: ECS (nyb/1CDB)</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">curl -o file.zip https://example.com/file.zip</span>
+<span class="comment"># Download file to disk</span>
+                </div>
+
+                <h3>wget - File Downloader</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">wget https://example.com/large-file.iso</span>
+<span class="output">--2026-02-23 12:00:00--  https://example.com/large-file.iso
+Resolving example.com... 93.184.216.34
+Connecting to example.com|93.184.216.34|:443... connected.
+Saving to: 'large-file.iso'
+
+large-file.iso     100%[==================>]  1.50G  25.5MB/s    in 60s</span>
+                </div>
+
+                <h3>traceroute - Trace Network Path</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">traceroute google.com</span>
+<span class="output">traceroute to google.com (142.250.80.46), 30 hops max
+ 1  192.168.1.1 (192.168.1.1)  1.234 ms  1.123 ms  1.098 ms
+ 2  isp-gateway.net (10.0.0.1)  5.432 ms  5.321 ms  5.287 ms</span>
+                </div>
+
+                <h3>netcat - Network Swiss Army Knife</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">nc -zv 192.168.1.1 22</span>
+<span class="output">Connection to 192.168.1.1 22 port [tcp/ssh] succeeded!</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">nc -l 8080</span>
+<span class="comment"># Listen on port 8080 for connections</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. The modern replacement for ifconfig is the _____ command.</p>
+                        <input type="text" class="quiz-input" data-answer="ip" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Short and modern</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. The _____ command replaces netstat for socket statistics.</p>
+                        <input type="text" class="quiz-input" data-answer="ss" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Socket Statistics</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. To download a file from the command line, use _____ or wget.</p>
+                        <input type="text" class="quiz-input" data-answer="curl" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Client URL</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. The _____ command traces the network path to a destination.</p>
+                        <input type="text" class="quiz-input" data-answer="traceroute" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Trace the route</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>ip</li>
+                                <li>ss</li>
+                                <li>curl</li>
+                                <li>traceroute</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 --><div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Storage Management</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Disk Management Fundamentals</h3>
+                <p>Understanding storage management is critical for system administration. From partitioning disks to managing LVM volumes and configuring mount points, these skills ensure your data is safe and accessible.</p>
+                
+                <div class="highlight-box">
+                    <strong>DATA PROTECTION:</strong> Always backup data before making storage changes. Disk operations can be destructive. Use virtual machines to practice before working on production systems.
+                </div>
+
+                <h3>Listing Disk Information</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">lsblk</span>
+<span class="output">NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda      8:0    0   100G  0 disk 
+├─sda1   8:1    0   512M  0 part /boot
+├─sda2   8:2    0    20G  0 part /
+└─sda3   8:3    0  79.5G  0 part /home
+sdb      8:16   0    50G  0 disk</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">df -h</span>
+<span class="output">Filesystem      Size  Used Avail Use% Mounted on
+udev            3.9G     0  3.9G   0% /dev
+/dev/sda2        20G   15G  4.5G  77% /
+/dev/sda3        79G   45G   32G  59% /home</span>
+                </div>
+
+                <h3>Partitioning with fdisk</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo fdisk /dev/sdb</span>
+<span class="output">Command (m for help): n
+Partition type
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended (container for logical partitions)
+Select (default p): p
+Partition number (1-4, default 1): 1
+First sector (2048-104857599, default 2048): 
+Last sector ...: +10G
+
+Created a new partition 1 of type 'Linux' and of size 10 GiB.</span>
+                </div>
+
+                <h3>Creating Filesystems</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo mkfs.ext4 /dev/sdb1</span>
+<span class="output">mke2fs 1.46.5 (30-Dec-2021)
+Creating filesystem with 2621440 4k blocks and 655360 inodes
+Filesystem UUID: 1234-abcd-5678-efgh
+Writing superblocks and filesystem accounting information: done</span>
+                </div>
+
+                <h3>Mounting Filesystems</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo mkdir /mnt/data</span>
+<span class="prompt">$</span> <span class="command">sudo mount /dev/sdb1 /mnt/data</span>
+<span class="prompt">$</span> <span class="command">mount | grep /mnt/data</span>
+<span class="output">/dev/sdb1 on /mnt/data type ext4 (rw,relatime)</span>
+                </div>
+
+                <h3>Permanent Mounts (fstab)</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat /etc/fstab</span>
+<span class="output"># <file system> <mount point>   <type>  <options>       <dump>  <pass>
+UUID=abc123...  /               ext4    errors=remount-ro 0       1
+UUID=def456...  /home           ext4    defaults          0       2
+/dev/sdb1       /mnt/data       ext4    defaults          0       2</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>FSTAB FIELDS:</strong> device, mount point, filesystem type, mount options, dump (backup), pass (fsck order). Use 0 for pass on data partitions, 1 for root, 2 for other system partitions.
+                </div>
+
+                <h3>Logical Volume Manager (LVM)</h3>
+                <p>LVM provides flexible disk management by abstracting physical disks into logical volumes.</p>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo pvcreate /dev/sdb</span>
+<span class="output">Physical volume "/dev/sdb" successfully created</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo vgcreate vg_data /dev/sdb</span>
+<span class="output">Volume group "vg_data" successfully created</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo lvcreate -L 20G -n lv_storage vg_data</span>
+<span class="output">Logical volume "lv_storage" created</span>
+                </div>
+
+                <h3>Extending Volumes</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo lvextend -L +10G /dev/vg_data/lv_storage</span>
+<span class="output">Size of logical volume vg_data/lv_storage changed from 20.00 GiB to 30.00 GiB</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo resize2fs /dev/vg_data/lv_storage</span>
+<span class="output">Filesystem at /dev/vg_data/lv_storage is now 7864320 blocks long</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. The command to view disk partition information is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="lsblk" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: List Block devices</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. The file _____ defines permanent filesystem mounts.</p>
+                        <input type="text" class="quiz-input" data-answer="fstab" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: /etc/fstab</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. LVM stands for _____ Volume Manager.</p>
+                        <input type="text" class="quiz-input" data-answer="logical" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Not physical</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. To create an ext4 filesystem, use the _____ command.</p>
+                        <input type="text" class="quiz-input" data-answer="mkfs.ext4" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Make filesystem</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>lsblk</li>
+                                <li>fstab</li>
+                                <li>logical</li>
+                                <li>mkfs.ext4</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 --><div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// System Monitoring</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Real-Time System Monitoring</h3>
+                <p>System monitoring is essential for identifying performance bottlenecks, detecting resource exhaustion, and ensuring system stability. Linux provides numerous tools for real-time and historical monitoring.</p>
+                
+                <div class="highlight-box">
+                    <strong>PERFORMANCE TUNING:</strong> Understanding resource usage patterns helps you optimize systems for better performance and plan capacity upgrades before hitting limits.
+                </div>
+
+                <h3>top - Classic Process Viewer</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">top</span>
+<span class="output">top - 12:00:00 up 5 days,  1:23,  1 user,  load average: 0.52, 0.58, 0.59
+Tasks: 245 total,   1 running, 244 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  5.2 us,  1.3 sy,  0.0 ni, 93.5 id,  0.0 wa,  0.0 hi,  0.0 si
+MiB Mem :  8192.0 total,  2048.0 free,  3072.0 used,  3072.0 buff/cache
+MiB Swap:  2048.0 total,  2048.0 free,    0.0 used.  4096.0 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+ 1234 root      20   0  512344  45000  12000 S   2.0   0.5   0:05.32 Xorg
+ 5678 user      20   0  234567  89012  34000 S   1.5   1.1   0:03.21 firefox</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>TOP COLUMNS:</strong> PID (Process ID), USER (owner), %CPU (CPU usage), %MEM (memory usage), VIRT (virtual memory), RES (resident memory), TIME+ (CPU time), COMMAND (process name).
+                </div>
+
+                <h3>htop - Interactive Process Viewer</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">htop</span>
+<span class="output">  1  [||||||||||||||||                    25.0%]   Tasks: 45, 2 thr; 1 running
+  2  [||||||||||                          12.5%]   Load average: 0.52 0.58 0.59
+Mem [|||||||||||||||           3.00G/8.00G]
+Swp [                                    0K/2.00G]
+
+  PID USER  PRI  NI  VIRT   RES   SHR S CPU% MEM%   TIME+  Command
+ 1234 root   20   0  500M  450M  120M S  2.0  5.6  0:05.32 nginx
+ 5678 user   20   0  230M   89M   34M S  1.5  1.1  0:03.21 sshd</span>
+                </div>
+
+                <p>htop features: Color-coded display, mouse support, visual CPU/memory bars, easier process killing (F9), sorting by any column (F6).</p>
+
+                <h3>vmstat - Virtual Memory Statistics</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">vmstat 1 5</span>
+<span class="output">procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 1  0      0 2048000 123456 2345672    0    0    12    15  234  567  5  2 93  0  0
+ 0  0      0 2048123 123456 2345678    0    0     0     0  123  234  2  1 97  0  0</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>VMSTAT COLUMNS:</strong> r (running), b (blocked), swpd (swapped), free (free memory), si/so (swap in/out), bi/bo (blocks in/out), us/sy/id/wa (user/system/idle/wait CPU).
+                </div>
+
+                <h3>iostat - I/O Statistics</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">iostat -x 2</span>
+<span class="output">Linux 5.15.0-91-generic (rebel)     02/23/2026      _x86_64_
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           5.25    0.00    1.30    0.05    0.00   93.40
+
+Device            r/s     w/s     rkB/s     wkB/s   await
+sda              12.34   45.67    123.45    567.89    2.34
+sdb               0.12    0.34      1.23      4.56    5.67</span>
+                </div>
+
+                <h3>System Logs with journalctl</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo journalctl -b</span>
+<span class="comment"># View boot logs</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo journalctl -u sshd -f</span>
+<span class="comment"># Follow sshd service logs in real-time</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo journalctl --since "1 hour ago"</span>
+<span class="comment"># View logs from last hour</span>
+                </div>
+
+                <h3>Traditional Log Files</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo tail -f /var/log/syslog</span>
+<span class="output">Feb 23 12:00:01 rebel CRON[1234]: (root) CMD (/usr/local/bin/backup.sh)
+Feb 23 12:00:05 rebel sshd[5678]: Accepted publickey for user from 192.168.1.100</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo tail -f /var/log/auth.log</span>
+<span class="comment"># Authentication and security logs</span>
+                </div>
+
+                <h3>dmesg - Kernel Ring Buffer</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">dmesg | tail -20</span>
+<span class="output">[   12.345678] usb 1-1: new high-speed USB device number 2 using xhci_hcd
+[   12.456789] usb 1-1: New USB device found, idVendor=1234, idProduct=5678</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. The enhanced version of top with colors and mouse support is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="htop" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: H for human-friendly</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. The command to view virtual memory statistics is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="vmstat" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Virtual Memory Statistics</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. systemd logs are viewed using the _____ command.</p>
+                        <input type="text" class="quiz-input" data-answer="journalctl" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Journal Control</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Kernel messages are viewed with the _____ command.</p>
+                        <input type="text" class="quiz-input" data-answer="dmesg" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Diagnostic Message</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>htop</li>
+                                <li>vmstat</li>
+                                <li>journalctl</li>
+                                <li>dmesg</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 --><div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Linux Security</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Defense in Depth</h3>
+                <p>Linux security is multi-layered, combining mandatory access controls, auditing, integrity checking, and least-privilege principles. Understanding these tools is essential for protecting systems and data.</p>
+                
+                <div class="highlight-box">
+                    <strong>SECURITY MINDSET:</strong> Security is not a product you buy, it's a process. Layer your defenses—no single tool provides complete protection. Monitor, audit, and verify continuously.
+                </div>
+
+                <h3>SELinux - Security-Enhanced Linux</h3>
+                <p>SELinux is a mandatory access control (MAC) system that enforces security policies at the kernel level.</p>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">getenforce</span>
+<span class="output">Enforcing</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sestatus</span>
+<span class="output">SELinux status:                 enabled
+SELinuxfs mount:                /sys/fs/selinux
+SELinux root directory:         /etc/selinux
+Loaded policy name:             targeted
+Current mode:                   enforcing</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls -Z /etc/passwd</span>
+<span class="output">system_u:object_r:passwd_file_t:s0 /etc/passwd</span>
+                </div>
+
+                <h3>AppArmor - Alternative MAC</h3>
+                <p>AppArmor is another MAC system, used primarily on Ubuntu and SUSE. It uses profiles to confine programs.</p>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo aa-status</span>
+<span class="output">apparmor module is loaded.
+14 profiles are loaded.
+14 profiles are in enforce mode.
+   /usr/sbin/mysqld
+   /usr/sbin/nginx
+   /usr/sbin/sshd</span>
+                </div>
+
+                <h3>Auditd - System Auditing</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo auditctl -l</span>
+<span class="output">-w /etc/passwd -p wa -k identity
+-w /etc/group -p wa -k identity
+-a always,exit -F arch=b64 -S setuid -k privilege_escalation</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo ausearch -k identity -ts today</span>
+<span class="output">----
+time->Mon Feb 23 12:00:00 2026
+type=SYSCALL msg=audit(1234567890.123:12345):
+arch=c000003e syscall=257 success=yes ...
+auid=1000 uid=0 gid=0 euid=0 suid=0 ...
+comm="vim" exe="/usr/bin/vim" ...</span>
+                </div>
+
+                <h3>AIDE - File Integrity Checker</h3>
+                <p>AIDE (Advanced Intrusion Detection Environment) monitors file integrity and detects unauthorized changes.</p>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo aide --init</span>
+<span class="output">AIDE initialized database at /var/lib/aide/aide.db.new.gz</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo aide --check</span>
+<span class="output">AIDE found differences between database and filesystem!!
+
+Summary:
+  Total number of entries:      12345
+  Added entries:                0
+  Removed entries:              0
+  Changed entries:              3</span>
+                </div>
+
+                <h3>File Permissions Best Practices</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">find /home -type f -perm /o+w</span>
+<span class="comment"># Find files world-writable (security risk)</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">find / -perm -4000 -type f 2>/dev/null</span>
+<span class="comment"># Find SetUID files (potential privilege escalation)</span>
+                </div>
+
+                <h3>SSH Security</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat /etc/ssh/sshd_config | grep -E "^(Port|PermitRootLogin|PasswordAuthentication)"</span>
+<span class="output">Port 22
+PermitRootLogin no
+PasswordAuthentication no</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>SSH HARDENING:</strong> Disable root login, use key authentication only, change default port, use fail2ban to block brute force attempts, and keep software updated.
+                </div>
+
+                <h3>Firewall with nftables/iptables</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo nft list ruleset</span>
+<span class="output">table inet filter {
+    chain input {
+        type filter hook input priority filter; policy drop;
+        ct state established,related accept
+        iif "lo" accept
+        tcp dport { 22, 80, 443 } accept
+    }
+}</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. SELinux stands for Security-_____ Linux.</p>
+                        <input type="text" class="quiz-input" data-answer="enhanced" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Improved or strengthened</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. The command to check SELinux status is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="sestatus" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: SE Linux Status</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. _____ is an alternative to SELinux used on Ubuntu.</p>
+                        <input type="text" class="quiz-input" data-answer="apparmor" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Application Armor</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. AIDE stands for Advanced Intrusion _____ Environment.</p>
+                        <input type="text" class="quiz-input" data-answer="detection" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Finding intrusions</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>enhanced</li>
+                                <li>sestatus</li>
+                                <li>apparmor</li>
+                                <li>detection</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set initial state on page load
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            const toggle = document.getElementById('themeToggle');
+            const icon = document.querySelector('.theme-toggle-icon');
+            if (toggle) toggle.checked = true;
+            if (icon) icon.textContent = '☀️';
+        }
+        
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="nav.js" defer></script>
+</body>
+</html>
