@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="onion-location" content="http://yppxyvqzw3lcpkjqpbm24ugbpqibke45bkrqzatsy3asoa377urir3yd.onion/account.html">
 
     <title>My Account - Rebel With Linux</title>
     <meta name="description" content="Track your learning progress and achievements on Rebel With Linux. View completed guides, earned badges, and level up your skills.">
@@ -92,6 +91,10 @@
                     <div class="stat-label">Projects Done</div>
                 </div>
                 <div class="stat-card">
+                    <div class="stat-number" id="gamesCompleted">0</div>
+                    <div class="stat-label">Games Completed</div>
+                </div>
+                <div class="stat-card">
                     <div class="stat-number" id="achievementsCount">0</div>
                     <div class="stat-label">Achievements</div>
                 </div>
@@ -138,6 +141,13 @@
                 <!-- Projects will be populated by JavaScript -->
             </div>
         </section>
+
+        <section class="games-progress-section">
+            <h2>// Game Progress</h2>
+            <div class="games-list" id="gamesList">
+                <!-- Games will be populated by JavaScript -->
+            </div>
+        </section>
     </main>
 
     <a class="back-to-top" href="#top" aria-label="Back to top">↑</a>
@@ -153,6 +163,7 @@
         let currentUser = null;
         let completedCourses = [];
         let completedProjects = [];
+        let completedGames = [];
 
         // Guide and project definitions
         const GUIDES = [
@@ -187,21 +198,53 @@
             { id: 'project-mail', name: 'Self-Hosted Mail Server', file: 'project-mail.html', icon: '📧' }
         ];
 
+        const GAMES = [
+            { id: 'bash', name: 'Captain Bash', file: 'bashterm.html', icon: '🏴‍☠️' },
+            { id: 'python', name: 'Professor Python', file: 'pyterm.html', icon: '🐍' },
+            { id: 'linux', name: 'Linux Larry', file: 'nixterm.html', icon: '🐧' },
+            { id: 'vim', name: 'Vim Vince', file: 'vimterm.html', icon: '✏️' },
+            { id: 'sql', name: 'SQL Sally', file: 'sqlterm.html', icon: '🗄️' },
+            { id: 'sed', name: 'Sed the Wizard', file: 'sedterm.html', icon: '✨' },
+            { id: 'regex', name: 'Regex Rachel', file: 'regexterm.html', icon: '🔍' },
+            { id: 'ssh', name: 'SSH Steve', file: 'sshterm.html', icon: '🔑' },
+            { id: 'jq', name: 'jq Jessica', file: 'jqterm.html', icon: '📋' },
+            { id: 'awk', name: 'AWK Andy', file: 'awkterm.html', icon: '📊' },
+            { id: 'curl', name: 'cURL Chris', file: 'curlterm.html', icon: '🌐' },
+            { id: 'git', name: 'Git Gary', file: 'gitterm.html', icon: '🔀' }
+        ];
+
         // Check authentication on page load
+        let authChecked = false;
+        
         async function checkAuth() {
+            if (authChecked) return;
+            authChecked = true;
+            
+            console.log('=== Starting auth check ===');
+            
             try {
-                const response = await fetch('api/auth.php?action=check', { credentials: 'include' });
-                const data = await response.json();
-                if (data.authenticated) {
-                    currentUser = data.email;
+                // First, let's verify the session
+                const sessionCheck = await fetch('api/auth.php?action=check&t=' + Date.now(), { 
+                    credentials: 'include',
+                    cache: 'no-store'
+                });
+                console.log('Session check status:', sessionCheck.status);
+                const sessionData = await sessionCheck.json();
+                console.log('Session check data:', sessionData);
+                
+                if (sessionData.authenticated) {
+                    console.log('User is authenticated:', sessionData.email);
+                    currentUser = sessionData.email;
                     updateUserUI();
                     loadProgress();
                     loadAchievementsData();
+                    console.log('Account page loaded successfully!');
                 } else {
+                    console.log('User NOT authenticated, redirecting...');
                     window.location.href = 'index.html';
                 }
             } catch (e) {
-                console.error('Auth check failed:', e);
+                console.error('Auth check FAILED:', e);
                 window.location.href = 'index.html';
             }
         }
@@ -243,10 +286,12 @@
         async function loadProgress() {
             completedCourses = [];
             completedProjects = [];
+            completedGames = [];
             
             // Show loading state
             document.getElementById('guidesList').innerHTML = '<div class="progress-row"><div class="progress-name">Loading progress...</div></div>';
             document.getElementById('projectsList').innerHTML = '<div class="progress-row"><div class="progress-name">Loading progress...</div></div>';
+            document.getElementById('gamesList').innerHTML = '<div class="progress-row"><div class="progress-name">Loading progress...</div></div>';
             
             // Load guide progress
             for (const guide of GUIDES) {
@@ -278,19 +323,37 @@
                 }
             }
             
+            // Load game progress
+            for (const game of GAMES) {
+                try {
+                    const response = await fetch(`api/progress.php?course=${game.id}`, { credentials: 'include' });
+                    const progress = await response.json();
+                    console.log(`Game ${game.id} progress:`, progress);
+                    // Check if any lesson is completed
+                    if (progress.length > 0 && progress.some(p => p.completed == 1 || p.completed === true || p.completed === "1")) {
+                        completedGames.push(game);
+                    }
+                } catch (e) {
+                    console.error('Could not load progress for', game.id, e);
+                }
+            }
+            
             console.log('Completed courses:', completedCourses);
             console.log('Completed projects:', completedProjects);
+            console.log('Completed games:', completedGames);
             
             // Update stats
             document.getElementById('guidesCompleted').textContent = completedCourses.length;
             document.getElementById('projectsCompleted').textContent = completedProjects.length;
+            document.getElementById('gamesCompleted').textContent = completedGames.length;
             
             // Update progress lists
             renderGuidesList();
             renderProjectsList();
+            renderGamesList();
             
             // Check achievements based on completed items
-            checkAchievements([...completedCourses.map(c => c.file), ...completedProjects.map(p => p.file)]);
+            checkAchievements([...completedCourses.map(c => c.file), ...completedProjects.map(p => p.file), ...completedGames.map(g => g.file)]);
             updateLevelUI();
         }
 
@@ -329,6 +392,26 @@
                         ${isCompleted ? '✓ Completed' : '○ In Progress'}
                     </div>
                     <a href="${project.file}" class="progress-link">View →</a>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function renderGamesList() {
+            const container = document.getElementById('gamesList');
+            container.innerHTML = '';
+            
+            GAMES.forEach(game => {
+                const isCompleted = completedGames.some(g => g.id === game.id);
+                const row = document.createElement('div');
+                row.className = `progress-row ${isCompleted ? 'completed' : ''}`;
+                row.innerHTML = `
+                    <div class="progress-icon">${game.icon}</div>
+                    <div class="progress-name">${game.name}</div>
+                    <div class="progress-status">
+                        ${isCompleted ? '✓ Completed' : '○ In Progress'}
+                    </div>
+                    <a href="${game.file}" class="progress-link">Play →</a>
                 `;
                 container.appendChild(row);
             });

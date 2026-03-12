@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Self-Hosted Email: The Complete Guide - REBEL WITH LINUX</title>
+    <meta name="description" content="Own your inbox with self-hosted email.">
+    <meta name="keywords" content="email, self-hosted, mailserver, mailcow, privacy">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Self-Hosted Email: The Complete Guide">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog-email.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog-email.html">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: var(--black); border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: var(--white); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .blog-content a { color: var(--black); }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="index.html#distros">DISTRO</a>
+                    <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#games">GAMES</a>
+                    <a href="index.html#guides">GUIDES</a>
+                    <a href="index.html#projects">PROJECTS</a>
+                    <a href="index.html#resources">RESOURCES</a>
+                    <a href="index.html#references">REFERENCES</a>
+                    <a href="index.html#blog">BLOG</a>
+                    <a href="index.html#stats">STATS</a>
+                    <a href="index.html#contact">CONTACT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="blog-header">
+        <h1>Self-Hosted Email: The Complete Guide</h1>
+        <p>March 8, 2026 • Self-Hosting • 25 min read</p>
+    </div>
+    
+    <nav class="blog-nav">
+        <a href="index.html">← Home</a>
+        <a href="index.html#blog">All Posts</a>
+    </nav>
+
+    <article class="blog-content">
+        <p>Own your inbox. Learn how email works at a technical level, set up your own mail server with Mailu, configure DNS for proper deliverability, and migrate away from Gmail and Outlook.</p>
+
+        <h2>Why Self-Hosted Email?</h2>
+        <ul>
+            <li>Full control of your data</li>
+            <li>No tracking or scanning</li>
+            <li>Custom domain</li>
+            <li>No ads</li>
+        </ul>
+
+        <h2>Prerequisites</h2>
+        <ul>
+            <li>VPS with at least 2GB RAM</li>
+            <li>Domain name</li>
+            <li>Proper DNS configuration</li>
+        </ul>
+
+        <h2>DNS Records Explained</h2>
+
+        <h3>MX Record</h3>
+        <p>Mail exchanger - tells other mail servers where to deliver your email.</p>
+        <pre><code>@ MX 10 mail.yourdomain.com</code></pre>
+
+        <h3>SPF Record</h3>
+        <p>Sender Policy Framework - authorizes which servers can send email for your domain.</p>
+        <pre><code>@ TXT v=spf1 mx -all</code></pre>
+
+        <h3>DKIM Record</h3>
+        <p>DomainKeys Identified Mail - cryptographic signature proving the email wasn't tampered with.</p>
+
+        <h3>DMARC Record</h3>
+        <p>Domain-based Message Authentication - tells receivers what to do with failed SPF/DKIM.</p>
+        <pre><code>_dmarc TXT v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com</code></pre>
+
+        <h2>Installing Mailcow</h2>
+
+        <pre><code>cd /opt
+git clone https://github.com/mailcow/mailcow-dockerized
+cd mailcow-dockerized
+./generate_config.sh
+docker-compose up -d</code></pre>
+
+        <h2>Configuring DNS</h2>
+        <p>After Mailcow is running, access the admin panel and generate DNS records. Add the following to your domain's DNS:</p>
+        <ul>
+            <li>MX record pointing to your server</li>
+            <li>SPF TXT record</li>
+            <li>DKIM TXT record</li>
+            <li>DMARC TXT record</li>
+            <li>Reverse PTR (contact your provider)</li>
+        </ul>
+
+        <h2>Testing Your Setup</h2>
+        <pre><code>nslookup -type=mx yourdomain.com
+dig yourdomain.com TXT
+# Use mail-tester.com to check deliverability</code></pre>
+
+        <h2>Migrating from Gmail/Outlook</h2>
+        <ol>
+            <li>Set up your new email addresses in Mailcow</li>
+            <li>Configure your new accounts in your email client</li>
+            <li>Use imapsync to migrate existing emails</li>
+            <li>Update your accounts on services</li>
+            <li>Keep old accounts forwarding to new for a transition period</li>
+        </ol>
+
+        <p>Self-hosted email is challenging but rewarding. The feeling of owning your inbox is worth the effort!</p>
+    </article>
+
+    <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+        <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+        <div id="comments-list" style="margin-bottom: 32px;"></div>
+        <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+            <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+            <div style="display: grid; gap: 16px;">
+                <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                <button onclick="submitComment('blog-email')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+            </div>
+        </div>
+    </section>
+    <script src="comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-email');
+        });
+    </script>
+</body>
+</html>

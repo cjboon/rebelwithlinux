@@ -1,7 +1,46 @@
 #!/bin/bash
 
 LOG_FILE="${1:-/var/log/apache2/rebelwithlinux.com_access.log}"
-INDEX_FILE="/var/www/html/index.html"
+INDEX_FILE="/var/www/rebelwithlinux.com/index.html"
+
+setup_systemd_timer() {
+    local timer_name="os-report.timer"
+    local service_name="os-report.service"
+    
+    if [ ! -f "/etc/systemd/system/$timer_name" ]; then
+        echo "Setting up systemd timer..."
+        
+        # Create service file
+        cat > "/etc/systemd/system/$service_name" << 'EOF'
+[Unit]
+Description=Hourly OS Report Script
+
+[Service]
+Type=oneshot
+ExecStart=/var/www/rebelwithlinux.com/os_report.sh
+EOF
+        
+        # Create timer file
+        cat > "/etc/systemd/system/$timer_name" << 'EOF'
+[Unit]
+Description=Hourly OS Report Timer
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+        
+        systemctl daemon-reload
+        systemctl enable --now "$timer_name"
+        echo "Timer installed and enabled"
+    fi
+}
+
+# Setup systemd timer if needed
+setup_systemd_timer
 
 NOW=$(date +%s)
 START_TIME=$((NOW - 86400))
@@ -27,7 +66,7 @@ while IFS= read -r line; do
   fi
 done < "$LOG_FILE" > "$TMPDIR/filtered.log"
 
-TOTAL=$(awk -F'"' '{print $1, $6}' "$TMPDIR/filtered.log" | sort -u -k1,1 | awk '{
+TOTAL=$(gawk -F'"' '{print $1, $6}' "$TMPDIR/filtered.log" | sort -u -k1,1 | gawk '{
   ua = $0
   if (ua ~ /[Ww]indows/) print "Windows", $1
   else if (ua ~ /Mac.*OS/) print "macOS", $1
@@ -39,7 +78,7 @@ TOTAL=$(awk -F'"' '{print $1, $6}' "$TMPDIR/filtered.log" | sort -u -k1,1 | awk 
   else print "Other", $1
 }' | sort -u -k2,2 | wc -l)
 
-REPORT_HTML=$(awk -F'"' '{print $1, $6}' "$TMPDIR/filtered.log" | sort -u -k1,1 | awk '{
+REPORT_HTML=$(gawk -F'"' '{print $1, $6}' "$TMPDIR/filtered.log" | sort -u -k1,1 | gawk '{
   ua = $0
   if (ua ~ /[Ww]indows/) print "Windows", $1
   else if (ua ~ /Mac.*OS/) print "macOS", $1
@@ -49,7 +88,7 @@ REPORT_HTML=$(awk -F'"' '{print $1, $6}' "$TMPDIR/filtered.log" | sort -u -k1,1 
   else if (ua ~ /[Ll]inux/ && ua !~ /Android/) print "Linux", $1
   else if (ua ~ /[Bb]ot/ || ua ~ /^ *$/) next
   else print "Other", $1
-}' | sort -u -k1,1 -k2,2 | awk '
+}' | sort -u -k1,1 -k2,2 | gawk '
 BEGIN {
   print "        <ul style=\"list-style: none; padding: 0; margin: 0;\">"
 }
@@ -103,7 +142,7 @@ with open(index_file, 'r') as f:
 content = re.sub(r'\s*<!--\s*Daily OS Report\s*-->.*?<!--\s*INCLUDE_OS_STATS\s*-->', '<!--INCLUDE_OS_STATS-->', content, flags=re.DOTALL)
 
 section_html = f'''    <!-- Daily OS Report -->
-    <section id="stats" style="padding: 32px; text-align: center; background: var(--ivory); border-top: 2px solid var(--black);">
+    <section id="stats" style="padding: 32px; text-align: center; background: var(--ivory); max-width: 1200px; margin: 0 auto;">
         <p style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 8px;">Last updated: {timestamp}</p>
         <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">{total} rebelled today.</h3>
 {report_html}

@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="onion-location" content="http://yppxyvqzw3lcpkjqpbm24ugbpqibke45bkrqzatsy3asoa377urir3yd.onion/linux.html">
     <title>Linux Fundamentals - Master the Command Line | REBEL WITH LINUX</title>
     <meta name="description" content="Learn Linux from scratch. Master the terminal, file system navigation, permissions, process management, and text manipulation. Free interactive lessons with quizzes.">
     <meta name="keywords" content="Linux, Linux tutorial, learn Linux, command line, terminal, bash, file system, Linux permissions, process management, FOSS, open source, Linux commands">
@@ -19,6 +18,15 @@
         }
     </script>
     <script src="terminal-select.js"></script>
+    <script>
+        // Sync checkbox after DOM loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
     <script>
         // Theme toggle functionality - defined early
         function toggleThemeLinux(e) {
@@ -61,14 +69,20 @@
                     <span class="hamburger-line"></span>
                     <span class="hamburger-line"></span>
                 </a>
-                <div class="nav-links">
+                <div class="nav-links" id="navLinks">
                     <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
-                    <a href="index.html">HOME</a>
+                    <a href="index.html#distros">DISTRO</a>
                     <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#games">GAMES</a>
                     <a href="index.html#guides">GUIDES</a>
                     <a href="index.html#projects">PROJECTS</a>
+                    <a href="index.html#resources">RESOURCES</a>
+                    <a href="index.html#references">REFERENCES</a>
                     <a href="index.html#blog">BLOG</a>
+                    <a href="index.html#stats">STATS</a>
                     <a href="index.html#contact">CONTACT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
                 </div>
             </div>
         </div>
@@ -2698,6 +2712,7 @@ PasswordAuthentication no</span>
         // Set initial state on page load
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
+            document.getElementById('themeToggle').checked = true;
             document.documentElement.setAttribute('data-theme', 'dark');
             const toggle = document.getElementById('themeToggle');
             const icon = document.querySelector('.theme-toggle-icon');

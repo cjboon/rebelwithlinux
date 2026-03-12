@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homelab on the Cheap - REBEL WITH LINUX</title>
+    <meta name="description" content="Build your own homelab without breaking the bank. A practical guide to affordable self-hosted infrastructure.">
+    <meta name="keywords" content="homelab, self-hosted, server, Raspberry Pi, cheap, budget, infrastructure">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Homelab on the Cheap">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog-homelab.html">
+    <link rel="canonical" href="https://rebelwithlinux.com/blog-homelab.html">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+    <style>
+        .blog-header {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 32px 60px;
+            text-align: center;
+        }
+        .blog-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .blog-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--gray);
+        }
+        .blog-nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 16px;
+            border-bottom: 2px solid var(--black);
+            background: var(--white);
+        }
+        .blog-nav a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--black);
+            text-decoration: none;
+        }
+        .blog-nav a:hover {
+            text-decoration: underline;
+        }
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+        .blog-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 16px;
+        }
+        .blog-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+        .blog-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        .blog-content p {
+            margin-bottom: 24px;
+        }
+        .blog-content h2 {
+            font-size: 1.5rem;
+            margin: 40px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--black);
+        }
+        .blog-content ul, .blog-content ol {
+            margin-bottom: 24px;
+            padding-left: 24px;
+        }
+        .blog-content li {
+            margin-bottom: 8px;
+        }
+        .blog-content blockquote {
+            border-left: 4px solid var(--black);
+            padding-left: 20px;
+            margin: 24px 0;
+            font-style: italic;
+            color: var(--gray);
+        }
+        .blog-content code {
+            background: var(--beige);
+            padding: 2px 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95rem;
+        }
+        .blog-content pre {
+            background: var(--black);
+            color: var(--ivory);
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            border: 3px solid var(--black);
+        }
+        .blog-content pre code {
+            background: transparent;
+            padding: 0;
+            color: var(--ivory);
+        }
+        .price-box {
+            background: var(--beige);
+            border: 2px solid var(--black);
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .price-box h3 {
+            margin-bottom: 12px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: var(--black);
+            text-decoration: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="index.html#distros">DISTRO</a>
+                    <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#games">GAMES</a>
+                    <a href="index.html#guides">GUIDES</a>
+                    <a href="index.html#projects">PROJECTS</a>
+                    <a href="index.html#resources">RESOURCES</a>
+                    <a href="index.html#references">REFERENCES</a>
+                    <a href="index.html#blog">BLOG</a>
+                    <a href="index.html#stats">STATS</a>
+                    <a href="index.html#contact">CONTACT</a>
+                    <a href="#" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="blog-header">
+        <h1>// THE REBEL BLOG</h1>
+        <p>Thoughts on free software, privacy, and taking back control</p>
+    </header>
+
+    <nav class="blog-nav">
+        <a href="index.html#blog">← Back to Blog</a>
+    </nav>
+
+    <main class="blog-container" id="main-content">
+        <article>
+            <div class="blog-meta">
+                <span>2026-03-11</span> • <span>10 min read</span> • <span>Homelab</span>
+            </div>
+            <h1 class="blog-title">Homelab on the Cheap: Build Your Own Infrastructure for Under $100</h1>
+
+            <div class="blog-content">
+                <p>You don't need expensive hardware to run your own services. You don't need a server room or a dedicated closet. You don't even need to spend more than a few dollars.</p>
+
+                <p>A homelab is about ownership. Running your own DNS, your own cloud storage, your own media server, your own password manager. Taking back control from the cloud giants—one container at a time.</p>
+
+                <p>This guide will show you how to start small, spend little, and build something meaningful.</p>
+
+                <blockquote>The best time to start a homelab was last year. The second best time is today.</blockquote>
+
+                <h2>Level 1: The Raspberry Pi ($35-55)</h2>
+
+                <p>The classic entry point. A Raspberry Pi is a small, affordable computer that uses very little power (under $10/year in electricity). It's perfect for learning and running lightweight services.</p>
+
+                <div class="price-box">
+                    <h3>Recommended: Raspberry Pi 4 or 5</h3>
+                    <ul>
+                        <li><strong>4GB model:</strong> ~$55 ( refurbished or on sale)</li>
+                        <li><strong>8GB model:</strong> ~$75 (if you want to run more containers)</li>
+                        <li><strong>Power supply:</strong> ~$10 (official charger)</li>
+                        <li><strong>Case:</strong> ~$10 (optional)</li>
+                        <li><strong>MicroSD card:</strong> ~$15 (32GB minimum, 64GB recommended)</li>
+                    </ul>
+                    <p><strong>Total: ~$80-95</strong></p>
+                </div>
+
+                <p>What you can run on a Pi:</p>
+                <ul>
+                    <li><strong>Pi-hole:</strong> Network-wide ad and tracker blocking</li>
+                    <li><strong>AdGuard Home:</strong> Similar to Pi-hole with more features</li>
+                    <li><strong>Docker:</strong> Run multiple services in containers</li>
+                    <li><strong>Home Assistant:</strong> Smart home control center</li>
+                    <li><strong>WireGuard VPN:</strong> Access your home network remotely</li>
+                    <li><strong>plex or Jellyfin:</strong> Media server for your content</li>
+                </ul>
+
+                <h2>Level 2: Old Hardware (Free)</h2>
+
+                <p>You probably already have capable hardware sitting in a closet. Old laptops, desktops, or even old servers from work (with permission) can make great homelab machines.</p>
+
+                <div class="price-box">
+                    <h3>What to Look For</h3>
+                    <ul>
+                        <li><strong>CPU:</strong> Intel i3/i5 or AMD Ryzen 3/5 (4+ cores ideal)</li>
+                        <li><strong>RAM:</strong> 8GB minimum, 16GB+ recommended</li>
+                        <li><strong>Storage:</strong> Can always add more drives later</li>
+                        <li><strong>Form factor:</strong> Small form factor (SFF) desktops are great</li>
+                        <li><strong>Power usage:</strong> Older desktops can be power-hungry (~100W)</li>
+                    </ul>
+                    <p><strong>Total: FREE (if you have old hardware)</strong></p>
+                </div>
+
+                <p>Where to find free/cheap hardware:</p>
+                <ul>
+                    <li>Freecycle, Facebook Marketplace, Craigslist (often free)</li>
+                    <li>Workstations being replaced (many companies recycle)</li>
+                    <li>School/office upgrades (surplus sales)</li>
+                    <li>eBay for business liquidations</li>
+                </ul>
+
+                <h2>Level 3: Refurbished Servers ($50-100)</h2>
+
+                <p>For more power, enterprise hardware offers incredible value. Companies constantly cycle out hardware that's still perfectly capable.</p>
+
+                <div class="price-box">
+                    <h3>Recommended: Dell OptiPlex / HP ProDesk</h3>
+                    <ul>
+                        <li><strong>Desktop (SFF):</strong> $50-100 on eBay</li>
+                        <li><strong>Specs:</strong> Intel i5-6500 or better, 8-16GB RAM</li>
+                        <li><strong>Power:</strong> ~20-40W idle (much better than old desktops)</li>
+                        <li><strong>Noise:</strong> Very quiet, designed for offices</li>
+                    </ul>
+                    <p><strong>Total: ~$50-100</strong></p>
+                </div>
+
+                <p>What to run on more powerful hardware:</p>
+                <ul>
+                    <li><strong>TrueNAS Scale:</strong> Full NAS with Docker support</li>
+                    <li><strong>Proxmox:</strong> Virtualization platform (run multiple VMs)</li>
+                    <li><strong>Multiple Docker Compose stacks:</strong> Services, databases, dev tools</li>
+                    <li><strong>Game servers:</strong> Minecraft, Valheim, etc.</li>
+                    <li><strong>Security cameras:</strong> ZoneMinder, Frigate</li>
+                </ul>
+
+                <h2>The Software Stack</h2>
+
+                <p>Hardware is just the beginning. Here's what to run once you have it:</p>
+
+                <h3>Essential First Services</h3>
+                <ul>
+                    <li><strong>Docker + Docker Compose:</strong> The foundation of everything</li>
+                    <li><strong>Traefik:</strong> Reverse proxy with automatic HTTPS</li>
+                    <li><strong>Cloudflare Tunnel:</strong> Access services without port forwarding</li>
+                    <li><strong>Watchtower:</strong> Auto-update Docker containers</li>
+                </ul>
+
+                <h3>Self-Hosted Favorites</h3>
+                <ul>
+                    <li><strong>AdGuard Home:</strong> Block ads and trackers network-wide</li>
+                    <li><strong>Immich:</strong> Google Photos alternative</li>
+                    <li><strong>Paperless-ngx:</strong> Digital document management</li>
+                    <li><strong>Home Assistant:</strong> Smart home hub</li>
+                    <li><strong>FreshRSS:</strong> RSS feed reader</li>
+                    <li><strong>Syncthing:</strong> File sync between devices</li>
+                    <li><strong>Bitwarden:</strong> Password manager</li>
+                </ul>
+
+                <h2>Networking Essentials</h2>
+
+                <p>Your home network setup matters:</p>
+
+                <ul>
+                    <li><strong>Get a real router:</strong> Don't use ISP-provided equipment if possible</li>
+                    <li><strong>VLANs:</strong> Separate your homelab from your main network</li>
+                    <li><strong>Static DHCP reservations:</strong> Always know your server's IP</li>
+                    <li><strong>Consider UniFi or OPNsense:</strong> For more advanced setups</li>
+                </ul>
+
+                <h2>Power and Cooling</h2>
+
+                <p>One of the biggest costs is electricity. A Raspberry Pi costs pennies to run. A desktop server might add $10-20/month to your bill.</p>
+
+                <ul>
+                    <li><strong>Kill-A-Watt meter:</strong> Measure actual power consumption ($20)</li>
+                    <li><strong>Smart plugs:</strong> Monitor and control power usage</li>
+                    <li><strong>Placement:</strong> Put noisy equipment in out-of-the-way places</li>
+                    <li><strong>UPS:</strong> Battery backup for critical services ($50-100)</li>
+                </ul>
+
+                <h2>Start Small, Grow Steady</h2>
+
+                <p>Don't try to build everything at once. Start with one service. Learn it. Use it. Then add another.</p>
+
+                <p>My recommended order:</p>
+                <ol>
+                    <li><strong>Pi-hole or AdGuard:</strong> Immediate benefit—fewer ads everywhere</li>
+                    <li><strong>WireGuard VPN:</strong> Secure remote access to your home network</li>
+                    <li><strong>Bitwarden:</strong> Better password management</li>
+                    <li><strong>Immich or Nextcloud:</strong> Your own cloud photo/storage</li>
+                    <li><strong>Home Assistant:</strong> If you're into smart home</li>
+                    <li>Whatever else catches your interest!</li>
+                </ol>
+
+                <h2>The Real Cost</h2>
+
+                <p>Here's the beautiful thing about homelab: the ongoing costs are minimal. Your initial investment gets you years of service. Compare that to:</p>
+
+                <ul>
+                    <li>Google One (2TB): $100/year</li>
+                    <li>Dropbox (2TB): $120/year</li>
+                    <li>LastPass (1 user): $36/year</li>
+                    <li>Various streaming services: $200+/year</li>
+                </ul>
+
+                <p>A $100 homelab pays for itself in the first year.</p>
+
+                <blockquote>You already own your computer. Now own your infrastructure.</blockquote>
+
+                <p>The learning curve is worth it. You'll understand how the internet actually works. You'll have skills that matter. You'll own the things you use every day.</p>
+
+                <p>Start small. Stay curious. Build something.</p>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <p>© 2026 REBEL WITH LINUX — <a href="index.html" style="color: var(--white);">Home</a> — <a href="index.html#contact" style="color: var(--white);">Contact</a></p>
+    </footer>
+</body>
+</html>

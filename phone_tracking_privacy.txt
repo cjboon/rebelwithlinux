@@ -1,0 +1,70 @@
+Question: Can cellular networks identify and track individual phones?
+
+Answer:
+
+Yes, multiple ways:
+
+Identifiers your phone broadcasts:
+- IMEI - Unique hardware ID (permanent, tied to device)
+- IMSI - Unique SIM card ID (tied to carrier)
+- TMSI - Temporary ID assigned by network (changes periodically)
+- MAC address - WiFi/Bluetooth (can be randomized on modern OSes)
+
+What carriers see:
+- IMSI/IMEI at connect time
+- Phone number (linked to IMSI)
+- Location (via tower triangulation)
+- Call/SMS metadata
+- Usage patterns
+
+GrapheneOS improvements:
+- Can randomize MAC addresses per network
+- Better at rejecting IMSI catchers
+- Doesn't whitelist base stations
+
+Mitigation:
+- Use GrapheneOS or similar hardened OSes
+- Turn off phone when not needed
+- Airplane mode in sensitive areas
+- Consider a Faraday bag
+
+Your identity is tied to the SIM (IMSI) and device (IMEI). Carriers and anyone with access to cell tower data can track you based on these.
+
+---
+
+Question: Can intercepted encrypted web traffic be traced back to a specific user?
+
+Answer:
+
+Yes, in several ways:
+
+At network level:
+- Your IP address is visible to ISP/carrier
+- DNS queries often unencrypted (shows domains visited)
+- TLS SNI (Server Name Indication) leaks the hostname you're connecting to
+
+Tying to identity:
+- Carrier knows IMEI/IMSI → phone number → your identity (subscriber info)
+- They can correlate traffic timestamps with your account
+- Subpoena/logs from ISP = your identity
+
+What encryption hides:
+- Actual content (HTTPS traffic)
+- Form data, passwords
+
+What it doesn't hide:
+- Metadata: who, when, how much, how long
+- Domain names (SNI)
+- IP addresses
+
+Privacy implications:
+- Carriers see everything you do online, just not the content
+- Anyone with legal authority can request your data
+- Mass surveillance can collect metadata in bulk
+
+Better privacy:
+- Use VPN (hides traffic from carrier)
+- Use encrypted DNS (NextDNS, Cloudflare 1.1.1.1)
+- GrapheneOS has private DNS and connection monitoring
+
+The encryption protects content, but metadata can still deanonymize you.

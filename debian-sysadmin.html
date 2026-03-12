@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debian SysAdmin Challenge</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        body {
+            background: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: #161b22;
+            border-right: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #30363d;
+            text-align: center;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 16px;
+            color: #58a6ff;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .sidebar-header .debian-logo {
+            color: #a80030;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .task-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+        
+        .task-item {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .task-item:hover {
+            border-color: #58a6ff;
+        }
+        
+        .task-item.active {
+            border-color: #58a6ff;
+            background: #1c2128;
+        }
+        
+        .task-item.completed {
+            border-color: #238636;
+            opacity: 0.6;
+        }
+        
+        .task-number {
+            font-size: 11px;
+            color: #8b949e;
+            margin-bottom: 4px;
+        }
+        
+        .task-title {
+            color: #c9d1d9;
+            font-size: 13px;
+        }
+        
+        .task-difficulty {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-top: 6px;
+            display: inline-block;
+        }
+        
+        .diff-easy {
+            background: #23863633;
+            color: #3fb950;
+        }
+        
+        .diff-medium {
+            background: #d2992233;
+            color: #d29922;
+        }
+        
+        .diff-hard {
+            background: #f8514933;
+            color: #f85149;
+        }
+        
+        .main-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .top-bar {
+            background: #161b22;
+            padding: 12px 20px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stat-label {
+            color: #8b949e;
+            font-size: 12px;
+        }
+        
+        .stat-value {
+            color: #3fb950;
+            font-weight: bold;
+        }
+        
+        .terminal-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .terminal-tabs {
+            background: #161b22;
+            padding: 8px 16px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .terminal-tab {
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+        
+        .terminal-tab.active {
+            background: #21262d;
+            color: #c9d1d9;
+            border-color: #58a6ff;
+        }
+        
+        .terminal-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: #0d1117;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .terminal-line {
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+        
+        .prompt {
+            color: #3fb950;
+        }
+        
+        .command {
+            color: #c9d1d9;
+        }
+        
+        .output {
+            color: #8b949e;
+            margin-left: 16px;
+            white-space: pre-wrap;
+        }
+        
+        .output.error {
+            color: #f85149;
+        }
+        
+        .output.success {
+            color: #3fb950;
+        }
+        
+        .output.info {
+            color: #58a6ff;
+        }
+        
+        .output.warning {
+            color: #d29922;
+        }
+        
+        .input-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #161b22;
+            border-top: 1px solid #30363d;
+        }
+        
+        .input-line .prompt {
+            white-space: nowrap;
+        }
+        
+        #command-input {
+            flex: 1;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 8px 12px;
+            outline: none;
+        }
+        
+        #command-input:focus {
+            border-color: #58a6ff;
+        }
+        
+        .help-panel {
+            background: #161b22;
+            border-top: 1px solid #30363d;
+            padding: 12px 16px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        
+        .help-title {
+            color: #58a6ff;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        
+        .help-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+        
+        .help-cmd {
+            color: #3fb950;
+            min-width: 180px;
+        }
+        
+        .help-desc {
+            color: #8b949e;
+        }
+        
+        .intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(13, 17, 23, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        
+        .intro-box {
+            background: #161b22;
+            border: 1px solid #30363d;
+            padding: 40px;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        .intro-box h2 {
+            color: #a80030;
+            margin-bottom: 16px;
+            font-size: 24px;
+        }
+        
+        .intro-box p {
+            color: #8b949e;
+            margin-bottom: 12px;
+            line-height: 1.6;
+            text-align: left;
+        }
+        
+        .intro-box .start-btn {
+            background: #a80030;
+            border: none;
+            color: white;
+            padding: 12px 32px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        
+        .intro-box .start-btn:hover {
+            background: #c4003d;
+        }
+        
+        .hint-box {
+            background: #1c2128;
+            border: 1px solid #30363d;
+            padding: 12px;
+            margin: 12px 0;
+        }
+        
+        .hint-title {
+            color: #d29922;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        
+        .hint-text {
+            color: #8b949e;
+            font-size: 12px;
+        }
+        
+        .system-status {
+            background: #161b22;
+            border: 1px solid #30363d;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .status-title {
+            color: #58a6ff;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 12px;
+        }
+        
+        .status-item .label {
+            color: #8b949e;
+        }
+        
+        .status-item .value {
+            color: #3fb950;
+        }
+        
+        .status-item .value.warning {
+            color: #d29922;
+        }
+        
+        .status-item .value.error {
+            color: #f85149;
+        }
+        
+        .file-viewer {
+            background: #161b22;
+            border: 1px solid #30363d;
+            padding: 12px;
+            font-size: 12px;
+            margin: 8px 0;
+        }
+        
+        .file-line {
+            display: flex;
+        }
+        
+        .line-number {
+            color: #484f58;
+            min-width: 40px;
+            user-select: none;
+        }
+        
+        .line-content {
+            color: #c9d1d9;
+        }
+        
+        .file-comment {
+            color: #484f58;
+        }
+        
+        .file-keyword {
+            color: #ff7b72;
+        }
+        
+        .file-string {
+            color: #a5d6ff;
+        }
+        
+        .file-variable {
+            color: #79c0ff;
+        }
+        
+        .result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(13, 17, 23, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        
+        .result-box {
+            background: #161b22;
+            border: 1px solid #30363d;
+            padding: 32px;
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        .result-box h3 {
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .result-box.success {
+            border-color: #238636;
+        }
+        
+        .result-box.success h3 {
+            color: #3fb950;
+        }
+        
+        .result-box.error {
+            border-color: #f85149;
+        }
+        
+        .result-box.error h3 {
+            color: #f85149;
+        }
+        
+        .result-box p {
+            color: #8b949e;
+            margin-bottom: 20px;
+        }
+        
+        .result-box button {
+            background: #238636;
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .score-display {
+            background: #21262d;
+            border: 1px solid #30363d;
+            padding: 16px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .score-label {
+            color: #8b949e;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        
+        .score-value {
+            color: #3fb950;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .points {
+            color: #d29922;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        
+        .current-task-panel {
+            background: #21262d;
+            border: 1px solid #30363d;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .current-task-label {
+            color: #58a6ff;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        
+        .current-task-title {
+            color: #c9d1d9;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .current-task-desc {
+            color: #8b949e;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="intro-overlay" id="intro">
+        <div class="intro-box">
+            <h2>DEBIAN SYSADMIN CHALLENGE</h2>
+            <p>Welcome to the Debian SysAdmin Challenge! You'll manage a Debian server and complete real-world sysadmin tasks.</p>
+            <p>Tasks include: installing packages, configuring services, managing users, hardening security, and troubleshooting issues.</p>
+            <p>Use real Debian/Ubuntu commands. Read the task carefully - sometimes you need to complete multiple steps.</p>
+            <p><strong>Available commands:</strong> apt, systemctl, useradd, usermod, passwd, chmod, chown, nano, cat, ls, ps, kill, nginx, apache2, mysql, mariadb, ssh, ufw, fail2ban</p>
+            <button class="start-btn" onclick="startGame()">START CHALLENGE</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="debian-logo">DEBIAN</div>
+                <h1>SYSADMIN CHALLENGE</h1>
+            </div>
+            
+            <div class="task-list" id="taskList">
+            </div>
+        </div>
+        
+        <div class="main-panel">
+            <div class="top-bar">
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-label">Score:</span>
+                        <span class="stat-value" id="score">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Completed:</span>
+                        <span class="stat-value" id="completed">0/10</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">System:</span>
+                        <span class="stat-value" id="systemStatus">ONLINE</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="terminal-area">
+                <div class="terminal-tabs">
+                    <button class="terminal-tab active" onclick="switchTab('task')">Current Task</button>
+                    <button class="terminal-tab" onclick="switchTab('system')">System Status</button>
+                    <button class="terminal-tab" onclick="switchTab('logs')">System Logs</button>
+                </div>
+                
+                <div class="terminal-content" id="terminalContent">
+                    <div id="taskView">
+                        <div class="current-task-panel">
+                            <div class="current-task-label">Current Task</div>
+                            <div class="current-task-title" id="taskTitle">Welcome!</div>
+                            <div class="current-task-desc" id="taskDesc">Select a task from the sidebar to begin.</div>
+                        </div>
+                    </div>
+                    <div id="systemView" style="display: none;">
+                        <div class="system-status">
+                            <div class="status-title">SERVER STATUS</div>
+                            <div class="status-item">
+                                <span class="label">Hostname</span>
+                                <span class="value">debian-server</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">OS</span>
+                                <span class="value">Debian 12 (Bookworm)</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Uptime</span>
+                                <span class="value" id="uptime">15 minutes</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">CPU Load</span>
+                                <span class="value">0.15, 0.10, 0.05</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Memory</span>
+                                <span class="value">512M / 4G (12%)</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Disk</span>
+                                <span class="value">2.1G / 20G (10%)</span>
+                            </div>
+                        </div>
+                        <div class="system-status">
+                            <div class="status-title">SERVICES</div>
+                            <div class="status-item">
+                                <span class="label">SSH</span>
+                                <span class="value">active (running)</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Nginx</span>
+                                <span class="value" id="nginxStatus">inactive (dead)</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">MySQL</span>
+                                <span class="value" id="mysqlStatus">inactive (dead)</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Firewall</span>
+                                <span class="value warning">inactive</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="logsView" style="display: none;">
+                        <div class="terminal-line"><span class="output">[2026-03-12 10:00:01] System startup complete</span></div>
+                        <div class="terminal-line"><span class="output">[2026-03-12 10:00:02] SSH service started</span></div>
+                        <div class="terminal-line"><span class="output">[2026-03-12 10:00:03] System ready</span></div>
+                    </div>
+                </div>
+                
+                <div class="input-line">
+                    <span class="prompt">root@debian-server:~#</span>
+                    <input type="text" id="command-input" placeholder="Enter command..." autofocus>
+                </div>
+                
+                <div class="help-panel">
+                    <div class="help-title">Available Commands</div>
+                    <div class="help-item"><span class="help-cmd">apt update</span><span class="help-desc">Update package lists</span></div>
+                    <div class="help-item"><span class="help-cmd">apt install [package]</span><span class="help-desc">Install a package</span></div>
+                    <div class="help-item"><span class="help-cmd">systemctl start [service]</span><span class="help-desc">Start a service</span></div>
+                    <div class="help-item"><span class="help-cmd">systemctl enable [service]</span><span class="help-desc">Enable service at boot</span></div>
+                    <div class="help-item"><span class="help-cmd">systemctl status [service]</span><span class="help-desc">Check service status</span></div>
+                    <div class="help-item"><span class="help-cmd">useradd / passwd</span><span class="help-desc">Manage users</span></div>
+                    <div class="help-item"><span class="help-cmd">ufw allow / deny</span><span class="help-desc">Configure firewall</span></div>
+                    <div class="help-item"><span class="help-cmd">cat / nano</span><span class="help-desc">View/edit files</span></div>
+                    <div class="help-item"><span class="help-cmd">hint</span><span class="help-desc">Get a hint for current task</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="result-modal" id="resultModal" style="display: none;">
+        <div class="result-box" id="resultBox">
+            <h3 id="resultTitle">Task Complete!</h3>
+            <p id="resultMessage">Great work!</p>
+            <button onclick="closeResult()">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        const tasks = [
+            {
+                id: 1,
+                title: "Update Your System",
+                desc: "Before installing anything, always update your package lists. Run 'apt update' to refresh the repositories.",
+                difficulty: "easy",
+                hint: "Type: apt update",
+                check: (state) => state.aptUpdated,
+                solve: (cmd, state) => {
+                    if (cmd === 'apt update' || cmd === 'sudo apt update') {
+                        state.aptUpdated = true;
+                        return { success: true, message: "Package lists updated successfully!" };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 2,
+                title: "Install Nginx",
+                desc: "Our web server needs Nginx. Install it using apt. Remember: installing software requires root privileges.",
+                difficulty: "easy",
+                hint: "Type: apt install nginx (or sudo apt install nginx)",
+                check: (state) => state.nginxInstalled,
+                solve: (cmd, state) => {
+                    if (cmd.includes('apt install') && cmd.includes('nginx')) {
+                        state.nginxInstalled = true;
+                        return { success: true, message: "Nginx installed successfully!" };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 3,
+                title: "Start Nginx Service",
+                desc: "Nginx is installed but not running. Start the nginx service using systemctl.",
+                difficulty: "easy",
+                hint: "Type: systemctl start nginx",
+                check: (state) => state.nginxRunning,
+                solve: (cmd, state) => {
+                    if (cmd.includes('systemctl start') && cmd.includes('nginx')) {
+                        state.nginxRunning = true;
+                        return { success: true, message: "Nginx is now running!" };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 4,
+                title: "Create a Developer User",
+                desc: "We need a regular user account for development work. Create a user named 'developer' with a home directory.",
+                difficulty: "easy",
+                hint: "Type: useradd -m developer",
+                check: (state) => state.userCreated,
+                solve: (cmd, state) => {
+                    if ((cmd.includes('useradd') && cmd.includes('developer')) || 
+                        (cmd.includes('adduser') && cmd.includes('developer'))) {
+                        state.userCreated = true;
+                        return { success: true, message: "User 'developer' created successfully!" };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 5,
+                title: "Set Up SSH Key Authentication",
+                desc: "For security, we need to configure SSH to use key-based authentication. First, check the SSH config.",
+                difficulty: "medium",
+                hint: "Check /etc/ssh/sshd_config for 'PubkeyAuthentication'",
+                check: (state) => state.sshChecked,
+                solve: (cmd, state) => {
+                    if (cmd.includes('cat') && cmd.includes('sshd_config')) {
+                        state.sshChecked = true;
+                        return { success: true, message: "SSH config shows PubkeyAuthentication is enabled. Good!" };
+                    }
+                    if (cmd === 'hint') return null;
+                    return { success: false, message: "Try reading the SSH config file first." };
+                }
+            },
+            {
+                id: 6,
+                title: "Install a Firewall",
+                desc: "Security is important. Install and enable UFW (Uncomplicated Firewall) to protect your server.",
+                difficulty: "medium",
+                hint: "apt install ufw, then ufw enable, then ufw allow 22/tcp",
+                check: (state) => state.ufwEnabled,
+                solve: (cmd, state) => {
+                    if (cmd.includes('apt install') && cmd.includes('ufw')) {
+                        return { success: false, message: "UFW installed. Now enable it with 'ufw enable'." };
+                    }
+                    if (cmd.includes('ufw enable')) {
+                        return { success: false, message: "UFW enabled. Don't forget to allow SSH (port 22)!" };
+                    }
+                    if (cmd.includes('ufw allow') && cmd.includes('22')) {
+                        state.ufwEnabled = true;
+                        return { success: true, message: "Firewall configured and SSH allowed!" };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 7,
+                title: "Install MariaDB",
+                desc: "We need a database for our application. Install MariaDB (the MySQL replacement).",
+                difficulty: "easy",
+                hint: "apt install mariadb-server",
+                check: (state) => state.mariadbInstalled,
+                solve: (cmd, state) => {
+                    if (cmd.includes('apt install') && (cmd.includes('mariadb') || cmd.includes('mysql'))) {
+                        state.mariadbInstalled = true;
+                        return { success: true, message: "MariaDB installed successfully!" };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 8,
+                title: "Secure MariaDB Installation",
+                desc: "Run the MySQL secure installation script to set root password and remove test databases.",
+                difficulty: "medium",
+                hint: "mysql_secure_installation or mariadb-secure-installation",
+                check: (state) => state.mariadbSecured,
+                solve: (cmd, state) => {
+                    if (cmd.includes('mysql_secure_installation') || cmd.includes('mariadb-secure-installation')) {
+                        state.mariadbSecured = true;
+                        return { success: true, message: "MariaDB secured! Root password set, test databases removed." };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 9,
+                title: "Configure Nginx for PHP",
+                desc: "To run PHP applications with Nginx, we need to install PHP-FPM and configure Nginx to process PHP files.",
+                difficulty: "hard",
+                hint: "apt install php-fpm php-mysql, then edit /etc/nginx/sites-available/default",
+                check: (state) => state.phpConfigured,
+                solve: (cmd, state) => {
+                    if (cmd.includes('apt install') && (cmd.includes('php-fpm') || cmd.includes('php'))) {
+                        return { success: false, message: "PHP installed. Now configure Nginx to process PHP files." };
+                    }
+                    if (cmd.includes('nano') || cmd.includes('vim') || cmd.includes('cat')) {
+                        if (cmd.includes('nginx') || cmd.includes('default')) {
+                            state.phpConfigured = true;
+                            return { success: true, message: "Nginx configured to process PHP! Add location ~\\.php$ to your server block." };
+                        }
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 10,
+                title: "Set Up Fail2Ban",
+                desc: "Protect your server from brute force attacks by installing and configuring Fail2Ban.",
+                difficulty: "hard",
+                hint: "apt install fail2ban, then cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local",
+                check: (state) => state.fail2banInstalled,
+                solve: (cmd, state) => {
+                    if (cmd.includes('apt install') && cmd.includes('fail2ban')) {
+                        state.fail2banInstalled = true;
+                        return { success: true, message: "Fail2Ban installed! Your server is now protected against brute force attacks." };
+                    }
+                    return null;
+                }
+            }
+        ];
+
+        let gameState = {
+            aptUpdated: false,
+            nginxInstalled: false,
+            nginxRunning: false,
+            userCreated: false,
+            sshChecked: false,
+            ufwEnabled: false,
+            mariadbInstalled: false,
+            mariadbSecured: false,
+            phpConfigured: false,
+            fail2banInstalled: false
+        };
+
+        let currentTaskIndex = 0;
+        let score = 0;
+        let completedTasks = [];
+
+        function startGame() {
+            document.getElementById('intro').style.display = 'none';
+            renderTaskList();
+            loadTask(0);
+        }
+
+        function renderTaskList() {
+            const list = document.getElementById('taskList');
+            let html = '';
+            
+            tasks.forEach((task, index) => {
+                const isActive = index === currentTaskIndex;
+                const isCompleted = completedTasks.includes(task.id);
+                const difficultyClass = `diff-${task.difficulty}`;
+                
+                html += `
+                    <div class="task-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}" onclick="loadTask(${index})">
+                        <div class="task-number">TASK ${task.id}</div>
+                        <div class="task-title">${task.title}</div>
+                        <span class="task-difficulty ${difficultyClass}">${task.difficulty}</span>
+                    </div>
+                `;
+            });
+            
+            list.innerHTML = html;
+        }
+
+        function loadTask(index) {
+            currentTaskIndex = index;
+            const task = tasks[index];
+            
+            renderTaskList();
+            
+            document.getElementById('taskTitle').textContent = `Task ${task.id}: ${task.title}`;
+            document.getElementById('taskDesc').textContent = task.desc;
+            
+            switchTab('task');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.terminal-tab').forEach(t => t.classList.remove('active'));
+            event?.target?.classList?.add('active');
+            
+            document.getElementById('taskView').style.display = 'none';
+            document.getElementById('systemView').style.display = 'none';
+            document.getElementById('logsView').style.display = 'none';
+            
+            document.getElementById(tab + 'View').style.display = 'block';
+        }
+
+        function executeCommand(cmd) {
+            const trimmedCmd = cmd.trim().toLowerCase();
+            const task = tasks[currentTaskIndex];
+            
+            if (trimmedCmd === 'hint') {
+                addOutput(`💡 ${task.hint}`, 'warning');
+                return;
+            }
+            
+            if (trimmedCmd === 'clear') {
+                clearTerminal();
+                return;
+            }
+            
+            const result = task.solve(cmd, gameState);
+            
+            if (result) {
+                addOutput(`$ ${cmd}`, '');
+                
+                if (result.success) {
+                    addOutput(result.message, 'success');
+                    
+                    if (task.check(gameState) && !completedTasks.includes(task.id)) {
+                        completedTasks.push(task.id);
+                        score += task.difficulty === 'easy' ? 10 : task.difficulty === 'medium' ? 20 : 30;
+                        updateStats();
+                        
+                        setTimeout(() => {
+                            showResult(true, `Task ${task.id} complete! +${task.difficulty === 'easy' ? 10 : task.difficulty === 'medium' ? 20 : 30} points`);
+                        }, 500);
+                    }
+                } else {
+                    addOutput(result.message, 'error');
+                }
+            } else {
+                addOutput(`$ ${cmd}`, '');
+                addOutput(`Command accepted. Keep working on the task or type 'hint' for help.`, 'info');
+            }
+        }
+
+        function addOutput(text, type) {
+            const terminal = document.getElementById('taskView');
+            const div = document.createElement('div');
+            div.className = `terminal-line ${type}`;
+            div.innerHTML = `<span class="output ${type}">${text}</span>`;
+            terminal.appendChild(div);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function clearTerminal() {
+            const task = tasks[currentTaskIndex];
+            document.getElementById('taskView').innerHTML = `
+                <div class="current-task-panel">
+                    <div class="current-task-label">Current Task</div>
+                    <div class="current-task-title">Task ${task.id}: ${task.title}</div>
+                    <div class="current-task-desc">${task.desc}</div>
+                </div>
+            `;
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('completed').textContent = `${completedTasks.length}/${tasks.length}`;
+            renderTaskList();
+        }
+
+        function showResult(success, message) {
+            const modal = document.getElementById('resultModal');
+            const box = document.getElementById('resultBox');
+            const title = document.getElementById('resultTitle');
+            const msg = document.getElementById('resultMessage');
+            
+            box.className = `result-box ${success ? 'success' : 'error'}`;
+            title.textContent = success ? '✓ Task Complete!' : '✗ Task Failed';
+            msg.textContent = message;
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeResult() {
+            document.getElementById('resultModal').style.display = 'none';
+            
+            if (currentTaskIndex < tasks.length - 1) {
+                loadTask(currentTaskIndex + 1);
+            } else if (completedTasks.length === tasks.length) {
+                showResult(true, `🎉 Congratulations! You completed all ${tasks.length} tasks! Final score: ${score}`);
+            }
+        }
+
+        document.getElementById('command-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const cmd = this.value;
+                if (cmd.trim()) {
+                    executeCommand(cmd);
+                }
+                this.value = '';
+            }
+        });
+    </script>
+</body>
+</html>

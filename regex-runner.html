@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex Runner</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        #gameCanvas {
+            display: block;
+            background: linear-gradient(180deg, #0d1117 0%, #161b22 100%);
+        }
+        
+        .ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(13, 17, 23, 0.9);
+            border-bottom: 1px solid #30363d;
+            z-index: 100;
+        }
+        
+        .game-title {
+            font-size: 18px;
+            color: #f778ba;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stat-label {
+            color: #8b949e;
+            font-size: 12px;
+        }
+        
+        .stat-value {
+            color: #3fb950;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .stat-value.health {
+            color: #f85149;
+        }
+        
+        .stat-value.level {
+            color: #58a6ff;
+        }
+        
+        .regex-input-area {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+        
+        .regex-input-wrapper {
+            display: flex;
+            align-items: center;
+            background: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 8px;
+            padding: 10px 20px;
+            gap: 10px;
+        }
+        
+        .regex-input-wrapper.focused {
+            border-color: #f778ba;
+        }
+        
+        .regex-prompt {
+            color: #8b949e;
+            font-size: 16px;
+        }
+        
+        #regexInput {
+            background: transparent;
+            border: none;
+            color: #f778ba;
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            width: 300px;
+            outline: none;
+        }
+        
+        #regexInput::placeholder {
+            color: #484f58;
+        }
+        
+        .match-display {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            z-index: 90;
+            display: none;
+        }
+        
+        .match-display.show {
+            display: block;
+        }
+        
+        .match-display .matched {
+            color: #3fb950;
+        }
+        
+        .match-display .pattern {
+            color: #f778ba;
+        }
+        
+        .intro-screen, .game-over-screen, .level-complete-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(13, 17, 23, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        
+        .intro-box, .game-over-box, .level-complete-box {
+            background: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+        }
+        
+        .intro-box h1 {
+            color: #f778ba;
+            font-size: 32px;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+        
+        .intro-box h2 {
+            color: #58a6ff;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .intro-box p {
+            color: #8b949e;
+            margin-bottom: 12px;
+            line-height: 1.6;
+            text-align: left;
+        }
+        
+        .intro-box ul {
+            text-align: left;
+            color: #8b949e;
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+        
+        .intro-box li {
+            margin-bottom: 8px;
+        }
+        
+        .intro-box code {
+            background: #21262d;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #f778ba;
+        }
+        
+        .start-btn {
+            background: #f778ba;
+            border: none;
+            color: #0d1117;
+            padding: 14px 40px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-top: 20px;
+            transition: all 0.2s;
+        }
+        
+        .start-btn:hover {
+            background: #ff8fca;
+            transform: scale(1.05);
+        }
+        
+        .game-over-box h2 {
+            color: #f85149;
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+        
+        .game-over-box p {
+            color: #8b949e;
+            margin-bottom: 10px;
+        }
+        
+        .level-complete-box h2 {
+            color: #3fb950;
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .health-bar {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .health-pip {
+            width: 20px;
+            height: 12px;
+            background: #f85149;
+            border-radius: 2px;
+        }
+        
+        .health-pip.empty {
+            background: #30363d;
+        }
+        
+        .level-info {
+            position: fixed;
+            top: 70px;
+            left: 20px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 12px;
+            z-index: 90;
+        }
+        
+        .level-info .level-name {
+            color: #58a6ff;
+            font-weight: bold;
+        }
+        
+        .level-info .level-desc {
+            color: #8b949e;
+            margin-top: 4px;
+        }
+        
+        .instructions {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #484f58;
+            font-size: 11px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui-overlay">
+        <div class="game-title">REGEX RUNNER</div>
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-label">SCORE</span>
+                <span class="stat-value" id="score">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">LEVEL</span>
+                <span class="stat-value level" id="level">1</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">HEALTH</span>
+                <div class="health-bar" id="healthBar">
+                    <div class="health-pip"></div>
+                    <div class="health-pip"></div>
+                    <div class="health-pip"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="level-info" id="levelInfo">
+        <div class="level-name" id="levelName">Level 1: Basics</div>
+        <div class="level-desc" id="levelDesc">Match the words!</div>
+    </div>
+    
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="match-display" id="matchDisplay">
+        Pattern: <span class="pattern" id="patternText"></span> → Matched: <span class="matched" id="matchedText"></span>
+    </div>
+    
+    <div class="regex-input-area">
+        <div class="regex-input-wrapper" id="inputWrapper">
+            <span class="regex-prompt">/</span>
+            <input type="text" id="regexInput" placeholder="type regex..." autocomplete="off" spellcheck="false">
+            <span class="regex-prompt">/g</span>
+        </div>
+    </div>
+    
+    <div class="instructions" id="instructions">
+        Type a regex to match and destroy the flying words!
+    </div>
+    
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-box">
+            <h1>REGEX RUNNER</h1>
+            <h2>Learn Regex Through Battle!</h2>
+            <p>Words are attacking your position! Use regex patterns to match and destroy them before they reach you.</p>
+            <p><strong>How to play:</strong></p>
+            <ul>
+                <li>Words fly toward you from the right</li>
+                <li>Type a regex pattern to match the words</li>
+                <li>Matching words get destroyed</li>
+                <li>Don't let words hit you!</li>
+            </ul>
+            <p><strong>Regex basics:</strong></p>
+            <ul>
+                <li><code>\d</code> - Match any digit (0-9)</li>
+                <li><code>\w</code> - Match any word character</li>
+                <li><code>[aeiou]</code> - Match any vowel</li>
+                <li><code>^start</code> - Match words starting with "start"</li>
+                <li><code>end$</code> - Match words ending with "end"</li>
+                <li><code>.</code> - Match any single character</li>
+                <li><code>*</code> - Match 0 or more</li>
+                <li><code>+</code> - Match 1 or more</li>
+            </ul>
+            <button class="start-btn" onclick="startGame()">START GAME</button>
+        </div>
+    </div>
+    
+    <div class="game-over-screen hidden" id="gameOverScreen">
+        <div class="game-over-box">
+            <h2>GAME OVER</h2>
+            <p>Final Score: <strong id="finalScore">0</strong></p>
+            <p>Level Reached: <strong id="finalLevel">1</strong></p>
+            <p>Words Destroyed: <strong id="finalWords">0</strong></p>
+            <button class="start-btn" onclick="restartGame()">PLAY AGAIN</button>
+        </div>
+    </div>
+    
+    <div class="level-complete-screen hidden" id="levelCompleteScreen">
+        <div class="level-complete-box">
+            <h2>LEVEL COMPLETE!</h2>
+            <p id="levelCompleteMsg">Great work!</p>
+            <p>Score: <strong id="levelScore">0</strong></p>
+            <button class="start-btn" onclick="nextLevel()">NEXT LEVEL</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        const levels = [
+            {
+                name: "Level 1: The Basics",
+                desc: "Simple letter matching",
+                words: ["cat", "dog", "bat", "hat", "rat", "mat", "sat", "fat"],
+                spawnRate: 2500,
+                speed: 1.5,
+                target: 10,
+                hint: "Type the letters you see"
+            },
+            {
+                name: "Level 2: Number Hunt",
+                desc: "Match the digits!",
+                words: ["user1", "user2", "test99", "item5", "code7", "data3", "file8", "log4"],
+                spawnRate: 2200,
+                speed: 1.8,
+                target: 12,
+                hint: "Use \\d to match digits"
+            },
+            {
+                name: "Level 3: Vowel Attack",
+                desc: "Target the vowels!",
+                words: ["apple", "orange", "banana", "cherry", "grape", "lemon", "melon", "peach"],
+                spawnRate: 2000,
+                speed: 2,
+                target: 15,
+                hint: "Use [aeiou] to match vowels"
+            },
+            {
+                name: "Level 4: Consonant Force",
+                desc: "Match the consonants!",
+                words: ["apple", "orange", "banana", "cherry", "grape", "lemon", "melon", "peach"],
+                spawnRate: 2000,
+                speed: 2.2,
+                target: 15,
+                hint: "Use [^aeiou] to match consonants"
+            },
+            {
+                name: "Level 5: Word Characters",
+                desc: "Match all word characters!",
+                words: ["user_name", "test-value", "file_2024", "item_code", "data_set", "log_file"],
+                spawnRate: 1800,
+                speed: 2.5,
+                target: 18,
+                hint: "Use \\w to match word characters"
+            },
+            {
+                name: "Level 6: Start the Attack",
+                desc: "Words starting with...",
+                words: ["hyper", "hybrid", "hydra", "hydrogen", "hydrant", "hymn", "hype"],
+                spawnRate: 1700,
+                speed: 2.8,
+                target: 18,
+                hint: "Use ^word to match start"
+            },
+            {
+                name: "Level 7: End the Threat",
+                desc: "Words ending with...",
+                words: ["start", "restart", "cart", "part", "apart", "depart", "impart"],
+                spawnRate: 1700,
+                speed: 3,
+                target: 20,
+                hint: "Use word$ to match end"
+            },
+            {
+                name: "Level 8: The Dot Wildcard",
+                desc: "Match any character!",
+                words: ["cat", "bat", "hat", "rat", "mat", "fat", "sat", "pat", "vat"],
+                spawnRate: 1500,
+                speed: 3.2,
+                target: 20,
+                hint: "Use . to match any character"
+            },
+            {
+                name: "Level 9: Repetition Nation",
+                desc: "Match repeated characters!",
+                words: ["book", "look", "took", "cook", "hook", "wood", "food", "mood"],
+                spawnRate: 1500,
+                speed: 3.5,
+                target: 22,
+                hint: "Use * for 0+ or + for 1+"
+            },
+            {
+                name: "Level 10: Regex Master",
+                desc: "Final Challenge!",
+                words: ["email@test", "site.org", "domain.net", "web.io", "app.dev", "code.io"],
+                spawnRate: 1200,
+                speed: 4,
+                target: 25,
+                hint: "Combine what you've learned!"
+            }
+        ];
+        
+        let gameState = {
+            running: false,
+            score: 0,
+            health: 3,
+            currentLevel: 0,
+            wordsDestroyed: 0,
+            levelTarget: 0,
+            wordsThisLevel: 0,
+            words: [],
+            lastSpawn: 0,
+            playerX: 100,
+            playerY: 0,
+            currentRegex: '',
+            matchedWords: []
+        };
+        
+        const input = document.getElementById('regexInput');
+        const inputWrapper = document.getElementById('inputWrapper');
+        const matchDisplay = document.getElementById('matchDisplay');
+        
+        input.addEventListener('focus', () => {
+            inputWrapper.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', () => {
+            inputWrapper.classList.remove('focused');
+        });
+        
+        input.addEventListener('input', () => {
+            gameState.currentRegex = input.value;
+            checkMatches();
+        });
+        
+        function startGame() {
+            document.getElementById('introScreen').classList.add('hidden');
+            gameState.running = true;
+            gameState.score = 0;
+            gameState.health = 3;
+            gameState.currentLevel = 0;
+            gameState.wordsDestroyed = 0;
+            gameState.words = [];
+            gameState.wordsThisLevel = 0;
+            input.value = '';
+            gameState.currentRegex = '';
+            
+            updateUI();
+            loadLevel(0);
+            gameLoop();
+        }
+        
+        function loadLevel(levelIndex) {
+            if (levelIndex >= levels.length) {
+                showVictory();
+                return;
+            }
+            
+            const level = levels[levelIndex];
+            gameState.currentLevel = levelIndex;
+            gameState.levelTarget = level.target;
+            gameState.wordsThisLevel = 0;
+            gameState.lastSpawn = Date.now();
+            gameState.words = [];
+            
+            document.getElementById('levelName').textContent = level.name;
+            document.getElementById('levelDesc').textContent = level.desc;
+            document.getElementById('instructions').textContent = level.hint;
+            document.getElementById('level').textContent = levelIndex + 1;
+        }
+        
+        function restartGame() {
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            startGame();
+        }
+        
+        function nextLevel() {
+            document.getElementById('levelCompleteScreen').classList.add('hidden');
+            gameState.running = true;
+            loadLevel(gameState.currentLevel + 1);
+            gameLoop();
+        }
+        
+        function checkMatches() {
+            const regex = gameState.currentRegex;
+            const patternText = document.getElementById('patternText');
+            const matchedText = document.getElementById('matchedText');
+            
+            if (!regex) {
+                matchDisplay.classList.remove('show');
+                return;
+            }
+            
+            try {
+                const re = new RegExp(regex, 'gi');
+                const matched = [];
+                
+                gameState.words.forEach(word => {
+                    if (word.text && re.test(word.text)) {
+                        matched.push(word.text);
+                        word.hit = true;
+                    }
+                    re.lastIndex = 0;
+                });
+                
+                patternText.textContent = regex;
+                matchedText.textContent = matched.length > 0 ? matched.join(', ') : 'none';
+                matchDisplay.classList.add('show');
+                
+                if (matched.length > 0) {
+                    const points = matched.length * 10 * (gameState.currentLevel + 1);
+                    gameState.score += points;
+                    gameState.wordsDestroyed += matched.length;
+                    gameState.wordsThisLevel += matched.length;
+                    
+                    gameState.words = gameState.words.filter(w => !w.hit);
+                    
+                    if (gameState.wordsThisLevel >= gameState.levelTarget) {
+                        levelComplete();
+                    }
+                }
+                
+                updateUI();
+            } catch (e) {
+                patternText.textContent = 'Invalid regex';
+                matchedText.textContent = '';
+            }
+        }
+        
+        function levelComplete() {
+            gameState.running = false;
+            document.getElementById('levelScore').textContent = gameState.score;
+            
+            if (gameState.currentLevel >= levels.length - 1) {
+                document.getElementById('levelCompleteMsg').textContent = "You've mastered regex!";
+            } else {
+                document.getElementById('levelCompleteMsg').textContent = "Ready for the next challenge?";
+            }
+            
+            document.getElementById('levelCompleteScreen').classList.remove('hidden');
+        }
+        
+        function showVictory() {
+            gameState.running = false;
+            document.getElementById('finalScore').textContent = gameState.score;
+            document.getElementById('finalLevel').textContent = levels.length;
+            document.getElementById('finalWords').textContent = gameState.wordsDestroyed;
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+        }
+        
+        function gameOver() {
+            gameState.running = false;
+            document.getElementById('finalScore').textContent = gameState.score;
+            document.getElementById('finalLevel').textContent = gameState.currentLevel + 1;
+            document.getElementById('finalWords').textContent = gameState.wordsDestroyed;
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+        }
+        
+        function spawnWord() {
+            const level = levels[gameState.currentLevel];
+            const word = level.words[Math.floor(Math.random() * level.words.length)];
+            
+            gameState.words.push({
+                text: word,
+                x: canvas.width + 50,
+                y: 150 + Math.random() * (canvas.height - 300),
+                speed: level.speed + (Math.random() * 0.5),
+                size: 24 + Math.random() * 8,
+                hit: false
+            });
+        }
+        
+        function updateWords() {
+            const level = levels[gameState.currentLevel];
+            
+            if (Date.now() - gameState.lastSpawn > level.spawnRate) {
+                spawnWord();
+                gameState.lastSpawn = Date.now();
+            }
+            
+            gameState.words.forEach(word => {
+                word.x -= word.speed;
+                
+                if (word.x < 50) {
+                    word.hit = true;
+                    gameState.health--;
+                    updateHealthBar();
+                    
+                    if (gameState.health <= 0) {
+                        gameOver();
+                    }
+                }
+            });
+            
+            gameState.words = gameState.words.filter(w => !w.hit);
+        }
+        
+        function drawWords() {
+            ctx.font = 'bold 24px Courier New';
+            
+            gameState.words.forEach(word => {
+                const gradient = ctx.createLinearGradient(word.x - 40, word.y, word.x + 100, word.y);
+                gradient.addColorStop(0, '#ff6b6b');
+                gradient.addColorStop(1, '#feca57');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillText(word.text, word.x, word.y);
+            });
+        }
+        
+        function drawPlayer() {
+            const x = 60;
+            const y = canvas.height / 2;
+            
+            ctx.fillStyle = '#58a6ff';
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x - 30, y - 20);
+            ctx.lineTo(x - 30, y + 20);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.fillStyle = '#3fb950';
+            ctx.beginPath();
+            ctx.arc(x - 15, y, 8, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        function drawBackground() {
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#21262d';
+            ctx.lineWidth = 1;
+            
+            for (let i = 0; i < canvas.width; i += 50) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            
+            for (let i = 0; i < canvas.height; i += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+            
+            ctx.fillStyle = '#161b22';
+            ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
+            ctx.strokeStyle = '#30363d';
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height - 60);
+            ctx.lineTo(canvas.width, canvas.height - 60);
+            ctx.stroke();
+        }
+        
+        function updateUI() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.currentLevel + 1;
+            updateHealthBar();
+        }
+        
+        function updateHealthBar() {
+            const healthBar = document.getElementById('healthBar');
+            healthBar.innerHTML = '';
+            
+            for (let i = 0; i < 3; i++) {
+                const pip = document.createElement('div');
+                pip.className = 'health-pip' + (i >= gameState.health ? ' empty' : '');
+                healthBar.appendChild(pip);
+            }
+        }
+        
+        function gameLoop() {
+            if (!gameState.running) return;
+            
+            drawBackground();
+            updateWords();
+            drawWords();
+            drawPlayer();
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        input.focus();
+    </script>
+</body>
+</html>

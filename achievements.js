@@ -118,6 +118,118 @@ const ACHIEVEMENTS = {
         icon: '🔒',
         requirement: 1,
         xp: 200
+    },
+    terminal_master: {
+        id: 'terminal_master',
+        name: 'Terminal Master',
+        description: 'Complete any terminal game',
+        icon: '🖥️',
+        requirement: 1,
+        xp: 100
+    },
+    bash_champion: {
+        id: 'bash_champion',
+        name: 'Bash Champion',
+        description: 'Complete Bash terminal game',
+        icon: '💻',
+        requirement: 1,
+        xp: 150
+    },
+    python_dev: {
+        id: 'python_dev',
+        name: 'Python Developer',
+        description: 'Complete Python terminal game',
+        icon: '🐍',
+        requirement: 1,
+        xp: 150
+    },
+    linux_expert: {
+        id: 'linux_expert',
+        name: 'Linux Expert',
+        description: 'Complete Linux terminal game',
+        icon: '🐧',
+        requirement: 1,
+        xp: 150
+    },
+    vim_ninja: {
+        id: 'vim_ninja',
+        name: 'Vim Ninja',
+        description: 'Complete Vim terminal game',
+        icon: '✏️',
+        requirement: 1,
+        xp: 150
+    },
+    sql_wizard: {
+        id: 'sql_wizard',
+        name: 'SQL Wizard',
+        description: 'Complete SQL terminal game',
+        icon: '🗄️',
+        requirement: 1,
+        xp: 150
+    },
+    regex_master: {
+        id: 'regex_master',
+        name: 'Regex Master',
+        description: 'Complete Regex terminal game',
+        icon: '🔍',
+        requirement: 1,
+        xp: 150
+    },
+    git_guru: {
+        id: 'git_guru',
+        name: 'Git Guru',
+        description: 'Complete Git terminal game',
+        icon: '🔀',
+        requirement: 1,
+        xp: 150
+    },
+    tool_collector: {
+        id: 'tool_collector',
+        name: 'Tool Collector',
+        description: 'Complete 5 terminal games',
+        icon: '🛠️',
+        requirement: 5,
+        xp: 300
+    },
+    sed_wizard: {
+        id: 'sed_wizard',
+        name: 'Sed Wizard',
+        description: 'Complete Sed terminal game',
+        icon: '✨',
+        requirement: 1,
+        xp: 150
+    },
+    ssh_specialist: {
+        id: 'ssh_specialist',
+        name: 'SSH Specialist',
+        description: 'Complete SSH terminal game',
+        icon: '🔑',
+        requirement: 1,
+        xp: 150
+    },
+    jq_genius: {
+        id: 'jq_genius',
+        name: 'jq Genius',
+        description: 'Complete jq terminal game',
+        icon: '📋',
+        requirement: 1,
+        xp: 150
+    },
+    awk_master: {
+        id: 'awk_master',
+        name: 'AWK Master',
+        description: 'Complete AWK terminal game',
+        icon: '📊',
+        requirement: 1,
+        xp: 150
+    },
+    curl_expert: {
+        id: 'curl_expert',
+        name: 'cURL Expert',
+        description: 'Complete cURL terminal game',
+        icon: '🌐',
+        requirement: 1,
+        xp: 150
     }
 };
 
@@ -230,6 +342,24 @@ function checkAchievements(completedCourses) {
     if (completedProjects.length >= 1) unlockAchievement('project_builder');
     if (completed.has('project-homelab.html')) unlockAchievement('homelabber');
     if (completed.has('project-wireguard.html')) unlockAchievement('vpn_warrior');
+    
+    // Terminal games achievements
+    const terminalGames = ['bash', 'python', 'linux', 'vim', 'sql', 'sed', 'regex', 'ssh', 'jq', 'awk', 'curl', 'git'];
+    const completedTerminals = terminalGames.filter(g => completed.has(g + 'term.html'));
+    if (completedTerminals.length >= 1) unlockAchievement('terminal_master');
+    if (completedTerminals.length >= 5) unlockAchievement('tool_collector');
+    if (completed.has('bashterm.html')) unlockAchievement('bash_champion');
+    if (completed.has('pyterm.html')) unlockAchievement('python_dev');
+    if (completed.has('nixterm.html')) unlockAchievement('linux_expert');
+    if (completed.has('vimterm.html')) unlockAchievement('vim_ninja');
+    if (completed.has('sqlterm.html')) unlockAchievement('sql_wizard');
+    if (completed.has('regexterm.html')) unlockAchievement('regex_master');
+    if (completed.has('gitterm.html')) unlockAchievement('git_guru');
+    if (completed.has('sedterm.html')) unlockAchievement('sed_wizard');
+    if (completed.has('sshterm.html')) unlockAchievement('ssh_specialist');
+    if (completed.has('jqterm.html')) unlockAchievement('jq_genius');
+    if (completed.has('awkterm.html')) unlockAchievement('awk_master');
+    if (completed.has('curlterm.html')) unlockAchievement('curl_expert');
 }
 
 function showAchievementPopup(achievement) {

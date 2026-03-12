@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="onion-location" content="http://yppxyvqzw3lcpkjqpbm24ugbpqibke45bkrqzatsy3asoa377urir3yd.onion/blog-foss.html">
 
     <title>The Need for FOSS Is More Important Than Ever - REBEL WITH LINUX</title>
     <meta name="description" content="Why free and open source software matters more than ever in the age of mass surveillance.">
@@ -25,6 +24,13 @@
         if (savedTheme === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
         }
+        // Sync checkbox after DOM loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
     </script>
 
     <style>
@@ -163,15 +169,20 @@
                     <span class="hamburger-line"></span>
                     <span class="hamburger-line"></span>
                 </a>
-                <div class="nav-links">
+                <div class="nav-links" id="navLinks">
                     <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
-                    <a href="index.html">HOME</a>
+                    <a href="index.html#distros">DISTRO</a>
                     <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#games">GAMES</a>
                     <a href="index.html#guides">GUIDES</a>
                     <a href="index.html#projects">PROJECTS</a>
                     <a href="index.html#resources">RESOURCES</a>
+                    <a href="index.html#references">REFERENCES</a>
                     <a href="index.html#blog">BLOG</a>
+                    <a href="index.html#stats">STATS</a>
                     <a href="index.html#contact">CONTACT</a>
+                    <a href="#" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" style="display:none">ACCOUNT</a>
                 </div>
             </div>
         </div>
@@ -262,6 +273,22 @@
                 <p><strong>Use FOSS. Encrypt everything. Self-host. Choose freedom.</strong></p>
             </div>
         </article>
+
+        <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+            <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+            <div id="comments-list" style="margin-bottom: 32px;"></div>
+            <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+                <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+                <div style="display: grid; gap: 16px;">
+                    <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                    <button onclick="submitComment('blog-foss')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                    <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                    <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer>
@@ -281,5 +308,11 @@
 
     
     <script src="nav.js" defer></script>
+    <script src="comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-foss');
+        });
+    </script>
 </body>
 </html>

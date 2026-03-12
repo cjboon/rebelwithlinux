@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Security: Physical Protection and Encryption - REBEL WITH LINUX</title>
+    <meta name="description" content="Learn about device security, encryption effectiveness, and physical security. How to protect your laptop and why encryption math is solid.">
+    <meta name="keywords" content="device security, encryption, LUKS, BitLocker, AES-256, physical security, laptop security">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Device Security: Physical Protection and Encryption">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog-device-security.html">
+    <link rel="canonical" href="https://rebelwithlinux.com/blog-device-security.html">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; border-bottom: 2px solid var(--black); background: var(--white); }
+        .blog-nav a { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: var(--black); text-decoration: none; }
+        .blog-nav a:hover { text-decoration: underline; }
+        .blog-container { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+        .blog-meta { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--gray); margin-bottom: 16px; }
+        .blog-title { font-size: 2rem; line-height: 1.2; margin-bottom: 24px; }
+        .blog-content { font-size: 1.1rem; line-height: 1.8; }
+        .blog-content p { margin-bottom: 24px; }
+        .blog-content h2 { font-size: 1.5rem; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--black); }
+        .blog-content h3 { font-size: 1.25rem; margin: 32px 0 12px; }
+        .blog-content ul, .blog-content ol { margin-bottom: 24px; padding-left: 24px; }
+        .blog-content li { margin-bottom: 8px; }
+        .blog-content blockquote { border-left: 4px solid var(--black); padding-left: 20px; margin: 24px 0; font-style: italic; color: var(--gray); }
+        .blog-content code { background: var(--beige); padding: 2px 6px; font-family: 'IBM Plex Mono', monospace; font-size: 0.95rem; }
+        .blog-content pre { background: var(--black); color: var(--ivory); padding: 20px; margin: 24px 0; overflow-x: auto; border: 3px solid var(--black); }
+        .blog-content pre code { background: transparent; padding: 0; color: var(--ivory); }
+        .tip-box { background: #F0FFF0; border-left: 4px solid var(--dark-green); padding: 16px; margin: 24px 0; }
+        .warning-box { background: #FFF0F0; border-left: 4px solid var(--dark-red); padding: 16px; margin: 24px 0; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="index.html#distros">DISTRO</a>
+                    <a href="index.html#about">ABOUT</a>
+                    <a href="index.html#games">GAMES</a>
+                    <a href="index.html#guides">GUIDES</a>
+                    <a href="index.html#projects">PROJECTS</a>
+                    <a href="index.html#resources">RESOURCES</a>
+                    <a href="index.html#references">REFERENCES</a>
+                    <a href="index.html#blog">BLOG</a>
+                    <a href="index.html#stats">STATS</a>
+                    <a href="index.html#contact">CONTACT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="blog-header">
+        <h1>// THE REBEL BLOG</h1>
+        <p>Thoughts on free software, privacy, and taking back control</p>
+    </header>
+
+    <nav class="blog-nav">
+        <a href="index.html#blog">← Back to Blog</a>
+    </nav>
+
+    <main class="blog-container" id="main-content">
+        <article>
+            <div class="blog-meta">
+                <span>2026-03-12</span> • <span>6 min read</span> • <span>Security</span>
+            </div>
+            <h1 class="blog-title">Device Security: Physical Protection and Encryption</h1>
+
+            <div class="blog-content">
+                <p>Physical security and encryption are your first line of defense. No amount of firewall rules or network hardening matters if someone can just walk away with your laptop and read your hard drive.</p>
+
+                <p>In this guide, we're covering two critical aspects of device security: how modern encryption actually works, and what to do about physical threats.</p>
+
+                <h2>Modern Encryption: How Strong Is It Really?</h2>
+
+                <p>Here's the thing about encryption: the mathematics are solid. We're not talking about the encryption of the 1990s that governments could crack. Modern encryption is serious business.</p>
+
+                <p><strong>AES-256 (Symmetric Encryption)</strong></p>
+                <ul>
+                    <li>Considered unbreakable with current technology</li>
+                    <li>Used for full-disk encryption and file encryption</li>
+                    <li>NSA-approved for classified information</li>
+                    <li>No known practical attacks</li>
+                </ul>
+
+                <p><strong>RSA-4096 and Curve25519 (Asymmetric Encryption)</strong></p>
+                <ul>
+                    <li>Used for key exchange and digital signatures</li>
+                    <li>Curve25519 is considered highly secure and efficient</li>
+                    <li>Warning: Quantum computers will eventually threaten RSA</li>
+                    <li>Post-quantum algorithms are emerging to address this</li>
+                </ul>
+
+                <h3>Common Implementations You Should Know</h3>
+
+                <ul>
+                    <li><strong>LUKS</strong> — Linux disk encryption. Very strong. The standard for Linux full-disk encryption.</li>
+                    <li><strong>BitLocker</strong> — Windows full-disk encryption. Closed source but audited and considered strong.</li>
+                    <li><strong>GPG</strong> — For files and email encryption. The gold standard for asymmetric encryption.</li>
+                    <li><strong>Signal</strong> — For messaging. End-to-end encrypted by default.</li>
+                </ul>
+
+                <div class="tip-box">
+                    <strong>Pro Tip:</strong> For most users, AES-256 with a strong passphrase is more than sufficient. The encryption itself won't be broken—the weak point is typically the human element.
+                </div>
+
+                <h3>Where Encryption Falls Short</h3>
+
+                <p>The math is solid. I cannot stress this enough. But the weak points are elsewhere:</p>
+
+                <ul>
+                    <li><strong>Weak passwords</strong> — If your encryption passphrase is "password123," no amount of AES-256 will save you.</li>
+                    <li><strong>Keyloggers</strong> — Malware on your device can capture your passphrase when you type it.</li>
+                    <li><strong>Social engineering</strong> — Someone tricking you into giving up your keys.</li>
+                    <li><strong>Implementation bugs</strong> — Flaws in how the encryption was programmed.</li>
+                    <li><strong>Side-channel attacks</strong> — Exploiting physical characteristics like power consumption or electromagnetic emissions.</li>
+                    <li><strong>Metadata and headers</strong> — Even encrypted messages leak some information about sender/recipient.</li>
+                </ul>
+
+                <blockquote>The encryption itself is rarely the problem. It's usually the human behind the keyboard.</blockquote>
+
+                <h2>Physical Security: Leaving Your Laptop at Home</h2>
+
+                <p>So you've enabled full-disk encryption. You're using a strong passphrase. But what happens when you leave your laptop at home?</p>
+
+                <p>The answer depends on your setup. Done right, it's relatively safe. Done wrong, and you've essentially handed someone your data on a silver platter.</p>
+
+                <h3>What Could Happen With Physical Access</h3>
+
+                <ul>
+                    <li><strong>Hard drive extraction</strong> — They remove the drive and read it directly (mitigated by encryption)</li>
+                    <li><strong>Live USB boot</strong> — Boot from a USB stick to bypass your OS login entirely</li>
+                    <li><strong>Hardware keyloggers</strong> — Physical devices installed between keyboard and motherboard</li>
+                    <li><strong>Drive cloning</strong> — Copy everything for offline attack</li>
+                </ul>
+
+                <div class="warning-box">
+                    <strong>Critical:</strong> Without encryption, physical access equals data access. It's that simple. With encryption, they need the passphrase—which brings us to mitigation.
+                </div>
+
+                <h3>Essential Mitigations</h3>
+
+                <ul>
+                    <li><strong>Full-disk encryption is non-negotiable.</strong> LUKS on Linux, BitLocker on Windows. Set it up. Now.</li>
+                    <li><strong>Power off.</strong> Not sleep. Not hibernate. Power off. Sleep mode can sometimes be bypassed.</li>
+                    <li><strong>Strong BIOS/boot password.</strong> Prevents booting from unauthorized devices.</li>
+                    <li><strong>Secure location.</strong> Locked room, safe, or somewhere physically inaccessible.</li>
+                </ul>
+
+                <p>If your laptop is encrypted AND powered off, an attacker needs the encryption passphrase. Without it, your data is effectively inaccessible. That's the protection encryption provides.</p>
+
+                <p>If your laptop is NOT encrypted, anyone with physical access can read everything. Every document, every password saved in your browser, every private file.</p>
+
+                <h2>Wireless Keyboards: An Overlooked Security Risk</h2>
+
+                <p>Let me tell you about something most people don't think about: wireless keyboards. That convenient little dongle? It might be broadcasting everything you type.</p>
+
+                <h3>The Risks</h3>
+
+                <ul>
+                    <li><strong>2.4GHz keyboards (non-Bluetooth)</strong> — Often unencrypted. Vulnerable to keystroke interception from nearby attackers.</li>
+                    <li><strong>MouseJack vulnerability</strong> — Can inject keystrokes into vulnerable receivers. Attackers can type whatever they want on your computer.</li>
+                    <li><strong>Keyloggers</strong> — Attackers with the right equipment can capture everything you type from a distance.</li>
+                </ul>
+
+                <h3>Risk by Type</h3>
+
+                <ul>
+                    <li>Old 2.4GHz dongle keyboards: <strong>High risk</strong></li>
+                    <li>Modern 2.4GHz (Logitech etc.): <strong>Low-medium risk</strong> — most include encryption now</li>
+                    <li>Bluetooth 4.0+: <strong>Low risk</strong> — encrypted and authenticated</li>
+                </ul>
+
+                <div class="tip-box">
+                    <strong>Recommendation:</strong> For high-security work, use a wired keyboard. If you must use wireless, stick to modern Bluetooth 4.0+ devices or recent encrypted dongle keyboards. Keep firmware updated.
+                </div>
+
+                <p>For most users, the practical risk is low—it requires a nearby attacker with specific equipment. But if you're handling sensitive data, or if you're a high-value target, wired is the way to go.</p>
+
+                <h2>The Bottom Line</h2>
+
+                <p>Security is layered. Encryption protects your data at rest. Physical security protects your device from being stolen. Good habits protect you from the human element.</p>
+
+                <p>Enable full-disk encryption on every device you own. Power off when leaving your device unattended. Use strong passphrases. Prefer wired peripherals for sensitive work.</p>
+
+                <p>No system is perfect. But making yourself a harder target matters. Most attackers will move on to easier prey.</p>
+
+                <blockquote>The goal isn't perfect security. The goal is making yourself not worth the effort.</blockquote>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p>contact: busydrama @ proton.me</p>
+    </footer>
+    <script>
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="nav.js" defer></script>
+</body>
+</html>

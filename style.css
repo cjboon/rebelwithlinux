@@ -54,6 +54,17 @@
     --beige: #3a3a3a;
 }
 
+[data-theme="dark"] .quiz-input,
+[data-theme="dark"] .form-group input {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #e0e0e0;
+}
+
+[data-theme="dark"] .quiz-input::placeholder {
+    color: #888888;
+}
+
 /* Hide the theme toggle checkbox but keep it functional */
 #themeToggle {
     position: absolute;
@@ -241,25 +252,19 @@ nav {
     font-size: 1.1rem;
     font-weight: 700;
     white-space: nowrap;
-}
-
-.nav-title a {
     color: var(--white);
     text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
 }
 
-.nav-title a:visited {
+.nav-title:visited {
     color: var(--white);
 }
 
-.nav-title a:hover {
+.nav-title:hover {
     opacity: 0.8;
 }
-
-.nav-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    white-space: nowrap;
 }
 
 .nav-left {
@@ -455,17 +460,39 @@ nav {
 .show-more-checkbox,
 #show-more-guides,
 #show-more-projects,
-#show-more-resources {
+#show-more-resources,
+#show-more-games,
+#show-more-distros,
+#show-more-references,
+#show-more-blog,
+#show-more-about {
     position: absolute;
-    left: -9999px;
-    opacity: 0;
-    pointer-events: none;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 /* Hide cards initially */
 .lesson-card.hidden,
+.about-preview {
+    display: block;
+    font-size: 1rem;
+    color: var(--charcoal);
+    margin-bottom: 16px;
+}
+
+#about:has(#show-more-about:checked) .about-preview {
+    display: none;
+}
+
 .project-card.hidden,
-.resource-card.hidden {
+.resource-card.hidden,
+.about-hidden {
     display: none;
 }
 
@@ -482,17 +509,94 @@ nav {
     display: block;
 }
 
-/* Hide show more button when expanded */
-#show-more-guides:checked ~ .show-more-container,
-#show-more-projects:checked ~ .show-more-container,
-#show-more-resources:checked ~ .show-more-container {
+#games:has(#show-more-games:checked) .lesson-card.hidden {
+    display: block;
+}
+
+#distros .lesson-card.hidden {
     display: none;
+}
+
+#distros:has(#show-more-distros:checked) .lesson-card.hidden {
+    display: block;
+}
+
+#games .lesson-card.hidden {
+    display: none;
+}
+
+#games .browser-games-header {
+    display: none;
+}
+
+#games:has(#show-more-games:checked) .browser-games-header {
+    display: block;
+}
+
+#games:has(#show-more-games:checked) .lesson-card.hidden {
+    display: block;
+}
+
+#guides .lesson-card.hidden {
+    display: none;
+}
+
+#guides:has(#show-more-guides:checked) .lesson-card.hidden {
+    display: block;
+}
+
+#references .lesson-card.hidden {
+    display: none;
+}
+
+#references:has(#show-more-references:checked) .lesson-card.hidden {
+    display: block;
+}
+
+#blog .lesson-card.hidden {
+    display: none;
+}
+
+#blog:has(#show-more-blog:checked) .lesson-card.hidden {
+    display: block;
+}
+
+#about:has(#show-more-about:checked) .about-hidden {
+    display: block;
+}
+
+/* Hide show more button when expanded - DISABLED to show arrow instead */
+#guides:has(#show-more-guides:checked) .show-more-btn,
+#projects:has(#show-more-projects:checked) .show-more-btn,
+#resources:has(#show-more-resources:checked) .show-more-btn,
+#games:has(#show-more-games:checked) .show-more-btn,
+#browser-games:has(#show-more-browser-games:checked) .show-more-btn,
+#distros:has(#show-more-distros:checked) .show-more-btn,
+#references:has(#show-more-references:checked) .show-more-btn,
+#blog:has(#show-more-blog:checked) .show-more-btn,
+#about:has(#show-more-about:checked) .show-more-btn {
+    /* display: none; - removed to show arrow instead */
+}
+
+/* Arrow rotation when expanded - point left when closed, down when open */
+#guides:has(#show-more-guides:checked) .show-more-btn::after,
+#projects:has(#show-more-projects:checked) .show-more-btn::after,
+#resources:has(#show-more-resources:checked) .show-more-btn::after,
+#games:has(#show-more-games:checked) .show-more-btn::after,
+#distros:has(#show-more-distros:checked) .show-more-btn::after,
+#references:has(#show-more-references:checked) .show-more-btn::after,
+#blog:has(#show-more-blog:checked) .show-more-btn::after,
+#about:has(#show-more-about:checked) .show-more-btn::after {
+    transform: rotate(90deg);
 }
 
 /* Show more button styling */
 .show-more-btn {
-    display: inline-block;
-    padding: 12px 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
     background: var(--black);
     color: var(--white);
     font-family: 'IBM Plex Mono', monospace;
@@ -500,11 +604,28 @@ nav {
     cursor: pointer;
     border: 2px solid var(--black);
     transition: all 0.2s ease;
+    position: relative;
+}
+
+.show-more-btn::after {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 10px solid var(--white);
+    transform: rotate(180deg);
+    transition: transform 0.3s ease;
 }
 
 .show-more-btn:hover {
     background: var(--white);
     color: var(--black);
+}
+
+.show-more-btn:hover::after {
+    border-left-color: var(--black);
 }
 
 .show-more-container {
@@ -670,12 +791,23 @@ nav {
    ============================================================================= */
 .lessons-section {
     padding: 64px 32px;
-    max-width: 1400px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
 .section-header {
     margin-bottom: 48px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 0 32px;
+}
+
+.section-header .section-title-wrap {
+    flex: 1;
+    min-width: 200px;
 }
 
 .section-header h2 {
@@ -1351,9 +1483,13 @@ nav {
    ============================================================================= */
 .about-section {
     padding: 64px 32px;
+    max-width: 1100px;
+    margin: 0 auto;
     background: var(--white);
     border-top: 4px solid var(--black);
     border-bottom: 4px solid var(--black);
+    border-left: 2px solid var(--black);
+    border-right: 2px solid var(--black);
 }
 
 .links-section {
@@ -1824,7 +1960,7 @@ footer .copyleft {
    ============================================================================= */
 .projects-section {
     padding: 64px 32px;
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
@@ -2197,18 +2333,21 @@ footer .copyleft {
 }
 
 .guides-progress-section,
-.projects-progress-section {
+.projects-progress-section,
+.games-progress-section {
     margin-bottom: 48px;
 }
 
 .guides-progress-section h2,
-.projects-progress-section h2 {
+.projects-progress-section h2,
+.games-progress-section h2 {
     font-size: 1.5rem;
     margin-bottom: 24px;
 }
 
 .guides-list,
-.projects-list {
+.projects-list,
+.games-list {
     background: var(--white);
     border: 3px solid var(--black);
 }
@@ -2346,4 +2485,48 @@ footer .copyleft {
     .achievements-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* Override hover for blog and games - remove box shadow and transition */
+.blog-grid .lesson-card,
+#games .lesson-card {
+    border: 1px solid var(--charcoal);
+    outline: none;
+    transition: none !important;
+}
+
+[data-theme="dark"] .blog-grid .lesson-card,
+[data-theme="dark"] #games .lesson-card {
+    border: 1px solid #444;
+}
+
+[data-theme="dark"] .blog-grid .lesson-card:hover,
+[data-theme="dark"] #games .lesson-card:hover {
+    box-shadow: 8px 8px 0 #666 !important;
+}
+
+.blog-grid .lesson-card:hover,
+.blog-grid .lesson-card:focus,
+#games .lesson-card:hover,
+#games .lesson-card:focus {
+    box-shadow: 8px 8px 0 var(--black) !important;
+    transform: translate(-2px, -2px);
+    border: 1px solid var(--black) !important;
+    outline: none !important;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.blog-grid .lesson-card:hover article,
+#games .lesson-card:hover article,
+.blog-grid .lesson-card:hover h3,
+#games .lesson-card:hover h3,
+.blog-grid .lesson-card:hover p,
+#games .lesson-card:hover p,
+.blog-grid .lesson-card:hover div,
+#games .lesson-card:hover div {
+    background: transparent !important;
+    color: var(--charcoal) !important;
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
 }

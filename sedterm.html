@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sed Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: #444444; 2px solid }
+        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
+        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
+        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
+        .sed-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .sed-output-line { color: #aaaaaa; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .sed-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1e; }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .sed-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .sed-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .sed-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">Sed Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type sed command:</div>
+                <textarea id="command-input" placeholder="sed 's/old/new/' file.txt" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <div class="hint">Enter for new line, Ctrl+Enter to run</div>
+            </div>
+            <div class="sed-output-area" id="sed-output">
+                <div class="sed-output-line" style="color: #586e75;">Sed output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    
+        
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const sedOutput = document.getElementById('sed-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                document.documentElement.requestFullscreen();
+            }
+        };
+        
+        window.toggleDarkMode = function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=sed');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'sed', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addSedLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'sed-error-line' : 'sed-output-line';
+            line.textContent = text;
+            sedOutput.appendChild(line);
+            sedOutput.scrollTop = sedOutput.scrollHeight;
+        }
+        
+        function clearSedOutput() {
+            sedOutput.innerHTML = '';
+        }
+        
+        function runSedCode(cmd) {
+            addSedLine('$ echo "' + testData.line1 + '" | ' + cmd);
+            
+            const inputText = testData.line1;
+            let result = inputText;
+            let error = null;
+            
+            try {
+                const match = cmd.match(/sed\s+['"]s\/([^\/]*)\/([^\/]*)\/(['"]?)(g?)(I?)/);
+                if (match) {
+                    const pattern = match[1];
+                    const replacement = match[2];
+                    const hasG = match[4] === 'g';
+                    const hasI = match[5] === 'I';
+                    
+                    let flags = '';
+                    if (hasI) flags += 'i';
+                    if (hasG) flags += 'g';
+                    
+                    const regex = new RegExp(pattern, flags);
+                    if (hasG) {
+                        result = inputText.replace(regex, replacement);
+                    } else {
+                        result = inputText.replace(regex, replacement);
+                    }
+                } else if (cmd.includes("'d'") || cmd.includes('/d')) {
+                    const delMatch = cmd.match(/sed\s+['"]\/([^\/]+)\/d['"]/);
+                    if (delMatch) {
+                        const pattern = new RegExp(delMatch[1], 'g');
+                        result = inputText.replace(pattern, '');
+                    }
+                } else {
+                    result = "(Sed commands supported: s/pattern/replacement/, /pattern/d)";
+                }
+                
+                result.split('\n').forEach(line => addSedLine(line));
+            } catch (e) {
+                addSedLine('Error: ' + e.message, 'error');
+            }
+        }
+        
+        const character = {
+            name: "Sed the Wizard",
+            greeting: "Greetings, apprentice! I am Sed the Wizard - master of text transformation! Sed (Stream Editor) is the most powerful spell in your command-line arsenal. With sed, you can transform any text instantly - find, replace, delete, insert - with magical precision! Let's begin your journey into the dark arts of text manipulation! Type --beginner or --intermediate to choose your path.",
+            encourage: ["Magical work!", "Enchanting transformation!", "You're a natural wizard!", "The text obeys your will!", "Perfect casting!", "Most excellent!"],
+            getEncouragement: function() {
+                return this.encourage[Math.floor(Math.random() * this.encourage.length)];
+            }
+        };
+        
+        const beginnerLevels = [
+            {
+                id: 1,
+                title: "The Substitution Spell",
+                intro: "Welcome, apprentice! Let's start with sed's most powerful spell: substitution! The 's' command replaces text. It's like magic - watch!",
+                content: "Replace 'hello' with 'hi':\nsed 's/hello/hi/'",
+                hint: "Type: sed 's/hello/hi/'",
+                answer: "sed 's/hello/hi/'",
+                success: "Magnificent! The 's' command substitutes! Format: s/pattern/replacement/. See how 'hello' became 'hi'? The spell is cast!",
+                type: "exact"
+            },
+            {
+                id: 2,
+                title: "Global Replacement",
+                intro: "By default, sed only replaces the FIRST match. But what if we want to replace ALL? That's where the 'g' flag comes in!",
+                content: "Replace ALL occurrences:\nsed 's/hello/hi/g'",
+                hint: "Type: sed 's/hello/hi/g'",
+                answer: "sed 's/hello/hi/g'",
+                success: "Behold! The 'g' means GLOBAL - every 'hello' becomes 'hi'! Without 'g', only the first would change. Master the g, and transformation is yours!",
+                type: "exact"
+            },
+            {
+                id: 3,
+                title: "Case Sensitivity",
+                intro: "Sed is case-sensitive by default. But we can use the 'I' flag to ignore case!",
+                content: "Replace ignoring case:\nsed 's/apple/grape/Ig'",
+                hint: "Type: sed 's/apple/grape/Ig'",
+                answer: "sed 's/apple/grape/Ig'",
+                success: "Case ignored! The 'I' flag makes it case-insensitive. Combined with 'g', it replaces ALL case variations! True wizardry!",
+                type: "exact"
+            },
+            {
+                id: 4,
+                title: "The Delete Spell",
+                intro: "Sometimes you don't want to replace - you want to DESTROY! The 'd' command deletes lines that match.",
+                content: "Delete lines with 'hello':\nsed '/hello/d'",
+                hint: "Type: sed '/hello/d'",
+                answer: "sed '/hello/d'",
+                success: "Gone! The 'd' command deletes matching lines entirely. Use with caution - once deleted, text is lost to the void!",
+                type: "exact"
+            },
+            {
+                id: 5,
+                title: "Addressed Magic",
+                intro: "Sed can target SPECIFIC lines! Use line numbers to apply magic only where needed.",
+                content: "Change only line 1:\nsed '1s/world/there/'",
+                hint: "Type: sed '1s/world/there/'",
+                answer: "sed '1s/world/there/'",
+                success: "Only line 1 changed! The '1' before the command is the address. Use any line number - precision is the wizard's ally!",
+                type: "exact"
+            },
+            {
+                id: 6,
+                title: "Range of Power",
+                intro: "You can address a RANGE of lines! From one line to another.",
+                content: "Change lines 1 to 3:\nsed '1,3s/line/note/'",
+                hint: "Type: sed '1,3s/line/note/'",
+                answer: "sed '1,3s/line/note/'",
+                success: "Only lines 1 through 3 transformed! The comma creates a range. From line X to line Y - master this range and power is yours!",
+                type: "exact"
+            },
+            {
+                id: 7,
+                title: "Print Command",
+                intro: "The 'p' command prints lines. Combined with -n, it shows only what you want.",
+                content: "Print specific line:\nsed -n '2p'",
+                hint: "Type: sed -n '2p'",
+                answer: "sed -n '2p'",
+                success: "Only line 2 appears! The -n suppresses auto-print, 'p' prints the addressed line. Filtering has never been so elegant!",
+                type: "exact"
+            },
+            {
+                id: 8,
+                title: "Pattern as Address",
+                intro: "Addresses can be PATTERNS too! Apply magic only to lines matching a regex.",
+                content: "Change lines with 'two':\nsed '/two/s/three/THREE/'",
+                hint: "Type: sed '/two/s/three/THREE/'",
+                answer: "sed '/two/s/three/THREE/'",
+                success: "Only the line containing 'two' was modified! The address /pattern/ targets matching lines. Selective magic!",
+                type: "exact"
+            },
+            {
+                id: 9,
+                title: "Character Classes",
+                intro: "Use brackets [] to match CHARACTER CLASSES - any single character in the set.",
+                content: "Replace any digit:\nsed 's/[0-9]/X/g'",
+                hint: "Type: sed 's/[0-9]/X/g'",
+                answer: "sed 's/[0-9]/X/g'",
+                success: "All digits become X! [0-9] matches any digit. [a-z] for lowercase, [A-Z] for uppercase, [aeiou] for vowels. Classes are powerful!",
+                type: "exact"
+            },
+            {
+                id: 10,
+                title: "Wildcard Magic",
+                intro: "The dot (.) matches ANY character. Combine with * for 'any number of any character'.",
+                content: "Match any 3 chars:\nsed 's/.../XXX/g'",
+                hint: "Type: sed 's/.../XXX/g'",
+                answer: "sed 's/.../XXX/g'",
+                success: "Every group of 3 characters became XXX! The dot is a wildcard, matching anything. This is the basis of pattern matching!",
+                type: "exact"
+            },
+            {
+                id: 11,
+                title: "Ampersand Magic",
+                intro: "The & represents what was MATCHED! Insert around what you find.",
+                content: "Wrap match in tags:\nsed 's/fox/<&>/g'",
+                hint: "Type: sed 's/fox/<&>/g'",
+                answer: "sed 's/fox/<&>/g'",
+                success: "The matched text (&) got wrapped in tags! & is your wildcard capture. Insert BEFORE, AFTER, or AROUND your match!",
+                type: "exact"
+            },
+            {
+                id: 12,
+                title: "Beginner Finale",
+                intro: "Incredible! You've mastered the fundamentals of sed! Let's combine everything!",
+                content: "The ultimate spell:\nsed '1,2s/[a-z]/U&/g'",
+                hint: "Type: sed '1,2s/[a-z]/U&/g'",
+                answer: "sed '1,2s/[a-z]/U&/g'",
+                success: "YOU DID IT! First 2 lines, lowercase letters all became UPPERCASE! Range, class, global, AND ampersand - you've mastered the basics! Sed apprentice - COMPLETE! The text transformation arts are yours! PROUD!",
+                type: "starts"
+            }
+        ];
+        
+        const intermediateLevels = [
+            {
+                id: 1,
+                title: "Line Addresses",
+                intro: "Welcome to INTERMEDIATE level! Let's learn about addresses - we can target specific lines!",
+                content: "Replace only on line 2:\nsed '2s/hello/hi/'",
+                hint: "Type: sed '2s/hello/hi/'",
+                answer: "sed '2s/",
+                success: "Line addresses are powerful! '2s' means only on line 2. You can use any line number - sed obeys your spatial commands!",
+                type: "starts"
+            },
+            {
+                id: 2,
+                title: "Range of Lines",
+                intro: "We can target a RANGE of lines! This is very useful for processing specific sections.",
+                content: "Replace on lines 1-3:\nsed '1,3s/hello/hi/'",
+                hint: "Type: sed '1,3s/hello/hi/'",
+                answer: "sed '1,3s/",
+                success: "The range 1,3 means lines 1 through 3! You can transform entire sections of files with this spell!",
+                type: "starts"
+            },
+            {
+                id: 3,
+                title: "Pattern Addresses",
+                intro: "Instead of line numbers, we can use PATTERNS to find lines!",
+                content: "Replace only in lines containing 'error':\nsed '/error/s/warn/critical/'",
+                hint: "Type: sed '/error/s/warn/critical/'",
+                answer: "sed '/error/s/",
+                success: "Pattern matching! '/error/' selects lines with 'error', then s/// works on those lines only. Precise targeting!",
+                type: "starts"
+            },
+            {
+                id: 4,
+                title: "Delete by Range",
+                intro: "We can delete ranges of lines too! Very useful for removing headers or footers.",
+                content: "Delete lines 1-5:\nsed '1,5d'",
+                hint: "Type: sed '1,5d'",
+                answer: "sed '1,5d'",
+                success: "Lines 1 through 5 are gone! This is how you strip headers from files instantly. The void claims them!",
+                type: "exact"
+            },
+            {
+                id: 5,
+                title: "Print Only Matched",
+                intro: "The 'p' command prints lines. Combined with -n, it shows ONLY matching lines!",
+                content: "Print lines with 'hello':\nsed -n '/hello/p'",
+                hint: "Type: sed -n '/hello/p'",
+                answer: "sed -n '/hello/p'",
+                success: "The -n suppresses auto-print, 'p' prints matches. This is like grep with sed power! Selective display!",
+                type: "starts"
+            },
+            {
+                id: 6,
+                title: "Multiple Commands",
+                intro: "We can chain multiple sed commands with -e! Like casting multiple spells at once!",
+                content: "Two replacements:\nsed -e 's/foo/bar/' -e 's/baz/qux/'",
+                hint: "Type: sed -e 's/foo/bar/' -e 's/baz/qux/'",
+                answer: "sed -e 's/foo/bar/' -e",
+                success: "Multiple commands! Each -e adds a command. You can chain as many as you need for complex transformations!",
+                type: "starts"
+            },
+            {
+                id: 7,
+                title: "Using & as Match",
+                intro: "The & represents what you matched! Very useful for wrapping text.",
+                content: "Wrap matches in brackets:\nsed 's/word/[&]/'",
+                hint: "Type: sed 's/word/[&]/'",
+                answer: "s/word/[&]/",
+                success: "The & inserts the matched text! [word] - you can wrap, add prefixes, suffixes - & is your placeholder!",
+                type: "starts"
+            },
+            {
+                id: 8,
+                title: "Capture Groups",
+                intro: "Parentheses () create capture groups, \\1 \\2 reference them! This is advanced magic.",
+                content: "Swap words:\nsed 's/\\(word1\\) \\(word2\\)/\\2 \\1/'",
+                hint: "Type: sed 's/\\\\(word1\\\\) \\\\(word2\\\\)/\\\\2 \\\\1/'",
+                answer: "sed 's/\\\\(word1\\\\) \\\\2 \\1/'",
+                success: "Capture groups! \\1 and \\2 hold matched parts. This swaps word1 and word2 - regex sorcery!",
+                type: "starts"
+            },
+            {
+                id: 9,
+                title: "The Hold Space",
+                intro: "Sed has a 'hold' space - like a clipboard! The 'h' command copies pattern to hold, 'x' exchanges them.",
+                content: "Copy line to hold:\nsed 'h'",
+                hint: "Type: sed 'h'",
+                answer: "sed 'h'",
+                success: "The hold space stores lines! 'h' copies, 'H' appends, 'g' gets from hold. This is sed's memory!",
+                type: "exact"
+            },
+            {
+                id: 10,
+                title: "Insert and Append",
+                intro: "The 'i' inserts BEFORE a line, 'a' appends AFTER. These need addresses!",
+                content: "Insert before line 1:\nsed '1i\\New line'",
+                hint: "Type: sed '1i\\\\New line'",
+                answer: "sed '1i\\\\",
+                success: "Line insertion! 'i' inserts before, 'a' appends after. Perfect for adding headers to files!",
+                type: "starts"
+            },
+            {
+                id: 11,
+                title: "Change Entire Line",
+                intro: "The 'c' command replaces an ENTIRE line with new text!",
+                content: "Replace line 1:\nsed '1c\\Replaced!'",
+                hint: "Type: sed '1c\\\\Replaced!'",
+                answer: "sed '1c\\\\",
+                success: "Complete replacement! 'c' swaps the whole line. This is how you do wholesale line transformations!",
+                type: "starts"
+            },
+            {
+                id: 12,
+                title: "Intermediate Finale",
+                intro: "Final challenge! Use sed to transform text in a way that combines multiple techniques!",
+                content: "On lines with 'TODO', replace 'fix' with 'DONE':\nsed '/TODO/s/fix/DONE/'",
+                hint: "Type: sed '/TODO/s/fix/DONE/'",
+                answer: "sed '/TODO/s/",
+                success: "INTERMEDIATE COMPLETE! You now command addresses, patterns, groups, hold space, and more! You're a sed wizard!",
+                type: "starts"
+            }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        function addLine(text, className = '') {
+            const line = document.createElement('div');
+            line.className = 'output-line ' + className;
+            line.textContent = text;
+            history.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        async function showCharacterMessage(text, showName = true) {
+            const line = document.createElement('div');
+            line.className = 'output-line';
+            history.appendChild(line);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                let currentText = '';
+                
+                function type() {
+                    if (i < text.length) {
+                        currentText += text.charAt(i);
+                        if (showName) {
+                            line.innerHTML = '<span class="character-name">' + character.name + ':</span> ' + currentText;
+                        } else {
+                            line.innerHTML = '<span class="character-name">' + character.name + '</span> ' + currentText;
+                        }
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function addUserInput(text) {
+            const line = document.createElement('div');
+            line.className = 'output-line user-input';
+            line.textContent = '> ' + text;
+            history.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function checkAnswer(userAnswer) {
+            const level = levels[currentLevel];
+            let isCorrect = false;
+            
+            if (level.type === 'exact') {
+                isCorrect = userAnswer.trim() === level.answer;
+            } else if (level.type === 'starts') {
+                isCorrect = userAnswer.trim().startsWith(level.answer);
+            }
+            
+            return isCorrect;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            
+            addLine('');
+            addLine('═══════════════════════════════════════', 'lesson-number');
+            addLine('  Level ' + level.id + ': ' + level.title, 'lesson-number');
+            addLine('═══════════════════════════════════════', 'lesson-number');
+            addLine('');
+            
+            await showCharacterMessage(level.intro);
+            addLine('');
+            
+            const contentLine = document.createElement('div');
+            contentLine.className = 'output-line command-output';
+            contentLine.textContent = level.content;
+            history.appendChild(contentLine);
+            output.scrollTop = output.scrollHeight;
+            
+            addLine('');
+            await showCharacterMessage("Cast your spell! " + level.hint, false);
+            addLine('');
+        }
+        
+        async function showSuccess() {
+            const level = levels[currentLevel];
+            
+            addLine('');
+            await showCharacterMessage(level.success);
+            
+            addLine('');
+            const encour = document.createElement('div');
+            encour.className = 'output-line encouragement';
+            encour.textContent = '✨ ' + character.getEncouragement() + ' ✨';
+            history.appendChild(encour);
+            
+            addLine('');
+        }
+        
+        async function startGame() {
+            history.innerHTML = '';
+            clearSedOutput();
+            currentLevel = 0;
+            
+            addLine('');
+            addLine('╔═══════════════════════════════════════╗', 'lesson-number');
+            addLine('║    SED TUTOR with Sed the Wizard     ║', 'lesson-number');
+            addLine('╚═══════════════════════════════════════╝', 'lesson-number');
+            addLine('');
+            
+            await showCharacterMessage(character.greeting);
+            
+            addLine('');
+            addLine('Choose your path, apprentice:', 'lesson-number');
+            addLine('');
+            
+            const menu1 = document.createElement('div');
+            menu1.className = 'output-line choice';
+            menu1.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Start with the basics (lessons 1-12)';
+            history.appendChild(menu1);
+            
+            const menu2 = document.createElement('div');
+            menu2.className = 'output-line choice';
+            menu2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Advanced sed (lessons 13-24)';
+            history.appendChild(menu2);
+            
+            const menu3 = document.createElement('div');
+            menu3.className = 'output-line choice';
+            menu3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menu3);
+            
+            const menu4 = document.createElement('div');
+            menu4.className = 'output-line choice';
+            menu4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menu4);
+            
+            const menu5 = document.createElement('div');
+            menu5.className = 'output-line choice';
+            menu5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menu5);
+            
+            addLine('');
+            addCharacterMessage("Click on a choice or type --beginner, --intermediate, --fullscreen, --darkmode, or --exit!");
+            addLine('');
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') {
+                levels = beginnerLevels;
+                addCharacterMessage("Excellent! We'll start from the very beginning. I'll teach you the fundamental spells of text transformation!");
+            } else if (trackName === 'intermediate') {
+                levels = intermediateLevels;
+                addCharacterMessage("Welcome back! You've mastered the basics - now let's dive into addresses, patterns, capture groups, and the hold space!");
+            }
+            
+            currentLevel = 0;
+            addLine('');
+            showLevel();
+        }
+        
+        function addCharacterMessage(text) {
+            const line = document.createElement('div');
+            line.className = 'output-line';
+            line.innerHTML = '<span class="character-name">' + character.name + ':</span> ' + text;
+            history.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        async function handleCommand(cmd) {
+            cmd = cmd.trim();
+            if (!cmd) return;
+            
+            addUserInput(cmd);
+            
+            runSedCode(cmd);
+            
+            if (cmd === '--start' || cmd === '--restart') {
+                startGame();
+                return;
+            }
+            
+            if (cmd === '--beginner') {
+                await startTrack('beginner');
+                return;
+            }
+            
+            if (cmd === '--intermediate') {
+                await startTrack('intermediate');
+                return;
+            }
+            
+            if (cmd === '--fullscreen') {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    document.documentElement.requestFullscreen();
+                }
+                return;
+            }
+            
+            if (cmd === '--darkmode') {
+                const current = document.documentElement.getAttribute('data-theme');
+                const newTheme = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                if (userId) {
+                    try {
+                        await fetch('/api/auth.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: 'action=updateTheme&theme=' + newTheme,
+                            credentials: 'include'
+                        });
+                    } catch (e) {}
+                }
+                const toggle = document.getElementById('themeToggle');
+                if (toggle) toggle.checked = newTheme === 'dark';
+                addCharacterMessage("Theme switched to " + newTheme + " mode!");
+                return;
+            }
+            
+            if (cmd === '--exit') {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            if (cmd === '--help') {
+                addCharacterMessage("Type --start to return to the main menu!");
+                addCharacterMessage("Type --beginner for beginner lessons (1-12)");
+                addCharacterMessage("Type --intermediate for intermediate lessons (13-24)");
+                addCharacterMessage("Type --fullscreen to toggle fullscreen mode");
+                addCharacterMessage("Type --darkmode to toggle dark/light mode");
+                addCharacterMessage("Type --exit to go back to homepage");
+                addCharacterMessage("Type --level to see your current level");
+                addCharacterMessage("Type --hint if you're stuck");
+                return;
+            }
+            
+            if (cmd === '--level') {
+                addLine('Current level: ' + (currentLevel + 1) + ' - ' + levels[currentLevel].title);
+                return;
+            }
+            
+            if (cmd === '--skip') {
+                currentLevel++;
+                if (currentLevel >= levels.length) {
+                    addCharacterMessage("You finished all the levels! You're a sed wizard now! Type --start to practice again!");
+                    return;
+                }
+                showLevel();
+                return;
+            }
+            
+            if (cmd === '--hint') {
+                addCharacterMessage("No worries! The hint is: " + levels[currentLevel].hint);
+                return;
+            }
+            
+            if (checkAnswer(cmd)) {
+                await showSuccess();
+                saveProgress(currentLevel + 2);
+                currentLevel++;
+                
+                if (currentLevel >= levels.length) {
+                    addLine('');
+                    addLine('═══════════════════════════════════════', 'lesson-number');
+                    if (levels === beginnerLevels) {
+                        addCharacterMessage("CONGRATULATIONS! You completed all 12 beginner sed lessons! You're a true text transformation wizard! Type --intermediate to continue your journey!");
+                    } else if (levels === intermediateLevels) {
+                        addCharacterMessage("CONGRATULATIONS! You completed all 12 intermediate sed lessons! You've mastered addresses, patterns, capture groups, and the hold space! The power of sed is yours! Type --beginner to start over!");
+                    }
+                    addLine('═══════════════════════════════════════', 'lesson-number');
+                    addLine('');
+                } else {
+                    setTimeout(() => showLevel(), 1500);
+                }
+            } else {
+                addCharacterMessage("Hmm, that's not quite right. Try again! Remember the format: sed 's/pattern/replacement/' - you've got this!");
+            }
+        }
+        
+        input.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                const cmd = input.value;
+                input.value = '';
+                handleCommand(cmd);
+            }
+        });
+        
+        input.focus();
+        document.addEventListener('click', () => input.focus());
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) {
+                currentLevel = savedLevel - 1;
+            }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+                const toggle = document.getElementById('themeToggle');
+                if (toggle) toggle.checked = userTheme === 'dark';
+            }
+            startGame();
+        }
+        init();
+    </script>
+</body>
+</html>
