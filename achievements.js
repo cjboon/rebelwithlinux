@@ -319,47 +319,46 @@ function checkAchievements(completedCourses) {
     const completed = new Set(completedCourses);
     
     if (completed.size >= 1) unlockAchievement('first_lesson');
-    if (completed.has('linux.html')) unlockAchievement('linux_novice');
-    if (completed.has('bash.html')) unlockAchievement('bash_beginner');
-    if (completed.has('git.html')) unlockAchievement('git_user');
-    if (completed.has('python.html')) unlockAchievement('python_coder');
-    if (completed.has('docker.html')) unlockAchievement('docker_master');
-    if (completed.has('kubernetes.html')) unlockAchievement('k8s_ninja');
+    if (completed.has('guides/guide-linux.html')) unlockAchievement('linux_novice');
+    if (completed.has('guides/guide-bash.html')) unlockAchievement('bash_beginner');
+    if (completed.has('guides/guide-git.html')) unlockAchievement('git_user');
+    if (completed.has('guides/guide-python.html')) unlockAchievement('python_coder');
+    if (completed.has('guides/guide-docker.html')) unlockAchievement('docker_master');
+    if (completed.has('guides/guide-kubernetes.html')) unlockAchievement('k8s_ninja');
     
-    const webDevCount = ['hyper.html', 'css.html', 'javascript.html'].filter(c => completed.has(c)).length;
-    if (webDevCount >= 3) unlockAchievement('web_dev');
+    const webDevCount = ['guides/guide-html.html', 'guides/guide-css.html', 'guides/guide-javascript.html'].filter(c => completed.has(c)).length;
     
-    const serverCount = ['nginx.html', 'apache2.html', 'vps.html'].filter(c => completed.has(c)).length;
+    const serverCount = ['guides/guide-nginx.html', 'guides/guide-apache2.html', 'guides/guide-vps.html'].filter(c => completed.has(c)).length;
     if (serverCount >= 3) unlockAchievement('server_admin');
     
-    const securityCount = ['hardening.html', 'networking.html', 'dns.html'].filter(c => completed.has(c)).length;
+    const securityCount = ['guides/guide-hardening.html', 'guides/guide-networking.html', 'guides/guide-dns.html'].filter(c => completed.has(c)).length;
     if (securityCount >= 3) unlockAchievement('privacy_advocate');
     
     if (completed.size >= 10) unlockAchievement('full_stack');
     
-    const projects = ['project-homelab.html', 'project-wireguard.html', 'project-blog.html', 'project-paste.html', 'project-fileshare.html'];
+    const projects = ['projects/project-homelab.html', 'projects/project-wireguard.html', 'projects/project-blog.html', 'projects/project-paste.html', 'projects/project-fileshare.html', 'projects/project-matrix.html'];
     const completedProjects = projects.filter(c => completed.has(c));
     if (completedProjects.length >= 1) unlockAchievement('project_builder');
-    if (completed.has('project-homelab.html')) unlockAchievement('homelabber');
-    if (completed.has('project-wireguard.html')) unlockAchievement('vpn_warrior');
+    if (completed.has('projects/project-homelab.html')) unlockAchievement('homelabber');
+    if (completed.has('projects/project-wireguard.html')) unlockAchievement('vpn_warrior');
     
     // Terminal games achievements
     const terminalGames = ['bash', 'python', 'linux', 'vim', 'sql', 'sed', 'regex', 'ssh', 'jq', 'awk', 'curl', 'git'];
-    const completedTerminals = terminalGames.filter(g => completed.has(g + 'term.html'));
+    const completedTerminals = terminalGames.filter(g => completed.has('terms/term-' + g + '.html'));
     if (completedTerminals.length >= 1) unlockAchievement('terminal_master');
     if (completedTerminals.length >= 5) unlockAchievement('tool_collector');
-    if (completed.has('bashterm.html')) unlockAchievement('bash_champion');
-    if (completed.has('pyterm.html')) unlockAchievement('python_dev');
-    if (completed.has('nixterm.html')) unlockAchievement('linux_expert');
-    if (completed.has('vimterm.html')) unlockAchievement('vim_ninja');
-    if (completed.has('sqlterm.html')) unlockAchievement('sql_wizard');
-    if (completed.has('regexterm.html')) unlockAchievement('regex_master');
-    if (completed.has('gitterm.html')) unlockAchievement('git_guru');
-    if (completed.has('sedterm.html')) unlockAchievement('sed_wizard');
-    if (completed.has('sshterm.html')) unlockAchievement('ssh_specialist');
-    if (completed.has('jqterm.html')) unlockAchievement('jq_genius');
-    if (completed.has('awkterm.html')) unlockAchievement('awk_master');
-    if (completed.has('curlterm.html')) unlockAchievement('curl_expert');
+    if (completed.has('terms/term-bash.html')) unlockAchievement('bash_champion');
+    if (completed.has('terms/term-py.html')) unlockAchievement('python_dev');
+    if (completed.has('terms/term-nix.html')) unlockAchievement('linux_expert');
+    if (completed.has('terms/term-vim.html')) unlockAchievement('vim_ninja');
+    if (completed.has('terms/term-sql.html')) unlockAchievement('sql_wizard');
+    if (completed.has('terms/term-regex.html')) unlockAchievement('regex_master');
+    if (completed.has('terms/term-git.html')) unlockAchievement('git_guru');
+    if (completed.has('terms/term-sed.html')) unlockAchievement('sed_wizard');
+    if (completed.has('terms/term-ssh.html')) unlockAchievement('ssh_specialist');
+    if (completed.has('terms/term-jq.html')) unlockAchievement('jq_genius');
+    if (completed.has('terms/term-awk.html')) unlockAchievement('awk_master');
+    if (completed.has('terms/term-curl.html')) unlockAchievement('curl_expert');
 }
 
 function showAchievementPopup(achievement) {

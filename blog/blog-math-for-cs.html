@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Math for CS: A Beginner's Guide - REBEL WITH LINUX</title>
+    <meta name="description" content="A practical guide to learning math for computer science, even if you feel 'bad at math'.">
+    <meta name="keywords" content="math, computer science, programming, learning, algebra, beginner">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Math for CS: A Beginner's Guide">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-math-for-cs.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-math-for-cs.html">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+
+    <style>
+        .blog-header {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 32px 60px;
+            text-align: center;
+        }
+        .blog-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .blog-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--gray);
+        }
+        .blog-nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 16px;
+            background: var(--black);
+            border-bottom: 1px solid var(--charcoal);
+        }
+        .blog-nav a {
+            color: var(--white);
+            text-decoration: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .blog-nav a:hover {
+            color: var(--gray);
+        }
+        .blog-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 32px;
+            font-family: 'IBM Plex Mono', monospace;
+            line-height: 1.8;
+        }
+        .blog-content h2 {
+            font-size: 1.5rem;
+            margin: 32px 0 16px;
+            border-bottom: 2px solid var(--black);
+            padding-bottom: 8px;
+        }
+        .blog-content h3 {
+            font-size: 1.2rem;
+            margin: 24px 0 12px;
+        }
+        .blog-content p {
+            margin-bottom: 16px;
+        }
+        .blog-content code {
+            background: var(--light-gray);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        .blog-content pre {
+            background: var(--black);
+            color: var(--white);
+            padding: 16px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+        .blog-content pre code {
+            background: none;
+            padding: 0;
+        }
+        .blog-content ul, .blog-content ol {
+            margin: 16px 0 16px 32px;
+        }
+        .blog-content li {
+            margin-bottom: 8px;
+        }
+        .blog-content a {
+            color: var(--black);
+        }
+        .meta {
+            font-size: 0.85rem;
+            color: var(--charcoal);
+            margin-bottom: 24px;
+        }
+        .callout {
+            background: var(--ivory);
+            border-left: 4px solid var(--black);
+            padding: 16px;
+            margin: 24px 0;
+            font-style: italic;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin: 24px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th, td {
+            border: 1px solid var(--charcoal);
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: var(--light-gray);
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#distros">DISTRO</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#projects">PROJECTS</a>
+                    <a href="../index.html#resources">RESOURCES</a>
+                    <a href="../index.html#references">REFERENCES</a>
+                    <a href="../index.html#scripts">SCRIPTS</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#contact">CONTACT</a>
+                    <a href="../index.html#stats">STATS</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="blog-header">
+        <h1>Math for CS: A Beginner's Guide</h1>
+        <p>March 11, 2026 • Learning • 12 min read</p>
+    </div>
+    
+    <nav class="blog-nav">
+        <a href="../index.html">← Home</a>
+        <a href="../index.html#blog">All Posts</a>
+    </nav>
+
+    <article class="blog-content">
+        <p class="meta">A practical guide to learning the math required for computer science, even if you feel "bad at math."</p>
+
+        <div class="callout">
+            <strong>You're Not Bad at Math.</strong> You Just Haven't Learned It Yet.
+        </div>
+
+        <p>If you're worried about the math requirements for computer science, take a deep breath. This guide is for you.</p>
+
+        <h2>The Truth About Math and Programming</h2>
+
+        <p>Here's what nobody tells you: <strong>most programming doesn't require advanced math.</strong></p>
+
+        <p>Web developers, mobile app developers, and most software engineers rarely use calculus or linear algebra in their day-to-day work. They're writing business logic, building user interfaces, and processing data - none of which needs more than basic algebra.</p>
+
+        <p>The math becomes more relevant if you want to:</p>
+        <ul>
+            <li>Work in machine learning/AI</li>
+            <li>Do computer graphics/game development</li>
+            <li>Specialize in cryptography</li>
+            <li>Go into data science</li>
+            <li>Pursue research</li>
+        </ul>
+
+        <p>But even in those fields, you learn the specific math you need along the way.</p>
+
+        <h2>What You Actually Need (Minimum)</h2>
+
+        <h3>1. Basic Algebra</h3>
+
+        <p><strong>Why:</strong> Everything in programming is built on variables and functions.</p>
+
+        <p><strong>What to learn:</strong></p>
+        <ul>
+            <li>Solving equations (isolate x)</li>
+            <li>Understanding functions (input → output)</li>
+            <li>Working with inequalities</li>
+            <li>Basic word problems</li>
+        </ul>
+
+        <p><strong>Real-world programming:</strong></p>
+        <pre><code>// This is algebra in code
+let price = 100;
+let discount = 0.2;
+let finalPrice = price * (1 - discount);</code></pre>
+
+        <p><strong>Resources:</strong></p>
+        <ul>
+            <li>Khan Academy "Algebra 1" course (free)</li>
+            <li>Paul's Online Math Notes (lamar.edu)</li>
+        </ul>
+
+        <p><strong>Time to learn:</strong> 1-2 months of casual study</p>
+
+        <h3>2. Logic and Boolean Algebra</h3>
+
+        <p><strong>Why:</strong> Every if-statement, every loop condition, every comparison in code is boolean logic.</p>
+
+        <p><strong>What to learn:</strong></p>
+        <ul>
+            <li>AND, OR, NOT operations</li>
+            <li>Truth tables</li>
+            <li>De Morgan's Laws</li>
+            <li>Understanding "if X AND NOT Y"</li>
+        </ul>
+
+        <p><strong>Real-world programming:</strong></p>
+        <pre><code>if user.is_logged_in and not user.is_banned:
+    print("Welcome!")</code></pre>
+
+        <p><strong>Resources:</strong></p>
+        <ul>
+            <li>Search "boolean algebra basics"</li>
+            <li>Discrete math books (start with the logic chapter)</li>
+        </ul>
+
+        <p><strong>Time to learn:</strong> 2-3 weeks</p>
+
+        <h3>3. Basic Statistics</h3>
+
+        <p><strong>Why:</strong> Data is everywhere. Understanding averages, distributions, and probabilities helps you make sense of data and avoid being misled.</p>
+
+        <p><strong>What to learn:</strong></p>
+        <ul>
+            <li>Mean, median, mode</li>
+            <li>Basic probability</li>
+            <li>Standard deviation</li>
+            <li>Correlation vs. causation</li>
+        </ul>
+
+        <p><strong>Resources:</strong></p>
+        <ul>
+            <li>Khan Academy "Statistics and Probability"</li>
+        </ul>
+
+        <p><strong>Time to learn:</strong> 1-2 months</p>
+
+        <h2>What You Might Need Later (Intermediate)</h2>
+
+        <h3>4. Discrete Mathematics</h3>
+
+        <p><strong>Why:</strong> This is the math behind algorithms and data structures. Essential for understanding efficiency (Big-O notation), recursion, and counting.</p>
+
+        <p><strong>Topics:</strong></p>
+        <ul>
+            <li>Sets and sequences</li>
+            <li>Induction and recursion</li>
+            <li>Counting (combinations, permutations)</li>
+            <li>Graph theory basics</li>
+        </ul>
+
+        <p><strong>When to learn:</strong> Take a discrete math course in your second year, or study alongside your first algorithms class.</p>
+
+        <p><strong>Resources:</strong></p>
+        <ul>
+            <li>"Discrete Mathematics and Its Applications" by Rosen</li>
+            <li>MIT OpenCourseWare discrete math lectures</li>
+        </ul>
+
+        <h3>5. Calculus (Optional)</h3>
+
+        <p><strong>Why:</strong> Needed for machine learning, some graphics, and understanding continuous change.</p>
+
+        <p><strong>When to learn:</strong> Only when you need it. Don't force yourself to learn it upfront if you're not interested in those fields.</p>
+
+        <p><strong>The secret:</strong> You can learn the specific calculus you need for ML in specialized courses like 3Blue1Brown's "Neural Networks" series or Andrew Ng's ML course.</p>
+
+        <h2>How to Actually Learn (Especially If You Feel "Slow")</h2>
+
+        <h3>1. Go Slower Than You Think You Need To</h3>
+
+        <p>Math builds on itself. If you don't understand algebra, you'll struggle with everything else. It's okay to spend extra time. Really understanding foundations is more important than rushing.</p>
+
+        <h3>2. Do Problems. Lots of Problems.</h3>
+
+        <p>You can't learn math by just watching videos or reading. You learn by doing. Start with easy problems, then gradually harder ones.</p>
+
+        <p><strong>Sites with problems:</strong></p>
+        <ul>
+            <li>Khan Academy (excellent problem sets)</li>
+            <li>Pauls Online Notes (practice problems with solutions)</li>
+            <li>IXL Math (adaptive practice)</li>
+        </ul>
+
+        <h3>3. When You Get Stuck, Take a Break</h3>
+
+        <p>Walk away. Sleep on it. Often your brain works on problems in the background. Coming back tomorrow with fresh eyes makes a huge difference.</p>
+
+        <h3>4. Accept That Forgetting Is Normal</h3>
+
+        <p>You will forget things. That's fine. You'll re-learn them when you need them. Each time gets easier.</p>
+
+        <h3>5. Connect Math to Code</h3>
+
+        <p>Since you're learning programming, try to see the math in code:</p>
+        <ul>
+            <li>Variables = algebraic symbols</li>
+            <li>Functions = mathematical functions</li>
+            <li>Loops = repeated calculations</li>
+            <li>If statements = boolean logic</li>
+        </ul>
+
+        <p>This makes abstract concepts concrete.</p>
+
+        <h2>A Realistic Timeline</h2>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Semester</th>
+                        <th>Focus</th>
+                        <th>Time Commitment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Before College</td>
+                        <td>Algebra + Logic</td>
+                        <td>30 min/day, 3 months</td>
+                    </tr>
+                    <tr>
+                        <td>Year 1</td>
+                        <td>Review + Start Discrete Math</td>
+                        <td>30 min/day during semester</td>
+                    </tr>
+                    <tr>
+                        <td>Year 2</td>
+                        <td>Discrete Math + Stats</td>
+                        <td>Class-based</td>
+                    </tr>
+                    <tr>
+                        <td>Year 3+</td>
+                        <td>Specific math for your focus</td>
+                        <td>As needed</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2>The Mindset Shift</h2>
+
+        <div class="callout">
+            <strong>Stop thinking:</strong> "I'm bad at math."<br>
+            <strong>Start thinking:</strong> "I haven't learned this part yet."
+        </div>
+
+        <p>Every programmer who seems "good at math" simply learned it at some point. They forgot most of it. They're looking things up constantly. You're not behind - you're at the beginning.</p>
+
+        <p>Your worth as a programmer isn't determined by how fast you can solve equations. It's determined by how well you can solve problems, work with others, and build useful things.</p>
+
+        <p>The math will come. One piece at a time. At your pace.</p>
+
+        <p><strong>You've got this.</strong></p>
+
+        <h2>Quick Reference: What to Study First</h2>
+
+        <ol>
+            <li><strong>Start now:</strong> Algebra basics (Khan Academy Algebra 1)</li>
+            <li><strong>In parallel:</strong> Boolean logic (search "boolean algebra for programmers")</li>
+            <li><strong>Before sophomore year:</strong> Basic statistics</li>
+            <li><strong>With CS data structures:</strong> Discrete math</li>
+        </ol>
+
+        <div class="callout">
+            <strong>Remember:</strong> Most successful programmers aren't math geniuses. They're problem solvers who learned the math they needed along the way. You'll be fine.
+        </div>
+    </article>
+
+    <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+        <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+        <div id="comments-list" style="margin-bottom: 32px;"></div>
+        <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+            <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+            <div style="display: grid; gap: 16px;">
+                <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                <button onclick="submitComment('blog-math-for-cs')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+            </div>
+        </div>
+    </section>
+    <script src="../comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-math-for-cs');
+        });
+    </script>
+</body>
+</html>

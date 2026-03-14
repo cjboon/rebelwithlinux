@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Fundamentals - Build the Structure of the Web | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn HTML from basics to advanced. Master semantic markup, forms, accessibility, and SEO best practices. Build the foundation of every website.">
+    <meta name="keywords" content="HTML, HTML tutorial, learn HTML, web development, semantic HTML, HTML5, forms, accessibility, SEO, markup, website structure">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        // Theme persistence - check and apply immediately in head
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        // Sync checkbox after DOM loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    <script src="../terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #E34F26;
+        }
+        
+        .html-block {
+            background: var(--black);
+            color: var(--ivory);
+            padding: 20px;
+            margin: 16px 0;
+            border: 3px solid var(--black);
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+        
+        .html-block .tag { color: #e34f26; }
+        .html-block .attr { color: #0070a9; }
+        .html-block .string { color: #a31515; }
+        .html-block .comment { color: #6a9955; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">&lt;HTML MASTERY/&gt;</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#distros">DISTRO</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#projects">PROJECTS</a>
+                    <a href="../index.html#resources">RESOURCES</a>
+                    <a href="../index.html#references">REFERENCES</a>
+                    <a href="../index.html#scripts">SCRIPTS</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#contact">CONTACT</a>
+                    <a href="../index.html#stats">STATS</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>BUILD THE<br>STRUCTURE</h1>
+        <p class="tagline">// The foundation of every website.</p>
+        
+        <div class="manifesto">
+            <p><strong>HTML IS THE SKELETON OF THE WEB.</strong></p>
+            <p>Every website you've ever visited starts with HTML. It defines the structure, the semantics, and the meaning of content. Without HTML, there is no web.</p>
+            <p><strong>WHY HTML MATTERS</strong></p>
+            <p>HTML is not about presentation—it's about meaning. When you use semantic HTML, you create accessible content that works for everyone: screen readers, search engines, and all devices.</p>
+            <p><strong>MASTER THE MARKUP.</strong></p>
+            <p>Learn to structure documents properly, create accessible forms, and use the full power of HTML5. Every web developer must know HTML inside and out.</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to Mastery</h2>
+            <p>12 lessons. Complete HTML control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to HTML</h3>
+                <p class="lesson-desc">Learn what HTML is and create your first webpage.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Document Structure</h3>
+                <p class="lesson-desc">Understand DOCTYPE, head, and body elements.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Text Elements & Headings</h3>
+                <p class="lesson-desc">Format text and create document hierarchy with headings.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Links and Navigation</h3>
+                <p class="lesson-desc">Create hyperlinks and navigate between pages.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Images and Media</h3>
+                <p class="lesson-desc">Add images, video, and audio to your pages.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Lists</h3>
+                <p class="lesson-desc">Create ordered, unordered, and definition lists.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Tables</h3>
+                <p class="lesson-desc">Display tabular data with rows and columns.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Forms and Input</h3>
+                <p class="lesson-desc">Collect user data with form controls and validation.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Semantic HTML</h3>
+                <p class="lesson-desc">Use meaningful elements for better structure and accessibility.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">HTML5 Features</h3>
+                <p class="lesson-desc">Leverage modern HTML5 elements and new input types.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Accessibility</h3>
+                <p class="lesson-desc">Make your websites usable by everyone including screen readers.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Best Practices</h3>
+                <p class="lesson-desc">Follow standards, validate markup, and optimize for SEO.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why HTML</h2>
+            <p>HTML (HyperText Markup Language) is the standard markup language for documents designed to be displayed in a web browser. It was created by Tim Berners-Lee in 1991 and has evolved through several versions, with HTML5 being the current standard since 2014.</p>
+            <p>HTML is not a programming language—it's a markup language that defines the structure of your content. When combined with CSS for styling and JavaScript for interactivity, you have the complete web development stack.</p>
+            <p><strong>The web starts with HTML. Master it first.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>📖 MDN Web Docs</h3>
+                <p>Comprehensive HTML reference</p>
+                <a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank">developer.mozilla.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔧 W3C Validator</h3>
+                <p>Check your HTML validity</p>
+                <a href="https://validator.w3.org/" target="_blank">validator.w3.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>🎨 HTML5 Spec</h3>
+                <p>Official WHATWG standard</p>
+                <a href="https://html.spec.whatwg.org/" target="_blank">html.spec.whatwg.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>🏗️ Can I Use</h3>
+                <p>Browser support tables</p>
+                <a href="https://caniuse.com/" target="_blank">caniuse.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>🌐 HTML5 Doctor</h3>
+                <p>Semantic HTML reference</p>
+                <a href="http://html5doctor.com/" target="_blank">html5doctor.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>⚡ CodePen</h3>
+                <p>Test HTML in browser</p>
+                <a href="https://codepen.io/" target="_blank">codepen.io</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        
+    </footer>
+
+    <!-- Lesson 1 --><div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Introduction to HTML</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is HTML?</h3>
+                <p>HTML (HyperText Markup Language) is the standard markup language for creating web pages. It describes the structure of a web page and consists of a series of elements or tags.</p>
+                
+                <h3>Why HTML Matters</h3>
+                <ul>
+                    <li><strong>Foundation:</strong> Every website uses HTML as its foundation</li>
+                    <li><strong>Semantic:</strong> Elements describe meaning, not presentation</li>
+                    <li><strong>Universal:</strong> Works across all browsers and devices</li>
+                    <li><strong>Standard:</strong> Maintained by W3C and WHATWG</li>
+                    <li><strong>Accessible:</strong> Built-in support for screen readers</li>
+                </ul>
+                
+                <div class="highlight-box">
+                    <strong>HISTORY:</strong> HTML was created by Tim Berners-Lee in 1991. HTML5, the current version, was standardized in 2014 and brought semantic elements, multimedia support, and mobile-friendly features.
+                </div>
+
+                <h3>Your First HTML Document</h3>
+                
+                <div class="html-block">
+<span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;title&gt;</span>My First Page<span class="tag">&lt;/title&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+    <span class="tag">&lt;h1&gt;</span>Hello, World!<span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;p&gt;</span>This is my first webpage.<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span>
+                </div>
+
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Elements:</strong> Building blocks wrapped in tags like &lt;p&gt;...&lt;/p&gt;</li>
+                    <li><strong>Attributes:</strong> Additional info like href="url" in &lt;a&gt;</li>
+                    <li><strong>Nesting:</strong> Elements inside other elements</li>
+                    <li><strong>Structure:</strong> Head contains metadata, body contains visible content</li>
+                </ul>
+
+                <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
+                    <div class="quiz-question" data-answer="hypertext">
+                        <p class="question-text">1. HTML stands for _____ Markup Language.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Not just text</p>
+                    </div>
+                    <div class="quiz-question" data-answer="body">
+                        <p class="question-text">2. The visible content goes in the _____ tag.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Not head</p>
+                    </div>
+                    <div class="quiz-question" data-answer="head">
+                        <p class="question-text">3. The _____ element contains page metadata.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Contains title</p>
+                    </div>
+                    <div class="quiz-question" data-answer="tags">
+                        <p class="question-text">4. HTML elements are wrapped in _____.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Angle brackets</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers:</h4>
+                            <ol>
+                                <li>HyperText</li>
+                                <li>body</li>
+                                <li>head</li>
+                                <li>tags</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 --><div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Document Structure</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>The DOCTYPE Declaration</h3>
+                <p>Every HTML document must start with a DOCTYPE declaration. This tells the browser which version of HTML to use. For HTML5, it's simple:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;!DOCTYPE html&gt;</span>
+                </div>
+
+                <h3>The HTML Element</h3>
+                <p>The &lt;html&gt; element is the root element that wraps all content. Always include the lang attribute for accessibility and SEO:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="string">"en"</span><span class="tag">&gt;</span>
+    <span class="comment">&lt;!-- All content here --&gt;</span>
+<span class="tag">&lt;/html&gt;</span>
+                </div>
+
+                <h3>The Head Section</h3>
+                <p>The &lt;head&gt; contains metadata about the document. This information isn't displayed but is crucial for SEO, styling, and functionality:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="string">"description"</span> <span class="attr">content</span>=<span class="string">"Learn HTML"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;title&gt;</span>Page Title<span class="tag">&lt;/title&gt;</span>
+    <span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"styles.css"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+                </div>
+
+                <h3>Essential Meta Tags</h3>
+                <ul>
+                    <li><strong>charset:</strong> Character encoding (UTF-8)</li>
+                    <li><strong>viewport:</strong> Responsive design settings</li>
+                    <li><strong>description:</strong> SEO meta description</li>
+                    <li><strong>keywords:</strong> SEO keywords</li>
+                    <li><strong>author:</strong> Page author</li>
+                </ul>
+
+                <h3>Complete Document Structure</h3>
+                
+                <div class="html-block">
+<span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="string">"en"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;title&gt;</span>Document Title<span class="tag">&lt;/title&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+    <span class="comment">&lt;!-- Content goes here --&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span>
+                </div>
+
+                <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
+                    <div class="quiz-question" data-answer="doctype">
+                        <p class="question-text">1. _____ tells the browser which HTML version to use.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: First line of document</p>
+                    </div>
+                    <div class="quiz-question" data-answer="lang">
+                        <p class="question-text">2. The _____ attribute specifies the language.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: On html element</p>
+                    </div>
+                    <div class="quiz-question" data-answer="utf-8">
+                        <p class="question-text">3. _____ is the standard character encoding.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Unicode</p>
+                    </div>
+                    <div class="quiz-question" data-answer="viewport">
+                        <p class="question-text">4. The _____ meta tag enables responsive design.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Mobile-friendly</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers:</h4>
+                            <ol>
+                                <li>DOCTYPE</li>
+                                <li>lang</li>
+                                <li>UTF-8</li>
+                                <li>viewport</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 --><div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Text Elements & Headings</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Heading Elements</h3>
+                <p>Headings define the structure and hierarchy of your content. There are six levels, from h1 (most important) to h6 (least important):</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;h1&gt;</span>Main Page Title<span class="tag">&lt;/h1&gt;</span>
+<span class="tag">&lt;h2&gt;</span>Section Title<span class="tag">&lt;/h2&gt;</span>
+<span class="tag">&lt;h3&gt;</span>Subsection Title<span class="tag">&lt;/h3&gt;</span>
+<span class="tag">&lt;h4&gt;</span>Minor Heading<span class="tag">&lt;/h4&gt;</span>
+<span class="tag">&lt;h5&gt;</span>Small Heading<span class="tag">&lt;/h5&gt;</span>
+<span class="tag">&lt;h6&gt;</span>Smallest Heading<span class="tag">&lt;/h6&gt;</span>
+                </div>
+
+                <h3>Paragraphs and Text Formatting</h3>
+                
+                <div class="html-block">
+<span class="tag">&lt;p&gt;</span>This is a paragraph of text.<span class="tag">&lt;/p&gt;</span>
+
+<span class="tag">&lt;p&gt;</span>This is <span class="tag">&lt;strong&gt;</span>bold<span class="tag">&lt;/strong&gt;</span> text.<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;p&gt;</span>This is <span class="tag">&lt;em&gt;</span>italic<span class="tag">&lt;/em&gt;</span> text.<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;p&gt;</span>This is <span class="tag">&lt;mark&gt;</span>highlighted<span class="tag">&lt;/mark&gt;</span> text.<span class="tag">&lt;/p&gt;</span>
+
+<span class="tag">&lt;br&gt;</span> <span class="comment">&lt;!-- Line break --&gt;</span>
+<span class="tag">&lt;hr&gt;</span> <span class="comment">&lt;!-- Horizontal rule --&gt;</span>
+                </div>
+
+                <h3>Best Practices for Headings</h3>
+                <ul>
+                    <li>Use only one h1 per page</li>
+                    <li>Don't skip heading levels (h1 → h2 → h3)</li>
+                    <li>Use headings for structure, not for styling</li>
+                    <li>h1 should describe the main topic of the page</li>
+                </ul>
+
+                <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
+                    <div class="quiz-question" data-answer="h1">
+                        <p class="question-text">1. _____ is the most important heading.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Main title</p>
+                    </div>
+                    <div class="quiz-question" data-answer="one">
+                        <p class="question-text">2. You should use only _____ h1 per page.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Single main topic</p>
+                    </div>
+                    <div class="quiz-question" data-answer="strong">
+                        <p class="question-text">3. _____ indicates strong importance.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Bold semantic</p>
+                    </div>
+                    <div class="quiz-question" data-answer="em">
+                        <p class="question-text">4. _____ indicates emphasis.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Italic semantic</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers:</h4>
+                            <ol>
+                                <li>h1</li>
+                                <li>one</li>
+                                <li>strong</li>
+                                <li>em</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 --><div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Links and Navigation</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Creating Links with &lt;a&gt;</h3>
+                <p>The anchor element creates hyperlinks to other pages, files, or locations within the same page. The href attribute specifies the destination:</p>
+                
+                <div class="html-block">
+<span class="comment">&lt;!-- External link --&gt;</span>
+<span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"https://example.com"</span><span class="tag">&gt;</span>Visit Example<span class="tag">&lt;/a&gt;</span>
+
+<span class="comment">&lt;!-- Internal link --&gt;</span>
+<span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"about.html"</span><span class="tag">&gt;</span>About Us<span class="tag">&lt;/a&gt;</span>
+
+<span class="comment">&lt;!-- Same-page link --&gt;</span>
+<span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"#section2"</span><span class="tag">&gt;</span>Jump to Section 2<span class="tag">&lt;/a&gt;</span>
+
+<span class="comment">&lt;!-- Email link --&gt;</span>
+<span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"mailto:email@example.com"</span><span class="tag">&gt;</span>Send Email<span class="tag">&lt;/a&gt;</span>
+                </div>
+
+                <h3>Opening Links in New Tabs</h3>
+                <p>Use <code>target="_blank"</code> to open links in a new tab. For security, always add <code>rel="noopener noreferrer"</code>:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="string">"https://example.com"</span> 
+   <span class="attr">target</span>=<span class="string">"_blank"</span> 
+   <span class="attr">rel</span>=<span class="string">"noopener noreferrer"</span><span class="tag">&gt;</span>
+   Open in New Tab
+<span class="tag">&lt;/a&gt;</span>
+                </div>
+
+                <h3>Navigation Structure</h3>
+                <p>Use semantic elements for navigation menus:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;nav&gt;</span>
+    <span class="tag">&lt;ul&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="string">"/"</span><span class="tag">&gt;</span>Home<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="string">"/about"</span><span class="tag">&gt;</span>About<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="tag">&lt;li&gt;&lt;a</span> <span class="attr">href</span>=<span class="string">"/contact"</span><span class="tag">&gt;</span>Contact<span class="tag">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="tag">&lt;/ul&gt;</span>
+<span class="tag">&lt;/nav&gt;</span>
+                </div>
+
+                <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
+                    <div class="quiz-question" data-answer="href">
+                        <p class="question-text">1. The _____ attribute specifies the link destination.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Hypertext reference</p>
+                    </div>
+                    <div class="quiz-question" data-answer="_blank">
+                        <p class="question-text">2. _____ opens a link in a new tab.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Target attribute value</p>
+                    </div>
+                    <div class="quiz-question" data-answer="nav">
+                        <p class="question-text">3. The _____ element defines navigation links.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Navigation</p>
+                    </div>
+                    <div class="quiz-question" data-answer="noopener">
+                        <p class="question-text">4. _____ prevents security vulnerabilities.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: rel attribute value</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers:</h4>
+                            <ol>
+                                <li>href</li>
+                                <li>_blank</li>
+                                <li>nav</li>
+                                <li>noopener</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 --><div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Images and Media</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>The &lt;img&gt; Element</h3>
+                <p>The image element embeds pictures in your page. It requires the <code>src</code> attribute and should always include <code>alt</code> text:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="string">"photo.jpg"</span> 
+     <span class="attr">alt</span>=<span class="string">"A beautiful sunset over the ocean"</span> 
+     <span class="attr">width</span>=<span class="string">"800"</span> 
+     <span class="attr">height</span>=<span class="string">"600"</span><span class="tag">&gt;</span>
+                </div>
+
+                <h3>Essential Image Attributes</h3>
+                <ul>
+                    <li><strong>src:</strong> Path to the image file (required)</li>
+                    <li><strong>alt:</strong> Alternative text for accessibility (required)</li>
+                    <li><strong>width/height:</strong> Dimensions in pixels</li>
+                    <li><strong>loading:</strong> "lazy" for below-fold images</li>
+                </ul>
+
+                <h3>Figure with Caption</h3>
+                
+                <div class="html-block">
+<span class="tag">&lt;figure&gt;</span>
+    <span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="string">"chart.png"</span> <span class="attr">alt</span>=<span class="string">"Sales data chart"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;figcaption&gt;</span>
+        Figure 1: Q4 Sales increased by 25%
+    <span class="tag">&lt;/figcaption&gt;</span>
+<span class="tag">&lt;/figure&gt;</span>
+                </div>
+
+                <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
+                    <div class="quiz-question" data-answer="src">
+                        <p class="question-text">1. The _____ attribute specifies the image path.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Source</p>
+                    </div>
+                    <div class="quiz-question" data-answer="alt">
+                        <p class="question-text">2. The _____ attribute provides alternative text.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Accessibility</p>
+                    </div>
+                    <div class="quiz-question" data-answer="figure">
+                        <p class="question-text">3. The _____ element groups images with captions.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: With figcaption</p>
+                    </div>
+                    <div class="quiz-question" data-answer="lazy">
+                        <p class="question-text">4. loading="_____" defers loading until needed.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Opposite of eager</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers:</h4>
+                            <ol>
+                                <li>src</li>
+                                <li>alt</li>
+                                <li>figure</li>
+                                <li>lazy</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 --><div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lists</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Unordered Lists &lt;ul&gt;</h3>
+                <p>For bullet points where order doesn't matter:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;ul&gt;</span>
+    <span class="tag">&lt;li&gt;</span>Apples<span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;</span>Bananas<span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;</span>Oranges<span class="tag">&lt;/li&gt;</span>
+<span class="tag">&lt;/ul&gt;</span>
+                </div>
+
+                <h3>Ordered Lists &lt;ol&gt;</h3>
+                <p>For numbered sequences where order matters:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;ol&gt;</span>
+    <span class="tag">&lt;li&gt;</span>Preheat oven<span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;</span>Mix ingredients<span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;</span>Bake for 30 minutes<span class="tag">&lt;/li&gt;</span>
+<span class="tag">&lt;/ol&gt;</span>
+                </div>
+
+                <h3>Definition Lists &lt;dl&gt;</h3>
+                <p>For key-value pairs like glossaries:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;dl&gt;</span>
+    <span class="tag">&lt;dt&gt;</span>HTML<span class="tag">&lt;/dt&gt;</span>
+    <span class="tag">&lt;dd&gt;</span>HyperText Markup Language<span class="tag">&lt;/dd&gt;</span>
+    
+    <span class="tag">&lt;dt&gt;</span>CSS<span class="tag">&lt;/dt&gt;</span>
+    <span class="tag">&lt;dd&gt;</span>Cascading Style Sheets<span class="tag">&lt;/dd&gt;</span>
+<span class="tag">&lt;/dl&gt;</span>
+                </div>
+
+                <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
+                    <div class="quiz-question" data-answer="ul">
+                        <p class="question-text">1. _____ is for unordered bullet lists.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Unordered list</p>
+                    </div>
+                    <div class="quiz-question" data-answer="ol">
+                        <p class="question-text">2. _____ is for ordered numbered lists.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Ordered list</p>
+                    </div>
+                    <div class="quiz-question" data-answer="li">
+                        <p class="question-text">3. _____ is the list item element.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: List item</p>
+                    </div>
+                    <div class="quiz-question" data-answer="dl">
+                        <p class="question-text">4. _____ is for definition lists.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Definition list</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers:</h4>
+                            <ol>
+                                <li>ul</li>
+                                <li>ol</li>
+                                <li>li</li>
+                                <li>dl</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 --><div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Tables</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Basic Table Structure</h3>
+                <p>Tables display tabular data in rows and columns:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;table&gt;</span>
+    <span class="tag">&lt;thead&gt;</span>
+        <span class="tag">&lt;tr&gt;</span>
+            <span class="tag">&lt;th&gt;</span>Name<span class="tag">&lt;/th&gt;</span>
+            <span class="tag">&lt;th&gt;</span>Age<span class="tag">&lt;/th&gt;</span>
+        <span class="tag">&lt;/tr&gt;</span>
+    <span class="tag">&lt;/thead&gt;</span>
+    <span class="tag">&lt;tbody&gt;</span>
+        <span class="tag">&lt;tr&gt;</span>
+            <span class="tag">&lt;td&gt;</span>Alice<span class="tag">&lt;/td&gt;</span>
+            <span class="tag">&lt;td&gt;</span>25<span class="tag">&lt;/td&gt;</span>
+        <span class="tag">&lt;/tr&gt;</span>
+    <span class="tag">&lt;/tbody&gt;</span>
+<span class="tag">&lt;/table&gt;</span>
+                </div>
+
+                <h3>Table Elements</h3>
+                <ul>
+                    <li><strong>table:</strong> Container for the entire table</li>
+                    <li><strong>thead/tbody/tfoot:</strong> Header, body, footer sections</li>
+                    <li><strong>tr:</strong> Table row</li>
+                    <li><strong>th:</strong> Header cell (bold, centered)</li>
+                    <li><strong>td:</strong> Data cell</li>
+                </ul>
+
+                <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
+                    <div class="quiz-question" data-answer="table">
+                        <p class="question-text">1. _____ is the container for tabular data.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Main table element</p>
+                    </div>
+                    <div class="quiz-question" data-answer="tr">
+                        <p class="question-text">2. _____ defines a table row.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Table row</p>
+                    </div>
+                    <div class="quiz-question" data-answer="th">
+                        <p class="question-text">3. _____ is a header cell element.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Table header</p>
+                    </div>
+                    <div class="quiz-question" data-answer="td">
+                        <p class="question-text">4. _____ is a standard data cell.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Table data</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers:</h4>
+                            <ol>
+                                <li>table</li>
+                                <li>tr</li>
+                                <li>th</li>
+                                <li>td</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 --><div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Forms and Input</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Form Basics</h3>
+                <p>Forms collect user input and send it to a server:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;form</span> <span class="attr">action</span>=<span class="string">"/submit"</span> <span class="attr">method</span>=<span class="string">"POST"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;label</span> <span class="attr">for</span>=<span class="string">"email"</span><span class="tag">&gt;</span>Email:<span class="tag">&lt;/label&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"email"</span> 
+           <span class="attr">id</span>=<span class="string">"email"</span> 
+           <span class="attr">name</span>=<span class="string">"email"</span> 
+           <span class="attr">required</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">type</span>=<span class="string">"submit"</span><span class="tag">&gt;</span>Submit<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/form&gt;</span>
+                </div>
+
+                <h3>Input Types</h3>
+                <ul>
+                    <li><strong>text:</strong> Single-line text input</li>
+                    <li><strong>email:</strong> Email with validation</li>
+                    <li><strong>password:</strong> Masked text input</li>
+                    <li><strong>number:</strong> Numeric input</li>
+                    <li><strong>checkbox/radio:</strong> Selection controls</li>
+                </ul>
+
+                <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
+                    <div class="quiz-question" data-answer="form">
+                        <p class="question-text">1. The _____ element is the container for form controls.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Main form element</p>
+                    </div>
+                    <div class="quiz-question" data-answer="label">
+                        <p class="question-text">2. The _____ element describes form controls.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Uses for attribute</p>
+                    </div>
+                    <div class="quiz-question" data-answer="required">
+                        <p class="question-text">3. The _____ attribute makes a field mandatory.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Must fill</p>
+                    </div>
+                    <div class="quiz-question" data-answer="textarea">
+                        <p class="question-text">4. _____ is for multiline text input.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Long text</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers:</h4>
+                            <ol>
+                                <li>form</li>
+                                <li>label</li>
+                                <li>required</li>
+                                <li>textarea</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 --><div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Semantic HTML</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Semantic HTML?</h3>
+                <p>Semantic HTML uses elements that describe the meaning of content, not just its appearance. This makes your code more readable, accessible, and SEO-friendly.</p>
+                
+                <h3>Common Semantic Elements</h3>
+                <ul>
+                    <li><strong>&lt;header&gt;:</strong> Page or section header</li>
+                    <li><strong>&lt;nav&gt;:</strong> Navigation links</li>
+                    <li><strong>&lt;main&gt;:</strong> Main content of the page</li>
+                    <li><strong>&lt;article&gt;:</strong> Self-contained content (blog post, news article)</li>
+                    <li><strong>&lt;section&gt;:</strong> Thematic grouping of content</li>
+                    <li><strong>&lt;aside&gt;:</strong> Sidebar content</li>
+                    <li><strong>&lt;footer&gt;:</strong> Page or section footer</li>
+                </ul>
+
+                <div class="html-block">
+<span class="tag">&lt;header&gt;</span>
+    <span class="tag">&lt;h1&gt;</span>Site Title<span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;nav&gt;</span>...<span class="tag">&lt;/nav&gt;</span>
+<span class="tag">&lt;/header&gt;</span>
+
+<span class="tag">&lt;main&gt;</span>
+    <span class="tag">&lt;article&gt;</span>
+        <span class="tag">&lt;h2&gt;</span>Article Title<span class="tag">&lt;/h2&gt;</span>
+        <span class="tag">&lt;p&gt;</span>Content...<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/article&gt;</span>
+<span class="tag">&lt;/main&gt;</span>
+
+<span class="tag">&lt;footer&gt;</span>
+    <span class="tag">&lt;p&gt;</span>© 2024<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/footer&gt;</span>
+                </div>
+
+                <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
+                    <div class="quiz-question" data-answer="header">
+                        <p class="question-text">1. The _____ element contains introductory content.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Site/page intro</p>
+                    </div>
+                    <div class="quiz-question" data-answer="nav">
+                        <p class="question-text">2. The _____ element contains navigation links.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Menu links</p>
+                    </div>
+                    <div class="quiz-question" data-answer="article">
+                        <p class="question-text">3. The _____ element is for self-contained content.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Blog post</p>
+                    </div>
+                    <div class="quiz-question" data-answer="main">
+                        <p class="question-text">4. The _____ element contains the main content.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Primary content</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers:</h4>
+                            <ol>
+                                <li>header</li>
+                                <li>nav</li>
+                                <li>article</li>
+                                <li>main</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 --><div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// HTML5 Features</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>New Input Types</h3>
+                <p>HTML5 introduced many new input types with built-in validation:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"date"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"time"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"color"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"range"</span> <span class="attr">min</span>=<span class="string">"0"</span> <span class="attr">max</span>=<span class="string">"100"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="string">"search"</span><span class="tag">&gt;</span>
+                </div>
+
+                <h3>Data Attributes</h3>
+                <p>Store custom data in HTML elements:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;button</span> <span class="attr">data-user-id</span>=<span class="string">"123"</span> 
+        <span class="attr">data-action</span>=<span class="string">"delete"</span><span class="tag">&gt;</span>
+    Delete
+<span class="tag">&lt;/button&gt;</span>
+                </div>
+
+                <h3>Details/Summary</h3>
+                <p>Create disclosure widgets without JavaScript:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;details&gt;</span>
+    <span class="tag">&lt;summary&gt;</span>Click to expand<span class="tag">&lt;/summary&gt;</span>
+    <span class="tag">&lt;p&gt;</span>Hidden content revealed when clicked.<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/details&gt;</span>
+                </div>
+
+                <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
+                    <div class="quiz-question" data-answer="data-">
+                        <p class="question-text">1. _____ attributes store custom data.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: data- prefix</p>
+                    </div>
+                    <div class="quiz-question" data-answer="details">
+                        <p class="question-text">2. _____ creates disclosure widgets without JS.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: With summary child</p>
+                    </div>
+                    <div class="quiz-question" data-answer="placeholder">
+                        <p class="question-text">3. The _____ attribute shows hint text in inputs.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Example text</p>
+                    </div>
+                    <div class="quiz-question" data-answer="progress">
+                        <p class="question-text">4. _____ shows task completion.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Loading bar</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers:</h4>
+                            <ol>
+                                <li>data-</li>
+                                <li>details</li>
+                                <li>placeholder</li>
+                                <li>progress</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 --><div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Accessibility</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Why Accessibility Matters</h3>
+                <p>Web accessibility ensures people with disabilities can use your website. It benefits everyone and is often legally required:</p>
+                <ul>
+                    <li>15% of the world's population has a disability</li>
+                    <li>Better for mobile users</li>
+                    <li>Improves SEO</li>
+                    <li>Required by law in many places</li>
+                </ul>
+
+                <h3>Alt Text Best Practices</h3>
+                
+                <div class="html-block">
+<span class="comment">&lt;!-- Descriptive alt text --&gt;</span>
+<span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="string">"chart.png"</span> 
+     <span class="attr">alt</span>=<span class="string">"Bar chart showing 25% increase in Q4 sales"</span><span class="tag">&gt;</span>
+
+<span class="comment">&lt;!-- Decorative image --&gt;</span>
+<span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="string">"decoration.jpg"</span> <span class="attr">alt</span>=<span class="string">""</span><span class="tag">&gt;</span>
+                </div>
+
+                <h3>ARIA Attributes</h3>
+                <p>ARIA enhances accessibility for complex UI:</p>
+                
+                <div class="html-block">
+<span class="tag">&lt;button</span> <span class="attr">aria-expanded</span>=<span class="string">"false"</span> 
+        <span class="attr">aria-controls</span>=<span class="string">"menu"</span><span class="tag">&gt;</span>
+    Toggle Menu
+<span class="tag">&lt;/button&gt;</span>
+                </div>
+
+                <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
+                    <div class="quiz-question" data-answer="alt">
+                        <p class="question-text">1. _____ text makes images accessible.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Alternative</p>
+                    </div>
+                    <div class="quiz-question" data-answer="aria">
+                        <p class="question-text">2. _____ attributes enhance accessibility.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Accessible Rich Internet Applications</p>
+                    </div>
+                    <div class="quiz-question" data-answer="label">
+                        <p class="question-text">3. _____ elements describe form controls.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: for attribute</p>
+                    </div>
+                    <div class="quiz-question" data-answer="contrast">
+                        <p class="question-text">4. Color _____ ensures text is readable.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Difference between colors</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers:</h4>
+                            <ol>
+                                <li>alt</li>
+                                <li>aria</li>
+                                <li>label</li>
+                                <li>contrast</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 --><div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Best Practices</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>HTML Validation</h3>
+                <p>Always validate your HTML using the W3C Validator. Valid HTML works better across browsers:</p>
+                <ul>
+                    <li>Use DOCTYPE declaration</li>
+                    <li>Include lang attribute on html</li>
+                    <li>Close all tags properly</li>
+                    <li>Use unique IDs</li>
+                    <li>Validate at validator.w3.org</li>
+                </ul>
+
+                <h3>SEO Best Practices</h3>
+                <table class="reference-table">
+                    <tr>
+                        <th>Practice</th>
+                        <th>Implementation</th>
+                    </tr>
+                    <tr>
+                        <td>Unique h1 per page</td>
+                        <td>One main heading</td>
+                    </tr>
+                    <tr>
+                        <td>Meta description</td>
+                        <td>150-160 characters</td>
+                    </tr>
+                    <tr>
+                        <td>Semantic HTML</td>
+                        <td>Proper elements</td>
+                    </tr>
+                    <tr>
+                        <td>Alt text</td>
+                        <td>For every image</td>
+                    </tr>
+                </table>
+
+                <h3>Common Mistakes to Avoid</h3>
+                <ul>
+                    <li>✗ Using &lt;br&gt; for spacing (use CSS)</li>
+                    <li>✗ Tables for layout (use CSS Grid/Flexbox)</li>
+                    <li>✗ Missing alt attributes</li>
+                    <li>✗ Duplicate IDs</li>
+                    <li>✗ Block inside inline elements</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>REMEMBER:</strong> Write HTML for meaning, CSS for presentation, JavaScript for behavior. Keep concerns separate for maintainable code.
+                </div>
+
+                <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
+                    <div class="quiz-question" data-answer="doctype">
+                        <p class="question-text">1. Every document needs a _____ declaration.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: First line</p>
+                    </div>
+                    <div class="quiz-question" data-answer="semantic">
+                        <p class="question-text">2. Use _____ HTML for better SEO.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Meaningful elements</p>
+                    </div>
+                    <div class="quiz-question" data-answer="validation">
+                        <p class="question-text">3. _____ ensures HTML is correct.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: W3C process</p>
+                    </div>
+                    <div class="quiz-question" data-answer="separation">
+                        <p class="question-text">4. Keep structure, presentation, and behavior in _____.</p>
+                        <input type="text" class="quiz-input" placeholder="Your answer...">
+                        <button class="quiz-submit" onclick="checkAnswer(this)">Check Answer</button>
+                        <p class="quiz-feedback"></p>
+                        <p class="hint">Hint: Separate concerns</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers:</h4>
+                            <ol>
+                                <li>DOCTYPE</li>
+                                <li>semantic</li>
+                                <li>validation</li>
+                                <li>separation</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    
+    <script src="../nav.js" defer></script>
+</body>
+</html>

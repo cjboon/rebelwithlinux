@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Hardening - Secure Your Linux Server | REBEL WITH LINUX</title>
+    <meta name="description" content="Master server hardening techniques. Learn SSH security, firewall configuration, user management, automatic updates, fail2ban, file permissions, and security best practices.">
+    <meta name="keywords" content="server hardening, Linux security, SSH hardening, UFW firewall, fail2ban, server security, cybersecurity, system administration">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        // Theme persistence - check and apply immediately in head
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        // Sync checkbox after DOM loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    <script src="../terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #8E44AD;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">SERVER HARDENING</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#distros">DISTRO</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#projects">PROJECTS</a>
+                    <a href="../index.html#resources">RESOURCES</a>
+                    <a href="../index.html#references">REFERENCES</a>
+                    <a href="../index.html#scripts">SCRIPTS</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#contact">CONTACT</a>
+                    <a href="../index.html#stats">STATS</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>SECURE YOUR<br>SERVER</h1>
+        <p class="tagline">// Defense is the best offense.</p>
+        
+        <div class="manifesto">
+            <p><strong>YOUR SERVER IS UNDER CONSTANT ATTACK.</strong></p>
+            <p>Every minute, automated bots scan the internet for vulnerable servers. They hunt for weak passwords, open ports, and misconfigured services. Without proper hardening, your server is a sitting duck.</p>
+            <p><strong>HARDENING IS YOUR SHIELD.</strong></p>
+            <p>Server hardening is the process of securing a system by reducing its attack surface. Close unnecessary ports, disable unused services, enforce strong authentication, and monitor for intrusions. Make your server a fortress.</p>
+            <p><strong>BECOME A SECURITY GUARDIAN.</strong></p>
+            <p>Learn SSH key authentication, firewall rules, user privileges, automatic updates, intrusion detection, log monitoring, and security scanning. Protect your data and your users from threats.</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">START HARDENING →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to Security</h2>
+            <p>12 lessons. Complete server protection.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Hardening</h3>
+                <p class="lesson-desc">What server hardening is, why it matters, and understanding attack surfaces.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">SSH Security</h3>
+                <p class="lesson-desc">Disable root login, enable key authentication, change default port, and configure fail2ban.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Firewall with UFW</h3>
+                <p class="lesson-desc">Install UFW, configure rules, set default deny policy, and allow necessary services.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">User Management</h3>
+                <p class="lesson-desc">Create users, configure sudo privileges, disable root, and enforce password policies.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Automatic Updates</h3>
+                <p class="lesson-desc">Configure unattended-upgrades for automatic security updates and patches.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Fail2ban Setup</h3>
+                <p class="lesson-desc">Install fail2ban, configure jails, and set up automatic IP banning for brute force attacks.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">File Permissions</h3>
+                <p class="lesson-desc">Master chmod, chown, umask, and understand special permissions and access control.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Services & Ports</h3>
+                <p class="lesson-desc">Audit running services with ss, disable unnecessary services, and practice minimal installation.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Log Monitoring</h3>
+                <p class="lesson-desc">Monitor system logs with journalctl, configure logwatch, and manage rsyslog.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Security Scanning</h3>
+                <p class="lesson-desc">Run security audits with Lynis, detect rootkits with rkhunter and chkrootkit.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Backup Strategies</h3>
+                <p class="lesson-desc">Implement backup solutions with rsync, schedule with cron, and manage offsite backups.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Security Checklist</h3>
+                <p class="lesson-desc">Complete server hardening checklist and ongoing security maintenance practices.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why Server Hardening</h2>
+            <p>Server hardening is not optional—it's essential. Every day, thousands of servers are compromised due to basic security misconfigurations. A single open port, weak password, or outdated package can be the entry point for attackers.</p>
+            <p>The attack surface of a server is the sum of all possible entry points. Every installed package, running service, and open port expands this surface. Hardening systematically reduces this surface by removing unnecessary components and securing essential ones.</p>
+            <p>Security is a process, not a product. Threats evolve, new vulnerabilities are discovered, and attackers develop new techniques. Regular audits, updates, and monitoring are required to maintain security over time.</p>
+            <p><strong>Secure your server before attackers secure it for you.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Security Tools</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>🔥 UFW</h3>
+                <p>Uncomplicated Firewall</p>
+                <a href="https://wiki.ubuntu.com/UFW" target="_blank">wiki.ubuntu.com/UFW</a>
+            </div>
+            <div class="resource-card">
+                <h3>🚫 Fail2ban</h3>
+                <p>Intrusion Prevention</p>
+                <a href="https://www.fail2ban.org" target="_blank">fail2ban.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔍 Lynis</h3>
+                <p>Security Auditing Tool</p>
+                <a href="https://cisofy.com/lynis/" target="_blank">cisofy.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>🛡️ rkhunter</h3>
+                <p>Rootkit Detector</p>
+                <a href="https://rkhunter.sourceforge.net/" target="_blank">rkhunter.sf.net</a>
+            </div>
+            <div class="resource-card">
+                <h3>📝 Logwatch</h3>
+                <p>Log Analyzer</p>
+                <a href="https://sourceforge.net/projects/logwatch/" target="_blank">logwatch.sf.net</a>
+            </div>
+            <div class="resource-card">
+                <h3>⚡ OpenSCAP</h3>
+                <p>Security Compliance</p>
+                <a href="https://www.open-scap.org" target="_blank">open-scap.org</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        
+    </footer>
+
+    <!-- Lesson 1: Introduction to Hardening -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Introduction to Hardening</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Server Hardening?</h3>
+                <p>Server hardening is the process of securing a server by reducing its vulnerability surface. It involves removing unnecessary software, closing unused ports, configuring security policies, and implementing monitoring systems.</p>
+                
+                <h3>Why Harden Your Server?</h3>
+                <ul>
+                    <li><strong>Prevent unauthorized access:</strong> Block attackers before they breach your system</li>
+                    <li><strong>Protect sensitive data:</strong> Secure customer information and business secrets</li>
+                    <li><strong>Ensure uptime:</strong> Avoid service disruptions from attacks</li>
+                    <li><strong>Compliance:</strong> Meet regulatory requirements for data protection</li>
+                    <li><strong>Reputation:</strong> Maintain trust with users and customers</li>
+                </ul>
+                
+                <div class="highlight-box">
+                    <strong>SECURITY PRINCIPLE:</strong> Defense in depth. Multiple layers of security ensure that if one layer fails, others remain to protect your system.
+                </div>
+
+                <h3>The Attack Surface</h3>
+                <p>The attack surface is the sum of all possible entry points an attacker could exploit:</p>
+                
+                <ul>
+                    <li>Open network ports</li>
+                    <li>Running services and daemons</li>
+                    <li>Installed software packages</li>
+                    <li>User accounts and privileges</li>
+                    <li>File permissions</li>
+                    <li>Configuration files</li>
+                </ul>
+
+                <h3>Common Attack Vectors</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Most common server attack vectors:</span>
+<span class="output">1. Brute force SSH attacks</span>
+<span class="output">2. Unpatched software vulnerabilities</span>
+<span class="output">3. Weak or default passwords</span>
+<span class="output">4. Open database ports (3306, 5432)</span>
+<span class="output">5. Misconfigured web servers</span>
+<span class="output">6. Unnecessary services running</span>
+                </div>
+
+                <h3>Hardening Methodology</h3>
+                <ol>
+                    <li><strong>Inventory:</strong> Document what's running on your server</li>
+                    <li><strong>Assess:</strong> Identify vulnerabilities and unnecessary components</li>
+                    <li><strong>Secure:</strong> Apply configuration changes and updates</li>
+                    <li><strong>Monitor:</strong> Set up logging and intrusion detection</li>
+                    <li><strong>Maintain:</strong> Regular updates and security audits</li>
+                </ol>
+
+                <h3>Before You Begin</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">whoami</span>
+<span class="output">root</span>
+
+<span class="prompt">#</span> <span class="command">cat /etc/os-release</span>
+<span class="output">PRETTY_NAME="Ubuntu 22.04.3 LTS"</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>WARNING:</strong> Always test hardening changes in a staging environment first. Document all changes and have a rollback plan.
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Server hardening reduces the _____ surface.</p>
+                        <input type="text" class="quiz-input" data-answer="attack" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Vulnerability</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Defense in _____ means multiple security layers.</p>
+                        <input type="text" class="quiz-input" data-answer="depth" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Opposite of shallow</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. SSH uses port _____ by default.</p>
+                        <input type="text" class="quiz-input" data-answer="22" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Twenty-two</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Always test changes in a _____ environment first.</p>
+                        <input type="text" class="quiz-input" data-answer="staging" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Test environment</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>attack</li>
+                                <li>depth</li>
+                                <li>22</li>
+                                <li>staging</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2: SSH Security -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// SSH Security</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Why SSH Security Matters</h3>
+                <p>SSH (Secure Shell) is the primary way to remotely administer Linux servers. It's also the #1 attack vector for brute force attacks. Proper SSH hardening is critical for server security.</p>
+
+                <div class="highlight-box">
+                    <strong>THREAT:</strong> Automated bots constantly scan for SSH servers and attempt brute force attacks using common passwords. Default configurations make you an easy target.
+                </div>
+
+                <h3>Generate SSH Key Pair</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ssh-keygen -t ed25519 -C "your-email@example.com"</span>
+<span class="output">Generating public/private ed25519 key pair.</span>
+<span class="output">Enter file in which to save the key (~/.ssh/id_ed25519):</span>
+<span class="output">Enter passphrase (empty for no passphrase):</span>
+<span class="output">Your identification has been saved in ~/.ssh/id_ed25519</span>
+<span class="output">Your public key has been saved in ~/.ssh/id_ed25519.pub</span>
+                </div>
+
+                <h3>Copy Public Key to Server</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ssh-copy-id user@server-ip</span>
+<span class="output">/usr/bin/ssh-copy-id: INFO: attempting to log in...</span>
+<span class="output">user@server-ip's password:</span>
+<span class="output">Number of key(s) added: 1</span>
+                </div>
+
+                <h3>Edit SSH Configuration</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">nano /etc/ssh/sshd_config</span>
+                </div>
+
+                <div class="config-block">
+<span class="comment"># SSH Hardening Configuration</span>
+<span class="output">PermitRootLogin no</span>
+<span class="output">PasswordAuthentication no</span>
+<span class="output">PubkeyAuthentication yes</span>
+<span class="output">Port 2222</span>
+<span class="output">MaxAuthTries 3</span>
+<span class="output">ClientAliveInterval 300</span>
+<span class="output">ClientAliveCountMax 2</span>
+<span class="output">AllowUsers yourusername</span>
+                </div>
+
+                <h3>Restart SSH Service</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">systemctl restart sshd</span>
+
+<span class="comment"># Test new configuration before closing current session!</span>
+<span class="prompt">$</span> <span class="command">ssh -p 2222 user@server-ip</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>CRITICAL:</strong> Never close your current SSH session until you've tested the new configuration in a separate terminal. A misconfiguration could lock you out permanently.
+                </div>
+
+                <h3>SSH Key Best Practices</h3>
+                <ul>
+                    <li>Use Ed25519 keys (modern, secure, compact)</li>
+                    <li>Set a passphrase on your private key</li>
+                    <li>Store keys in ~/.ssh with proper permissions (600)</li>
+                    <li>Use ssh-agent for key management</li>
+                    <li>Never share your private key</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Set PermitRootLogin to _____ to disable root SSH.</p>
+                        <input type="text" class="quiz-input" data-answer="no" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Opposite of yes</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. ssh-keygen creates a key _____.</p>
+                        <input type="text" class="quiz-input" data-answer="pair" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Two keys</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Use ssh-copy-id to copy your _____ key.</p>
+                        <input type="text" class="quiz-input" data-answer="public" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Not private</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Test in a separate _____ before closing current session.</p>
+                        <input type="text" class="quiz-input" data-answer="terminal" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Command window</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>no</li>
+                                <li>pair</li>
+                                <li>public</li>
+                                <li>terminal</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3: Firewall with UFW -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Firewall with UFW</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is UFW?</h3>
+                <p>UFW (Uncomplicated Firewall) is a user-friendly frontend for iptables. It provides a simple command-line interface for managing firewall rules on Ubuntu and Debian systems.</p>
+
+                <h3>Install UFW</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apt update && sudo apt install ufw -y</span>
+<span class="output">Reading package lists... Done</span>
+<span class="output">Building dependency tree... Done</span>
+<span class="output">Setting up ufw (0.36.1-4) ...</span>
+                </div>
+
+                <h3>Default Policy</h3>
+                <p>Set default to deny incoming and allow outgoing:</p>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo ufw default deny incoming</span>
+<span class="output">Default incoming policy changed to 'deny'</span>
+
+<span class="prompt">$</span> <span class="command">sudo ufw default allow outgoing</span>
+<span class="output">Default outgoing policy changed to 'allow'</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>SECURITY PRINCIPLE:</strong> Default deny is the foundation of firewall security. Block everything by default, then explicitly allow only what you need.
+                </div>
+
+                <h3>Allow Essential Services</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Allow SSH (use your custom port if changed)</span>
+<span class="prompt">$</span> <span class="command">sudo ufw allow 2222/tcp</span>
+<span class="output">Rules updated</span>
+
+<span class="comment"># Allow HTTP</span>
+<span class="prompt">$</span> <span class="command">sudo ufw allow 80/tcp</span>
+
+<span class="comment"># Allow HTTPS</span>
+<span class="prompt">$</span> <span class="command">sudo ufw allow 443/tcp</span>
+
+<span class="comment"># Allow specific IP</span>
+<span class="prompt">$</span> <span class="command">sudo ufw allow from 192.168.1.100 to any port 22</span>
+                </div>
+
+                <h3>Enable and Check Status</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo ufw enable</span>
+<span class="output">Command may disrupt existing ssh connections. Proceed? (y|n): y</span>
+<span class="output">Firewall is active and enabled on system startup</span>
+
+<span class="prompt">$</span> <span class="command">sudo ufw status verbose</span>
+<span class="output">Status: active</span>
+<span class="output">To                         Action      From</span>
+<span class="output">--                         ------      ----</span>
+<span class="output">2222/tcp                   ALLOW IN    Anywhere</span>
+<span class="output">80/tcp                     ALLOW IN    Anywhere</span>
+<span class="output">443/tcp                    ALLOW IN    Anywhere</span>
+                </div>
+
+                <h3>Common UFW Commands</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Disable firewall</span>
+<span class="prompt">$</span> <span class="command">sudo ufw disable</span>
+
+<span class="comment"># Delete a rule</span>
+<span class="prompt">$</span> <span class="command">sudo ufw delete allow 80/tcp</span>
+
+<span class="comment"># Show numbered rules</span>
+<span class="prompt">$</span> <span class="command">sudo ufw status numbered</span>
+
+<span class="comment"># Delete by number</span>
+<span class="prompt">$</span> <span class="command">sudo ufw delete 2</span>
+
+<span class="comment"># Rate limit (prevents brute force)</span>
+<span class="prompt">$</span> <span class="command">sudo ufw limit 2222/tcp</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. UFW stands for Uncomplicated _____.</p>
+                        <input type="text" class="quiz-input" data-answer="firewall" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Network security</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Default policy should be deny _____.</p>
+                        <input type="text" class="quiz-input" data-answer="incoming" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Entering</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. HTTP uses port _____.</p>
+                        <input type="text" class="quiz-input" data-answer="80" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Eighty</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. HTTPS uses port _____.</p>
+                        <input type="text" class="quiz-input" data-answer="443" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Four-forty-three</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>firewall</li>
+                                <li>incoming</li>
+                                <li>80</li>
+                                <li>443</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4: User Management -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// User Management</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Creating a New User</h3>
+                <p>Never use root for daily operations. Create a regular user with sudo privileges:</p>
+                
+                <div class="terminal-block">
+<span class="comment"># Create new user</span>
+<span class="prompt">#</span> <span class="command">adduser username</span>
+<span class="output">Adding user 'username' ...</span>
+<span class="output">Adding new group 'username' (1001) ...</span>
+<span class="output">Creating home directory '/home/username' ...</span>
+<span class="output">Enter new UNIX password:</span>
+<span class="output">Retype new UNIX password:</span>
+                </div>
+
+                <h3>Grant Sudo Privileges</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Add user to sudo group</span>
+<span class="prompt">#</span> <span class="command">usermod -aG sudo username</span>
+
+<span class="comment"># Verify</span>
+<span class="prompt">$</span> <span class="command">groups username</span>
+<span class="output">username : username sudo</span>
+                </div>
+
+                <h3>Secure Sudo Configuration</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">visudo</span>
+                </div>
+
+                <div class="config-block">
+<span class="comment"># Require password for sudo</span>
+<span class="output">Defaults    passwd_timeout=5</span>
+<span class="output">Defaults    timestamp_timeout=5</span>
+<span class="output">Defaults    logfile="/var/log/sudo.log"</span>
+<span class="output">Defaults    log_input,log_output</span>
+                </div>
+
+                <h3>Disable Root Login</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Lock root password</span>
+<span class="prompt">#</span> <span class="command">passwd -l root</span>
+
+<span class="comment"># Alternative: Set root shell to nologin</span>
+<span class="prompt">#</span> <span class="command">usermod -s /usr/sbin/nologin root</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>WARNING:</strong> Before disabling root, ensure you have a working sudo user. Otherwise, you may lock yourself out completely.
+                </div>
+
+                <h3>Password Policies</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Install password quality checking</span>
+<span class="prompt">#</span> <span class="command">apt install libpam-pwquality -y</span>
+
+<span class="comment"># Edit password policy</span>
+<span class="prompt">#</span> <span class="command">nano /etc/security/pwquality.conf</span>
+                </div>
+
+                <div class="config-block">
+<span class="comment"># Password quality requirements</span>
+<span class="output">minlen = 12</span>
+<span class="output">minclass = 3</span>
+<span class="output">maxrepeat = 2</span>
+<span class="output">gecoscheck = 1</span>
+<span class="output">dictcheck = 1</span>
+                </div>
+
+                <h3>Account Management Commands</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># List all users</span>
+<span class="prompt">$</span> <span class="command">cat /etc/passwd | grep -v nologin | grep -v false</span>
+
+<span class="comment"># Check user activity</span>
+<span class="prompt">$</span> <span class="command">last</span>
+
+<span class="comment"># View failed login attempts</span>
+<span class="prompt">$</span> <span class="command">lastb</span>
+
+<span class="comment"># Disable user account</span>
+<span class="prompt">#</span> <span class="command">passwd -l username</span>
+
+<span class="comment"># Delete user and home directory</span>
+<span class="prompt">#</span> <span class="command">userdel -r username</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Add users to the _____ group for sudo access.</p>
+                        <input type="text" class="quiz-input" data-answer="sudo" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Super user do</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Use _____ to safely edit sudoers file.</p>
+                        <input type="text" class="quiz-input" data-answer="visudo" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: vi + sudo</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Lock root with passwd -_____.</p>
+                        <input type="text" class="quiz-input" data-answer="l" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Letter L</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Minimum password length should be at least _____ characters.</p>
+                        <input type="text" class="quiz-input" data-answer="12" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Twelve</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>sudo</li>
+                                <li>visudo</li>
+                                <li>l</li>
+                                <li>12</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5: Automatic Updates -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Automatic Updates</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Why Automatic Updates?</h3>
+                <p>Unpatched vulnerabilities are a leading cause of server compromises. Automatic security updates ensure critical patches are applied without delay, closing windows of opportunity for attackers.</p>
+
+                <div class="highlight-box">
+                    <strong>RISK:</strong> Many servers are compromised within 24 hours of a vulnerability disclosure because attackers know many administrators delay updates.
+                </div>
+
+                <h3>Install unattended-upgrades</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">apt install unattended-upgrades apt-listchanges -y</span>
+<span class="output">Reading package lists... Done</span>
+<span class="output">Setting up unattended-upgrades (2.8ubuntu1) ...</span>
+                </div>
+
+                <h3>Configure Automatic Updates</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">dpkg-reconfigure -plow unattended-upgrades</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>SELECT:</strong> Yes when prompted to enable automatic updates
+                </div>
+
+                <h3>Edit Configuration</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">nano /etc/apt/apt.conf.d/50unattended-upgrades</span>
+                </div>
+
+                <div class="config-block">
+<span class="comment">// Automatically upgrade security updates</span>
+<span class="output">Unattended-Upgrade::Allowed-Origins {</span>
+<span class="output">    "${distro_id}:${distro_codename}-security";</span>
+<span class="output">};</span>
+<span class="comment">// Send email on errors</span>
+<span class="output">Unattended-Upgrade::Mail "admin@example.com";</span>
+<span class="output">Unattended-Upgrade::MailOnlyOnError "true";</span>
+<span class="comment">// Auto-remove unused dependencies</span>
+<span class="output">Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";</span>
+<span class="output">Unattended-Upgrade::Remove-Unused-Dependencies "true";</span>
+<span class="comment">// Auto-reboot if required</span>
+<span class="output">Unattended-Upgrade::Automatic-Reboot "true";</span>
+<span class="output">Unattended-Upgrade::Automatic-Reboot-Time "03:00";</span>
+                </div>
+
+                <h3>Configure Update Schedule</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">nano /etc/apt/apt.conf.d/20auto-upgrades</span>
+                </div>
+
+                <div class="config-block">
+<span class="output">APT::Periodic::Update-Package-Lists "1";</span>
+<span class="output">APT::Periodic::Download-Upgradeable-Packages "1";</span>
+<span class="output">APT::Periodic::AutocleanInterval "7";</span>
+<span class="output">APT::Periodic::Unattended-Upgrade "1";</span>
+                </div>
+
+                <h3>Test and Verify</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Dry run to test configuration</span>
+<span class="prompt">#</span> <span class="command">unattended-upgrade --dry-run --debug</span>
+
+<span class="comment"># Check status</span>
+<span class="prompt">$</span> <span class="command">systemctl status unattended-upgrades</span>
+
+<span class="comment"># View logs</span>
+<span class="prompt">$</span> <span class="command">tail -f /var/log/unattended-upgrades/unattended-upgrades.log</span>
+                </div>
+
+                <h3>Manual Update Commands</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Update package lists</span>
+<span class="prompt">#</span> <span class="command">apt update</span>
+
+<span class="comment"># Upgrade installed packages</span>
+<span class="prompt">#</span> <span class="command">apt upgrade</span>
+
+<span class="comment"># Full distribution upgrade</span>
+<span class="prompt">#</span> <span class="command">apt dist-upgrade</span>
+
+<span class="comment"># Remove unused packages</span>
+<span class="prompt">#</span> <span class="command">apt autoremove</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. _____-upgrades handles automatic updates.</p>
+                        <input type="text" class="quiz-input" data-answer="unattended" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Not watched</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Enable _____ reboot for critical kernel updates.</p>
+                        <input type="text" class="quiz-input" data-answer="automatic" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Auto</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. apt _____ downloads package lists.</p>
+                        <input type="text" class="quiz-input" data-answer="update" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Refresh</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. apt _____ installs new versions.</p>
+                        <input type="text" class="quiz-input" data-answer="upgrade" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Level up</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>unattended</li>
+                                <li>automatic</li>
+                                <li>update</li>
+                                <li>upgrade</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6: Fail2ban Setup -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Fail2ban Setup</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Fail2ban?</h3>
+                <p>Fail2ban is an intrusion prevention framework that monitors log files for malicious activity and automatically bans IP addresses that show suspicious behavior—such as multiple failed login attempts.</p>
+
+                <div class="highlight-box">
+                    <strong>PROTECTION:</strong> Fail2ban reduces brute force attacks by automatically blocking IPs after a defined number of failed attempts, typically within minutes.
+                </div>
+
+                <h3>Install Fail2ban</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">apt install fail2ban -y</span>
+<span class="output">Reading package lists... Done</span>
+<span class="output">Setting up fail2ban (0.11.2-2) ...</span>
+<span class="output">Created symlink /etc/systemd/system/multi-user.target.wants/fail2ban.service</span>
+                </div>
+
+                <h3>Configure Jail Settings</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local</span>
+<span class="prompt">#</span> <span class="command">nano /etc/fail2ban/jail.local</span>
+                </div>
+
+                <div class="config-block">
+<span class="comment"># Fail2ban jail configuration</span>
+<span class="output">[DEFAULT]</span>
+<span class="comment"># Ban IP after 3 failed attempts</span>
+<span class="output">maxretry = 3</span>
+<span class="comment"># Ban for 1 hour</span>
+<span class="output">bantime = 3600</span>
+<span class="comment"># Look back 10 minutes</span>
+<span class="output">findtime = 600</span>
+<span class="comment"># Send email alerts (optional)</span>
+<span class="output">destemail = admin@example.com</span>
+<span class="output">sendername = Fail2ban</span>
+<span class="output">mta = sendmail</span>
+<span class="comment"># Enable SSH jail</span>
+<span class="output">[sshd]</span>
+<span class="output">enabled = true</span>
+<span class="output">port = ssh,2222</span>
+<span class="output">filter = sshd</span>
+<span class="output">logpath = /var/log/auth.log</span>
+<span class="output">maxretry = 3</span>
+                </div>
+
+                <h3>Enable and Start Fail2ban</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">systemctl enable fail2ban</span>
+<span class="output">Created symlink /etc/systemd/system/multi-user.target.wants/fail2ban.service</span>
+
+<span class="prompt">#</span> <span class="command">systemctl start fail2ban</span>
+
+<span class="comment"># Check status</span>
+<span class="prompt">#</span> <span class="command">systemctl status fail2ban</span>
+<span class="output">● fail2ban.service - Fail2ban Service</span>
+<span class="output">   Active: active (running) since Mon 2024-01-01 12:00:00 UTC</span>
+                </div>
+
+                <h3>Monitor and Manage Bans</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># View active jails</span>
+<span class="prompt">$</span> <span class="command">fail2ban-client status</span>
+<span class="output">Status</span>
+<span class="output">|- Number of jail:      1</span>
+<span class="output">`- Jail list:   sshd</span>
+
+<span class="comment"># View SSH jail details</span>
+<span class="prompt">$</span> <span class="command">fail2ban-client status sshd</span>
+
+<span class="comment"># View banned IPs</span>
+<span class="prompt">$</span> <span class="command">fail2ban-client status sshd | grep "Banned IP list"</span>
+
+<span class="comment"># Unban an IP manually</span>
+<span class="prompt">#</span> <span class="command">fail2ban-client set sshd unbanip 192.168.1.100</span>
+                </div>
+
+                <h3>Additional Jails</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Enable Apache/Nginx jails</span>
+<span class="output">[apache-auth]</span>
+<span class="output">enabled = true</span>
+
+<span class="output">[nginx-http-auth]</span>
+<span class="output">enabled = true</span>
+
+<span class="comment"># Custom filter for WordPress</span>
+<span class="output">[wordpress]</span>
+<span class="output">enabled = true</span>
+<span class="output">filter = wordpress</span>
+<span class="output">logpath = /var/log/apache2/access.log</span>
+<span class="output">maxretry = 5</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Fail2ban monitors _____ files for attacks.</p>
+                        <input type="text" class="quiz-input" data-answer="log" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: System records</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Bantime is measured in _____.</p>
+                        <input type="text" class="quiz-input" data-answer="seconds" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: 3600 = 1 hour</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Maxretry sets the number of _____ attempts allowed.</span>
+                        <input type="text" class="quiz-input" data-answer="failed" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Unsuccessful</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Use fail2ban-_____ to manage bans.</p>
+                        <input type="text" class="quiz-input" data-answer="client" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Command interface</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>log</li>
+                                <li>seconds</li>
+                                <li>failed</li>
+                                <li>client</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7: File Permissions -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// File Permissions</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Understanding Permissions</h3>
+                <p>Linux file permissions control who can read, write, or execute files. Understanding and properly setting permissions is essential for system security.</p>
+
+                <h3>Permission Structure</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls -la /etc/passwd</span>
+<span class="output">-rw-r--r-- 1 root root 2845 Jan  1 12:00 /etc/passwd</span>
+<span class="output"> |  [Owner][Group][Others]</span>
+<span class="output"> |   rw-   r--   r--</span>
+<span class="output"> |    ↓     ↓     ↓</span>
+<span class="output"> |   6     4     4</span>
+                </div>
+
+                <ul>
+                    <li><strong>r (read):</strong> View file contents or list directory</li>
+                    <li><strong>w (write):</strong> Modify file or directory contents</li>
+                    <li><strong>x (execute):</strong> Run files or access directories</li>
+                </ul>
+
+                <h3>Numeric Permissions</h3>
+                
+                <div class="terminal-block">
+<span class="output">7 = rwx (read, write, execute)</span>
+<span class="output">6 = rw- (read, write)</span>
+<span class="output">5 = r-x (read, execute)</span>
+<span class="output">4 = r-- (read only)</span>
+<span class="output">0 = --- (no permissions)</span>
+                </div>
+
+                <h3>chmod Commands</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Set permissions (owner:rw, group:r, others:r)</span>
+<span class="prompt">$</span> <span class="command">chmod 644 file.txt</span>
+
+<span class="comment"># Set executable</span>
+<span class="prompt">$</span> <span class="command">chmod 755 script.sh</span>
+
+<span class="comment"># Add execute permission for owner</span>
+<span class="prompt">$</span> <span class="command">chmod u+x script.sh</span>
+
+<span class="comment"># Remove write for group</span>
+<span class="prompt">$</span> <span class="command">chmod g-w file.txt</span>
+
+<span class="comment"># Make read-only for all</span>
+<span class="prompt">$</span> <span class="command">chmod a-w file.txt</span>
+
+<span class="comment"># Recursive change</span>
+<span class="prompt">$</span> <span class="command">chmod -R 755 /var/www/html</span>
+                </div>
+
+                <h3>Change Ownership</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Change owner</span>
+<span class="prompt">#</span> <span class="command">chown user:group file.txt</span>
+
+<span class="comment"># Change only owner</span>
+<span class="prompt">#</span> <span class="command">chown user file.txt</span>
+
+<span class="comment"># Change only group</span>
+<span class="prompt">#</span> <span class="command">chgrp group file.txt</span>
+
+<span class="comment"># Recursive</span>
+<span class="prompt">#</span> <span class="command">chown -R www-data:www-data /var/www</span>
+                </div>
+
+                <h3>Special Permissions</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># SUID - Run with file owner's permissions</span>
+<span class="prompt">$</span> <span class="command">chmod u+s /usr/bin/somebinary</span>
+<span class="output">-rwsr-xr-x 1 root root ...</span>
+
+<span class="comment"># SGID - Run with group's permissions</span>
+<span class="prompt">$</span> <span class="command">chmod g+s /shared/directory</span>
+
+<span class="comment"># Sticky Bit - Only owner can delete</span>
+<span class="prompt">$</span> <span class="command">chmod +t /shared/tmp</span>
+<span class="output">drwxrwxrwt 10 root root ...</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>SECURITY NOTE:</strong> SUID binaries are high-value targets. Avoid creating new SUID programs and regularly audit existing ones with: find / -perm -4000 -type f 2>/dev/null
+                </div>
+
+                <h3>umask Configuration</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Check current umask</span>
+<span class="prompt">$</span> <span class="command">umask</span>
+<span class="output">0022</span>
+
+<span class="comment"># Set restrictive umask (files: 644, dirs: 755)</span>
+<span class="prompt">$</span> <span class="command">umask 022</span>
+
+<span class="comment"># Very restrictive (files: 600, dirs: 700)</span>
+<span class="prompt">$</span> <span class="command">umask 077</span>
+
+<span class="comment"># Add to ~/.bashrc or /etc/profile</span>
+<span class="output">umask 027</span>
+                </div>
+
+                <h3>Secure File Locations</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># SSH keys - must be 600</span>
+<span class="prompt">$</span> <span class="command">chmod 600 ~/.ssh/id_rsa</span>
+<span class="prompt">$</span> <span class="command">chmod 644 ~/.ssh/id_rsa.pub</span>
+<span class="prompt">$</span> <span class="command">chmod 700 ~/.ssh</span>
+
+<span class="comment"># Password files - must be 640 or 600</span>
+<span class="prompt">#</span> <span class="command">chmod 640 /etc/shadow</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. chmod _____ gives owner read and write.</p>
+                        <input type="text" class="quiz-input" data-answer="600" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: rw-------</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. _____ changes file owner.</p>
+                        <input type="text" class="quiz-input" data-answer="chown" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Change owner</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. _____ sets default permissions for new files.</p>
+                        <input type="text" class="quiz-input" data-answer="umask" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: User mask</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Sticky bit is set with chmod _____.</p>
+                        <input type="text" class="quiz-input" data-answer="+t" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Plus T</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>600</li>
+                                <li>chown</li>
+                                <li>umask</li>
+                                <li>+t</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8: Services & Ports -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Services & Ports</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Audit Running Services</h3>
+                <p>Every running service is a potential attack vector. Regularly audit what services are running and disable those you don't need.</p>
+
+                <h3>List Listening Ports</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Modern replacement for netstat</span>
+<span class="prompt">$</span> <span class="command">ss -tulpn</span>
+<span class="output">Netid  State   Recv-Q  Send-Q  Local Address:Port  Peer Address:PortProcess</span>
+<span class="output">tcp    LISTEN  0       128     0.0.0.0:22          0.0.0.0:*     users:(("sshd",pid=1234,fd=3))</span>
+<span class="output">tcp    LISTEN  0       128     0.0.0.0:80          0.0.0.0:*     users:(("nginx",pid=5678,fd=6))</span>
+<span class="output">tcp    LISTEN  0       128     0.0.0.0:443         0.0.0.0:*     users:(("nginx",pid=5678,fd=7))</span>
+
+<span class="comment"># Alternative: show all connections</span>
+<span class="prompt">$</span> <span class="command">ss -tulpan</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>ANALYSIS:</strong> Each LISTEN port represents a service accepting connections. Review each one and ask: "Do I need this service? Can it be restricted?"
+                </div>
+
+                <h3>Check Installed Services</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># List all systemd services</span>
+<span class="prompt">$</span> <span class="command">systemctl list-units --type=service --state=running</span>
+
+<span class="comment"># Check specific service</span>
+<span class="prompt">$</span> <span class="command">systemctl status sshd</span>
+
+<span class="comment"># List enabled services (start on boot)</span>
+<span class="prompt">$</span> <span class="command">systemctl list-unit-files --state=enabled</span>
+                </div>
+
+                <h3>Disable Unnecessary Services</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Stop and disable a service</span>
+<span class="prompt">#</span> <span class="command">systemctl stop cups</span>
+<span class="prompt">#</span> <span class="command">systemctl disable cups</span>
+
+<span class="comment"># Mask to prevent accidental starting</span>
+<span class="prompt">#</span> <span class="command">systemctl mask cups</span>
+
+<span class="comment"># Verify it's disabled</span>
+<span class="prompt">$</span> <span class="command">systemctl is-enabled cups</span>
+<span class="output">masked</span>
+                </div>
+
+                <h3>Common Services to Disable</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Bluetooth (if not needed on server)</span>
+<span class="prompt">#</span> <span class="command">systemctl stop bluetooth && systemctl disable bluetooth</span>
+
+<span class="comment"># CUPS printing</span>
+<span class="prompt">#</span> <span class="command">systemctl stop cups && systemctl disable cups</span>
+
+<span class="comment"># Avahi (mDNS/DNS-SD)</span>
+<span class="prompt">#</span> <span class="command">systemctl stop avahi-daemon && systemctl disable avahi-daemon</span>
+
+<span class="comment"># Modem manager</span>
+<span class="prompt">#</span> <span class="command">systemctl stop ModemManager && systemctl disable ModemManager</span>
+                </div>
+
+                <h3>Package Management</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># List installed packages</span>
+<span class="prompt">$</span> <span class="command">dpkg -l | wc -l</span>
+
+<span class="comment"># Remove unnecessary packages</span>
+<span class="prompt">#</span> <span class="command">apt remove package-name</span>
+
+<span class="comment"># Purge (remove config too)</span>
+<span class="prompt">#</span> <span class="command">apt purge package-name</span>
+
+<span class="comment"># Clean up unused dependencies</span>
+<span class="prompt">#</span> <span class="command">apt autoremove</span>
+
+<span class="comment"># Clean package cache</span>
+<span class="prompt">#</span> <span class="command">apt clean</span>
+                </div>
+
+                <h3>Minimal Installation</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># When installing Debian/Ubuntu, choose:</span>
+<span class="output">[ ] Debian desktop environment</span>
+<span class="output">[ ] GNOME</span>
+<span class="output">[ ] ... other desktop environments ...</span>
+<span class="output">[X] SSH server</span>
+<span class="output">[ ] Standard system utilities</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>BEST PRACTICE:</strong> Start with minimal installation. Add only what you need. Every installed package is potential attack surface.
+                </div>
+
+                <h3>Port Scanning (Self-Audit)</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Install nmap</span>
+<span class="prompt">#</span> <span class="command">apt install nmap -y</span>
+
+<span class="comment"># Scan localhost</span>
+<span class="prompt">$</span> <span class="command">nmap -sV localhost</span>
+<span class="output">PORT    STATE SERVICE VERSION</span>
+<span class="output">22/tcp  open  ssh     OpenSSH 8.9</span>
+<span class="output">80/tcp  open  http    nginx 1.18</span>
+<span class="output">443/tcp open  https   nginx 1.18</span>
+
+<span class="comment"># Scan from external host to test firewall</span>
+<span class="prompt">$</span> <span class="command">nmap -Pn external-server-ip</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Use _____ command to list listening ports.</p>
+                        <input type="text" class="quiz-input" data-answer="ss" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Socket statistics</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. _____ a service to prevent it from starting.</p>
+                        <input type="text" class="quiz-input" data-answer="mask" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Hide/disable</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. apt _____ removes unused packages.</p>
+                        <input type="text" class="quiz-input" data-answer="autoremove" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Clean up</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. _____ is a tool for port scanning.</p>
+                        <input type="text" class="quiz-input" data-answer="nmap" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Network mapper</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>ss</li>
+                                <li>mask</li>
+                                <li>autoremove</li>
+                                <li>nmap</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9: Log Monitoring -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Log Monitoring</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Why Log Monitoring Matters</h3>
+                <p>Logs are your window into server activity. They record who accessed your system, what they did, when they did it, and whether they succeeded or failed. Without log monitoring, you're flying blind.</p>
+
+                <div class="highlight-box">
+                    <strong>DETECTION:</strong> Most breaches are discovered months after they occur. Active log monitoring helps detect attacks in progress and investigate past incidents.
+                </div>
+
+                <h3>journalctl - Systemd Journal</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># View all logs</span>
+<span class="prompt">$</span> <span class="command">journalctl</span>
+
+<span class="comment"># View last 100 lines</span>
+<span class="prompt">$</span> <span class="command">journalctl -n 100</span>
+
+<span class="comment"># Follow logs in real-time (like tail -f)</span>
+<span class="prompt">$</span> <span class="command">journalctl -f</span>
+
+<span class="comment"># Logs since today</span>
+<span class="prompt">$</span> <span class="command">journalctl --since today</span>
+
+<span class="comment"># Logs for specific service</span>
+<span class="prompt">$</span> <span class="command">journalctl -u sshd</span>
+
+<span class="comment"># Logs for specific boot</span>
+<span class="prompt">$</span> <span class="command">journalctl -b</span>
+                </div>
+
+                <h3>Traditional Log Files</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Authentication attempts</span>
+<span class="prompt">$</span> <span class="command">tail -f /var/log/auth.log</span>
+
+<span class="comment"># System messages</span>
+<span class="prompt">$</span> <span class="command">tail -f /var/log/syslog</span>
+
+<span class="comment"># Failed login attempts</span>
+<span class="prompt">$</span> <span class="command">grep "Failed password" /var/log/auth.log</span>
+
+<span class="comment"># Successful logins</span>
+<span class="prompt">$</span> <span class="command">grep "Accepted" /var/log/auth.log</span>
+
+<span class="comment"># Log rotation (keeps logs manageable)</span>
+<span class="prompt">$</span> <span class="command">ls /var/log/*.log*</span>
+<span class="output">auth.log  auth.log.1  auth.log.2.gz  auth.log.3.gz</span>
+                </div>
+
+                <h3>Install Logwatch</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">apt install logwatch -y</span>
+
+<span class="comment"># Run manually to see output</span>
+<span class="prompt">$</span> <span class="command">logwatch --detail high --range today</span>
+
+<span class="comment"># Configure daily reports</span>
+<span class="prompt">#</span> <span class="command">nano /etc/cron.daily/00logwatch</span>
+                </div>
+
+                <h3>Logwatch Configuration</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">nano /usr/share/logwatch/default.conf/logwatch.conf</span>
+                </div>
+
+                <div class="config-block">
+<span class="comment"># Logwatch configuration</span>
+<span class="output">LogDir = /var/log</span>
+<span class="output">TmpDir = /var/cache/logwatch</span>
+<span class="output">MailTo = admin@example.com</span>
+<span class="output">Print = Yes</span>
+<span class="output">Range = yesterday</span>
+<span class="output">Detail = Med</span>
+<span class="output">Service = All</span>
+                </div>
+
+                <h3>rsyslog Configuration</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">nano /etc/rsyslog.conf</span>
+
+<span class="comment"># Common directives</span>
+<span class="output">*.info;mail.none;authpriv.none;cron.none   /var/log/messages</span>
+<span class="output">authpriv.*                                 /var/log/secure</span>
+<span class="output">mail.*                                     -/var/log/maillog</span>
+<span class="output">cron.*                                     /var/log/cron</span>
+<span class="output">*.emerg                                    :omusrmsg:*</span>
+
+<span class="comment"># Restart to apply</span>
+<span class="prompt">#</span> <span class="command">systemctl restart rsyslog</span>
+                </div>
+
+                <h3>Log Analysis Commands</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Count failed SSH attempts by IP</span>
+<span class="prompt">$</span> <span class="command">grep "Failed password" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -nr | head</span>
+
+<span class="comment"># Find sudo usage</span>
+<span class="prompt">$</span> <span class="command">grep sudo /var/log/auth.log</span>
+
+<span class="comment"># Check for port scanning</span>
+<span class="prompt">$</span> <span class="command">grep "Invalid user" /var/log/auth.log | wc -l</span>
+
+<span class="comment"># Failed login by user</span>
+<span class="prompt">$</span> <span class="command">grep "authentication failure" /var/log/auth.log</span>
+                </div>
+
+                <h3>Log Retention</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">nano /etc/logrotate.conf</span>
+                </div>
+
+                <div class="config-block">
+<span class="output">weekly</span>
+<span class="output">rotate 4</span>
+<span class="output">create</span>
+<span class="output">dateext</span>
+<span class="output">compress</span>
+<span class="output">include /etc/logrotate.d</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. journalctl -f follows logs like _____.</p>
+                        <input type="text" class="quiz-input" data-answer="tail" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: End of file</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. auth.log tracks _____ attempts.</p>
+                        <input type="text" class="quiz-input" data-answer="authentication" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Login</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. logwatch sends daily _____ reports.</p>
+                        <input type="text" class="quiz-input" data-answer="email" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Electronic mail</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. _____ rotates logs to prevent disk fill.</p>
+                        <input type="text" class="quiz-input" data-answer="logrotate" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Turn around</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>tail</li>
+                                <li>authentication</li>
+                                <li>email</li>
+                                <li>logrotate</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10: Security Scanning -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Security Scanning</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Why Security Scanning?</h3>
+                <p>Regular security scans help identify vulnerabilities before attackers do. They provide an objective assessment of your server's security posture and track improvements over time.</p>
+
+                <h3>Lynis - Security Auditing Tool</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Install Lynis</span>
+<span class="prompt">#</span> <span class="command">apt install lynis -y</span>
+
+<span class="comment"># Run basic audit</span>
+<span class="prompt">#</span> <span class="command">lynis audit system</span>
+
+<span class="comment"># Run with more details</span>
+<span class="prompt">#</span> <span class="command">lynis audit system --verbose</span>
+
+<span class="comment"># Create report file</span>
+<span class="prompt">#</span> <span class="command">lynis audit system --report-file /tmp/lynis-report.dat</span>
+                </div>
+
+                <h3>Understanding Lynis Output</h3>
+                
+                <div class="terminal-block">
+<span class="output">[+] Initializing program</span>
+<span class="output">------------------------------------</span>
+<span class="output">  - Detecting OS...                                           [ DONE ]</span>
+<span class="output">  - Checking profiles...                                      [ DONE ]</span>
+<span class="output"></span>
+<span class="output">[+] Boot and services</span>
+<span class="output">------------------------------------</span>
+<span class="output">  - Service Manager...                                        [ systemd ]</span>
+<span class="output"></span>
+<span class="output">[+] Security Frameworks</span>
+<span class="output">------------------------------------</span>
+<span class="output">  - Checking AppArmor status...                               [ ENABLED ]</span>
+<span class="output"></span>
+<span class="output">Lynis security scan details:</span>
+<span class="output"></span>
+<span class="output">  Hardening index : 72 [WARNING]</span>
+<span class="output">  Tests performed : 238</span>
+<span class="output">  Plugins enabled : 1</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>GOAL:</strong> Aim for a hardening index of 80+. Lynis provides specific recommendations for each warning. Review the full report at /var/log/lynis-report.dat
+                </div>
+
+                <h3>Rootkit Detection with rkhunter</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Install rkhunter</span>
+<span class="prompt">#</span> <span class="command">apt install rkhunter -y</span>
+
+<span class="comment"># Update definitions</span>
+<span class="prompt">#</span> <span class="command">rkhunter --update</span>
+
+<span class="comment"># Run system check</span>
+<span class="prompt">#</span> <span class="command">rkhunter --check</span>
+
+<span class="comment"># Run in background and create log</span>
+<span class="prompt">#</span> <span class="command">rkhunter --check --sk --rwo</span>
+                </div>
+
+                <h3>chkrootkit - Alternative Rootkit Scanner</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Install chkrootkit</span>
+<span class="prompt">#</span> <span class="command">apt install chkrootkit -y</span>
+
+<span class="comment"># Run scan</span>
+<span class="prompt">#</span> <span class="command">chkrootkit</span>
+
+<span class="comment"># Quiet mode (only show warnings)</span>
+<span class="prompt">#</span> <span class="command">chkrootkit -q</span>
+
+<span class="comment"># Check specific directory</span>
+<span class="prompt">#</span> <span class="command">chkrootkit -r /path/to/check</span>
+                </div>
+
+                <h3>Automated Security Updates</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Install debsecan</span>
+<span class="prompt">#</span> <span class="command">apt install debsecan -y</span>
+
+<span class="comment"># List vulnerable packages</span>
+<span class="prompt">$</span> <span class="command">debsecan</span>
+
+<span class="comment"># Only show fixed vulnerabilities</span>
+<span class="prompt">$</span> <span class="command">debsecan --suite bookworm --format report</span>
+                </div>
+
+                <h3>Setting Up Automated Scans</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Add to cron for weekly scans</span>
+<span class="prompt">#</span> <span class="command">crontab -e</span>
+                </div>
+
+                <div class="config-block">
+<span class="comment"># Weekly security scans</span>
+<span class="output">0 2 * * 0 /usr/bin/lynis audit system --quick &gt; /var/log/lynis-weekly.log 2&gt;&1</span>
+<span class="output">0 3 * * 0 /usr/bin/rkhunter --check --sk --rwo &gt; /var/log/rkhunter-weekly.log 2&gt;&1</span>
+                </div>
+
+                <h3>Interpreting Results</h3>
+                <ul>
+                    <li><strong>[OK]</strong> - Test passed, no action needed</li>
+                    <li><strong>[WARNING]</strong> - Potential issue, review recommended</li>
+                    <li><strong>[SUGGESTION]</strong> - Improvement possible</li>
+                    <li><strong>[FOUND]</strong> - Rootkit or malware detected (investigate immediately)</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. _____ audits system security configuration.</p>
+                        <input type="text" class="quiz-input" data-answer="lynis" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Security scanner</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. rkhunter detects _____.</p>
+                        <input type="text" class="quiz-input" data-answer="rootkits" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Hidden malware</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Target hardening index is _____ or higher.</p>
+                        <input type="text" class="quiz-input" data-answer="80" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Eighty</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Run scans _____ to detect issues early.</p>
+                        <input type="text" class="quiz-input" data-answer="regularly" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Often/Scheduled</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>lynis</li>
+                                <li>rootkits</li>
+                                <li>80</li>
+                                <li>regularly</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11: Backup Strategies -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Backup Strategies</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Why Backups Matter</h3>
+                <p>Backups are your insurance policy against data loss. Whether from hardware failure, ransomware, human error, or malicious attacks, having reliable backups ensures you can recover quickly.</p>
+
+                <div class="highlight-box">
+                    <strong>RULE OF THREE:</strong> 3 copies of your data, on 2 different media, with 1 copy offsite. Never rely on a single backup.
+                </div>
+
+                <h3>Basic rsync Backup</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Basic file copy with archive mode</span>
+<span class="prompt">$</span> <span class="command">rsync -av /source/directory/ /backup/directory/</span>
+
+<span class="comment"># Backup to remote server</span>
+<span class="prompt">$</span> <span class="command">rsync -avz -e ssh /local/data/ user@backup-server:/remote/backup/</span>
+
+<span class="comment"># Exclude certain files</span>
+<span class="prompt">$</span> <span class="command">rsync -av --exclude='*.tmp' --exclude='cache/' /source/ /backup/</span>
+
+<span class="comment"># Delete files in backup that no longer exist in source</span>
+<span class="prompt">$</span> <span class="command">rsync -av --delete /source/ /backup/</span>
+                </div>
+
+                <h3>Incremental Backups</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Create timestamped backup</span>
+<span class="prompt">$</span> <span class="command">rsync -av /var/www/html/ /backup/html-$(date +%Y%m%d)/</span>
+
+<span class="comment"># Link to previous backup (hard links for deduplication)</span>
+<span class="prompt">$</span> <span class="command">rsync -av --link-dest=/backup/html-$(date -d yesterday +%Y%m%d) /var/www/html/ /backup/html-$(date +%Y%m%d)/</span>
+                </div>
+
+                <h3>Database Backups</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># MySQL/MariaDB backup</span>
+<span class="prompt">$</span> <span class="command">mysqldump -u root -p database_name &gt; backup-$(date +%Y%m%d).sql</span>
+
+<span class="comment"># PostgreSQL backup</span>
+<span class="prompt">$</span> <span class="command">pg_dump -U postgres database_name &gt; backup-$(date +%Y%m%d).sql</span>
+
+<span class="comment"># Compress backup</span>
+<span class="prompt">$</span> <span class="command">mysqldump -u root -p database_name | gzip &gt; backup-$(date +%Y%m%d).sql.gz</span>
+                </div>
+
+                <h3>Automated Backups with Cron</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Edit crontab</span>
+<span class="prompt">$</span> <span class="command">crontab -e</span>
+                </div>
+
+                <div class="config-block">
+<span class="comment"># Daily backup at 2 AM</span>
+<span class="output">0 2 * * * /usr/bin/rsync -av --delete /var/www/ /backup/www/</span>
+<span class="comment"># Weekly database backup on Sundays at 3 AM</span>
+<span class="output">0 3 * * 0 /usr/bin/mysqldump -u root -p'password' mydb &gt; /backup/db-$(date +\%Y\%m\%d).sql</span>
+<span class="comment"># Clean up backups older than 30 days</span>
+<span class="output">0 4 * * * /usr/bin/find /backup -name "*.sql" -mtime +30 -delete</span>
+                </div>
+
+                <h3>Offsite Backup Options</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Rsync to remote server</span>
+<span class="prompt">$</span> <span class="command">rsync -avz -e "ssh -i /backup/.ssh/key" /local/backup/ backup@remote-server:/backups/server1/</span>
+
+<span class="comment"># Using rclone for cloud storage</span>
+<span class="prompt">$</span> <span class="command">rclone sync /local/backup remote:bucket-name</span>
+
+<span class="comment"># Encrypted backup with duplicity</span>
+<span class="prompt">$</span> <span class="command">duplicity --encrypt-key KEY_ID /source sftp://user@backup-server/backups</span>
+                </div>
+
+                <h3>Backup Verification</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Check backup integrity</span>
+<span class="prompt">$</span> <span class="command">rsync -avnc /source/ /backup/ | grep -c "^&lt;"</span>
+
+<span class="comment"># List backup contents</span>
+<span class="prompt">$</span> <span class="command">ls -lah /backup/</span>
+
+<span class="comment"># Test restore (critical!)</span>
+<span class="prompt">$</span> <span class="command">rsync -av /backup/test-restore/ /tmp/test-restore/</span>
+<span class="prompt">$</span> <span class="command">diff -r /source/test-data/ /tmp/test-restore/</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>CRITICAL:</strong> A backup you haven't tested restoring from is a gamble. Regularly test your restore process to ensure backups work when you need them.
+                </div>
+
+                <h3>System Backup with tar</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># Full system backup (excludes unnecessary directories)</span>
+<span class="prompt">#</span> <span class="command">tar -cvpzf /backup/full-backup-$(date +%Y%m%d).tar.gz --exclude=/backup --exclude=/proc --exclude=/tmp --exclude=/mnt --exclude=/sys --exclude=/dev --exclude=/run /</span>
+
+<span class="comment"># Restore from backup</span>
+<span class="prompt">#</span> <span class="command">tar -xvpzf /backup/full-backup-20240101.tar.gz -C /</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Use _____ for efficient file backups.</p>
+                        <input type="text" class="quiz-input" data-answer="rsync" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Remote sync</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. mysqldump backups _____ databases.</p>
+                        <input type="text" class="quiz-input" data-answer="mysql" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Popular SQL database</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Keep one backup _____.</p>
+                        <input type="text" class="quiz-input" data-answer="offsite" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Remote location</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. _____ backups periodically to ensure they work.</p>
+                        <input type="text" class="quiz-input" data-answer="test" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Verify</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>rsync</li>
+                                <li>mysql</li>
+                                <li>offsite</li>
+                                <li>test</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12: Security Checklist -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Security Checklist</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Pre-Deployment Checklist</h3>
+                <p>Complete these tasks before putting any server into production. This checklist represents the minimum security baseline.</p>
+
+                <h3>System Hardening</h3>
+                <ul>
+                    <li>[ ] Install minimal OS (no desktop environment)</li>
+                    <li>[ ] Apply all security updates</li>
+                    <li>[ ] Configure automatic security updates</li>
+                    <li>[ ] Set strong root password or disable root</li>
+                    <li>[ ] Create non-root user with sudo privileges</li>
+                    <li>[ ] Configure password policies (min 12 chars)</li>
+                </ul>
+
+                <h3>SSH Configuration</h3>
+                
+                <div class="terminal-block">
+<span class="comment"># SSH Checklist verification</span>
+<span class="prompt">$</span> <span class="command">grep -E "^(PermitRootLogin|PasswordAuthentication|Port|MaxAuthTries)" /etc/ssh/sshd_config</span>
+<span class="output">PermitRootLogin no</span>
+<span class="output">PasswordAuthentication no</span>
+<span class="output">Port 2222</span>
+<span class="output">MaxAuthTries 3</span>
+                </div>
+
+                <ul>
+                    <li>[ ] Change default SSH port (if desired)</li>
+                    <li>[ ] Disable root SSH login</li>
+                    <li>[ ] Disable password authentication</li>
+                    <li>[ ] Configure SSH key authentication only</li>
+                    <li>[ ] Set MaxAuthTries to 3 or less</li>
+                    <li>[ ] Configure ClientAliveInterval</li>
+                    <li>[ ] Allow only specific users (AllowUsers)</li>
+                </ul>
+
+                <h3>Firewall Configuration</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo ufw status verbose</span>
+                </div>
+
+                <ul>
+                    <li>[ ] Enable UFW or iptables</li>
+                    <li>[ ] Set default deny incoming</li>
+                    <li>[ ] Allow only necessary ports (SSH, HTTP, HTTPS)</li>
+                    <li>[ ] Rate limit SSH port</li>
+                    <li>[ ] Log firewall activity</li>
+                </ul>
+
+                <h3>Intrusion Prevention</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">systemctl status fail2ban</span>
+<span class="prompt">$</span> <span class="command">fail2ban-client status sshd</span>
+                </div>
+
+                <ul>
+                    <li>[ ] Install fail2ban</li>
+                    <li>[ ] Enable SSH jail</li>
+                    <li>[ ] Configure maxretry (3 recommended)</li>
+                    <li>[ ] Set appropriate bantime (1+ hours)</li>
+                    <li>[ ] Enable additional jails if needed</li>
+                </ul>
+
+                <h3>Services & Ports</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ss -tulpn | grep LISTEN</span>
+                </div>
+
+                <ul>
+                    <li>[ ] Audit all listening ports</li>
+                    <li>[ ] Disable unnecessary services</li>
+                    <li>[ ] Remove unused packages</li>
+                    <li>[ ] Configure services to listen on localhost only when possible</li>
+                </ul>
+
+                <h3>File Permissions</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">find / -perm -4000 -type f 2>/dev/null | wc -l</span>
+<span class="prompt">$</span> <span class="command">stat -c "%a %n" /etc/shadow</span>
+                </div>
+
+                <ul>
+                    <li>[ ] Review SUID/SGID binaries</li>
+                    <li>[ ] Set restrictive umask (027 or 077)</li>
+                    <li>[ ] Verify sensitive file permissions</li>
+                    <li>[ ] Configure SSH directory permissions (700)</li>
+                </ul>
+
+                <h3>Logging & Monitoring</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls -la /var/log/*.log | head</span>
+                </div>
+
+                <ul>
+                    <li>[ ] Verify rsyslog is running</li>
+                    <li>[ ] Configure log rotation</li>
+                    <li>[ ] Install logwatch for daily reports</li>
+                    <li>[ ] Set up centralized logging if multiple servers</li>
+                    <li>[ ] Configure logwatch or similar for alerts</li>
+                </ul>
+
+                <h3>Security Scanning</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command">lynis audit system --quick 2>&1 | grep "Hardening index"</span>
+                </div>
+
+                <ul>
+                    <li>[ ] Run Lynis security audit</li>
+                    <li>[ ] Review and address all warnings</li>
+                    <li>[ ] Run rkhunter rootkit scan</li>
+                    <li>[ ] Run chkrootkit scan</li>
+                    <li>[ ] Schedule regular security scans</li>
+                    <li>[ ] Target hardening index: 80+</li>
+                </ul>
+
+                <h3>Backup Strategy</h3>
+                <ul>
+                    <li>[ ] Configure automated backups</li>
+                    <li>[ ] Include databases in backup plan</li>
+                    <li>[ ] Set up offsite backup</li>
+                    <li>[ ] Test restore procedures</li>
+                    <li>[ ] Document recovery process</li>
+                    <li>[ ] Set backup retention policy</li>
+                </ul>
+
+                <h3>Maintenance Schedule</h3>
+                
+                <div class="terminal-block">
+<span class="output">Daily:  Check logs, review fail2ban bans</span>
+<span class="output">Weekly: Run security scans (Lynis, rkhunter)</span>
+<span class="output">Weekly: Verify backup integrity</span>
+<span class="output">Monthly: Review user accounts</span>
+<span class="output">Monthly: Audit installed packages</span>
+<span class="output">Quarterly: Full security review</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>REMEMBER:</strong> Security is not a one-time task but an ongoing process. Regular maintenance and vigilance are essential to maintaining a secure server over time.
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Minimum target hardening index is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="80" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Eighty</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Set maxretry to _____ or less.</p>
+                        <input type="text" class="quiz-input" data-answer="3" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Three</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Minimum password length should be _____ characters.</p>
+                        <input type="text" class="quiz-input" data-answer="12" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Twelve</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Security is an ongoing _____, not a one-time task.</p>
+                        <input type="text" class="quiz-input" data-answer="process" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Continuous activity</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>80</li>
+                                <li>3</li>
+                                <li>12</li>
+                                <li>process</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    
+    <script src="../nav.js" defer></script>
+</body>
+</html>

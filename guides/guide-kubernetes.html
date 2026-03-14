@@ -1,0 +1,3762 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes - Master Container Orchestration | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn Kubernetes from basics to advanced. Master pods, services, deployments, ingress, helm, and production-grade container orchestration.">
+    <meta name="keywords" content="Kubernetes, K8s, container orchestration, Docker, pods, services, deployments, kubectl, helm, ingress, cloud native, DevOps">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        // Theme persistence - check and apply immediately in head
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        // Sync checkbox after DOM loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    <script src="../terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #326CE5;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">KUBERNETES</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#distros">DISTRO</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#projects">PROJECTS</a>
+                    <a href="../index.html#resources">RESOURCES</a>
+                    <a href="../index.html#references">REFERENCES</a>
+                    <a href="../index.html#scripts">SCRIPTS</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#contact">CONTACT</a>
+                    <a href="../index.html#stats">STATS</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>KUBER<br>NETES</h1>
+        <p class="tagline">// Orchestrate at scale.</p>
+        
+        <div class="manifesto">
+            <p><strong>CONTAINERS ARE JUST THE BEGINNING.</strong></p>
+            <p>When you have dozens of services, across multiple servers, with scaling needs—managing containers manually becomes impossible. Kubernetes automates the hard stuff.</p>
+            <p><strong>DECLARE, DON'T EXECUTE.</strong></p>
+            <p>Tell Kubernetes what you want (3 replicas, auto-scaling, rolling updates). It figures out how to get there. Your infrastructure becomes code—versionable, testable, reviewable.</p>
+            <p><strong>THE CLOUD-NATIVE STANDARD.</strong></p>
+            <p>Kubernetes is the operating system of the cloud. AWS, GCP, Azure—all run Kubernetes. Learn it once, deploy everywhere.</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">START LEARNING →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to K8s Mastery</h2>
+            <p>12 lessons. Complete orchestration.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Kubernetes</h3>
+                <p class="lesson-desc">Container orchestration and K8s architecture</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Pods - The Smallest Unit</h3>
+                <p class="lesson-desc">Run containers in Kubernetes pods</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Deployments and ReplicaSets</h3>
+                <p class="lesson-desc">Scale and manage containerized applications</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Services - Stable Networking</h3>
+                <p class="lesson-desc">Expose applications and enable service discovery</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">ConfigMaps and Secrets</h3>
+                <p class="lesson-desc">Manage configuration and sensitive data</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Ingress - HTTP Routing</h3>
+                <p class="lesson-desc">Route external traffic to internal services</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Persistent Storage</h3>
+                <p class="lesson-desc">Volumes, PVs, PVCs, and stateful applications</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Resource Limits and Quality of Service</h3>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Helm - Package Manager</h3>
+                <p class="lesson-desc">Install and manage applications with Helm charts</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Production Best Practices</h3>
+                <p class="lesson-desc">Security, monitoring, and production readiness</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Security in Kubernetes</h3>
+                <p class="lesson-desc">RBAC, Pod Security, Network Policies, and secrets</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">CI/CD with Kubernetes</h3>
+                <p class="lesson-desc">GitOps, ArgoCD, and automated deployments</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why Kubernetes?</h2>
+            <p>Kubernetes (K8s) provides:</p>
+            <ul>
+                <li><strong>Self-healing:</strong> Restarts failed containers, replaces dead nodes</li>
+                <li><strong>Service discovery:</strong> Find services without manual config</li>
+                <li><strong>Auto-scaling:</strong> Scale based on CPU, memory, or custom metrics</li>
+                <li><strong>Rolling updates:</strong> Zero-downtime deployments</li>
+                <li><strong>Load balancing:</strong> Distribute traffic across replicas</li>
+                <li><strong>Secret management:</strong> Securely store passwords, API keys</li>
+            </ul>
+            <p>Whether you run 3 containers or 3000—Kubernetes scales with you.</p>
+            <p><strong>The future is containerized. Kubernetes is the cockpit.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>📖 Kubernetes Docs</h3>
+                <p>Official documentation</p>
+                <a href="https://kubernetes.io/docs/" target="_blank">kubernetes.io/docs</a>
+            </div>
+            <div class="resource-card">
+                <h3>🛠️ kubectl</h3>
+                <p>Kubernetes CLI</p>
+                <a href="https://kubernetes.io/docs/reference/kubectl/" target="_blank">kubernetes.io</a>
+            </div>
+            <div class="resource-card">
+                <h3">📦 Helm</h3>
+                <p>Package manager for K8s</p>
+                <a href="https://helm.sh/" target="_blank">helm.sh</a>
+            </div>
+            <div class="resource-card">
+                <h3">🏠 Minikube</h3>
+                <p>Local K8s cluster</p>
+                <a href="https://minikube.sigs.k8s.io/" target="_blank">minikube.sigs.k8s.io</a>
+            </div>
+            <div class="resource-card">
+                <h3">☸️ Kind</h3>
+                <p>Kubernetes in Docker</p>
+                <a href="https://kind.sigs.k8s.io/" target="_blank">kind.sigs.k8s.io</a>
+            </div>
+            <div class="resource-card">
+                <h3">📊 K9s</h3>
+                <p>Terminal UI for K8s</p>
+                <a href="https://k9scli.io/" target="_blank">k9scli.io</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        
+    </footer>
+
+    <div class="lesson-content" id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const lessons = [
+            {
+                id: 1,
+                title: "Introduction to Kubernetes",
+                difficulty: "beginner",
+                content: `
+                    <h3>What is Kubernetes?</h3>
+                    <p>Kubernetes (K8s) is an open-source container orchestration platform that automates deployment, scaling, and management of containerized applications.</p>
+                    
+                    <h3>Kubernetes Architecture</h3>
+                    <ul>
+                        <li><strong>Control Plane (Master):</strong> The brain
+                            <br>API Server, etcd, Scheduler, Controller Manager</li>
+                        <li><strong>Worker Nodes:</strong> The muscle
+                            <br>Kubelet, Kube Proxy, Container Runtime (Docker/Containerd)</li>
+                    </ul>
+                    
+                    <h3>Key Concepts</h3>
+                    <ul>
+                        <li><strong>Pod:</strong> Smallest deployable unit (1+ containers)</li>
+                        <li><strong>Node:</strong> Worker machine (VM or physical)</li>
+                        <li><strong>Cluster:</strong> Collection of nodes + control plane</li>
+                        <li><strong>Service:</strong> Stable endpoint for pods</li>
+                        <li><strong>Deployment:</strong> Manages pod replicas</li>
+                    </ul>
+                    
+                    <h3>Ways to Run Kubernetes</h3>
+                    <ul>
+                        <li><strong>Minikube:</strong> Single-node local cluster</li>
+                        <li><strong>Kind:</strong> Kubernetes IN Docker</li>
+                        <li><strong>Cloud:</strong> EKS, GKE, AKS</li>
+                        <li><strong>Self-hosted:</strong> kubeadm, k3s</li>
+                    </ul>
+                    
+                    <h3>Install kubectl</h3>
+                    <pre><span class="prompt">$</span> <span class="command">curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"</span>
+<span class="prompt">$</span> <span class="command">chmod +x kubectl</span>
+<span class="prompt">$</span> <span class="command">sudo mv kubectl /usr/local/bin/</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="pod">
+                        <p>What is the smallest deployable unit in Kubernetes?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="yaml">
+                        <p>What configuration format does Kubernetes commonly use?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl">
+                        <p>What is the Kubernetes command-line tool called?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="docker">
+                        <p>What container runtime does Kubernetes typically use?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="api server">
+                        <p>Which Kubernetes component validates configurations?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="scheduler">
+                        <p>Which component decides where pods run?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="etcd">
+                        <p>Where does Kubernetes store cluster state?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="controller">
+                        <p>Which component ensures desired state matches actual state?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>pod</li>
+                                <li>yaml</li>
+                                <li>kubectl</li>
+                                <li>docker</li>
+                                <li>api server</li>
+                                <li>scheduler</li>
+                                <li>etcd</li>
+                                <li>controller</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 2,
+                title: "Pods - The Smallest Unit",
+                difficulty: "beginner",
+                content: `
+                    <h3>Understanding Pods</h3>
+                    <p>A Pod is the smallest deployable object in Kubernetes. It can contain one or more tightly-coupled containers that share:</p>
+                    <ul>
+                        <li>Network namespace (same IP, ports)</li>
+                        <li>Storage volumes</li>
+                        <li>IPC namespace</li>
+                    </ul>
+                    
+                    <h3>Pod YAML</h3>
+                    <pre><span class="prompt">$</span> <span class="command">cat nginx-pod.yaml</span>
+<span class="output">apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.25
+    ports:
+    - containerPort: 80
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+      requests:
+        memory: "64Mi"
+        cpu: "250m"</span></pre>
+                    
+                    <h3>Managing Pods</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl apply -f nginx-pod.yaml</span>     <span class="comment"># Create pod</span>
+<span class="prompt">$</span> <span class="command">kubectl get pods</span>                    <span class="comment"># List pods</span>
+<span class="prompt">$</span> <span class="command">kubectl get pods -o wide</span>            <span class="comment"># More details</span>
+<span class="prompt">$</span> <span class="command">kubectl describe pod nginx</span>           <span class="comment"># Pod details</span>
+<span class="prompt">$</span> <span class="command">kubectl logs nginx</span>                  <span class="comment"># View logs</span>
+<span class="prompt">$</span> <span class="command">kubectl exec -it nginx -- /bin/sh</span>   <span class="comment"># Shell into pod</span>
+<span class="prompt">$</span> <span class="command">kubectl delete pod nginx</span>            <span class="comment"># Delete pod</span></pre>
+                    
+                    <h3>Multi-Container Pods</h3>
+                    <pre><span class="output">spec:
+  containers:
+  - name: web
+    image: nginx
+  - name: sidecar
+    image: log-collector
+    env:
+    - name: LOG_LEVEL
+      value: "debug"</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="network namespace">
+                        <p>What do containers in a Pod share?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="yaml">
+                        <p>What file format defines a Pod?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl apply">
+                        <p>What command creates resources from a file?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl get pods">
+                        <p>What command lists all pods?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl logs">
+                        <p>What command views container output?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl exec">
+                        <p>What command runs commands in a container?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="resources">
+                        <p>What field defines CPU and memory limits?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="sidecar">
+                        <p>What is a secondary container in a Pod called?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>network namespace</li>
+                                <li>yaml</li>
+                                <li>kubectl apply</li>
+                                <li>kubectl get pods</li>
+                                <li>kubectl logs</li>
+                                <li>kubectl exec</li>
+                                <li>resources</li>
+                                <li>sidecar</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 3,
+                title: "Deployments and ReplicaSets",
+                difficulty: "beginner",
+                content: `
+                    <h3>Why Not Just Pods?</h3>
+                    <p>Pods are mortal—they die. Deployments give you:</p>
+                    <ul>
+                        <li><strong>Self-healing:</strong> Automatic pod replacement</li>
+                        <li><strong>Scaling:</strong> Multiple replicas</li>
+                        <li><strong>Rolling updates:</strong> Zero-downtime deployments</li>
+                        <li><strong>Rollback:</strong> Go back to previous version</li>
+                    </ul>
+                    
+                    <h3>Deployment YAML</h3>
+                    <pre><span class="output">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25
+        ports:
+        - containerPort: 80</span></pre>
+                    
+                    <h3>Managing Deployments</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl apply -f deployment.yaml</span>     <span class="comment"># Create deployment</span>
+<span class="prompt">$</span> <span class="command">kubectl get deployments</span>            <span class="comment"># List deployments</span>
+<span class="prompt">$</span> <span class="command">kubectl get rs</span>                      <span class="comment"># List ReplicaSets</span>
+<span class="prompt">$</span> <span class="command">kubectl get pods</span>                    <span class="comment"># Pods managed by deployment</span>
+<span class="prompt">$</span> <span class="command">kubectl scale deployment nginx-deployment --replicas=5</span>  <span class="comment"># Scale</span>
+<span class="prompt">$</span> <span class="command">kubectl set image deployment/nginx-deployment nginx=nginx:1.26</span>  <span class="comment"># Update image</span>
+<span class="prompt">$</span> <span class="command">kubectl rollout status deployment/nginx-deployment</span>  <span class="comment"># Check rollout</span>
+<span class="prompt">$</span> <span class="command">kubectl rollout undo deployment/nginx-deployment</span>  <span class="comment"># Rollback</span></pre>
+                    
+                    <h3>Update Strategies</h3>
+                    <ul>
+                        <li><strong>RollingUpdate (default):</strong> Gradually replace pods</li>
+                        <li><strong>Recreate:</strong> Kill all, then create all (downtime)</li>
+                    </ul>
+                    
+                    <pre><span class="output">spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="kubectl set image">
+                        <p>Which command updates the image in a deployment?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="replicas">
+                        <p>What field specifies number of pods?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="replicaset">
+                        <p>What ensures a specific number of pods running?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="deployment">
+                        <p>What manages ReplicaSets?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="rolling update">
+                        <p>What is the default update strategy?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="rollback">
+                        <p>What command reverts to previous version?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="scale">
+                        <p>What changes the number of replicas?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl rollout">
+                        <p>What manages deployment revisions?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>kubectl set image</li>
+                                <li>replicas</li>
+                                <li>replicaset</li>
+                                <li>deployment</li>
+                                <li>rolling update</li>
+                                <li>rollback</li>
+                                <li>scale</li>
+                                <li>kubectl rollout</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 4,
+                title: "Services - Stable Networking",
+                difficulty: "intermediate",
+                content: `
+                    <h3>The Service Problem</h3>
+                    <p>Pods are ephemeral—their IPs change. Services provide stable endpoints.</p>
+                    
+                    <h3>Service Types</h3>
+                    <ul>
+                        <li><strong>ClusterIP (default):</strong> Internal cluster IP</li>
+                        <li><strong>NodePort:</strong> Expose on each node's IP</li>
+                        <li><strong>LoadBalancer:</strong> External load balancer</li>
+                        <li><strong>ExternalName:</strong> DNS CNAME alias</li>
+                    </ul>
+                    
+                    <h3>ClusterIP Service</h3>
+                    <pre><span class="output">apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP</span></pre>
+                    
+                    <h3>NodePort Service</h3>
+                    <pre><span class="output">apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport
+spec:
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080
+  type: NodePort</span></pre>
+                    
+                    <h3>Managing Services</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl get services</span>              <span class="comment"># List services</span>
+<span class="prompt">$</span> <span class="command">kubectl get svc</span>                  <span class="comment"># Short form</span>
+<span class="prompt">$</span> <span class="command">kubectl describe svc nginx-service</span>  <span class="comment"># Service details</span>
+<span class="prompt">$</span> <span class="command">kubectl get endpoints</span>            <span class="comment"># Pod IPs backing service</span></pre>
+                    
+                    <h3>Headless Services</h3>
+                    <p>For StatefulSets or when you need direct pod access:</p>
+                    <pre><span class="output">spec:
+  clusterIP: None
+  selector:
+    app: myapp
+  ports:
+  - port: 80</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="nodeport">
+                        <p>What Service type exposes a service on each node's IP?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="clusterip">
+                        <p>What is the default Service type?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="loadbalancer">
+                        <p>What Service type works with cloud load balancers?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="selector">
+                        <p>What field ties a Service to pods?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="targetport">
+                        <p>What port does traffic go to on the pod?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="headless">
+                        <p>What Service has no cluster IP?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="dns">
+                        <p>Services are discovered via what?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="externalname">
+                        <p>What Service type maps to external DNS?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>nodeport</li>
+                                <li>clusterip</li>
+                                <li>loadbalancer</li>
+                                <li>selector</li>
+                                <li>targetport</li>
+                                <li>headless</li>
+                                <li>dns</li>
+                                <li>externalname</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 5,
+                title: "ConfigMaps and Secrets",
+                difficulty: "intermediate",
+                content: `
+                    <h3>Configuration in Kubernetes</h3>
+                    <p>Separate config from code using ConfigMaps and Secrets.</p>
+                    
+                    <h3>ConfigMap - Non-Sensitive Config</h3>
+                    <pre><span class="comment"># From literal values</span>
+<span class="prompt">$</span> <span class="command">kubectl create configmap app-config --from-literal=ENV=production --from-literal=LOG_LEVEL=debug</span>
+
+<span class="comment"># From file</span>
+<span class="prompt">$</span> <span class="command">kubectl create configmap nginx-config --from-file=nginx.conf</span>
+
+<span class="comment"># From env file</span>
+<span class="prompt">$</span> <span class="command">kubectl create configmap app-env --from-env-file=.env</span></pre>
+                    
+                    <h3>ConfigMap YAML</h3>
+                    <pre><span class="output">apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  DATABASE_URL: "postgres://db:5432/app"
+  CACHE_TTL: "3600"
+  config.json: |
+    {
+      "logLevel": "debug",
+      "features": {
+        "featureA": true,
+        "featureB": false
+      }
+    }</span>
+                    
+                    <h3>Using ConfigMaps in Pods</h3>
+                    <pre><span class="output">spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    env:
+    - name: DATABASE_URL
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: DATABASE_URL
+    volumeMounts:
+    - name: config
+      mountPath: /etc/config
+  volumes:
+  - name: config
+    configMap:
+      name: app-config</span></pre>
+                    
+                    <h3>Secrets - Sensitive Data</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl create secret generic db-credentials --from-literal=username=admin --from-literal=password=secret123</span>
+<span class="prompt">$</span> <span class="command">kubectl create secret tls my-tls --cert=cert.crt --key=cert.key</span></pre>
+                    
+                    <h3>Secret YAML (base64 encoded)</h3>
+                    <pre><span class="output">apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+data:
+  username: YWRtaW4=
+  password: c2VjcmV0MTIz</span></pre>
+                    
+                    <h3>Using Secrets</h3>
+                    <pre><span class="output">env:
+- name: DB_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: db-credentials
+      key: password</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="secret">
+                        <p>Which Kubernetes object should store database passwords?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="configmap">
+                        <p>What stores non-sensitive configuration?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="environment variables">
+                        <p>How can ConfigMap data be passed to pods?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="volumes">
+                        <p>How else can ConfigMap data be mounted?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="base64">
+                        <p>Secret values are stored in what encoding?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="immutable">
+                        <p>What prevents ConfigMap changes from propagating?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl create configmap">
+                        <p>What creates a ConfigMap from CLI?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="envfrom">
+                        <p>What imports all configmap values as env vars?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>secret</li>
+                                <li>configmap</li>
+                                <li>environment variables</li>
+                                <li>volumes</li>
+                                <li>base64</li>
+                                <li>immutable</li>
+                                <li>kubectl create configmap</li>
+                                <li>envfrom</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 6,
+                title: "Ingress - HTTP Routing",
+                difficulty: "intermediate",
+                content: `
+                    <h3>What is Ingress?</h3>
+                    <p>Ingress exposes HTTP/HTTPS routes from outside the cluster to services. It's the K8s way to do what nginx/apache do in traditional setups.</p>
+                    
+                    <h3>Install Ingress Controller</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.9.4/deploy/static/provider/cloud/deploy.yaml</span></pre>
+                    
+                    <h3>Ingress Resource</h3>
+                    <pre><span class="output">apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: myapp.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: myapp-service
+            port:
+              number: 80</span></pre>
+                    
+                    <h3>Multiple Paths</h3>
+                    <pre><span class="output">spec:
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 8080
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-service
+            port:
+              number: 80</span></pre>
+                    
+                    <h3>TLS/HTTPS</h3>
+                    <pre><span class="output">spec:
+  tls:
+  - hosts:
+    - example.com
+    secretName: my-tls-secret
+  rules:
+  - host: example.com
+    ...</span></pre>
+                    
+                    <h3>Managing Ingress</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl get ingress</span>                  <span class="comment"># List ingresses</span>
+<span class="prompt">$</span> <span class="command">kubectl describe ingress my-ingress</span>    <span class="comment"># Details</span>
+<span class="prompt">$</span> <span class="command">kubectl delete ingress my-ingress</span>     <span class="comment"># Delete</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="ingress controller">
+                        <p>What do you need to create first before using Ingress resources?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="http">
+                        <p>What protocol does Ingress route?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="host">
+                        <p>What field routes by domain name?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="path">
+                        <p>What routes different URLs?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="nginx">
+                        <p>What is a common Ingress controller?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="tls">
+                        <p>What enables HTTPS in Ingress?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="secretname">
+                        <p>What references the TLS certificate?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="annotations">
+                        <p>What adds controller-specific config?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>ingress controller</li>
+                                <li>http</li>
+                                <li>host</li>
+                                <li>path</li>
+                                <li>nginx</li>
+                                <li>tls</li>
+                                <li>secretname</li>
+                                <li>annotations</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 7,
+                title: "Persistent Storage",
+                difficulty: "intermediate",
+                content: `
+                    <h3>The Storage Problem</h3>
+                    <p>Containers are ephemeral—data is lost when they restart. PersistentVolumes provide durable storage.</p>
+                    
+                    <h3>PersistentVolume (PV)</h3>
+                    <p>Cluster-wide storage resource:</p>
+                    <pre><span class="output">apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv
+spec:
+  capacity:
+    storage: 10Gi
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data</span></pre>
+                    
+                    <h3>PersistentVolumeClaim (PVC)</h3>
+                    <p>Request for storage:</p>
+                    <pre><span class="output">apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard</span></pre>
+                    
+                    <h3>Using PVC in Pod</h3>
+                    <pre><span class="output">spec:
+  containers:
+  - name: app
+    image: myapp
+    volumeMounts:
+    - name: data
+      mountPath: /var/data
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: my-pvc</span></pre>
+                    
+                    <h3>Storage Classes</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl get storageclass</span>          <span class="comment"># List storage classes</span>
+<span class="output">NAME                 PROVISIONER            RECLAIMPOLICY</span>
+<span class="output">standard             kubernetes.io/gce-pd   Delete</span>
+<span class="output">fast                pd-ssd                Delete</span></pre>
+                    
+                    <h3>Cloud Storage Examples</h3>
+                    <pre><span class="output"># AWS EBS
+spec:
+  storageClassName: gp3
+  awsElasticBlockStore:
+    volumeID: vol-12345
+
+# GCE PD
+spec:
+  storageClassName: standard
+  gcePersistentDisk:
+    pdName: my-disk</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="pvc requests storage from pv">
+                        <p>What is the relationship between PVC and PV?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="persistentvolume">
+                        <p>What represents cluster storage?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="persistentvolumeclaim">
+                        <p>What requests storage from PV?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="readwritonce">
+                        <p>What access mode allows single node mount?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="storageclass">
+                        <p>What provisions PVs dynamically?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="hostpath">
+                        <p>What is a node-based storage type?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="reclaim policy">
+                        <p>What determines PV handling on PVC deletion?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="mountpath">
+                        <p>What field specifies where to mount in container?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>pvc requests storage from pv</li>
+                                <li>persistentvolume</li>
+                                <li>persistentvolumeclaim</li>
+                                <li>readwritonce</li>
+                                <li>storageclass</li>
+                                <li>hostpath</li>
+                                <li>reclaim policy</li>
+                                <li>mountpath</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 8,
+                title: "Resource Limits and Quality of Service",
+                difficulty: "advanced",
+                content: `
+                    <h3>Why Resource Limits?</h3>
+                    <ul>
+                        <li>Prevent one app from consuming all resources</li>
+                        <li>Enable scheduling decisions</li>
+                        <li>Define QoS classes for pod eviction priority</li>
+                    </ul>
+                    
+                    <h3>Resource Requests vs Limits</h3>
+                    <ul>
+                        <li><strong>Requests:</strong> Minimum guaranteed (scheduler uses this)</li>
+                        <li><strong>Limits:</strong> Maximum allowed (cgroup enforces this)</li>
+                    </ul>
+                    
+                    <pre><span class="output">spec:
+  containers:
+  - name: app
+    image: myapp
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "250m"
+      limits:
+        memory: "256Mi"
+        cpu: "500m"</span></pre>
+                    
+                    <h3>QoS Classes</h3>
+                    <ul>
+                        <li><strong>Guaranteed:</strong> Requests = Limits for all containers</li>
+                        <li><strong>Burstable:</strong> Requests < Limits, or not guaranteed</li>
+                        <li><strong>BestEffort:</strong> No requests defined</li>
+                    </ul>
+                    
+                    <h3>Guaranteed QoS Example</h3>
+                    <pre><span class="output">spec:
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "250m"</span></pre>
+                    
+                    <h3>LimitRanges</h3>
+                    <p>Set defaults and limits for namespaces:</p>
+                    <pre><span class="output">apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-limits
+spec:
+  limits:
+  - default:
+      memory: "256Mi"
+      cpu: "500m"
+    defaultRequest:
+      memory: "128Mi"
+      cpu: "250m"
+    type: Container</span></pre>
+                    
+                    <h3>ResourceQuotas</h3>
+                    <p>Limit total resources per namespace:</p>
+                    <pre><span class="output">apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: my-quota
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: "8Gi"
+    limits.cpu: "8"
+    limits.memory: "16Gi"
+    pods: "20"</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="requests">
+                        <p>What does the scheduler use to decide where to place a pod?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="limits">
+                        <p>What caps maximum resource usage?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="guaranteed">
+                        <p>What QoS class has guaranteed resources?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="besteffort">
+                        <p>What QoS class has no requests or limits?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="burstable">
+                        <p>What QoS class is the default?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="limitrange">
+                        <p>What sets default resources for namespace?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="resourcequota">
+                        <p>What limits total resources per namespace?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="cpu">
+                        <p>What is measured in millicores?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>requests</li>
+                                <li>limits</li>
+                                <li>guaranteed</li>
+                                <li>besteffort</li>
+                                <li>burstable</li>
+                                <li>limitrange</li>
+                                <li>resourcequota</li>
+                                <li>cpu</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 9,
+                title: "Helm - Package Manager",
+                difficulty: "advanced",
+                content: `
+                    <h3>What is Helm?</h3>
+                    <p>Helm is the package manager for Kubernetes. It bundles K8s manifests into "charts" that are versioned, configurable, and reusable.</p>
+                    
+                    <h3>Installing Helm</h3>
+                    <pre><span class="prompt">$</span> <span class="command">curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash</span></pre>
+                    
+                    <h3>Helm Concepts</h3>
+                    <ul>
+                        <li><strong>Chart:</strong> Package of K8s manifests</li>
+                        <li><strong>Repository:</strong> Collection of charts</li>
+                        <li><strong>Release:</strong> Deployed instance of a chart</li>
+                        <li><strong>Values:</strong> Configuration overrides</li>
+                    </ul>
+                    
+                    <h3>Using Charts</h3>
+                    <pre><span class="prompt">$</span> <span class="command">helm repo add bitnami https://charts.bitnami.com/bitnami</span>  <span class="comment"># Add repo</span>
+<span class="prompt">$</span> <span class="command">helm repo update</span>                                        <span class="comment"># Update</span>
+<span class="prompt">$</span> <span class="command">helm search repo nginx</span>                                  <span class="comment"># Search</span>
+<span class="prompt">$</span> <span class="command">helm install my-nginx bitnami/nginx</span>                    <span class="comment"># Install</span>
+<span class="prompt">$</span> <span class="command">helm list</span>                                                 <span class="comment"># List releases</span>
+<span class="prompt">$</span> <span class="command">helm upgrade my-nginx bitnami/nginx</span>                    <span class="comment"># Upgrade</span>
+<span class="prompt">$</span> <span class="command">helm rollback my-nginx 1</span>                               <span class="comment"># Rollback</span>
+<span class="prompt">$</span> <span class="command">helm uninstall my-nginx</span>                                  <span class="comment"># Uninstall</span></pre>
+                    
+                    <h3>Custom Values</h3>
+                    <pre><span class="prompt">$</span> <span class="command">helm install my-app bitnami/wordpress --set mariadb.db.password=secret</span>
+<span class="prompt">$</span> <span class="command">helm install my-app bitnami/wordpress -f values.yaml</span></pre>
+                    
+                    <h3>values.yaml Example</h3>
+                    <pre><span class="output">replicaCount: 3
+
+image:
+  repository: myapp
+  tag: v1.0
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  hostname: myapp.example.com
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi</span></pre>
+                    
+                    <h3>Create Your Own Chart</h3>
+                    <pre><span class="prompt">$</span> <span class="command">helm create mychart</span>
+<span class="prompt">$</span> <span class="command">ls mychart/</span>
+<span class="output">Chart.yaml  charts/  templates/  values.yaml</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="a deployed instance of a chart">
+                        <p>What is a Helm Release?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="chart">
+                        <p>What is a Helm package called?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="values.yaml">
+                        <p>What file contains default config?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="templates">
+                        <p>What directory holds Kubernetes manifests?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="helm install">
+                        <p>What deploys a chart?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="helm upgrade">
+                        <p>What updates a release?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="helm rollback">
+                        <p>What reverts to previous version?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="helm repo">
+                        <p>What manages chart repositories?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>a deployed instance of a chart</li>
+                                <li>chart</li>
+                                <li>values.yaml</li>
+                                <li>templates</li>
+                                <li>helm install</li>
+                                <li>helm upgrade</li>
+                                <li>helm rollback</li>
+                                <li>helm repo</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 10,
+                title: "Production Best Practices",
+                difficulty: "advanced",
+                content: `
+                    <h3>Ready for Production?</h3>
+                    <p>Running K8s in production requires attention to:</p>
+                    
+                    <h3>Security</h3>
+                    <ul>
+                        <li><strong>RBAC:</strong> Use Role/RoleBinding, not ClusterRole unless needed</li>
+                        <li><strong>Network Policies:</strong> Limit pod-to-pod communication</li>
+                        <li><strong>Pod Security:</strong> Use Pod Security Standards</li>
+                        <li><stSecurity:</strong> Use Pod Security Standards</li>
+                        <li><strong>Secrets:</strong> Use external secrets operators</li>
+                    </ul>
+                    
+                    <h3>Network Policy Example</h3>
+                    <pre><span class="output">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress</span></pre>
+                    
+                    <h3>High Availability</h3>
+                    <ul>
+                        <li><strong>Multiple Replicas:</strong> Spread across nodes</li>
+                        <li><strong>Pod Disruption Budgets:</strong> Ensure min available during updates</li>
+                        <li><strong>Anti-affinity:</strong> Spread pods across nodes/zones</li>
+                    </ul>
+                    
+                    <pre><span class="output">apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: myapp-pdb
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: myapp</span></pre>
+                    
+                    <h3>Observability</h3>
+                    <ul>
+                        <li><strong>Logging:</strong> Aggregate logs (Loki, ELK)</li>
+                        <li><strong>Metrics:</strong> Prometheus + Grafana</li>
+                        <li><strong>Tracing:</strong> Jaeger or Tempo</li>
+                        <li><strong>Health Checks:</strong> Liveness, readiness probes</li>
+                    </ul>
+                    
+                    <h3>Health Checks</h3>
+                    <pre><span class="output">spec:
+  containers:
+  - name: app
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 5</span></pre>
+                    
+                    <h3>CI/CD with Kubernetes</h3>
+                    <ul>
+                        <li><strong>GitOps:</strong> ArgoCD or Flux</li>
+                        <li><strong>Image Scanning:</strong> Trivy, Clair</li>
+                        <li><strong>Image Updates:</strong> Renovate, Dependabot</li>
+                    </ul>
+                    
+                    <h3>Next Steps</h3>
+                    <ul>
+                        <li><strong>Service Mesh:</strong> Istio, Linkerd</li>
+                        <li><strong>GitOps:</strong> ArgoCD, Flux</li>
+                        <li><strong>Multi-cluster:</strong> Federation, Karmada</li>
+                        <li><strong>Serverless:</strong> Knative</li>
+                    </ul>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="poddisruptionbudget">
+                        <p>What ensures a minimum number of pods during voluntary disruptions?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="readiness probe">
+                        <p>What checks if pod can receive traffic?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="liveness probe">
+                        <p>What checks if container should restart?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="startup probe">
+                        <p>What delays health checks for slow starting containers?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="replicas">
+                        <p>How many pods minimum for high availability?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="anti-affinity">
+                        <p>What spreads pods across nodes?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="network policy">
+                        <p>What restricts pod-to-pod communication?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="rbac">
+                        <p>What controls user permissions?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>poddisruptionbudget</li>
+                                <li>readiness probe</li>
+                                <li>liveness probe</li>
+                                <li>startup probe</li>
+                                <li>replicas</li>
+                                <li>anti-affinity</li>
+                                <li>network policy</li>
+                                <li>rbac</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 11,
+                title: "Security in Kubernetes",
+                difficulty: "advanced",
+                content: `
+                    <h3>Security Overview</h3>
+                    <p>Securing Kubernetes requires defense in depth. Protect your cluster at every layer.</p>
+                    
+                    <h3>RBAC (Role-Based Access Control)</h3>
+                    <p>RBAC controls who can do what in your cluster. Always follow the principle of least privilege.</p>
+                    
+                    <h4>Role vs ClusterRole</h4>
+                    <ul>
+                        <li><strong>Role:</strong> Namespaced permissions</li>
+                        <li><strong>ClusterRole:</strong> Cluster-wide permissions</li>
+                    </ul>
+                    
+                    <pre><span class="output">apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: production
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]</span></pre>
+                    
+                    <h3>Pod Security Standards</h3>
+                    <p>Three security levels: Privileged, Baseline, Restricted</p>
+                    
+                    <h3>Network Policies</h3>
+                    <p>By default, all pods can communicate. Network policies restrict this.</p>
+                    
+                    <pre><span class="output">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-allow
+spec:
+  podSelector:
+    matchLabels:
+      app: api
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: frontend</span></pre>
+                    
+                    <h3>Secrets Management</h3>
+                    <ul>
+                        <li>Never commit secrets to git</li>
+                        <li>Use external secret operators</li>
+                        <li>Enable etcd encryption at rest</li>
+                        <li>Rotate secrets regularly</li>
+                    </ul>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="rbac">
+                        <p>What controls user permissions in Kubernetes?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="rolebinding">
+                        <p>What binds a Role to a user?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="networkpolicy">
+                        <p>What restricts pod-to-pod communication?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="restricted">
+                        <p>Which Pod Security Standard is most secure?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="secret">
+                        <p>What Kubernetes object stores sensitive data?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="external secrets operator">
+                        <p>What syncs secrets from cloud vaults?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="least privilege">
+                        <p>What security principle grants minimum permissions?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="read only root filesystem">
+                        <p>What prevents container filesystem modifications?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>rbac</li>
+                                <li>rolebinding</li>
+                                <li>networkpolicy</li>
+                                <li>restricted</li>
+                                <li>secret</li>
+                                <li>external secrets operator</li>
+                                <li>least privilege</li>
+                                <li>read only root filesystem</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 12,
+                title: "CI/CD with Kubernetes",
+                difficulty: "advanced",
+                content: `
+                    <h3>CI/CD Overview</h3>
+                    <p>Continuous Integration and Continuous Deployment automate building, testing, and deploying applications.</p>
+                    
+                    <h3>GitOps</h3>
+                    <p>Git as the single source of truth. Pull-based reconcilation instead of push.</p>
+                    
+                    <h3>ArgoCD</h3>
+                    <p>Most popular GitOps tool for Kubernetes.</p>
+                    
+                    <pre><span class="output">apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/myorg/myapp.git
+    targetRevision: HEAD
+    path: k8s/overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true</span></pre>
+                    
+                    <h3>Jenkins on Kubernetes</h3>
+                    <p>Scalable CI with Jenkins agents running as pods.</p>
+                    
+                    <h3>Deployment Strategies</h3>
+                    <ul>
+                        <li><strong>Blue/Green:</strong> Two identical environments</li>
+                        <li><strong>Canary:</strong> Route small % traffic first</li>
+                        <li><strong>Feature Flags:</strong> Enable for specific users</li>
+                    </ul>
+                    
+                    <h3>Image Scanning</h3>
+                    <p>Security scanning with Trivy, Clair, Snyk</p>
+                    
+                    <pre><span class="prompt">$</span> <span class="command">trivy image myapp:latest</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="gitops">
+                        <p>What uses git as single source of truth?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="argocd">
+                        <p>Most popular GitOps tool?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="jenkins">
+                        <p>CI tool running in Kubernetes?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="canary">
+                        <p>Routes small % traffic first?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="image scanning">
+                        <p>Checks for vulnerabilities?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="trivy">
+                        <p>Container image scanner?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="blue green">
+                        <p>Two identical environments?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="flux">
+                        <p>CNCF GitOps alternative?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>gitops</li>
+                                <li>argocd</li>
+                                <li>jenkins</li>
+                                <li>canary</li>
+                                <li>image scanning</li>
+                                <li>trivy</li>
+                                <li>blue green</li>
+                                <li>flux</li>
+                            </ol>
+                        </div>
+                    </details>`
+            }
+        ];
+
+        // =============================================================================
+        // PROGRESS TRACKING SYSTEM
+        // =============================================================================
+        // Uses Set() to track completed lessons (unique values only)
+        // Progress is saved to localStorage for persistence across sessions
+        // The progress bar and lesson cards update in real-time
+        // =============================================================================
+        
+        let completedLessons = new Set();
+
+        // Load saved progress from localStorage when page loads
+        // Parses JSON string back into array and adds to Set
+        function loadProgress() {
+            const saved = localStorage.getItem('kubernetes_progress');
+            if (saved) {
+                JSON.parse(saved).forEach(id => completedLessons.add(id));
+            }
+            updateProgressBar();
+            renderLessons();
+        }
+
+        // Save current Set to localStorage as JSON string
+        // Set is spread into array before stringifying
+        function saveProgress() {
+            localStorage.setItem('kubernetes_progress', JSON.stringify([...completedLessons]));
+        }
+
+        // Calculate completion percentage and update progress bar width
+        // Percentage = (completed / total) * 100
+        function updateProgressBar() {
+            const total = lessons.length;
+            const completed = completedLessons.size;
+            const percentage = (completed / total) * 100;
+            document.getElementById('progressBar').style.width = percentage + '%';
+        }
+
+        // Helper function to strip HTML tags for description preview
+        function stripHtml(html) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        }
+
+        // Render lesson cards dynamically from the lessons array
+        // Each card shows: lesson number, title, description preview, difficulty badge
+        // Cards get 'completed' class if lesson ID exists in completedLessons Set
+        function renderLessons() {
+            const grid = document.getElementById('lessonsGrid');
+            grid.innerHTML = lessons.map(lesson => `
+                <a href="#" class="lesson-card ${completedLessons.has(lesson.id) ? 'completed' : ''}" data-lesson="${lesson.id}">
+                    <div class="lesson-number">LESSON ${lesson.id.toString().padStart(2, '0')}</div>
+                    <h3 class="lesson-title">${lesson.title}</h3>
+                    <p class="lesson-desc">${stripHtml(lesson.content).substring(0, 100)}...</p>
+                    <span class="badge badge-${lesson.difficulty}">${lesson.difficulty.charAt(0).toUpperCase() + lesson.difficulty.slice(1)}</span>
+                </a>
+            `).join('');
+        }
+
+        // Click handler for lesson cards
+        // Prevents default link behavior, finds clicked card, loads lesson content into modal
+        // Lesson is marked complete when viewed
+        document.getElementById('lessonsGrid').addEventListener('click', (e) => {
+            e.preventDefault();
+            const card = e.target.closest('.lesson-card');
+            if (!card) return;
+            
+            const lessonId = parseInt(card.dataset.lesson);
+            const lesson = lessons.find(l => l.id === lessonId);
+            
+            if (lesson) {
+                document.getElementById('modalTitle').textContent = lesson.title;
+                document.getElementById('modalContent').innerHTML = lesson.content;
+                document.getElementById('modalOverlay').classList.add('active');
+                
+                completedLessons.add(lessonId);
+                saveProgress();
+                updateProgressBar();
+                renderLessons();
+                
+                // Setup quiz for this lesson
+            }
+        });
+
+        function checkAnswer(button) {
+            const quizQuestion = button.closest('.quiz-question');
+            const input = quizQuestion.querySelector('.quiz-input');
+            const feedback = quizQuestion.querySelector('.quiz-feedback');
+            const answer = quizQuestion.getAttribute('data-answer').toLowerCase();
+            const userAnswer = input.value.toLowerCase().trim();
+
+            if (userAnswer === answer) {
+                input.classList.add('correct');
+                input.classList.remove('incorrect');
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                feedback.textContent = 'Correct!';
+            } else {
+                input.classList.add('incorrect');
+                input.classList.remove('correct');
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                feedback.textContent = 'Incorrect. Try again!';
+            }
+        }
+
+        // Close modal when X button is clicked
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('modalOverlay').classList.remove('active');
+        });
+
+        // Close modal when clicking outside the modal content (on the overlay)
+        // Allows user to click away to close
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modalOverlay')) {
+                document.getElementById('modalOverlay').classList.remove('active');
+            }
+        });
+
+        // Initialize: load progress and render lessons on page load
+        loadProgress();
+
+    </script>
+
+    <!-- Lesson 1 --><div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Introduction to Kubernetes</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>What is Kubernetes?</h3>
+                    <p>Kubernetes (K8s) is an open-source container orchestration platform that automates deployment, scaling, and management of containerized applications.</p>
+                    
+                    <h3>Kubernetes Architecture</h3>
+                    <ul>
+                        <li><strong>Control Plane (Master):</strong> The brain
+                            <br>API Server, etcd, Scheduler, Controller Manager</li>
+                        <li><strong>Worker Nodes:</strong> The muscle
+                            <br>Kubelet, Kube Proxy, Container Runtime (Docker/Containerd)</li>
+                    </ul>
+                    
+                    <h3>Key Concepts</h3>
+                    <ul>
+                        <li><strong>Pod:</strong> Smallest deployable unit (1+ containers)</li>
+                        <li><strong>Node:</strong> Worker machine (VM or physical)</li>
+                        <li><strong>Cluster:</strong> Collection of nodes + control plane</li>
+                        <li><strong>Service:</strong> Stable endpoint for pods</li>
+                        <li><strong>Deployment:</strong> Manages pod replicas</li>
+                    </ul>
+                    
+                    <h3>Ways to Run Kubernetes</h3>
+                    <ul>
+                        <li><strong>Minikube:</strong> Single-node local cluster</li>
+                        <li><strong>Kind:</strong> Kubernetes IN Docker</li>
+                        <li><strong>Cloud:</strong> EKS, GKE, AKS</li>
+                        <li><strong>Self-hosted:</strong> kubeadm, k3s</li>
+                    </ul>
+                    
+                    <h3>Install kubectl</h3>
+                    <pre><span class="prompt">$</span> <span class="command">curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"</span>
+<span class="prompt">$</span> <span class="command">chmod +x kubectl</span>
+<span class="prompt">$</span> <span class="command">sudo mv kubectl /usr/local/bin/</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="pod">
+                        <p>What is the smallest deployable unit in Kubernetes?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="yaml">
+                        <p>What configuration format does Kubernetes commonly use?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl">
+                        <p>What is the Kubernetes command-line tool called?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="docker">
+                        <p>What container runtime does Kubernetes typically use?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="api server">
+                        <p>Which Kubernetes component validates configurations?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="scheduler">
+                        <p>Which component decides where pods run?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="etcd">
+                        <p>Where does Kubernetes store cluster state?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="controller">
+                        <p>Which component ensures desired state matches actual state?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>pod</li>
+                                <li>yaml</li>
+                                <li>kubectl</li>
+                                <li>docker</li>
+                                <li>api server</li>
+                                <li>scheduler</li>
+                                <li>etcd</li>
+                                <li>controller</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 2 --><div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Pods - The Smallest Unit</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Understanding Pods</h3>
+                    <p>A Pod is the smallest deployable object in Kubernetes. It can contain one or more tightly-coupled containers that share:</p>
+                    <ul>
+                        <li>Network namespace (same IP, ports)</li>
+                        <li>Storage volumes</li>
+                        <li>IPC namespace</li>
+                    </ul>
+                    
+                    <h3>Pod YAML</h3>
+                    <pre><span class="prompt">$</span> <span class="command">cat nginx-pod.yaml</span>
+<span class="output">apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.25
+    ports:
+    - containerPort: 80
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+      requests:
+        memory: "64Mi"
+        cpu: "250m"</span></pre>
+                    
+                    <h3>Managing Pods</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl apply -f nginx-pod.yaml</span>     <span class="comment"># Create pod</span>
+<span class="prompt">$</span> <span class="command">kubectl get pods</span>                    <span class="comment"># List pods</span>
+<span class="prompt">$</span> <span class="command">kubectl get pods -o wide</span>            <span class="comment"># More details</span>
+<span class="prompt">$</span> <span class="command">kubectl describe pod nginx</span>           <span class="comment"># Pod details</span>
+<span class="prompt">$</span> <span class="command">kubectl logs nginx</span>                  <span class="comment"># View logs</span>
+<span class="prompt">$</span> <span class="command">kubectl exec -it nginx -- /bin/sh</span>   <span class="comment"># Shell into pod</span>
+<span class="prompt">$</span> <span class="command">kubectl delete pod nginx</span>            <span class="comment"># Delete pod</span></pre>
+                    
+                    <h3>Multi-Container Pods</h3>
+                    <pre><span class="output">spec:
+  containers:
+  - name: web
+    image: nginx
+  - name: sidecar
+    image: log-collector
+    env:
+    - name: LOG_LEVEL
+      value: "debug"</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="network namespace">
+                        <p>What do containers in a Pod share?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="yaml">
+                        <p>What file format defines a Pod?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl apply">
+                        <p>What command creates resources from a file?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl get pods">
+                        <p>What command lists all pods?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl logs">
+                        <p>What command views container output?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl exec">
+                        <p>What command runs commands in a container?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="resources">
+                        <p>What field defines CPU and memory limits?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="sidecar">
+                        <p>What is a secondary container in a Pod called?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>network namespace</li>
+                                <li>yaml</li>
+                                <li>kubectl apply</li>
+                                <li>kubectl get pods</li>
+                                <li>kubectl logs</li>
+                                <li>kubectl exec</li>
+                                <li>resources</li>
+                                <li>sidecar</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 3 --><div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Deployments and ReplicaSets</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Why Not Just Pods?</h3>
+                    <p>Pods are mortal—they die. Deployments give you:</p>
+                    <ul>
+                        <li><strong>Self-healing:</strong> Automatic pod replacement</li>
+                        <li><strong>Scaling:</strong> Multiple replicas</li>
+                        <li><strong>Rolling updates:</strong> Zero-downtime deployments</li>
+                        <li><strong>Rollback:</strong> Go back to previous version</li>
+                    </ul>
+                    
+                    <h3>Deployment YAML</h3>
+                    <pre><span class="output">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25
+        ports:
+        - containerPort: 80</span></pre>
+                    
+                    <h3>Managing Deployments</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl apply -f deployment.yaml</span>     <span class="comment"># Create deployment</span>
+<span class="prompt">$</span> <span class="command">kubectl get deployments</span>            <span class="comment"># List deployments</span>
+<span class="prompt">$</span> <span class="command">kubectl get rs</span>                      <span class="comment"># List ReplicaSets</span>
+<span class="prompt">$</span> <span class="command">kubectl get pods</span>                    <span class="comment"># Pods managed by deployment</span>
+<span class="prompt">$</span> <span class="command">kubectl scale deployment nginx-deployment --replicas=5</span>  <span class="comment"># Scale</span>
+<span class="prompt">$</span> <span class="command">kubectl set image deployment/nginx-deployment nginx=nginx:1.26</span>  <span class="comment"># Update image</span>
+<span class="prompt">$</span> <span class="command">kubectl rollout status deployment/nginx-deployment</span>  <span class="comment"># Check rollout</span>
+<span class="prompt">$</span> <span class="command">kubectl rollout undo deployment/nginx-deployment</span>  <span class="comment"># Rollback</span></pre>
+                    
+                    <h3>Update Strategies</h3>
+                    <ul>
+                        <li><strong>RollingUpdate (default):</strong> Gradually replace pods</li>
+                        <li><strong>Recreate:</strong> Kill all, then create all (downtime)</li>
+                    </ul>
+                    
+                    <pre><span class="output">spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="kubectl set image">
+                        <p>Which command updates the image in a deployment?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="replicas">
+                        <p>What field specifies number of pods?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="replicaset">
+                        <p>What ensures a specific number of pods running?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="deployment">
+                        <p>What manages ReplicaSets?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="rolling update">
+                        <p>What is the default update strategy?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="rollback">
+                        <p>What command reverts to previous version?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="scale">
+                        <p>What changes the number of replicas?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl rollout">
+                        <p>What manages deployment revisions?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>kubectl set image</li>
+                                <li>replicas</li>
+                                <li>replicaset</li>
+                                <li>deployment</li>
+                                <li>rolling update</li>
+                                <li>rollback</li>
+                                <li>scale</li>
+                                <li>kubectl rollout</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 4 --><div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Services - Stable Networking</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>The Service Problem</h3>
+                    <p>Pods are ephemeral—their IPs change. Services provide stable endpoints.</p>
+                    
+                    <h3>Service Types</h3>
+                    <ul>
+                        <li><strong>ClusterIP (default):</strong> Internal cluster IP</li>
+                        <li><strong>NodePort:</strong> Expose on each node's IP</li>
+                        <li><strong>LoadBalancer:</strong> External load balancer</li>
+                        <li><strong>ExternalName:</strong> DNS CNAME alias</li>
+                    </ul>
+                    
+                    <h3>ClusterIP Service</h3>
+                    <pre><span class="output">apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP</span></pre>
+                    
+                    <h3>NodePort Service</h3>
+                    <pre><span class="output">apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-nodeport
+spec:
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080
+  type: NodePort</span></pre>
+                    
+                    <h3>Managing Services</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl get services</span>              <span class="comment"># List services</span>
+<span class="prompt">$</span> <span class="command">kubectl get svc</span>                  <span class="comment"># Short form</span>
+<span class="prompt">$</span> <span class="command">kubectl describe svc nginx-service</span>  <span class="comment"># Service details</span>
+<span class="prompt">$</span> <span class="command">kubectl get endpoints</span>            <span class="comment"># Pod IPs backing service</span></pre>
+                    
+                    <h3>Headless Services</h3>
+                    <p>For StatefulSets or when you need direct pod access:</p>
+                    <pre><span class="output">spec:
+  clusterIP: None
+  selector:
+    app: myapp
+  ports:
+  - port: 80</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="nodeport">
+                        <p>What Service type exposes a service on each node's IP?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="clusterip">
+                        <p>What is the default Service type?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="loadbalancer">
+                        <p>What Service type works with cloud load balancers?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="selector">
+                        <p>What field ties a Service to pods?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="targetport">
+                        <p>What port does traffic go to on the pod?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="headless">
+                        <p>What Service has no cluster IP?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="dns">
+                        <p>Services are discovered via what?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="externalname">
+                        <p>What Service type maps to external DNS?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>nodeport</li>
+                                <li>clusterip</li>
+                                <li>loadbalancer</li>
+                                <li>selector</li>
+                                <li>targetport</li>
+                                <li>headless</li>
+                                <li>dns</li>
+                                <li>externalname</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 5 --><div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// ConfigMaps and Secrets</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Configuration in Kubernetes</h3>
+                    <p>Separate config from code using ConfigMaps and Secrets.</p>
+                    
+                    <h3>ConfigMap - Non-Sensitive Config</h3>
+                    <pre><span class="comment"># From literal values</span>
+<span class="prompt">$</span> <span class="command">kubectl create configmap app-config --from-literal=ENV=production --from-literal=LOG_LEVEL=debug</span>
+
+<span class="comment"># From file</span>
+<span class="prompt">$</span> <span class="command">kubectl create configmap nginx-config --from-file=nginx.conf</span>
+
+<span class="comment"># From env file</span>
+<span class="prompt">$</span> <span class="command">kubectl create configmap app-env --from-env-file=.env</span></pre>
+                    
+                    <h3>ConfigMap YAML</h3>
+                    <pre><span class="output">apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  DATABASE_URL: "postgres://db:5432/app"
+  CACHE_TTL: "3600"
+  config.json: |
+    {
+      "logLevel": "debug",
+      "features": {
+        "featureA": true,
+        "featureB": false
+      }
+    }</span>
+                    
+                    <h3>Using ConfigMaps in Pods</h3>
+                    <pre><span class="output">spec:
+  containers:
+  - name: app
+    image: myapp:latest
+    env:
+    - name: DATABASE_URL
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: DATABASE_URL
+    volumeMounts:
+    - name: config
+      mountPath: /etc/config
+  volumes:
+  - name: config
+    configMap:
+      name: app-config</span></pre>
+                    
+                    <h3>Secrets - Sensitive Data</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl create secret generic db-credentials --from-literal=username=admin --from-literal=password=secret123</span>
+<span class="prompt">$</span> <span class="command">kubectl create secret tls my-tls --cert=cert.crt --key=cert.key</span></pre>
+                    
+                    <h3>Secret YAML (base64 encoded)</h3>
+                    <pre><span class="output">apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+data:
+  username: YWRtaW4=
+  password: c2VjcmV0MTIz</span></pre>
+                    
+                    <h3>Using Secrets</h3>
+                    <pre><span class="output">env:
+- name: DB_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: db-credentials
+      key: password</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="secret">
+                        <p>Which Kubernetes object should store database passwords?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="configmap">
+                        <p>What stores non-sensitive configuration?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="environment variables">
+                        <p>How can ConfigMap data be passed to pods?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="volumes">
+                        <p>How else can ConfigMap data be mounted?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="base64">
+                        <p>Secret values are stored in what encoding?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="immutable">
+                        <p>What prevents ConfigMap changes from propagating?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="kubectl create configmap">
+                        <p>What creates a ConfigMap from CLI?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="envfrom">
+                        <p>What imports all configmap values as env vars?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>secret</li>
+                                <li>configmap</li>
+                                <li>environment variables</li>
+                                <li>volumes</li>
+                                <li>base64</li>
+                                <li>immutable</li>
+                                <li>kubectl create configmap</li>
+                                <li>envfrom</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 6 --><div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Ingress - HTTP Routing</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>What is Ingress?</h3>
+                    <p>Ingress exposes HTTP/HTTPS routes from outside the cluster to services. It's the K8s way to do what nginx/apache do in traditional setups.</p>
+                    
+                    <h3>Install Ingress Controller</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.9.4/deploy/static/provider/cloud/deploy.yaml</span></pre>
+                    
+                    <h3>Ingress Resource</h3>
+                    <pre><span class="output">apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: myapp.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: myapp-service
+            port:
+              number: 80</span></pre>
+                    
+                    <h3>Multiple Paths</h3>
+                    <pre><span class="output">spec:
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 8080
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-service
+            port:
+              number: 80</span></pre>
+                    
+                    <h3>TLS/HTTPS</h3>
+                    <pre><span class="output">spec:
+  tls:
+  - hosts:
+    - example.com
+    secretName: my-tls-secret
+  rules:
+  - host: example.com
+    ...</span></pre>
+                    
+                    <h3>Managing Ingress</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl get ingress</span>                  <span class="comment"># List ingresses</span>
+<span class="prompt">$</span> <span class="command">kubectl describe ingress my-ingress</span>    <span class="comment"># Details</span>
+<span class="prompt">$</span> <span class="command">kubectl delete ingress my-ingress</span>     <span class="comment"># Delete</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="ingress controller">
+                        <p>What do you need to create first before using Ingress resources?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="http">
+                        <p>What protocol does Ingress route?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="host">
+                        <p>What field routes by domain name?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="path">
+                        <p>What routes different URLs?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="nginx">
+                        <p>What is a common Ingress controller?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="tls">
+                        <p>What enables HTTPS in Ingress?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="secretname">
+                        <p>What references the TLS certificate?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="annotations">
+                        <p>What adds controller-specific config?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>ingress controller</li>
+                                <li>http</li>
+                                <li>host</li>
+                                <li>path</li>
+                                <li>nginx</li>
+                                <li>tls</li>
+                                <li>secretname</li>
+                                <li>annotations</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 7 --><div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Persistent Storage</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>The Storage Problem</h3>
+                    <p>Containers are ephemeral—data is lost when they restart. PersistentVolumes provide durable storage.</p>
+                    
+                    <h3>PersistentVolume (PV)</h3>
+                    <p>Cluster-wide storage resource:</p>
+                    <pre><span class="output">apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv
+spec:
+  capacity:
+    storage: 10Gi
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data</span></pre>
+                    
+                    <h3>PersistentVolumeClaim (PVC)</h3>
+                    <p>Request for storage:</p>
+                    <pre><span class="output">apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard</span></pre>
+                    
+                    <h3>Using PVC in Pod</h3>
+                    <pre><span class="output">spec:
+  containers:
+  - name: app
+    image: myapp
+    volumeMounts:
+    - name: data
+      mountPath: /var/data
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: my-pvc</span></pre>
+                    
+                    <h3>Storage Classes</h3>
+                    <pre><span class="prompt">$</span> <span class="command">kubectl get storageclass</span>          <span class="comment"># List storage classes</span>
+<span class="output">NAME                 PROVISIONER            RECLAIMPOLICY</span>
+<span class="output">standard             kubernetes.io/gce-pd   Delete</span>
+<span class="output">fast                pd-ssd                Delete</span></pre>
+                    
+                    <h3>Cloud Storage Examples</h3>
+                    <pre><span class="output"># AWS EBS
+spec:
+  storageClassName: gp3
+  awsElasticBlockStore:
+    volumeID: vol-12345
+
+# GCE PD
+spec:
+  storageClassName: standard
+  gcePersistentDisk:
+    pdName: my-disk</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="pvc requests storage from pv">
+                        <p>What is the relationship between PVC and PV?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="persistentvolume">
+                        <p>What represents cluster storage?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="persistentvolumeclaim">
+                        <p>What requests storage from PV?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="readwritonce">
+                        <p>What access mode allows single node mount?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="storageclass">
+                        <p>What provisions PVs dynamically?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="hostpath">
+                        <p>What is a node-based storage type?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="reclaim policy">
+                        <p>What determines PV handling on PVC deletion?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="mountpath">
+                        <p>What field specifies where to mount in container?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>pvc requests storage from pv</li>
+                                <li>persistentvolume</li>
+                                <li>persistentvolumeclaim</li>
+                                <li>readwritonce</li>
+                                <li>storageclass</li>
+                                <li>hostpath</li>
+                                <li>reclaim policy</li>
+                                <li>mountpath</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 8 --><div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Resource Limits and Quality of Service</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Why Resource Limits?</h3>
+                    <ul>
+                        <li>Prevent one app from consuming all resources</li>
+                        <li>Enable scheduling decisions</li>
+                        <li>Define QoS classes for pod eviction priority</li>
+                    </ul>
+                    
+                    <h3>Resource Requests vs Limits</h3>
+                    <ul>
+                        <li><strong>Requests:</strong> Minimum guaranteed (scheduler uses this)</li>
+                        <li><strong>Limits:</strong> Maximum allowed (cgroup enforces this)</li>
+                    </ul>
+                    
+                    <pre><span class="output">spec:
+  containers:
+  - name: app
+    image: myapp
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "250m"
+      limits:
+        memory: "256Mi"
+        cpu: "500m"</span></pre>
+                    
+                    <h3>QoS Classes</h3>
+                    <ul>
+                        <li><strong>Guaranteed:</strong> Requests = Limits for all containers</li>
+                        <li><strong>Burstable:</strong> Requests < Limits, or not guaranteed</li>
+                        <li><strong>BestEffort:</strong> No requests defined</li>
+                    </ul>
+                    
+                    <h3>Guaranteed QoS Example</h3>
+                    <pre><span class="output">spec:
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "250m"
+      limits:
+        memory: "128Mi"
+        cpu: "250m"</span></pre>
+                    
+                    <h3>LimitRanges</h3>
+                    <p>Set defaults and limits for namespaces:</p>
+                    <pre><span class="output">apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-limits
+spec:
+  limits:
+  - default:
+      memory: "256Mi"
+      cpu: "500m"
+    defaultRequest:
+      memory: "128Mi"
+      cpu: "250m"
+    type: Container</span></pre>
+                    
+                    <h3>ResourceQuotas</h3>
+                    <p>Limit total resources per namespace:</p>
+                    <pre><span class="output">apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: my-quota
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: "8Gi"
+    limits.cpu: "8"
+    limits.memory: "16Gi"
+    pods: "20"</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="requests">
+                        <p>What does the scheduler use to decide where to place a pod?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="limits">
+                        <p>What caps maximum resource usage?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="guaranteed">
+                        <p>What QoS class has guaranteed resources?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="besteffort">
+                        <p>What QoS class has no requests or limits?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="burstable">
+                        <p>What QoS class is the default?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="limitrange">
+                        <p>What sets default resources for namespace?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="resourcequota">
+                        <p>What limits total resources per namespace?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="cpu">
+                        <p>What is measured in millicores?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>requests</li>
+                                <li>limits</li>
+                                <li>guaranteed</li>
+                                <li>besteffort</li>
+                                <li>burstable</li>
+                                <li>limitrange</li>
+                                <li>resourcequota</li>
+                                <li>cpu</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 9 --><div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Helm - Package Manager</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>What is Helm?</h3>
+                    <p>Helm is the package manager for Kubernetes. It bundles K8s manifests into "charts" that are versioned, configurable, and reusable.</p>
+                    
+                    <h3>Installing Helm</h3>
+                    <pre><span class="prompt">$</span> <span class="command">curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash</span></pre>
+                    
+                    <h3>Helm Concepts</h3>
+                    <ul>
+                        <li><strong>Chart:</strong> Package of K8s manifests</li>
+                        <li><strong>Repository:</strong> Collection of charts</li>
+                        <li><strong>Release:</strong> Deployed instance of a chart</li>
+                        <li><strong>Values:</strong> Configuration overrides</li>
+                    </ul>
+                    
+                    <h3>Using Charts</h3>
+                    <pre><span class="prompt">$</span> <span class="command">helm repo add bitnami https://charts.bitnami.com/bitnami</span>  <span class="comment"># Add repo</span>
+<span class="prompt">$</span> <span class="command">helm repo update</span>                                        <span class="comment"># Update</span>
+<span class="prompt">$</span> <span class="command">helm search repo nginx</span>                                  <span class="comment"># Search</span>
+<span class="prompt">$</span> <span class="command">helm install my-nginx bitnami/nginx</span>                    <span class="comment"># Install</span>
+<span class="prompt">$</span> <span class="command">helm list</span>                                                 <span class="comment"># List releases</span>
+<span class="prompt">$</span> <span class="command">helm upgrade my-nginx bitnami/nginx</span>                    <span class="comment"># Upgrade</span>
+<span class="prompt">$</span> <span class="command">helm rollback my-nginx 1</span>                               <span class="comment"># Rollback</span>
+<span class="prompt">$</span> <span class="command">helm uninstall my-nginx</span>                                  <span class="comment"># Uninstall</span></pre>
+                    
+                    <h3>Custom Values</h3>
+                    <pre><span class="prompt">$</span> <span class="command">helm install my-app bitnami/wordpress --set mariadb.db.password=secret</span>
+<span class="prompt">$</span> <span class="command">helm install my-app bitnami/wordpress -f values.yaml</span></pre>
+                    
+                    <h3>values.yaml Example</h3>
+                    <pre><span class="output">replicaCount: 3
+
+image:
+  repository: myapp
+  tag: v1.0
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  hostname: myapp.example.com
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi</span></pre>
+                    
+                    <h3>Create Your Own Chart</h3>
+                    <pre><span class="prompt">$</span> <span class="command">helm create mychart</span>
+<span class="prompt">$</span> <span class="command">ls mychart/</span>
+<span class="output">Chart.yaml  charts/  templates/  values.yaml</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="a deployed instance of a chart">
+                        <p>What is a Helm Release?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="chart">
+                        <p>What is a Helm package called?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="values.yaml">
+                        <p>What file contains default config?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="templates">
+                        <p>What directory holds Kubernetes manifests?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="helm install">
+                        <p>What deploys a chart?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="helm upgrade">
+                        <p>What updates a release?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="helm rollback">
+                        <p>What reverts to previous version?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="helm repo">
+                        <p>What manages chart repositories?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>a deployed instance of a chart</li>
+                                <li>chart</li>
+                                <li>values.yaml</li>
+                                <li>templates</li>
+                                <li>helm install</li>
+                                <li>helm upgrade</li>
+                                <li>helm rollback</li>
+                                <li>helm repo</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 10 --><div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Production Best Practices</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Ready for Production?</h3>
+                    <p>Running K8s in production requires attention to:</p>
+                    
+                    <h3>Security</h3>
+                    <ul>
+                        <li><strong>RBAC:</strong> Use Role/RoleBinding, not ClusterRole unless needed</li>
+                        <li><strong>Network Policies:</strong> Limit pod-to-pod communication</li>
+                        <li><strong>Pod Security:</strong> Use Pod Security Standards</li>
+                        <li><strong>Secrets:</strong> Use external secrets operators</li>
+                    </ul>
+                    
+                    <h3>Network Policy Example</h3>
+                    <pre><span class="output">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress</span></pre>
+                    
+                    <h3>High Availability</h3>
+                    <ul>
+                        <li><strong>Multiple Replicas:</strong> Spread across nodes</li>
+                        <li><strong>Pod Disruption Budgets:</strong> Ensure min available during updates</li>
+                        <li><strong>Anti-affinity:</strong> Spread pods across nodes/zones</li>
+                    </ul>
+                    
+                    <pre><span class="output">apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: myapp-pdb
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: myapp</span></pre>
+                    
+                    <h3>Observability</h3>
+                    <ul>
+                        <li><strong>Logging:</strong> Aggregate logs (Loki, ELK)</li>
+                        <li><strong>Metrics:</strong> Prometheus + Grafana</li>
+                        <li><strong>Tracing:</strong> Jaeger or Tempo</li>
+                        <li><strong>Health Checks:</strong> Liveness, readiness probes</li>
+                    </ul>
+                    
+                    <h3>Health Checks</h3>
+                    <pre><span class="output">spec:
+  containers:
+  - name: app
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 5</span></pre>
+                    
+                    <h3>CI/CD with Kubernetes</h3>
+                    <ul>
+                        <li><strong>GitOps:</strong> ArgoCD or Flux</li>
+                        <li><strong>Image Scanning:</strong> Trivy, Clair</li>
+                        <li><strong>Image Updates:</strong> Renovate, Dependabot</li>
+                    </ul>
+                    
+                    <h3>Next Steps</h3>
+                    <ul>
+                        <li><strong>Service Mesh:</strong> Istio, Linkerd</li>
+                        <li><strong>GitOps:</strong> ArgoCD, Flux</li>
+                        <li><strong>Multi-cluster:</strong> Federation, Karmada</li>
+                        <li><strong>Serverless:</strong> Knative</li>
+                    </ul>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="poddisruptionbudget">
+                        <p>What ensures a minimum number of pods during voluntary disruptions?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="readiness probe">
+                        <p>What checks if pod can receive traffic?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="liveness probe">
+                        <p>What checks if container should restart?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="startup probe">
+                        <p>What delays health checks for slow starting containers?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="replicas">
+                        <p>How many pods minimum for high availability?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="anti-affinity">
+                        <p>What spreads pods across nodes?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="network policy">
+                        <p>What restricts pod-to-pod communication?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="rbac">
+                        <p>What controls user permissions?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>poddisruptionbudget</li>
+                                <li>readiness probe</li>
+                                <li>liveness probe</li>
+                                <li>startup probe</li>
+                                <li>replicas</li>
+                                <li>anti-affinity</li>
+                                <li>network policy</li>
+                                <li>rbac</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 11 --><div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Security in Kubernetes</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Security Overview</h3>
+                <p>Securing Kubernetes requires defense in depth. Protect your cluster at every layer—from infrastructure to workloads.</p>
+                
+                <div class="highlight-box">
+                    <strong>Security Principle:</strong> Assume breach. Design your cluster so that even if one component is compromised, the damage is contained.
+                </div>
+                
+                <h3>RBAC (Role-Based Access Control)</h3>
+                <p>RBAC controls who can do what in your cluster. Always follow the principle of least privilege.</p>
+                
+                <h4>Role vs ClusterRole</h4>
+                <ul>
+                    <li><strong>Role:</strong> Namespaced permissions</li>
+                    <li><strong>ClusterRole:</strong> Cluster-wide permissions</li>
+                </ul>
+                
+                <pre><span class="output">apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: production
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]</span></pre>
+                
+                <pre><span class="output">apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: production
+subjects:
+- kind: User
+  name: jane
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io</span></pre>
+                
+                <h3>Pod Security Standards</h3>
+                <p>Pod Security Standards define security policies at three levels:</p>
+                <ul>
+                    <li><strong>Privileged:</strong> Unrestricted, maximum permissions</li>
+                    <li><strong>Baseline:</strong> Prevents known privilege escalations</li>
+                    <li><strong>Restricted:</strong> Best practices, hardened security</li>
+                </ul>
+                
+                <pre><span class="output">apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-pod
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: app
+    image: myapp:latest
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+        - ALL</span></pre>
+                
+                <h3>Network Policies</h3>
+                <p>By default, all pods can communicate. Network policies restrict this.</p>
+                
+                <pre><span class="output">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-allow
+spec:
+  podSelector:
+    matchLabels:
+      app: api
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: frontend
+    ports:
+    - protocol: TCP
+      port: 8080</span></pre>
+                
+                <h3>Default Deny All Traffic</h3>
+                <pre><span class="output">apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress</span></pre>
+                
+                <h3>Secrets Management Best Practices</h3>
+                <ul>
+                    <li><strong>Never commit secrets to git</strong> - Use external secret operators</li>
+                    <li><strong>Use encryption at rest</strong> - Enable etcd encryption</li>
+                    <li><strong>Rotate secrets regularly</strong> - Automate with operators</li>
+                    <li><strong>Limit secret access</strong> - RBAC on secrets</li>
+                </ul>
+                
+                <pre><span class="prompt">$</span> <span class="command">kubectl create secret generic db-creds --from-literal=password=$(openssl rand -base64 32)</span></pre>
+                
+                <h3>External Secrets Operators</h3>
+                <ul>
+                    <li><strong>External Secrets Operator:</strong> Sync secrets from AWS/GCP/Azure vaults</li>
+                    <li><strong>Sealed Secrets:</strong> Encrypt secrets for git storage</li>
+                    <li><strong>Vault by HashiCorp:</strong> Enterprise secret management</li>
+                </ul>
+                
+                <h3>Pod Security Admission</h3>
+                <p>Built-in alternative to PodSecurityPolicy (deprecated):</p>
+                <pre><span class="output">apiVersion: v1
+kind: Namespace
+metadata:
+  name: restricted-ns
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest</span></pre>
+                
+                <h3>Security Checklist</h3>
+                <ul>
+                    <li>Enable audit logging</li>
+                    <li>Use TLS everywhere</li>
+                    <li>Regular vulnerability scanning (Trivy, Snyk)</li>
+                    <li>Network segmentation with policies</li>
+                    <li>Restrict container capabilities</li>
+                    <li>Use read-only root filesystems</li>
+                </ul>
+                
+                <div class="highlight-box">
+                    <strong>Pro Tip:</strong> Run <code>kube-bench</code> to check your cluster against CIS Kubernetes Benchmark.
+                </div>
+                
+                <h3>Quiz</h3>
+                <div class="quiz-question" data-answer="rbac">
+                    <p>What controls user permissions in Kubernetes?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="rolebinding">
+                    <p>What binds a Role to a user or service account?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="networkpolicy">
+                    <p>What resource restricts pod-to-pod communication?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="restricted">
+                    <p>Which Pod Security Standard is the most secure?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="secret">
+                    <p>What Kubernetes object stores sensitive data?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="external secrets operator">
+                    <p>What syncs secrets from cloud vaults to Kubernetes?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="least privilege">
+                    <p>What security principle grants minimum necessary permissions?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="read only root filesystem">
+                    <p>What security setting prevents container filesystem modifications?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                
+                <details class="quiz-answers-reveal">
+                    <summary class="reveal-answers-link">Show All Answers</summary>
+                    <div class="quiz-answers-display">
+                        <h4>Answers</h4>
+                        <ol>
+                            <li>rbac</li>
+                            <li>rolebinding</li>
+                            <li>networkpolicy</li>
+                            <li>restricted</li>
+                            <li>secret</li>
+                            <li>external secrets operator</li>
+                            <li>least privilege</li>
+                            <li>read only root filesystem</li>
+                        </ol>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+    <!-- Lesson 12 --><div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// CI/CD with Kubernetes</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>CI/CD Overview</h3>
+                <p>Continuous Integration and Continuous Deployment (CI/CD) automates building, testing, and deploying applications to Kubernetes.</p>
+                
+                <div class="highlight-box">
+                    <strong>CI/CD Pipeline:</strong> Code commit → Build image → Run tests → Scan image → Deploy to staging → Deploy to production
+                </div>
+                
+                <h3>Traditional CI/CD vs GitOps</h3>
+                <table>
+                    <tr>
+                        <th>Traditional</th>
+                        <th>GitOps</th>
+                    </tr>
+                    <tr>
+                        <td>Push-based deployments</td>
+                        <td>Pull-based reconcilation</td>
+                    </tr>
+                    <tr>
+                        <td>CI tool pushes to cluster</td>
+                        <td>Git is single source of truth</td>
+                    </tr>
+                    <tr>
+                        <td>Harder to audit</td>
+                        <td>Full audit trail in git</td>
+                    </tr>
+                    <tr>
+                        <td>Can drift from config</td>
+                        <td>Automatic drift correction</td>
+                    </tr>
+                </table>
+                
+                <h3>GitOps with ArgoCD</h3>
+                <p>ArgoCD is the most popular GitOps tool for Kubernetes. It watches a git repo and ensures the cluster matches.</p>
+                
+                <pre><span class="prompt">$</span> <span class="command">kubectl create namespace argocd</span>
+<span class="prompt">$</span> <span class="command">kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml</span></pre>
+                
+                <h3>ArgoCD Application</h3>
+                <pre><span class="output">apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/myorg/myapp.git
+    targetRevision: HEAD
+    path: k8s/overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true</span></pre>
+                
+                <h3>Jenkins on Kubernetes</h3>
+                <p>Running Jenkins inside your cluster gives you scalable build agents.</p>
+                
+                <pre><span class="output">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+      - name: jenkins
+        image: jenkins/jenkins:lts
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: jenkins-home
+          mountPath: /var/jenkins_home
+      volumes:
+      - name: jenkins-home
+        persistentVolumeClaim:
+          claimName: jenkins-pvc</span></pre>
+                
+                <h3>Jenkins Pipeline for K8s</h3>
+                <pre><span class="output">pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                sh 'docker build -t myapp:${BUILD_NUMBER} .'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'docker run myapp:${BUILD_NUMBER} npm test'
+            }
+        }
+        stage('Push') {
+            steps {
+                sh 'docker push myapp:${BUILD_NUMBER}'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'kubectl set image deployment/myapp myapp=myapp:${BUILD_NUMBER}'
+            }
+        }
+    }
+}</span></pre>
+                
+                <h3>Automated Deployments</h3>
+                <p>Techniques for automated deployments:</p>
+                <ul>
+                    <li><strong>Image Updater:</strong> Automatically update images when new tags pushed</li>
+                    <li><strong>Webhook Triggers:</strong> Git webhooks trigger deployments</li>
+                    <li><strong>Polling:</strong> Check for new images periodically</li>
+                </ul>
+                
+                <h3>ArgoCD Image Updater</h3>
+                <pre><span class="output">apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: myapp=myregistry/myapp
+    argocd-image-updater.argoproj.io/myapp.update-strategy: semver</span></pre>
+                
+                <h3>Progressive Delivery</h3>
+                <ul>
+                    <li><strong>Blue/Green:</strong> Two environments, instant switch</li>
+                    <li><strong>Canary:</strong> Route small % traffic to new version</li>
+                    <li><strong>Feature Flags:</strong> Enable features for specific users</li>
+                </ul>
+                
+                <pre><span class="output">apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata:
+  name: myapp
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: myapp
+  service:
+    port: 80
+  analysis:
+    interval: 30s
+    threshold: 5
+    maxWeight: 50
+    stepWeight: 10</span></pre>
+                
+                <h3>Security in CI/CD</h3>
+                <ul>
+                    <li><strong>Image Scanning:</strong> Trivy, Clair, Snyk</li>
+                    <li><strong>Policy Enforcement:</strong> OPA, Kyverno</li>
+                    <li><strong>RBAC for CI:</strong> Service accounts with minimal permissions</li>
+                    <li><strong>Secrets in CI:</strong> Use external vaults, never hardcode</li>
+                </ul>
+                
+                <pre><span class="prompt">$</span> <span class="command">trivy image myapp:latest</span></pre>
+                
+                <h3>CI/CD Tools Comparison</h3>
+                <ul>
+                    <li><strong>ArgoCD:</strong> GitOps, Kubernetes-native, UI included</li>
+                    <li><strong>Flux:</strong> GitOps, CNCF graduated, GitOps Toolkit</li>
+                    <li><strong>Jenkins:</strong> Traditional CI, flexible, plugin ecosystem</li>
+                    <li><strong>GitLab CI:</strong> Integrated with Git, good for monorepos</li>
+                    <li><strong>GitHub Actions:</strong> Native GitHub integration, simple</li>
+                </ul>
+                
+                <div class="highlight-box">
+                    <strong>Best Practice:</strong> Use GitOps for production deployments. Your git repo becomes the audit trail and single source of truth.
+                </div>
+                
+                <h3>Quiz</h3>
+                <div class="quiz-question" data-answer="gitops">
+                    <p>What methodology uses git as the single source of truth for deployments?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="argocd">
+                    <p>What is the most popular GitOps tool for Kubernetes?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="jenkins">
+                    <p>What CI tool can run inside Kubernetes with scalable agents?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="canary">
+                    <p>What deployment strategy routes small percentage of traffic first?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="image scanning">
+                    <p>What security practice checks for vulnerabilities in container images?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="trivy">
+                    <p>What tool scans container images for vulnerabilities?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="blue green">
+                    <p>What deployment strategy maintains two identical environments?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                <div class="quiz-question" data-answer="flux">
+                    <p>What is the CNCF-graduated GitOps alternative to ArgoCD?</p>
+                    <input type="text" class="quiz-input" placeholder="Type your answer...">
+                    <button class="quiz-submit">Check</button>
+                    <p class="quiz-feedback"></p>
+                </div>
+                
+                <details class="quiz-answers-reveal">
+                    <summary class="reveal-answers-link">Show All Answers</summary>
+                    <div class="quiz-answers-display">
+                        <h4>Answers</h4>
+                        <ol>
+                            <li>gitops</li>
+                            <li>argocd</li>
+                            <li>jenkins</li>
+                            <li>canary</li>
+                            <li>image scanning</li>
+                            <li>trivy</li>
+                            <li>blue green</li>
+                            <li>flux</li>
+                        </ol>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+</body>
+</html>

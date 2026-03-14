@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CI/CD: Automating Your Path to Production - REBEL WITH LINUX</title>
+    <meta name="description" content="Learn the fundamentals of Continuous Integration and Continuous Deployment, and how to automate your software delivery pipeline.">
+    <meta name="keywords" content="CI/CD, Continuous Integration, Continuous Deployment, DevOps, automation, pipelines, GitHub Actions, GitLab CI, Jenkins">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="CI/CD: Automating Your Path to Production">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-cicd.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-cicd.html">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+
+    <style>
+        .blog-header {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 32px 60px;
+            text-align: center;
+        }
+        .blog-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .blog-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--gray);
+        }
+        .blog-nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 16px;
+            border-bottom: 2px solid var(--black);
+            background: var(--white);
+        }
+        .blog-nav a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--black);
+            text-decoration: none;
+        }
+        .blog-nav a:hover {
+            text-decoration: underline;
+        }
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+        .blog-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 16px;
+        }
+        .blog-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+        .blog-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        .blog-content p {
+            margin-bottom: 24px;
+        }
+        .blog-content h2 {
+            font-size: 1.5rem;
+            margin: 40px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--black);
+        }
+        .blog-content h3 {
+            font-size: 1.2rem;
+            margin: 32px 0 12px;
+        }
+        .blog-content ul, .blog-content ol {
+            margin-bottom: 24px;
+            padding-left: 24px;
+        }
+        .blog-content li {
+            margin-bottom: 8px;
+        }
+        .blog-content blockquote {
+            border-left: 4px solid var(--black);
+            padding-left: 20px;
+            margin: 24px 0;
+            font-style: italic;
+            color: var(--gray);
+        }
+        .blog-content code {
+            background: var(--beige);
+            padding: 2px 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95rem;
+        }
+        .blog-content pre {
+            background: var(--black);
+            color: var(--ivory);
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            border: 3px solid var(--black);
+        }
+        .blog-content pre code {
+            background: transparent;
+            padding: 0;
+            color: var(--ivory);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: var(--black);
+            text-decoration: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        footer {
+            padding: 48px 32px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#distros">DISTRO</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#projects">PROJECTS</a>
+                    <a href="../index.html#resources">RESOURCES</a>
+                    <a href="../index.html#references">REFERENCES</a>
+                    <a href="../index.html#scripts">SCRIPTS</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#contact">CONTACT</a>
+                    <a href="../index.html#stats">STATS</a>
+                    <a href="#" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="blog-header">
+        <h1>// THE REBEL BLOG</h1>
+        <p>Thoughts on free software, privacy, and taking back control</p>
+    </header>
+
+    <nav class="blog-nav">
+        <a href="../index.html#blog">← Back to Blog</a>
+    </nav>
+
+    <main class="blog-container" id="main-content">
+        <article>
+            <div class="blog-meta">
+                <span>2026-03-14</span> • <span>10 min read</span> • <span>DevOps</span>
+            </div>
+            <h1 class="blog-title">CI/CD: Automating Your Path to Production</h1>
+
+            <div class="blog-content">
+                <p>Once upon a time, shipping software meant burning CDs, mailing them to customers, and hoping nothing broke. Then came the internet. Then came updates. Then came the realization that manually deploying code was a one-way ticket to burnout city.</p>
+
+                <p>Enter CI/CD: Continuous Integration and Continuous Deployment (or Continuous Delivery). It's the practice of automating the building, testing, and releasing of software. And if you're not using it, you're working harder than you need to.</p>
+
+                <h2>What Is CI/CD?</h2>
+
+                <p><strong>Continuous Integration (CI)</strong></p>
+                <p>Developers merge their code changes into a shared repository frequently—ideally multiple times per day. Each merge triggers automated builds and tests, catching bugs early before they become problems.</p>
+
+                <p><strong>Continuous Delivery (CD)</strong></p>
+                <p>Code changes are automatically prepared for release to production. After passing tests, the code is ready to deploy at any moment. A human still presses the button (or approves the deployment).</p>
+
+                <p><strong>Continuous Deployment</strong></p>
+                <p>Going one step further: every change that passes tests is automatically deployed to production. No human intervention. Push to main, and minutes later it's live.</p>
+
+                <h2>Why CI/CD Matters</h2>
+
+                <p><strong>Faster Releases</strong></p>
+                <p>Manual deployments take time. CI/CD automates the repetitive parts, letting you ship multiple times per day instead of once per month. Netflix deploys thousands of times per day. You might not need that speed, but the option matters.</p>
+
+                <p><strong>Fewer Bugs</strong></p>
+                <p>Automated tests catch regressions before they reach production. That weird bug that only appears in production? CI catches it in the pipeline. Your users never see it.</p>
+
+                <p><strong>Less Human Error</strong></p>
+                <p>Humans make mistakes. Automating deployments means consistent, repeatable processes. No more "it worked on my machine" or "I forgot to run the migration script."</p>
+
+                <p><strong>Better Collaboration</strong></p>
+                <p>CI/CD creates a single source of truth. Everyone knows the current state of the codebase. Code reviews, automated checks, and clear pipelines improve team communication.</p>
+
+                <p><strong>Rollbacks That Actually Work</strong></p>
+                <p>When things go wrong (and they will), CI/CD makes rolling back trivial. One command, one click, back to a known-good state. No scrambling, no panic.</p>
+
+                <h2>The CI/CD Pipeline</h2>
+
+                <p>A pipeline is the sequence of steps your code goes through from commit to production. While every pipeline is different, most follow this pattern:</p>
+
+                <h3>1. Commit</h3>
+                <p>Developer pushes code to version control (Git). This triggers the pipeline.</p>
+
+                <h3>2. Build</h3>
+                <p>Code is compiled, dependencies are fetched, and artifacts are created. Docker images get built. Assets get bundled.</p>
+
+                <h3>3. Test</h3>
+                <p>Automated tests run:</p>
+                <ul>
+                    <li><strong>Unit tests:</strong> Test individual functions</li>
+                    <li><strong>Integration tests:</strong> Test how components work together</li>
+                    <li><strong>End-to-end tests:</strong> Test the full application</li>
+                    <li><strong>Linting:</strong> Check code style</li>
+                    <li><strong>Security scans:</strong> Look for vulnerabilities</li>
+                </ul>
+
+                <h3>4. Deploy to Staging</h3>
+                <p>If tests pass, the application deploys to a staging environment that mirrors production. This is where final QA happens.</p>
+
+                <h3>5. Deploy to Production</h3>
+                <p>For continuous delivery: a human approves. For continuous deployment: it happens automatically.</p>
+
+                <h2>Popular CI/CD Tools</h2>
+
+                <p><strong>GitHub Actions</strong></p>
+                <p>Integrated directly into GitHub. Define workflows with YAML files in your repository. Great for open source and GitHub-centric teams. Free tier is generous.</p>
+
+<pre><code>name: CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run tests
+        run: |
+          npm install
+          npm test</code></pre>
+
+                <p><strong>GitLab CI</strong></strong></p>
+                <p>Built into GitLab. Powerful, flexible, and free for self-hosted. The <code>.gitlab-ci.yml</code> file defines your pipeline.</p>
+
+<pre><code>stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+
+test:
+  stage: test
+  script:
+    - npm test
+
+deploy:
+  stage: deploy
+  script:
+    - ./deploy.sh
+  only:
+    - main</code></pre>
+
+                <p><strong>Jenkins</strong></p>
+                <p>The old reliable. Open source, self-hosted, extremely flexible. Steeper learning curve than modern tools, but battle-tested in enterprises worldwide.</p>
+
+                <p><strong>CircleCI</strong></p>
+                <p>Cloud-hosted, fast, great Docker support. Popular with teams wanting managed CI without managing infrastructure.</p>
+
+                <p><strong>Travis CI</strong></p>
+                <p>Popular for open source projects. Simple configuration, GitHub integration.</p>
+
+                <h2>Best Practices</h2>
+
+                <p><strong>Pipeline as Code</strong></p>
+                <p>Define your pipeline in version control alongside your code. This gives you code review for deployments, history of changes, and easy rollback.</p>
+
+                <p><strong>Fail Fast</strong></p>
+                <p>Order your pipeline stages so failures are caught quickly. Run fast tests first, slow tests later. Don't wait 30 minutes to discover a syntax error.</p>
+
+                <p><strong>Keep Builds Reproducible</strong></p>
+                <p>Use specific versions of tools. Pin dependencies. Use containers to ensure consistency between local development and CI environments.</p>
+
+                <p><strong>One Button Deploys</strong></p>
+                <p>If deploying requires multiple steps, manual commands, or tribal knowledge, you're doing it wrong. Any developer should be able to deploy.</p>
+
+                <p><strong>Separate Concerns</strong></p>
+                <p>Don't lump everything into one massive script. Use stages, jobs, and steps. Make each part testable and debuggable.</p>
+
+                <p><strong>Environment Parity</strong></p>
+                <p>Your development, staging, and production environments should be as similar as possible. Same OS, same versions, same configurations. Containers help immensely here.</p>
+
+                <h2>Deployment Strategies</h2>
+
+                <p><strong>Blue-Green Deployment</strong></p>
+                <p>Run two identical production environments. Blue is live. Green is the new version. Test green, then switch traffic. If something goes wrong, switch back to blue instantly.</p>
+
+                <p><strong>Canary Deployment</strong></p>
+                <p>Roll out to a small subset of users first. Monitor error rates and performance. Gradually increase traffic. If problems appear, roll back before most users are affected.</p>
+
+                <p><strong>Rolling Deployment</strong></p>
+                <p>Update instances one at a time or in batches. No downtime. But rollbacks take time since you have to undo each batch.</p>
+
+                <p><strong>Feature Flags</strong></p>
+                <p>Deploy code behind toggles. Enable features for specific users or percentages. Flip the switch to release, flip it back to rollback. No code changes needed.</p>
+
+                <h2>A Practical Example</h2>
+
+                <p>Let's build a simple pipeline for a Node.js app:</p>
+
+<pre><code>name: Node.js CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run linter
+      run: npm run lint
+    
+    - name: Run tests
+      run: npm test
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Deploy to server
+      run: |
+        echo "Deploying to production..."
+        # Add your deployment commands here
+        # Maybe use rsync, scp, or a deployment tool</code></pre>
+
+                <p>This pipeline:</p>
+                <ul>
+                    <li>Runs on every push and pull request</li>
+                    <li>Installs dependencies (with caching for speed)</li>
+                    <li>Runs linting and tests</li>
+                    <li>Only deploys after tests pass and code is on main</li>
+                </ul>
+
+                <h2>Getting Started</h2>
+
+                <ol>
+                    <li><strong>Start small:</strong> Just run tests automatically first. No deployment yet.</li>
+                    <li><strong>Add linting:</strong> Catch style issues automatically.</li>
+                    <li><strong>Automate one environment:</strong> Deploy to staging automatically.</li>
+                    <li><strong>Add approvals:</strong> Require human review before production.</li>
+                    <li><strong>Go continuous:</strong> When comfortable, automate production too.</li>
+                </ol>
+
+                <p>You don't need to implement everything at once. CI/CD is a journey, not a destination.</p>
+
+                <h2>The Bottom Line</h2>
+
+                <p>CI/CD isn't just for big teams with dedicated DevOps engineers. Every developer benefits from automated testing. Every project improves with reproducible builds. Every team grows with better deployment practices.</p>
+
+                <p>Start with what you need. Automate the painful parts first. Build from there. The goal isn't perfection—it's progress. Every step toward automation is a step toward shipping better software, faster.</p>
+
+                <p>Your users want new features. Your team wants to sleep at night. CI/CD helps with both.</p>
+
+                <p><strong>Automate all the things. Ship with confidence.</strong></p>
+            </div>
+        </article>
+
+        <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+            <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+            <div id="comments-list" style="margin-bottom: 32px;"></div>
+            <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+                <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+                <div style="display: grid; gap: 16px;">
+                    <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                    <button onclick="submitComment('blog-cicd')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                    <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                    <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        
+    </footer>
+    <script>
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    
+    <script src="../nav.js" defer></script>
+    <script src="../comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-cicd');
+        });
+    </script>
+</body>
+</html>

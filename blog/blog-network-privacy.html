@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Privacy 101: Protecting Your Digital Footprint - REBEL WITH LINUX</title>
+    <meta name="description" content="A comprehensive guide to network privacy. Learn how your phone is tracked, why encryption isn't enough, and how to use your phone as a secure gateway.">
+    <meta name="keywords" content="network privacy, VPN, ISP, Mullvad, phone tracking, IMSI, GrapheneOS, Tor, encrypted DNS">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Network Privacy 101: Protecting Your Digital Footprint">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-network-privacy.html">
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-network-privacy.html">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; border-bottom: 2px solid var(--black); background: var(--white); }
+        .blog-nav a { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: var(--black); text-decoration: none; }
+        .blog-nav a:hover { text-decoration: underline; }
+        .blog-container { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+        .blog-meta { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--gray); margin-bottom: 16px; }
+        .blog-title { font-size: 2rem; line-height: 1.2; margin-bottom: 24px; }
+        .blog-content { font-size: 1.1rem; line-height: 1.8; }
+        .blog-content p { margin-bottom: 24px; }
+        .blog-content h2 { font-size: 1.5rem; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--black); }
+        .blog-content h3 { font-size: 1.25rem; margin: 32px 0 12px; }
+        .blog-content ul, .blog-content ol { margin-bottom: 24px; padding-left: 24px; }
+        .blog-content li { margin-bottom: 8px; }
+        .blog-content blockquote { border-left: 4px solid var(--black); padding-left: 20px; margin: 24px 0; font-style: italic; color: var(--gray); }
+        .blog-content code { background: var(--beige); padding: 2px 6px; font-family: 'IBM Plex Mono', monospace; font-size: 0.95rem; }
+        .blog-content pre { background: var(--black); color: var(--ivory); padding: 20px; margin: 24px 0; overflow-x: auto; border: 3px solid var(--black); }
+        .blog-content pre code { background: transparent; padding: 0; color: var(--ivory); }
+        .tip-box { background: #F0FFF0; border-left: 4px solid var(--dark-green); padding: 16px; margin: 24px 0; }
+        .warning-box { background: #FFF0F0; border-left: 4px solid var(--dark-red); padding: 16px; margin: 24px 0; }
+        .alternative-box { background: var(--beige); border: 2px solid var(--black); padding: 20px; margin: 24px 0; }
+        .alternative-box h3 { margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#distros">DISTRO</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#projects">PROJECTS</a>
+                    <a href="../index.html#resources">RESOURCES</a>
+                    <a href="../index.html#references">REFERENCES</a>
+                    <a href="../index.html#scripts">SCRIPTS</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#contact">CONTACT</a>
+                    <a href="../index.html#stats">STATS</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="blog-header">
+        <h1>// THE REBEL BLOG</h1>
+        <p>Thoughts on free software, privacy, and taking back control</p>
+    </header>
+
+    <nav class="blog-nav">
+        <a href="../index.html#blog">← Back to Blog</a>
+    </nav>
+
+    <main class="blog-container" id="main-content">
+        <article>
+            <div class="blog-meta">
+                <span>2026-03-12</span> • <span>8 min read</span> • <span>Privacy</span>
+            </div>
+            <h1 class="blog-title">Network Privacy 101: Protecting Your Digital Footprint</h1>
+
+            <div class="blog-content">
+                <p>Every time you connect to the internet, you're leaking information. Your IP address, your DNS queries, your metadata—it's all visible to someone. The question isn't whether you're being watched, but who's watching and what they're doing with that data.</p>
+
+                <p>In this guide, we're going deep on network privacy. I'll show you how your phone tracks you, why encryption isn't the silver bullet people think it is, and how to set up a more secure network stack.</p>
+
+                <h2>Your Phone Is a Tracking Device You Carry Everywhere</h2>
+
+                <p>Let's start with your phone. That device in your pocket? It's a surveillance tool that happens to make calls. Your mobile carrier—and anyone with access to cell tower data—can track your every move.</p>
+
+                <p>Here's how it works. Every time your phone connects to a cell tower, it broadcasts several identifiers:</p>
+
+                <ul>
+                    <li><strong>IMEI</strong> — Your phone's unique hardware serial number. Permanent. Tied to the device forever.</li>
+                    <li><strong>IMSI</strong> — Your SIM card identifier. Tied to your carrier account and phone number.</li>
+                    <li><strong>TMSI</strong> — A "temporary" ID that's supposed to rotate, but implementation varies.</li>
+                    <li><strong>MAC address</strong> — Used by WiFi and Bluetooth. Modern OSes can randomize this, but not all do.</li>
+                </ul>
+
+                <p>Your carrier sees your IMSI/IMEI every time you connect. They know your phone number (linked to your IMSI). They can triangulate your position using cell towers. They log every call, every SMS, metadata on who you contacted and when.</p>
+
+                <div class="tip-box">
+                    <strong>Pro Tip:</strong> GrapheneOS randomizes MAC addresses per network, has better protection against IMSI catchers (fake cell towers), and doesn't whitelist base stations. If privacy on mobile matters to you, this is the OS to run.
+                </div>
+
+                <p>The uncomfortable truth: your identity is tied to your SIM (IMSI) and your device (IMEI). Anyone with access to cell network infrastructure can track you. That's your carrier, law enforcement, and potentially hackers with the right equipment.</p>
+
+                <h3>What Can You Do?</h3>
+
+                <ul>
+                    <li>Use GrapheneOS or a hardened mobile OS</li>
+                    <li>Turn off your phone when you're not using it</li>
+                    <li>Use airplane mode in sensitive situations</li>
+                    <li>Consider a Faraday bag (signal-blocking pouch) for truly sensitive scenarios</li>
+                </ul>
+
+                <h2>Encryption Isn't Enough—Here's Why</h2>
+
+                <p>Here's something that surprises most people: using HTTPS doesn't make you anonymous. I know, I know—your browser shows that little lock icon. You're "secure." But let's unpack what encryption actually protects and what it doesn't.</p>
+
+                <div class="warning-box">
+                    <strong>Important:</strong> Encryption protects CONTENT. It does NOT protect METADATA. This distinction matters more than you think.
+                </div>
+
+                <p><strong>What encryption hides:</strong></p>
+                <ul>
+                    <li>The actual content of your HTTPS traffic</li>
+                    <li>Form data and passwords</li>
+                    <li>File contents</li>
+                </ul>
+
+                <p><strong>What encryption doesn't hide:</strong></p>
+                <ul>
+                    <li>Your IP address (visible to every server you connect to)</li>
+                    <li>Domain names via SNI (Server Name Indication)—that lock icon doesn't hide which site you're visiting</li>
+                    <li>DNS queries (unless you're using encrypted DNS)</li>
+                    <li>Metadata: who, when, how much data, how long</li>
+                </ul>
+
+                <p>Your carrier knows your IMEI/IMSI, which ties to your phone number, which ties to you. They see every IP address you connect to. They can correlate traffic timestamps with your subscriber account. They can hand all of this over with a subpoena—or sell it to advertisers.</p>
+
+                <div class="alternative-box">
+                    <h3>Better Privacy Practices</h3>
+                    <p><strong>Use a VPN.</strong> It hides your traffic from your carrier. Your ISP sees only encrypted gibberish connecting to one IP (the VPN server). Choose one with a verified no-log policy—Mullvad is excellent, accepts cash payment for anonymity, and has been audited.</p>
+                    <p><strong>Use encrypted DNS.</strong> Services like NextDNS or Cloudflare 1.1.1.1 encrypt your DNS queries so your ISP can't see every domain you visit.</p>
+                    <p><strong>On GrapheneOS:</strong> Enable private DNS and use the built-in connection monitoring to see which apps are making which connections.</p>
+                </div>
+
+                <blockquote>The math behind encryption is solid. But metadata can still identify you even if the content is encrypted. This is the uncomfortable truth of network privacy.</blockquote>
+
+                <h2>ISP vs VPN: Who Should You Trust?</h2>
+
+                <p>This is a fundamental question of privacy architecture. You're shifting trust either way. Let's be clear about what each party can see.</p>
+
+                <p><strong>Your ISP sees:</strong></p>
+                <ul>
+                    <li>All unencrypted traffic (HTTP, DNS in plaintext)</li>
+                    <li>Every domain you visit (DNS queries)</li>
+                    <li>Metadata: who, when, how much, how long</li>
+                    <li>Your real IP address</li>
+                    <li>Your home address (subscriber info)</li>
+                    <li>They can sell your data to advertisers</li>
+                    <li>They must comply with government surveillance requests</li>
+                </ul>
+
+                <p><strong>A reputable VPN like Mullvad sees:</strong></p>
+                <ul>
+                    <li>Only encrypted traffic (can't read it)</li>
+                    <li>Connection to their server (not your real IP)</li>
+                    <li>No logs by policy (verified by audit)</li>
+                    <li>No connection to your identity (anonymous account, no email required)</li>
+                    <li>Swedish jurisdiction (strong privacy laws)</li>
+                </ul>
+
+                <p>You're shifting trust from your ISP to a VPN. But you're shifting to a service specifically designed for privacy, not one whose business model is surveillance and data monetization.</p>
+
+                <div class="warning-box">
+                    <strong>Caveat:</strong> A VPN can still see your traffic if they wanted to. Choose one you trust. Government agencies can still compel VPNs to log in their jurisdiction. For maximum anonymity, combine VPN with Tor.
+                </div>
+
+                <h2>Hotspot Security: Phone vs Laptop</h2>
+
+                <p>If you're running a Linux laptop and want cellular internet, here's the key insight: use your GrapheneOS phone as the gateway, not the other way around.</p>
+
+                <p>Here's why:</p>
+                <ul>
+                    <li>GrapheneOS is a hardened OS with minimal attack surface</li>
+                    <li>Your phone acts as a security gateway between the cellular network and your laptop</li>
+                    <li>Linux desktop has more running services, more attack surface</li>
+                    <li>Phone sandboxing isolates network traffic better</li>
+                </ul>
+
+                <p>Keep your laptop off cellular networks entirely. Let your hardened phone handle that exposure. Your laptop connects to your phone via USB—simpler, more secure.</p>
+
+                <h2>Direct Tethering vs Router: Keep It Simple</h2>
+
+                <p>I've seen people set up elaborate configurations: phone → router → laptop. Here's the uncomfortable truth: you're adding complexity, not security.</p>
+
+                <ul>
+                    <li><strong>USB tethering</strong> is more secure than using a router</li>
+                    <li>Fewer devices in the chain means smaller attack surface</li>
+                    <li>USB is a controlled, wired interface</li>
+                    <li>Adding a DD-WRT router adds firmware vulnerabilities you need to manage</li>
+                    <li>WiFi exposure—even if your laptop uses ethernet, the router is broadcasting</li>
+                </ul>
+
+                <p>The phone is already your security gateway. Adding a router between phone and laptop doesn't strengthen that—it extends the attack surface.</p>
+
+                <div class="tip-box">
+                    <strong>Use cases for a router:</strong> Multiple devices need internet, you want to isolate other devices from your laptop, or you need better WiFi range. Not for security.
+                </div>
+
+                <h2>The Bigger Picture</h2>
+
+                <p>Network privacy isn't about achieving perfection. There's no such thing as perfect security. It's about making yourself a harder target.</p>
+
+                <p>Most surveillance is automated. Mass collection systems grab everything they can. If your traffic is encrypted and routed through a VPN, you bounce off those automated systems. A human has to specifically target you to read your messages.</p>
+
+                <p>That's the difference between mass surveillance and targeted surveillance. That's the difference between being data and being a person.</p>
+
+                <p>Start with one change. Use your phone as a hotspot instead of your laptop. Set up a VPN. Enable encrypted DNS. Every step reduces your attack surface.</p>
+
+                <blockquote>The goal isn't perfection. The goal is progress.</blockquote>
+            </div>
+        </article>
+
+        <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+            <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+            <div id="comments-list" style="margin-bottom: 32px;"></div>
+            <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+                <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+                <div style="display: grid; gap: 16px;">
+                    <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                    <button onclick="submitComment('blog-network-privacy')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                    <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                    <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        
+    </footer>
+    <script>
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+    <script src="../comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-network-privacy');
+        });
+    </script>
+</body>
+</html>

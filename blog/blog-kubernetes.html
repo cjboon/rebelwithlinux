@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Kubernetes: Container Orchestration at Scale - REBEL WITH LINUX</title>
+    <meta name="description" content="Learn Kubernetes container orchestration, the platform that powers cloud-native applications.">
+    <meta name="keywords" content="Kubernetes, K8s, container orchestration, DevOps, cloud-native, Docker, pods, services">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Kubernetes: Container Orchestration at Scale">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-kubernetes.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-kubernetes.html">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+
+    <style>
+        .blog-header {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 32px 60px;
+            text-align: center;
+        }
+        .blog-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .blog-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--gray);
+        }
+        .blog-nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 16px;
+            border-bottom: 2px solid var(--black);
+            background: var(--white);
+        }
+        .blog-nav a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--black);
+            text-decoration: none;
+        }
+        .blog-nav a:hover {
+            text-decoration: underline;
+        }
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+        .blog-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 16px;
+        }
+        .blog-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+        .blog-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        .blog-content p {
+            margin-bottom: 24px;
+        }
+        .blog-content h2 {
+            font-size: 1.5rem;
+            margin: 40px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--black);
+        }
+        .blog-content h3 {
+            font-size: 1.2rem;
+            margin: 32px 0 12px;
+        }
+        .blog-content ul, .blog-content ol {
+            margin-bottom: 24px;
+            padding-left: 24px;
+        }
+        .blog-content li {
+            margin-bottom: 8px;
+        }
+        .blog-content blockquote {
+            border-left: 4px solid var(--black);
+            padding-left: 20px;
+            margin: 24px 0;
+            font-style: italic;
+            color: var(--gray);
+        }
+        .blog-content code {
+            background: var(--beige);
+            padding: 2px 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95rem;
+        }
+        .blog-content pre {
+            background: var(--black);
+            color: var(--ivory);
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            border: 3px solid var(--black);
+        }
+        .blog-content pre code {
+            background: transparent;
+            padding: 0;
+            color: var(--ivory);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: var(--black);
+            text-decoration: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        footer {
+            padding: 48px 32px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#distros">DISTRO</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#projects">PROJECTS</a>
+                    <a href="../index.html#resources">RESOURCES</a>
+                    <a href="../index.html#references">REFERENCES</a>
+                    <a href="../index.html#scripts">SCRIPTS</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#contact">CONTACT</a>
+                    <a href="../index.html#stats">STATS</a>
+                    <a href="#" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="blog-header">
+        <h1>// THE REBEL BLOG</h1>
+        <p>Thoughts on free software, privacy, and taking back control</p>
+    </header>
+
+    <nav class="blog-nav">
+        <a href="../index.html#blog">← Back to Blog</a>
+    </nav>
+
+    <main class="blog-container" id="main-content">
+        <article>
+            <div class="blog-meta">
+                <span>2026-03-14</span> • <span>12 min read</span> • <span>DevOps</span>
+            </div>
+            <h1 class="blog-title">Kubernetes: Container Orchestration at Scale</h1>
+
+            <div class="blog-content">
+                <p>You finally got Docker running. Your containers are building, your images are pushing to the registry, and your application is live. Then comes the hard part: how do you run this in production? How do you handle multiple replicas, rolling updates, scaling, service discovery, and failures?</p>
+
+                <p>Enter Kubernetes—often abbreviated as K8s (because K + 8 letters + s). Originally developed by Google and now maintained by the Cloud Native Computing Foundation, Kubernetes has become the industry standard for container orchestration.</p>
+
+                <h2>What Problem Does Kubernetes Solve?</h2>
+
+                <p>Docker gives you containers. Kubernetes gives you a platform to run those containers at scale. Consider what happens when:</p>
+
+                <ul>
+                    <li>Your traffic spikes and you need more instances</li>
+                    <li>A container crashes and needs to restart</li>
+                    <li>You want to deploy a new version without downtime</li>
+                    <li>You need to route traffic to different versions for testing</li>
+                    <li>You want to store data that persists across container restarts</li>
+                </ul>
+
+                <p>You could script all of this yourself, or you could let Kubernetes handle it. Kubernetes provides:</p>
+
+                <ul>
+                    <li><strong>Self-healing</strong> — Restart failed containers, replace failed nodes</li>
+                    <li><strong>Auto-scaling</strong> — Scale based on CPU, memory, or custom metrics</li>
+                    <li><strong>Rolling updates</strong> — Deploy new versions without downtime</li>
+                    <li><strong>Service discovery</strong> — Find services automatically without manual config</li>
+                    <li><strong>Load balancing</strong> — Distribute traffic across healthy pods</li>
+                    <li><strong>Secret management</strong> — Store sensitive data securely</li>
+                </ul>
+
+                <h2>Kubernetes Architecture</h2>
+
+                <p>Understanding Kubernetes starts with understanding its components. A Kubernetes cluster has two main parts: the <strong>control plane</strong> and the <strong>worker nodes</strong>.</p>
+
+                <h3>The Control Plane</h3>
+
+                <p>The control plane manages the cluster. It makes scheduling decisions, responds to cluster events, and handles API requests. Key components:</p>
+
+                <ul>
+                    <li><strong>kube-apiserver</strong> — The API front-end that handles all requests</li>
+                    <li><strong>etcd</strong> — Distributed key-value store holding cluster state</li>
+                    <li><strong>kube-scheduler</strong> — Assigns pods to nodes based on resources</li>
+                    <li><strong>kube-controller-manager</strong> — Runs controller loops to maintain desired state</li>
+                </ul>
+
+                <h3>Worker Nodes</h3>
+
+                <p>Nodes are the machines running your workloads. Each node runs:</p>
+
+                <ul>
+                    <li><strong>kubelet</strong> — Agent that communicates with the control plane</li>
+                    <li><strong>kube-proxy</strong> — Network proxy handling pod networking</li>
+                    <li><strong>container runtime</strong> — Usually Docker or containerd</li>
+                </ul>
+
+                <h2>Core Concepts</h2>
+
+                <h3>Pods</h3>
+
+                <p>A <strong>pod</strong> is the smallest deployable unit in Kubernetes. It represents a single instance of your application. A pod can contain one or more containers (usually just one) that share networking and storage.</p>
+
+                <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+spec:
+  containers:
+  - name: myapp
+    image: myapp:latest
+    ports:
+    - containerPort: 8080</code></pre>
+
+                <h3>Deployments</h3>
+
+                <p>A <strong>deployment</strong> manages replicas of your pods. It handles rolling updates, rollbacks, and scaling.</p>
+
+                <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: myapp:v1
+        ports:
+        - containerPort: 8080</code></pre>
+
+                <h3>Services</h3>
+
+                <p>A <strong>service</strong> provides a stable network endpoint for your pods. Even when pods are recreated with new IPs, the service stays the same.</p>
+
+                <pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service
+spec:
+  selector:
+    app: myapp
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: LoadBalancer</code></pre>
+
+                <h3>ConfigMaps and Secrets</h3>
+
+                <p><strong>ConfigMaps</strong> store non-sensitive configuration data. <strong>Secrets</strong> store sensitive data like passwords and API keys.</p>
+
+                <h3>Ingress</h3>
+
+                <p>An <strong>ingress</strong> manages external HTTP/HTTPS access to services, providing routing and TLS termination.</p>
+
+                <h2>Getting Started</h2>
+
+                <p>Ready to try Kubernetes? Here are your options:</p>
+
+                <ol>
+                    <li><strong>Minikube</strong> — Single-node Kubernetes for local development</li>
+                    <li><strong>kind</strong> — Kubernetes in Docker (great for testing)</li>
+                    <li><strong>k3s</strong> — Lightweight Kubernetes for edge and IoT</li>
+                    <li><strong>Managed Kubernetes</strong> — EKS, GKE, AKS, or DigitalOcean Kubernetes</li>
+                </ol>
+
+                <h3>Install Minikube</h3>
+
+                <pre><code># Linux
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+# Start cluster
+minikube start
+
+# Check status
+kubectl get nodes
+kubectl get pods --all-namespaces</code></pre>
+
+                <h3>Your First Deployment</h3>
+
+                <pre><code># Create a deployment
+kubectl create deployment nginx --image=nginx
+
+# Scale it
+kubectl scale deployment nginx --replicas=3
+
+# Expose it
+kubectl expose deployment nginx --port=80 --type=NodePort
+
+# Check it
+kubectl get pods
+kubectl get services</code></pre>
+
+                <h2>Kubernetes vs Docker Swarm</h2>
+
+                <p>If you're wondering why not just use Docker Swarm, that's a fair question. Docker Swarm is simpler and built into Docker, but Kubernetes offers:</p>
+
+                <ul>
+                    <li>More sophisticated scheduling</li>
+                    <li>Better ecosystem and tooling</li>
+                    <li>More flexible networking</li>
+                    <li>Better secret management</li>
+                    <li>Broader cloud provider support</li>
+                </ul>
+
+                <p>Swarm is fine for simple use cases, but Kubernetes has become the industry standard for a reason.</p>
+
+                <h2>The Learning Curve</h2>
+
+                <p>Kubernetes is complex. There's no sugarcoating it. You'll need to understand pods, deployments, services, ingress, configmaps, secrets, persistent volumes, and more. But the investment pays off.</p>
+
+                <p>Start small. Use a managed service if you can. Learn one concept at a time. And remember: you don't need to be a Kubernetes expert to get value from it.</p>
+
+                <blockquote>Start with what you need, expand as you learn.</blockquote>
+
+                <h2>What's Next?</h2>
+
+                <p>Once you're comfortable with the basics, explore:</p>
+
+                <ul>
+                    <li><strong>Helm</strong> — Package manager for Kubernetes</li>
+                    <li><strong>Operators</strong> — Automate complex application management</li>
+                    <li><strong>Service meshes</strong> — Istio, Linkerd for microservice networking</li>
+                    <li><strong>GitOps</strong> — ArgoCD, Flux for declarative deployments</li>
+                </ul>
+
+                <p>Kubernetes isn't going anywhere. It's become as fundamental to modern infrastructure as virtualization was a decade ago. The time to learn it is now.</p>
+            </div>
+        </article>
+
+        <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+            <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+            <div id="comments-list" style="margin-bottom: 32px;"></div>
+            <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+                <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+                <div style="display: grid; gap: 16px;">
+                    <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                    <button onclick="submitComment('blog-kubernetes')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                    <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                    <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        
+    </footer>
+    <script>
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    
+    <script src="../nav.js" defer></script>
+    <script src="../comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-kubernetes');
+        });
+    </script>
+</body>
+</html>

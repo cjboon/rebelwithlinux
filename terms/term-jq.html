@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jq Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid #444444; }
+        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
+        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
+        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
+        .jq-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .jq-output-line { color: #aaaaaa; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .jq-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1e; }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #ffffff; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #cccccc; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
+        
+        /* Light mode overrides */
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .jq-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .jq-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .jq-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #1a1a1a; }
+        [data-theme="light"] .message .text { color: #333333; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column-reverse;
+            }
+            .terminal-pane {
+                flex: none;
+                height: 50vh;
+            }
+            .right-pane {
+                border-bottom: 2px solid #444444;
+            }
+            .left-pane {
+                border-right: none;
+                border-top: 2px solid #444444;
+            }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea {
+                min-height: 60px !important;
+                font-size: 14px !important;
+            }
+            .mobile-run-btn { display: block !important; }
+        }
+        
+        .mobile-run-btn {
+            display: none;
+            background: #2d5016;
+            color: #98c379;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span class="terminal-title>
+                <span">jq Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type jq command:</div>
+                <textarea id="command-input" placeholder="echo '{...}' | jq '.key'" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="jq-output-area" id="jq-output">
+                <div class="jq-output-line" style="color: #586e75;">jq output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const jqOutput = document.getElementById('jq-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=jq');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'jq', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addJqLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'jq-error-line' : 'jq-output-line';
+            line.textContent = text;
+            jqOutput.appendChild(line);
+            jqOutput.scrollTop = jqOutput.scrollHeight;
+        }
+        
+        function clearJqOutput() { jqOutput.innerHTML = ''; }
+        
+        function runJq(cmd) {
+            addJqLine('$ ' + cmd);
+            
+            // JSON data for exercises
+            const data = '{"name": "Alice", "age": 30, "city": "NYC", "skills": ["Linux", "Python", "Docker"], "address": {"street": "123 Main", "zip": "10001"}, "users": [{"id": 1, "name": "Bob"}, {"id": 2, "name": "Carol"}]}';
+            
+            // Simulated jq responses
+            const responses = {
+                '.name': '"Alice"',
+                '.age': '30',
+                '.city': '"NYC"',
+                '.skills': '["Linux", "Python", "Docker"]',
+                '.skills[0]': '"Linux"',
+                '.address': '{"street": "123 Main", "zip": "10001"}',
+                '.address.zip': '"10001"',
+                '.users[0]': '{"id": 1, "name": "Bob"}',
+                '.users[].name': '"Bob"\n"Carol"',
+                '.users | length': '2',
+                'keys': '["address", "age", "city", "name", "skills", "users"]',
+                '.name, .age': '"Alice"\n30',
+                'has(.name)': 'true',
+                '.age + 5': '35',
+                'map(.name)': '["Alice"]',
+                '.skills[]': '"Linux"'
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.includes(key)) {
+                    addJqLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.includes('jq')) {
+                    addJqLine('(jq processed the JSON)');
+                } else {
+                    addJqLine('Try: echo \'{"name":"Alice"}\' | jq \'.name\'', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "jq Jack",
+            greeting: "Greetings! I'm jq Jack - your guide to JSON processing! jq is like sed/grep but for JSON. Perfect for APIs, configs, and any structured data!",
+            encourage: ["Excellent!", "JSON master!", "You're a pro!", "Keep filtering!", "Data ninja!", "Brilliant!"],
+            getEncouragement: function() { return this.encourage[Math.floor(Math.random() * this.encourage.length)]; }
+        };
+        
+        const beginnerLevels = [
+            { id: 1, title: "Your First Query", intro: "Welcome! jq extracts data from JSON. Start with a simple key.", content: "Extract the name:\necho '{\"name\":\"Alice\"}' | jq '.name'", hint: "Type: .name", answer: ".name", success: "You got 'Alice'! The dot starts your path into the JSON. This is the foundation!", type: "contains" },
+            { id: 2, title: "Nested Keys", intro: "Access nested objects with dot notation.", content: "Get the zip code:\necho '{\"address\":{\"zip\":\"10001\"}}' | jq '.address.zip'", hint: "Type: .address.zip", answer: ".address.zip", success: "Nested access! Chain dots for deeper paths. Simple and powerful!", type: "contains" },
+            { id: 3, title: "Array Access", intro: "Access array elements with [index]. Arrays are 0-indexed!", content: "Get first skill:\necho '{\"skills\":[\"Linux\",\"Python\"]}' | jq '.skills[0]'", hint: "Type: .skills[0]", answer: ".skills[0]", success: "First element! Arrays start at 0. [1] gets second, [-1] gets last!", type: "contains" },
+            { id: 4, title: "Array Slicing", intro: "Get a range of array elements with [start:end].", content: "Get first two skills:\necho '{\"skills\":[\"A\",\"B\",\"C\"]}' | jq '.skills[0:2]'", hint: "Type: .skills[0:2]", answer: ".skills[0:2]", success: "Sliced! [0:2] gives elements 0 and 1. Perfect for pagination!", type: "contains" },
+            { id: 5, title: "Object Keys", intro: "The 'keys' function lists all keys in an object.", content: "List all keys:\necho '{\"a\":1,\"b\":2}' | jq 'keys'", hint: "Type: keys", answer: "keys", success: "All keys! Use keys_unsorted for original order. Essential for exploration!", type: "contains" },
+            { id: 6, title: "Values", intro: "The 'values' function extracts all values.", content: "Get all values:\necho '{\"a\":1,\"b\":2}' | jq 'values'", hint: "Type: values", answer: "values", success: "All values! Combine with other filters for powerful extraction!", type: "contains" },
+            { id: 7, title: "Length", intro: "The 'length' function works on strings, arrays, and objects.", content: "Get array length:\necho '{\"items\":[1,2,3]}' | jq '.items | length'", hint: "Type: .items | length", answer: "length", success: "Length 3! Works on strings (char count), arrays (element count), objects (key count)!", type: "contains" },
+            { id: 8, title: "Has Key", intro: "Check if an object has a key with 'has' or 'hasn't.", content: "Check for name:\necho '{\"name\":\"Alice\"}' | jq 'has(\"name\")'", hint: "Type: has(\"name\")", answer: "has", success: "true! Use 'has' to check keys. Great for optional fields!", type: "contains" },
+            { id: 9, title: "Select", intro: "Filter arrays with 'select'. Like WHERE in SQL!", content: "Filter users over 18:\necho '{\"users\":[{\"age\":25},{\"age\":15}]}' | jq '.users[] | select(.age > 18)'", hint: "Type: select(.age > 18)", answer: "select", success: "Filtered! Select is incredible for data processing. Combine with >, <, ==, and, or!", type: "contains" },
+            { id: 10, title: "Map", intro: "Apply a filter to each element with 'map'.", content: "Get all names:\necho '{\"users\":[{\"name\":\"A\"},{\"name\":\"B\"}]}' | jq '.users[].name'", hint: "Type: .users[].name", answer: ".users[].name", success: "All names! The [] iterates through array. map() applies to each!", type: "contains" },
+            { id: 11, title: "Type", intro: "The 'type' function tells you what you're dealing with.", content: "Check type:\necho '\"hello\"' | jq 'type'", hint: "Type: type", answer: "type", success: "string! Returns: string, number, boolean, array, object, null. Very useful!", type: "contains" },
+            { id: 12, title: "Beginner Finale", intro: "Final challenge! Chain multiple operations.", content: "Get names from filtered users:\necho '{\"users\":[{\"name\":\"A\",\"age\":25}]}' | jq '.users[] | select(.age > 18) | .name'", hint: "Type: .users[] | select", answer: ".users[]", success: "BEGINNER COMPLETE! You can: extract keys, access arrays, filter, transform. jq is YOURS!", type: "starts" }
+        ];
+        
+        const intermediateLevels = [
+            { id: 1, title: "String Operations", intro: "INTERMEDIATE! Strings: uppercase, lowercase, split, join.", content: "Uppercase:\necho '\"hello\"' | jq 'uppercase'", hint: "Type: uppercase", answer: "uppercase", success: "HELLO! lowercase, upper, length, split, join - all available!", type: "contains" },
+            { id: 2, title: "Math Operations", intro: "jq does math! +, -, *, /, % and more.", content: "Add 10 to age:\necho '{\"age\":25}' | jq '.age + 10'", hint: "Type: .age + 10", answer: ".age +", success: "35! Math works on numbers. +=, -=, *= for in-place operations!", type: "contains" },
+            { id: 3, title: "Ternary Logic", intro: "Use if-then-else for conditional output.", content: "Adult or minor:\necho '{\"age\":25}' | jq 'if .age >= 18 then \"adult\" else \"minor\" end'", hint: "Type: if .age >= 18", answer: "if", success: "adult! if-then-else-end is powerful. Combine with and/or for complex logic!", type: "contains" },
+            { id: 4, title: "Null Handling", intro: "Use // for default values when null.", content: "Default if null:\necho '{\"name\":null}' | jq '.name // \"Unknown\"'", hint: "Type: .name //", answer: "//", success: "Unknown! The // operator returns right side if left is null. Essential!", type: "contains" },
+            { id: 5, title: "Object Construction", intro: "Build new objects with {key: value}.", content: "Create new object:\necho '{}' | jq '{name: \"Alice\", age: 30}'", hint: "Type: {name:", answer: "{name:", success: "New object! Build anything you need. Combine with existing data!", type: "contains" },
+            { id: 6, title: "Add to Object", intro: "The + operator merges objects.", content: "Add to object:\necho '{\"a\":1}' | jq '. + {\"b\":2}'", hint: "Type: . +", answer: ". +", success: "Merged! Objects combine. Use - to remove keys: . - {\"b\":2}", type: "contains" },
+            { id: 7, title: "Flatten", intro: "Flatten nested arrays into one.", content: "Flatten arrays:\necho '[[1,2],[3]]' | jq 'flatten'", hint: "Type: flatten", answer: "flatten", success: "[1,2,3]! Nested arrays become flat. Great for processing API responses!", type: "contains" },
+            { id: 8, title: "Unique", intro: "Remove duplicates with unique or unique_by.", content: "Get unique values:\necho '[1,2,2,3]' | jq 'unique'", hint: "Type: unique", answer: "unique", success: "[1,2,3]! unique_by lets you unique by specific field. Super useful!", type: "contains" },
+            { id: 9, title: "Group By", intro: "Group array elements by a field.", content: "Group by type:\necho '{\"items\":[{\"type\":\"a\",\"val\":1},{\"type\":\"b\",\"val\":2}]}' | jq 'group_by(.type)'", hint: "Type: group_by", answer: "group_by", success: "Grouped! Powerful for aggregation. Follow with map to process groups!", type: "contains" },
+            { id: 10, title: "To Entries", intro: "Convert object to array of key-value pairs.", content: "To entries:\necho '{\"a\":1,\"b\":2}' | jq 'to_entries'", hint: "Type: to_entries", answer: "to_entries", success: "Array of objects! {key, value}. Use from_entries to reverse!", type: "contains" },
+            { id: 11, title: "Variables", intro: "Store values with | (pipe) into $var.", content: "Use variable:\necho '5' | jq '. as $x | $x * 2'", hint: "Type: . as", answer: ". as", success: "10! Store any value in $var. Essential for complex transformations!", type: "contains" },
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Build complex queries.", content: "Chain it all:\necho '{\"users\":[{\"name\":\"A\",\"age\":25}]}' | jq '{adults: [.users[] | select(.age >= 18) | .name]}'", hint: "Type: select", answer: "select", success: "INTERMEDIATE COMPLETE! You now command: math, conditionals, objects, arrays, grouping. You're a JSON MASTER!", type: "starts" }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') return user === answer;
+            else if (level.type === 'contains') return user.includes(answer);
+            else if (level.type === 'starts') return user.startsWith(answer);
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! jq levels complete! You're a JSON processing ninja!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: keys, arrays, filters. I'll make you a JSON pro!"); }
+            else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Math, conditionals, transformations - jq's power features!"); }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                document.documentElement.requestFullscreen();
+            }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'action=updateTheme&theme=' + newTheme,
+                        credentials: 'include'
+                    });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') {
+                    startTrack('beginner');
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--intermediate') {
+                    startTrack('intermediate');
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--fullscreen') {
+                    toggleFullscreen();
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--darkmode') {
+                    toggleDarkMode();
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--exit') {
+                    window.location.href = '../index.html';
+                    return;
+                }
+                
+                await showMessage(character.name, "Press Ctrl+Enter to run jq commands. Use --beginner, --intermediate, --fullscreen, --darkmode, or --exit", 'hint');
+                input.value = '';
+                return;
+            }
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearJqOutput();
+                runJq(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                clearJqOutput();
+                runJq(userAnswer);
+                
+                const level = levels[currentLevel];
+                if (checkAnswer(userAnswer, level)) {
+                    showMessage(character.name, level.success, 'success');
+                    showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) {
+                currentLevel = savedLevel - 1;
+            }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+                const toggle = document.getElementById('themeToggle');
+                if (toggle) toggle.checked = userTheme === 'dark';
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basic keys & arrays (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Transformations & functions (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Choose your path - click above or type --beginner, --intermediate, --fullscreen, --darkmode, or --exit", '', true);
+        }
+        init();
+    </script>
+</body>
+</html>

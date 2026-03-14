@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Builder - Learn Linux Commands</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: var(--ivory);
+            color: var(--black);
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            color: var(--charcoal);
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+        
+        .header p {
+            color: var(--charcoal);
+            font-size: 14px;
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            background: var(--white);
+            padding: 15px 30px;
+            border-radius: 8px;
+            border: 1px solid var(--charcoal);
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-label {
+            color: var(--charcoal);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-value {
+            color: var(--charcoal);
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .stat-value.score {
+            color: #d29922;
+        }
+        
+        .game-container {
+            background: var(--white);
+            border: 1px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 700px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .definition-box {
+            background: var(--ivory);
+            border: 1px solid var(--charcoal);
+            border-left: 4px solid var(--black);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .command-name {
+            color: var(--black);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .definition-text {
+            color: var(--black);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        
+        .hint-text {
+            color: var(--charcoal);
+            font-size: 12px;
+            margin-top: 12px;
+            font-style: italic;
+        }
+        
+        .drop-zone {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .letter-slot {
+            width: 50px;
+            height: 50px;
+            background: var(--white);
+            border: 2px dashed var(--charcoal);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--black);
+            transition: all 0.2s;
+        }
+        
+        .letter-slot.filled {
+            border-style: solid;
+            border-color: var(--charcoal);
+            background: #238636;
+        }
+        
+        .letter-slot.drag-over {
+            border-color: var(--black);
+            background: #1c2128;
+        }
+        
+        .letter-slot.correct {
+            border-color: var(--charcoal);
+            background: #238636;
+        }
+        
+        .letter-slot.incorrect {
+            border-color: #f85149;
+            background: #f8514933;
+        }
+        
+        .letter-pool {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            min-height: 60px;
+            padding: 15px;
+            background: var(--ivory);
+            border-radius: 8px;
+        }
+        
+        .letter-tile {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, var(--charcoal), var(--white));
+            background-color: var(--charcoal);
+            border: 2px solid var(--charcoal);
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--black);
+            cursor: grab;
+            user-select: none;
+            -webkit-user-drag: element;
+            transition: all 0.15s;
+            box-sizing: border-box;
+        }
+        
+        .letter-tile:active {
+            cursor: grabbing;
+        }
+        
+        .letter-tile:hover {
+            border-color: var(--black);
+            transform: translateY(-2px);
+        }
+        
+        .letter-tile.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+            background: var(--charcoal) !important;
+            background-color: var(--charcoal) !important;
+        }
+        
+        .letter-tile.used {
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #238636;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2ea043;
+        }
+        
+        .btn-primary:disabled {
+            background: var(--white);
+            color: var(--charcoal);
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: var(--white);
+            color: var(--black);
+            border: 1px solid var(--charcoal);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--charcoal);
+        }
+        
+        .message {
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .message.success {
+            display: block;
+            background: #23863633;
+            border: 1px solid var(--charcoal);
+            color: var(--charcoal);
+        }
+        
+        .message.error {
+            display: block;
+            background: #f8514933;
+            border: 1px solid #f85149;
+            color: #f85149;
+        }
+        
+        .level-indicator {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .level-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--charcoal);
+        }
+        
+        .level-dot.completed {
+            background: var(--charcoal);
+        }
+        
+        .level-dot.current {
+            background: var(--black);
+        }
+        
+        .progress-info {
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--charcoal);
+            font-size: 13px;
+        }
+        
+        .complete-screen {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .complete-screen.show {
+            display: block;
+        }
+        
+        .complete-screen h2 {
+            color: var(--charcoal);
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+        
+        .complete-screen p {
+            color: var(--charcoal);
+            margin-bottom: 8px;
+        }
+        
+        .trophy {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .letter-slot, .letter-tile {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            
+            .stats-bar {
+                gap: 15px;
+                padding: 10px 20px;
+            }
+            
+            .stat-value {
+                font-size: 20px;
+            }
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .header { padding: 15px; margin-bottom: 15px; }
+            .header h1 { font-size: 20px; }
+            .header p { font-size: 12px; }
+            .stats-bar {
+                flex-wrap: wrap;
+                gap: 15px;
+                padding: 10px 15px;
+            }
+            .stat-value { font-size: 18px; }
+            .stat-label { font-size: 10px; }
+            .game-container { padding: 15px; }
+            .level-indicator { gap: 5px; }
+            .level-dot { width: 20px; height: 20px; }
+            .challenge-text { font-size: 14px; padding: 10px; }
+            .preview-area { padding: 10px; }
+            .preview-frame { min-height: 150px; }
+            .code-input { 
+                font-size: 14px; 
+                padding: 10px;
+            }
+            .submit-btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+            .modal-content { padding: 20px; margin: 10px; }
+            .modal-content h2 { font-size: 18px; }
+        }
+        
+        @media (max-width: 400px) {
+            .header h1 { font-size: 16px; }
+            .stats-bar { gap: 10px; }
+            .stat-value { font-size: 16px; }
+            .preview-frame { min-height: 100px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📟 COMMAND BUILDER</h1>
+        <p>Drag and drop letters to spell the Linux command</p>
+    </div>
+    
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-label">Level</div>
+            <div class="stat-value" id="level">1</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Score</div>
+            <div class="stat-value score" id="score">0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Streak</div>
+            <div class="stat-value" id="streak">0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Hints</div>
+            <div class="stat-value" id="hints">3</div>
+        </div>
+    </div>
+    
+    <div class="game-container" id="gameContainer">
+        <div class="level-indicator" id="levelIndicator"></div>
+        
+        <div class="progress-info" id="progressInfo">Command 1 of 15</div>
+        
+        <div class="definition-box">
+            <div class="command-name" id="commandName">COMMAND DEFINITION</div>
+            <div class="definition-text" id="definitionText">
+                Loading definition...
+            </div>
+            <div class="hint-text" id="hintText"></div>
+        </div>
+        
+        <div class="drop-zone" id="dropZone">
+            <!-- Letter slots will be generated here -->
+        </div>
+        
+        <div class="letter-pool" id="letterPool">
+            <!-- Letter tiles will be generated here -->
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="shuffleLetters()">🔀 Shuffle</button>
+            <button class="btn btn-secondary" onclick="useHint()">💡 Hint</button>
+            <button class="btn btn-primary" id="checkBtn" onclick="checkAnswer()">✓ Check Answer</button>
+        </div>
+        
+        <div class="message" id="message"></div>
+    </div>
+    
+    <div class="game-container complete-screen" id="completeScreen">
+        <div class="trophy">🏆</div>
+        <h2>CONGRATULATIONS!</h2>
+        <p>You've mastered all Linux commands!</p>
+        <p>Final Score: <strong id="finalScore">0</strong></p>
+        <p>Commands Learned: <strong>15</strong></p>
+        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 20px;">
+            <button class="btn btn-primary" onclick="restartGame()">Play Again</button>
+            <button class="btn btn-secondary" onclick="window.location.href='builder-command-2.html'">Next Level →</button>
+        </div>
+    </div>
+
+    <script>
+        const commands = [
+            {
+                name: "ls",
+                definition: "Lists directory contents. Shows files and folders in the current location.",
+                example: "ls -la /home",
+                hint: "Short for 'list'"
+            },
+            {
+                name: "cd",
+                definition: "Changes the current working directory. Navigate between folders.",
+                example: "cd /var/www",
+                hint: "Short for 'change directory'"
+            },
+            {
+                name: "pwd",
+                definition: "Print Working Directory. Shows your current location in the filesystem.",
+                example: "pwd",
+                hint: "Tells you where you are"
+            },
+            {
+                name: "mkdir",
+                definition: "Make Directory. Creates a new folder.",
+                example: "mkdir myproject",
+                hint: "Create a new directory"
+            },
+            {
+                name: "rmdir",
+                definition: "Remove Directory. Deletes an empty folder.",
+                example: "rmdir oldfolder",
+                hint: "Delete an empty directory"
+            },
+            {
+                name: "rm",
+                definition: "Remove. Deletes files or directories.",
+                example: "rm -rf folder",
+                hint: "Delete files (be careful!)"
+            },
+            {
+                name: "cp",
+                definition: "Copy. Copies files or directories from one location to another.",
+                example: "cp file.txt backup.txt",
+                hint: "Makes a duplicate"
+            },
+            {
+                name: "mv",
+                definition: "Move. Moves files or directories, or renames them.",
+                example: "mv oldname newname",
+                hint: "Can rename or relocate"
+            },
+            {
+                name: "cat",
+                definition: "Concatenate. Displays the contents of a file in the terminal.",
+                example: "cat readme.txt",
+                hint: "View file contents"
+            },
+            {
+                name: "grep",
+                definition: "Global Regular Expression Print. Searches for patterns in files.",
+                example: "grep 'error' log.txt",
+                hint: "Find text in files"
+            },
+            {
+                name: "chmod",
+                definition: "Change Mode. Modifies file permissions (read, write, execute).",
+                example: "chmod +x script.sh",
+                hint: "Changes file permissions"
+            },
+            {
+                name: "chown",
+                definition: "Change Owner. Modifies file or directory ownership.",
+                example: "chown user:group file",
+                hint: "Changes who owns a file"
+            },
+            {
+                name: "tar",
+                definition: "Tape Archive. Combines multiple files into one archive, optionally compressed.",
+                example: "tar -czf archive.tar.gz folder",
+                hint: "Create archive files"
+            },
+            {
+                name: "ssh",
+                definition: "Secure Shell. Connects to remote servers securely.",
+                example: "ssh user@server.com",
+                hint: "Remote server connection"
+            },
+            {
+                name: "scp",
+                definition: "Secure Copy. Copies files between local and remote systems over SSH.",
+                example: "scp file.txt user@server:/path",
+                hint: "Secure remote copy"
+            }
+        ];
+
+        let currentLevel = 0;
+        let score = 0;
+        let streak = 0;
+        let hints = 3;
+        let currentAnswer = "";
+        let placedLetters = [];
+        let draggedLetter = null;
+
+        function init() {
+            currentLevel = 0;
+            score = 0;
+            streak = 0;
+            hints = 3;
+            updateStats();
+            loadLevel(currentLevel);
+            renderLevelIndicator();
+            
+            // Keyboard support
+            document.addEventListener('keydown', (e) => {
+                const key = e.key.toLowerCase();
+                if (/^[a-z]$/.test(key)) {
+                    // Find the first occurrence of this letter in the pool
+                    const poolTiles = document.querySelectorAll('.letter-tile');
+                    for (let tile of poolTiles) {
+                        if (tile.textContent === key) {
+                            const originalIndex = parseInt(tile.dataset.originalIndex);
+                            clickToPlace(key, originalIndex);
+                            break;
+                        }
+                    }
+                } else if (e.key === 'Backspace' || e.key === 'Delete') {
+                    // Remove the last placed letter
+                    for (let i = placedLetters.length - 1; i >= 0; i--) {
+                        if (placedLetters[i] !== null) {
+                            removeLetter(i);
+                            break;
+                        }
+                    }
+                } else if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+        }
+
+        function renderLevelIndicator() {
+            const indicator = document.getElementById('levelIndicator');
+            indicator.innerHTML = commands.map((_, i) => 
+                `<div class="level-dot ${i < currentLevel ? 'completed' : i === currentLevel ? 'current' : ''}"></div>`
+            ).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('level').textContent = currentLevel + 1;
+            document.getElementById('score').textContent = score;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('hints').textContent = hints;
+        }
+
+        function loadLevel(level) {
+            if (level >= commands.length) {
+                showComplete();
+                return;
+            }
+
+            const cmd = commands[level];
+            currentAnswer = cmd.name;
+            placedLetters = new Array(currentAnswer.length).fill(null);
+            
+            document.getElementById('commandName').textContent = `COMMAND ${level + 1}: ${cmd.name.toUpperCase()}`;
+            document.getElementById('definitionText').textContent = cmd.definition;
+            document.getElementById('hintText').textContent = `Example: ${cmd.example}`;
+            document.getElementById('progressInfo').textContent = `Command ${level + 1} of ${commands.length}`;
+            document.getElementById('message').className = 'message';
+            document.getElementById('checkBtn').disabled = false;
+            
+            renderLetterSlots();
+            renderLetterPool();
+            renderLevelIndicator();
+            updateStats();
+        }
+
+        function renderLetterSlots() {
+            const dropZone = document.getElementById('dropZone');
+            dropZone.innerHTML = '';
+            
+            for (let i = 0; i < currentAnswer.length; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'letter-slot';
+                slot.dataset.index = i;
+                
+                if (placedLetters[i]) {
+                    slot.textContent = placedLetters[i];
+                    slot.classList.add('filled');
+                    slot.draggable = true;
+                }
+                
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('dragleave', handleDragLeave);
+                slot.addEventListener('drop', handleDrop);
+                slot.addEventListener('click', () => removeLetter(i));
+                
+                dropZone.appendChild(slot);
+            }
+        }
+
+        function renderLetterPool() {
+            const pool = document.getElementById('letterPool');
+            pool.innerHTML = '';
+            
+            // Create scrambled letters with their original indices
+            const letters = currentAnswer.split('').map((letter, i) => ({ letter, index: i }));
+            
+            // Shuffle the array
+            letters.sort(() => Math.random() - 0.5);
+            
+            // Track which original indices are already placed
+            const placedIndices = placedLetters.map((letter, i) => letter !== null ? i : -1).filter(i => i !== -1);
+            
+            letters.forEach((item) => {
+                // Skip if this specific index is already placed
+                if (placedIndices.includes(item.index)) {
+                    return;
+                }
+                
+                const tile = document.createElement('div');
+                tile.className = 'letter-tile';
+                tile.textContent = item.letter;
+                tile.draggable = true;
+                tile.dataset.letter = item.letter;
+                tile.dataset.originalIndex = item.index;
+                
+                tile.addEventListener('dragstart', handleDragStart);
+                tile.addEventListener('dragend', handleDragEnd);
+                tile.addEventListener('click', () => clickToPlace(item.letter, item.index));
+                
+                pool.appendChild(tile);
+            });
+        }
+        
+        function clickToPlace(letter, originalIndex) {
+            // Find first empty slot
+            const emptyIndex = placedLetters.findIndex(l => l === null);
+            if (emptyIndex !== -1) {
+                placedLetters[emptyIndex] = letter;
+                renderLetterSlots();
+                renderLetterPool();
+                
+                // Auto-check if all slots are filled
+                if (!placedLetters.includes(null)) {
+                    setTimeout(checkAnswer, 300);
+                }
+            }
+        }
+
+        function handleDragStart(e) {
+            draggedLetter = e.target.dataset.letter;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = 46;
+            canvas.height = 46;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'var(--charcoal)';
+            ctx.fillRect(0, 0, 46, 46);
+            ctx.strokeStyle = 'var(--charcoal)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, 0, 46, 46);
+            ctx.fillStyle = 'var(--black)';
+            ctx.font = 'bold 22px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.target.textContent, 23, 23);
+            
+            e.dataTransfer.setDragImage(canvas, 23, 23);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.letter-slot').forEach(slot => {
+                slot.classList.remove('drag-over');
+            });
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.target.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.target.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const slot = e.target.closest('.letter-slot');
+            if (!slot) return;
+            
+            slot.classList.remove('drag-over');
+            const slotIndex = parseInt(slot.dataset.index);
+            
+            // Remove letter from previous position if any
+            const prevIndex = placedLetters.indexOf(draggedLetter);
+            if (prevIndex !== -1) {
+                placedLetters[prevIndex] = null;
+            }
+            
+            // Place letter in new position
+            placedLetters[slotIndex] = draggedLetter;
+            
+            renderLetterSlots();
+            renderLetterPool();
+            
+            // Auto-check if all slots are filled
+            if (!placedLetters.includes(null)) {
+                setTimeout(checkAnswer, 300);
+            }
+        }
+
+        function removeLetter(index) {
+            if (placedLetters[index]) {
+                placedLetters[index] = null;
+                renderLetterSlots();
+                renderLetterPool();
+            }
+        }
+
+        function shuffleLetters() {
+            renderLetterPool();
+        }
+
+        function useHint() {
+            if (hints <= 0) return;
+            
+            // Find first empty slot and put correct letter
+            const emptyIndex = placedLetters.findIndex(l => l === null);
+            if (emptyIndex !== -1) {
+                placedLetters[emptyIndex] = currentAnswer[emptyIndex];
+                hints--;
+                renderLetterSlots();
+                renderLetterPool();
+                updateStats();
+            }
+        }
+
+        function checkAnswer() {
+            const attempt = placedLetters.join('');
+            
+            if (attempt.length !== currentAnswer.length || attempt.includes(null)) {
+                showMessage('Fill all slots first!', 'error');
+                return;
+            }
+            
+            if (attempt === currentAnswer) {
+                // Correct!
+                const points = 10 + (streak * 2) + (hints === 3 ? 5 : 0);
+                score += points;
+                streak++;
+                showMessage(`✓ Correct! +${points} points`, 'success');
+                document.getElementById('checkBtn').disabled = true;
+                
+                // Mark slots as correct
+                document.querySelectorAll('.letter-slot').forEach(slot => {
+                    slot.classList.add('correct');
+                });
+                
+                setTimeout(() => {
+                    currentLevel++;
+                    if (currentLevel >= commands.length) {
+                        showComplete();
+                    } else {
+                        loadLevel(currentLevel);
+                    }
+                }, 1500);
+            } else {
+                // Incorrect
+                streak = 0;
+                showMessage('✗ Not quite right. Try again!', 'error');
+                
+                // Highlight incorrect letters
+                document.querySelectorAll('.letter-slot').forEach((slot, i) => {
+                    if (placedLetters[i] !== currentAnswer[i]) {
+                        slot.classList.add('incorrect');
+                        setTimeout(() => slot.classList.remove('incorrect'), 500);
+                    }
+                });
+                
+                updateStats();
+            }
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+        }
+
+        function showComplete() {
+            document.getElementById('gameContainer').style.display = 'none';
+            document.getElementById('completeScreen').classList.add('show');
+            document.getElementById('finalScore').textContent = score;
+        }
+
+        function restartGame() {
+            document.getElementById('gameContainer').style.display = 'block';
+            document.getElementById('completeScreen').classList.remove('show');
+            init();
+        }
+
+        // Initialize game
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+        init();
+    </script>
+</body>
+</html>

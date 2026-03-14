@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turing Game - Guess What the Code Does | REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            background: #1a1a1a;
+            color: #cccccc;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 { margin-bottom: 10px; font-size: 1.8rem; color: #00ff00; }
+        .subtitle { margin-bottom: 20px; color: #888888; }
+        
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+            background: #333;
+            padding: 12px 24px;
+            border-radius: 8px;
+        }
+        .stat { text-align: center; }
+        .stat-label { font-size: 11px; color: #888; text-transform: uppercase; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #00ff00; }
+        
+        .game-container {
+            background: #222;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            border: 2px solid #444;
+        }
+        
+        .code-box {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+        
+        .code-line { color: #ff79c6; }
+        .code-comment { color: #6272a4; }
+        .code-string { color: #f1fa8c; }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .option-btn {
+            background: #333;
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            color: #ccc;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        
+        .option-btn:hover {
+            background: #444;
+            border-color: #00ff00;
+        }
+        
+        .option-btn.correct {
+            background: #1a4d1a;
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+        
+        .option-btn.wrong {
+            background: #4d1a1a;
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+        
+        .feedback {
+            text-align: center;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .feedback.show { display: block; }
+        .feedback.correct { background: #1a4d1a; color: #00ff00; }
+        .feedback.wrong { background: #4d1a1a; color: #ff4444; }
+        
+        .explanation {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .explanation.show { display: block; }
+        
+        .next-btn {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .next-btn.show { display: inline-block; }
+        
+        .difficulty-select {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .difficulty-select select {
+            background: #333;
+            color: #ccc;
+            border: 2px solid #444;
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .start-screen, .game-screen { width: 100%; }
+        .game-screen { display: none; }
+        .game-screen.active { display: block; }
+        
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover { color: #00ff00; }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            h1 { font-size: 1.4rem; }
+            .stats-bar {
+                gap: 15px;
+                padding: 8px 12px;
+            }
+            .stat-value { font-size: 18px; }
+            .game-container { padding: 15px; }
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            .code-box {
+                padding: 12px;
+                font-size: 12px;
+            }
+            .current-word { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <a href="../index.html#games" class="back-link">← Back to Games</a>
+    
+    <h1>🤖 TURING GAME</h1>
+    <p class="subtitle">Guess what the code does!</p>
+    
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-label">Score</div>
+            <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Streak</div>
+            <div class="stat-value" id="streak">0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Round</div>
+            <div class="stat-value" id="round">1</div>
+        </div>
+    </div>
+    
+    <div class="game-container">
+        <div class="start-screen" id="startScreen">
+            <div class="difficulty-select">
+                <select id="difficulty">
+                    <option value="easy">Easy - Bash Basics</option>
+                    <option value="medium" selected>Medium - Scripting</option>
+                    <option value="hard">Hard - Advanced</option>
+                </select>
+            </div>
+            <p style="text-align: center; margin-bottom: 20px; color: #888;">
+                You'll see a piece of code. Can you predict what it does?<br>
+                Test your understanding of bash, Linux commands, and scripting!
+            </p>
+            <div style="text-align: center;">
+                <button class="next-btn show" onclick="startGame()">START GAME</button>
+            </div>
+        </div>
+        
+        <div class="game-screen" id="gameScreen">
+            <div class="code-box" id="codeBox"></div>
+            <div class="options-grid" id="optionsGrid"></div>
+            <div class="feedback" id="feedback"></div>
+            <div class="explanation" id="explanation"></div>
+            <div style="text-align: center;">
+                <button class="next-btn" id="nextBtn" onclick="nextQuestion()">NEXT QUESTION →</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const questions = {
+            easy: [
+                {
+                    code: 'ls -la',
+                    options: [
+                        'List all files including hidden ones',
+                        'Delete all files in current directory',
+                        'Create a new directory',
+                        'Show system information'
+                    ],
+                    correct: 0,
+                    explanation: 'ls lists directory contents. The -a flag shows hidden files (starting with .) and -l uses long format.'
+                },
+                {
+                    code: 'pwd',
+                    options: [
+                        'Print working directory',
+                        'Delete current folder',
+                        'Power down the system',
+                        'Print with decoration'
+                    ],
+                    correct: 0,
+                    explanation: 'pwd prints the current working directory path.'
+                },
+                {
+                    code: 'cat file.txt',
+                    options: [
+                        'Display file contents',
+                        'Concatenate files together',
+                        'Create a new file',
+                        'Change file permissions'
+                    ],
+                    correct: 0,
+                    explanation: 'cat displays the contents of a file to the terminal. It can also concatenate files when given multiple arguments.'
+                },
+                {
+                    code: 'mkdir newfolder',
+                    options: [
+                        'Make a new directory',
+                        'Remove an empty directory',
+                        'Move to a directory',
+                        'List directory contents'
+                    ],
+                    correct: 0,
+                    explanation: 'mkdir creates a new directory (make directory).'
+                },
+                {
+                    code: 'rm file.txt',
+                    options: [
+                        'Remove/delete a file',
+                        'Read a file',
+                        'Rename a file',
+                        'Copy a file'
+                    ],
+                    correct: 0,
+                    explanation: 'rm removes (deletes) files. Use rm -r for directories.'
+                },
+                {
+                    code: 'cp old.txt new.txt',
+                    options: [
+                        'Copy a file',
+                        'Delete a file',
+                        'Compare two files',
+                        'Create a file'
+                    ],
+                    correct: 0,
+                    explanation: 'cp copies a file from source to destination.'
+                },
+                {
+                    code: 'mv old.txt new.txt',
+                    options: [
+                        'Rename or move a file',
+                        'View differences between files',
+                        'Copy a file',
+                        'Delete a file'
+                    ],
+                    correct: 0,
+                    explanation: 'mv moves or renames a file.'
+                },
+                {
+                    code: 'head -n 10 file.txt',
+                    options: [
+                        'Show first 10 lines',
+                        'Show last 10 lines',
+                        'Count lines in file',
+                        'Hide file contents'
+                    ],
+                    correct: 0,
+                    explanation: 'head shows the first lines of a file. -n specifies the number of lines.'
+                },
+                {
+                    code: 'chmod +x script.sh',
+                    options: [
+                        'Make file executable',
+                        'Change file owner',
+                        'Copy with execute permission',
+                        'Check file permissions'
+                    ],
+                    correct: 0,
+                    explanation: 'chmod +x adds execute permission to a file.'
+                },
+                {
+                    code: 'whoami',
+                    options: [
+                        'Show current username',
+                        'Show who is logged in',
+                        'Send message to all users',
+                        'List all users'
+                    ],
+                    correct: 0,
+                    explanation: 'whoami displays the current username.'
+                }
+            ],
+            medium: [
+                {
+                    code: 'for i in *.txt; do echo "$i"; done',
+                    options: [
+                        'Loop through all .txt files and print each',
+                        'Delete all .txt files',
+                        'Count all .txt files',
+                        'Search for text in files'
+                    ],
+                    correct: 0,
+                    explanation: 'This for loop iterates over all .txt files and echoes (prints) each filename.'
+                },
+                {
+                    code: 'grep -r "error" /var/log/',
+                    options: [
+                        'Search recursively for "error" in /var/log/',
+                        'Replace "error" in all log files',
+                        'Delete error logs',
+                        'Count error occurrences'
+                    ],
+                    correct: 0,
+                    explanation: 'grep searches for patterns. -r searches recursively through directories.'
+                },
+                {
+                    code: 'find . -type f -mtime -7',
+                    options: [
+                        'Find files modified in last 7 days',
+                        'Find files created in last 7 days',
+                        'Find files older than 7 days',
+                        'Find files modified at midnight'
+                    ],
+                    correct: 0,
+                    explanation: 'find locates files. -mtime -7 finds files modified within the last 7 days.'
+                },
+                {
+                    code: 'tar -czf archive.tar.gz folder/',
+                    options: [
+                        'Compress folder into tar.gz archive',
+                        'Extract tar.gz archive',
+                        'List archive contents',
+                        'Test archive integrity'
+                    ],
+                    correct: 0,
+                    explanation: 'tar -czf creates a compressed archive (c=create, z=gzip, f=file).'
+                },
+                {
+                    code: 'ps aux | grep python',
+                    options: [
+                        'List all python processes',
+                        'Kill all python processes',
+                        'Start python process',
+                        'Install python'
+                    ],
+                    correct: 0,
+                    explanation: 'ps aux lists processes, grep filters for "python" - showing running Python processes.'
+                },
+                {
+                    code: 'df -h',
+                    options: [
+                        'Show disk usage in human-readable format',
+                        'List files in detail',
+                        'Display file differences',
+                        'Find duplicate files'
+                    ],
+                    correct: 0,
+                    explanation: 'df shows disk filesystem usage. -h makes it human-readable (KB/MB/GB).'
+                },
+                {
+                    code: 'curl -s https://api.example.com | jq',
+                    options: [
+                        'Fetch JSON and format it',
+                        'Download a file',
+                        'Upload data to server',
+                        'Compare two APIs'
+                    ],
+                    correct: 0,
+                    explanation: 'curl fetches URLs, jq formats JSON output beautifully in the terminal.'
+                },
+                {
+                    code: 'chown user:group file.txt',
+                    options: [
+                        'Change file owner and group',
+                        'Change file permissions',
+                        'Copy with ownership',
+                        'Check file ownership'
+                    ],
+                    correct: 0,
+                    explanation: 'chown changes the owner and group of a file.'
+                },
+                {
+                    code: 'ln -s target link',
+                    options: [
+                        'Create symbolic link',
+                        'Create hard link',
+                        'List all links',
+                        'Remove link'
+                    ],
+                    correct: 0,
+                    explanation: 'ln -s creates a symbolic (soft) link to a target.'
+                },
+                {
+                    code: 'sort file.txt | uniq',
+                    options: [
+                        'Sort and remove duplicates',
+                        'Find unique lines only',
+                        'Compare sorted files',
+                        'Count unique lines'
+                    ],
+                    correct: 0,
+                    explanation: 'sort orders lines, uniq removes adjacent duplicates - together they get unique sorted lines.'
+                }
+            ],
+            hard: [
+                {
+                    code: 'awk -F: \'{print $1}\' /etc/passwd',
+                    options: [
+                        'Print first field (username) from passwd',
+                        'Print all fields from passwd',
+                        'Delete first field',
+                        'Count total fields'
+                    ],
+                    correct: 0,
+                    explanation: 'awk with -F: sets field separator to colon, prints $1 (first field - usernames).'
+                },
+                {
+                    code: 'sed -i \'s/foo/bar/g\' file.txt',
+                    options: [
+                        'Replace all "foo" with "bar" in file.txt',
+                        'Delete all "foo" lines',
+                        'Find "foo" in file.txt',
+                        'Save original to file.txt'
+                    ],
+                    correct: 0,
+                    explanation: 'sed -i does in-place editing, s/old/new/g replaces all occurrences globally.'
+                },
+                {
+                    code: 'netstat -tulpn | grep :80',
+                    options: [
+                        'Show processes listening on port 80',
+                        'Connect to port 80',
+                        'Block port 80',
+                        'List all network ports'
+                    ],
+                    correct: 0,
+                    explanation: 'netstat shows network statistics, -tulpn shows listening sockets with process info.'
+                },
+                {
+                    code: 'xargs -I {} cp {} /backup/',
+                    options: [
+                        'Copy each input item to /backup/',
+                        'Delete items from backup',
+                        'List backup contents',
+                        'Create backup archive'
+                    ],
+                    correct: 0,
+                    explanation: 'xargs -I {} replaces {} with each input item, running cp for each.'
+                },
+                {
+                    code: 'tar -tzf archive.tar.gz | head -5',
+                    options: [
+                        'List first 5 files in archive',
+                        'Extract 5 files from archive',
+                        'Compress 5 files',
+                        'Test archive'
+                    ],
+                    correct: 0,
+                    explanation: 'tar -t lists archive contents, head -5 shows first 5 entries.'
+                },
+                {
+                    code: 'cut -d: -f1,3 /etc/passwd | sort -t: -k2 -n',
+                    options: [
+                        'Sort users by UID',
+                        'List users and groups',
+                        'Find user by ID',
+                        'Count total users'
+                    ],
+                    correct: 0,
+                    explanation: 'cut extracts fields, sort -n sorts numerically by the second field (UID).'
+                },
+                {
+                    code: 'while read line; do echo "$line" | wc -c; done < file.txt',
+                    options: [
+                        'Print character count for each line',
+                        'Count total lines in file',
+                        'Read and delete lines',
+                        'Echo file contents'
+                    ],
+                    correct: 0,
+                    explanation: 'This reads file line by line, printing character count for each line including newline.'
+                },
+                {
+                    code: 'iptables -A INPUT -p tcp --dport 22 -j DROP',
+                    options: [
+                        'Block incoming SSH connections',
+                        'Allow SSH connections',
+                        'Redirect SSH to port 22',
+                        'Log SSH attempts'
+                    ],
+                    correct: 0,
+                    explanation: 'iptables adds (-A) a rule to INPUT chain to DROP TCP connections on port 22.'
+                },
+                {
+                    code: 'dd if=/dev/zero of=/dev/sdb bs=1M count=1',
+                    options: [
+                        'Write 1MB of zeros to beginning of disk',
+                        'Read 1MB from disk',
+                        'Copy disk to file',
+                        'Check disk speed'
+                    ],
+                    correct: 0,
+                    explanation: 'dd writes zeros to the first 1MB of sdb - often used to wipe disk headers.'
+                },
+                {
+                    code: 'exec 2>&1; set -x; commands',
+                    options: [
+                        'Redirect stderr to stdout and enable debug mode',
+                        'Execute commands in background',
+                        'Set executable flag',
+                        'Exit on error'
+                    ],
+                    correct: 0,
+                    explanation: 'exec 2>&1 redirects stderr to stdout, set -x enables command tracing/debugging.'
+                }
+            ]
+        };
+        
+        let currentDifficulty = 'medium';
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let streak = 0;
+        
+        function startGame() {
+            currentDifficulty = document.getElementById('difficulty').value;
+            currentQuestions = shuffle([...questions[currentDifficulty]]);
+            currentIndex = 0;
+            score = 0;
+            streak = 0;
+            
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').classList.add('active');
+            
+            updateStats();
+            showQuestion();
+        }
+        
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        function showQuestion() {
+            const q = currentQuestions[currentIndex];
+            
+            document.getElementById('codeBox').innerHTML = `<span class="code-line">$ ${q.code}</span>`;
+            
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+            
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt;
+                btn.onclick = () => checkAnswer(i);
+                optionsGrid.appendChild(btn);
+            });
+            
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('explanation').className = 'explanation';
+            document.getElementById('nextBtn').className = 'next-btn';
+        }
+        
+        function checkAnswer(selected) {
+            const q = currentQuestions[currentIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) btn.classList.add('correct');
+                if (i === selected && i !== q.correct) btn.classList.add('wrong');
+            });
+            
+            const feedback = document.getElementById('feedback');
+            if (selected === q.correct) {
+                score += 10 + (streak * 2);
+                streak++;
+                feedback.textContent = '✓ CORRECT!';
+                feedback.className = 'feedback show correct';
+            } else {
+                streak = 0;
+                feedback.textContent = '✗ WRONG!';
+                feedback.className = 'feedback show wrong';
+            }
+            
+            document.getElementById('explanation').innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
+            document.getElementById('explanation').className = 'explanation show';
+            document.getElementById('nextBtn').className = 'next-btn show';
+            
+            updateStats();
+        }
+        
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex >= currentQuestions.length) {
+                currentQuestions = shuffle([...questions[currentDifficulty]]);
+                currentIndex = 0;
+            }
+            document.getElementById('round').textContent = currentIndex + 1;
+            showQuestion();
+        }
+        
+        function updateStats() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('round').textContent = currentIndex + 1;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build a Self-Hosted Mail Server - Complete Guide | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn to build your own mail server with Postfix, Dovecot, and Roundcube. Full email hosting with SPF, DKIM, DMARC, and TLS. Complete tutorial for Debian Linux.">
+    <meta name="keywords" content="mail server, self-hosted email, Postfix, Dovecot, Roundcube, SPF, DKIM, DMARC, SMTP, IMAP, self-hosted, privacy">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        // Theme persistence - check and apply immediately in head
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+    <script src="terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #E74C3C;
+        }
+        
+        nav .nav-title a {
+            color: var(--white);
+            text-decoration: none;
+        }
+        
+        .lesson-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 32px;
+        }
+        
+        .lesson-content h2 {
+            font-size: 2rem;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--black);
+        }
+        
+        .lesson-content h3 {
+            font-size: 1.5rem;
+            margin: 32px 0 16px;
+        }
+        
+        .lesson-content p {
+            margin-bottom: 16px;
+        }
+        
+        .lesson-content ul, .lesson-content ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+        
+        .lesson-content li {
+            margin-bottom: 8px;
+        }
+        
+        footer {
+            padding: 48px 32px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+            width: 100%;
+        }
+
+        .project-nav {
+            background: #eeeeee;
+            border-bottom: 2px solid #000000;
+            border-top: 2px solid #000000;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 100;
+            margin-top: 52px;
+        }
+
+        .project-nav a {
+            color: #000000;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .project-nav a::after {
+            content: " |";
+            margin-left: 8px;
+            opacity: 0.5;
+        }
+
+        .project-nav a:last-child::after {
+            content: "";
+        }
+
+        [data-theme="dark"] .project-nav {
+            background: #333333;
+        }
+
+        [data-theme="dark"] .project-nav a {
+            color: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding-top: 100px !important;
+            }
+
+            nav {
+                justify-content: center;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .project-nav {
+                margin-top: 52px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#distros">DISTRO</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#projects">PROJECTS</a>
+                    <a href="../index.html#resources">RESOURCES</a>
+                    <a href="../index.html#references">REFERENCES</a>
+                    <a href="../index.html#scripts">SCRIPTS</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#contact">CONTACT</a>
+                    <a href="../index.html#stats">STATS</a>
+                    <a href="#" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="#" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="project-nav">
+        <a href="#overview">OVERVIEW</a>
+        <a href="#dns">DNS RECORDS</a>
+        <a href="#docker">DOCKER</a>
+        <a href="#postfix">POSTFIX</a>
+        <a href="#dovecot">DOVECOT</a>
+        <a href="#roundcube">ROUNDCUBE</a>
+    </div>
+
+    <header class="hero">
+        <h1>BUILD A SELF-HOSTED MAIL SERVER</h1>
+        <p class="tagline">// Own your inbox. Escape the surveillance economy.</p>
+        
+        <div class="manifesto">
+            <p><strong>// WHAT WE'RE BUILDING</strong></p>
+            <p>In this project, you'll build a complete mail server from scratch using Postfix (SMTP), Dovecot (IMAP/POP3), and Roundcube (webmail). You'll have full control over your email - no Gmail, no Outlook, no tracking.</p>
+            <p><strong>// WHY THIS MATTERS</strong></p>
+            <p>Email is the backbone of digital communication, yet most people trust tech giants with their inbox. Self-hosted email means: no scanning of your emails for ads, no "sorry, you can't send that" restrictions, complete control over your data, and true privacy.</p>
+        </div>
+    </header>
+
+    <section class="lesson-content" id="overview">
+        <h2>// What You'll Learn</h2>
+        
+        <p>This project combines multiple skills into a production-ready mail system:</p>
+        
+        <ul>
+            <li><strong>Postfix</strong> - The SMTP server that sends and receives email</li>
+            <li><strong>Dovecot</strong> - IMAP/POP3 server for retrieving email</li>
+            <li><strong>Roundcube</strong> - Beautiful webmail interface</li>
+            <li><strong>MariaDB</strong> - Store mail accounts and settings</li>
+            <li><strong>SPF, DKIM, DMARC</strong> - Email authentication to prevent spam</li>
+            <li><strong>TLS</strong> - Encrypt email in transit</li>
+            <li><strong>Docker</strong> - Containerize your mail stack</li>
+        </ul>
+
+        <h3>How Email Works</h3>
+        <p>Understanding the email architecture:</p>
+        
+        <ol>
+            <li><strong>MUA (Mail User Agent)</strong> - Your email client (Thunderbird, Roundcube, phone mail app)</li>
+            <li><strong>MTA (Mail Transfer Agent)</strong> - Postfix routes emails between servers (SMTP)</li>
+            <li><strong>MDA (Mail Delivery Agent)</strong> - Dovecot delivers mail to mailboxes (IMAP/POP3)</li>
+            <li><strong>MX Records</strong> - DNS tells the world which server accepts mail for your domain</li>
+        </ol>
+
+        <div class="highlight-box">
+            <p><strong>Prerequisites</strong></p>
+            <p>Before starting, make sure you've completed:</p>
+            <ul>
+                <li>Linux Fundamentals - Comfortable with the command line</li>
+                <li>DNS & BIND - Understand MX records and email DNS</li>
+                <li>Docker Containers - Understand Docker basics</li>
+                <li>VPS Hosting - A server with port 25 open (some providers block this)</li>
+                <li>A domain name - You'll need to manage DNS records</li>
+            </ul>
+        </div>
+
+        <h3>The Architecture</h3>
+        <p>Your mail system will use these components:</p>
+        
+        <ul>
+            <li><strong>Postfix</strong> - Receives incoming mail via SMTP (port 25)</li>
+            <li><strong>Dovecot</strong> - Serves mail via IMAP (port 143/993) and POP3 (110/995)</li>
+            <li><strong>MariaDB</strong> - Stores virtual mail users and domains</li>
+            <li><strong>Roundcube</strong> - Webmail interface via nginx</li>
+        </ul>
+    </section>
+
+    <section class="lesson-content" id="prereq">
+        <h2>// Part 1: Prerequisites & Domain Setup</h2>
+        
+        <p>Before installing mail software, we need to set up our domain and server.</p>
+
+        <h3>1.1 Choose a Domain</h3>
+        <p>You'll need a domain for email. Let's use <code>example.com</code> as our example. You'll need:</p>
+        
+        <ul>
+            <li><strong>example.com</strong> - Your domain</li>
+            <li><strong>mail.example.com</strong> - Your mail server hostname</li>
+            <li><strong>user@example.com</strong> - Your email address</li>
+        </ul>
+
+        <h3>1.2 Set Hostname</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo hostnamectl set-hostname mail.example.com</span>
+<span class="comment"># Set the hostname</span>
+<span class="prompt">$</span> <span class="command">echo "127.0.1.1 mail.example.com mail" | sudo tee -a /etc/hosts</span>
+<span class="comment"># Add to hosts file</span>
+</pre>
+        </div>
+
+        <h3>1.3 Install Required Packages</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt update</span>
+<span class="prompt">$</span> <span class="command">sudo apt install -y postfix postfix-mysql dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-mysql mariadb-server nginx certbot python3-certbot-nginx</span>
+<span class="comment"># Install mail stack</span>
+</pre>
+        </div>
+
+        <h3>1.4 Create SSL Certificate</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo certbot certonly --standalone -d mail.example.com</span>
+<span class="comment"># Get SSL certificate</span>
+</pre>
+        </div>
+
+        <h3>1.5 Create Database</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo mysql -u root -p</span>
+<span class="comment"># Connect to MariaDB</span>
+</pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">mysql></span> <span class="command">CREATE DATABASE mailserver;</span>
+<span class="prompt">mysql></span> <span class="command">CREATE USER 'mailuser'@'localhost' IDENTIFIED BY 'strong_password_here';</span>
+<span class="prompt">mysql></span> <span class="command">GRANT ALL PRIVILEGES ON mailserver.* TO 'mailuser'@'localhost';</span>
+<span class="prompt">mysql></span> <span class="command">FLUSH PRIVILEGES;</span>
+<span class="prompt">mysql></span> <span class="command">USE mailserver;</span>
+</pre>
+        </div>
+
+        <h3>1.6 Create Mail Tables</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">mysql></span> <span class="command">CREATE TABLE virtual_domains (
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;</span>
+
+<span class="prompt">mysql></span> <span class="command">CREATE TABLE virtual_users (
+    id INT NOT NULL AUTO_INCREMENT,
+    domain_id INT NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    password VARCHAR(150) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY email (email),
+    FOREIGN KEY (domain_id) REFERENCES virtual_domains(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;</span>
+
+<span class="prompt">mysql></span> <span class="command">CREATE TABLE virtual_aliases (
+    id INT NOT NULL AUTO_INCREMENT,
+    domain_id INT NOT NULL,
+    source VARCHAR(100) NOT NULL,
+    destination VARCHAR(100) NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (domain_id) REFERENCES virtual_domains(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;</span>
+</pre>
+        </div>
+
+        <h3>1.7 Add Initial Data</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">mysql></span> <span class="command">INSERT INTO virtual_domains (name) VALUES ('example.com');</span>
+<span class="prompt">mysql></span> <span class="command">INSERT INTO virtual_users (domain_id, email, password) VALUES 
+    (1, 'admin@example.com', ENCRYPT('your_secure_password'));</span>
+<span class="prompt">mysql></span> <span class="command">EXIT;</span>
+</pre>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="postfix">
+        <h2>// Part 2: Configure Postfix</h2>
+        
+        <p>Postfix is the MTA (Mail Transfer Agent) that handles sending and receiving emails.</p>
+
+        <h3>2.1 Backup Original Config</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo cp /etc/postfix/main.cf /etc/postfix/main.cf.backup</span>
+<span class="prompt">$</span> <span class="command">sudo cp /etc/postfix/master.cf /etc/postfix/master.cf.backup</span>
+</pre>
+        </div>
+
+        <h3>2.2 Configure main.cf</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/postfix/main.cf</span>
+</pre>
+        </div>
+
+        <p>Replace the file with this configuration:</p>
+        
+        <div class="config-block">
+<pre><span class="comment"># Host and domain settings</span>
+<span class="directive">myhostname</span> = mail.example.com
+<span class="directive">mydomain</span> = example.com
+<span class="directive">myorigin</span> = $mydomain
+<span class="directive">mydestination</span> = $myhostname, localhost, localhost.localdomain
+<span class="directive">mynetworks</span> = 127.0.0.0/8
+<span class="directive">inet_interfaces</span> = all
+<span class="directive">inet_protocols</span> = all
+
+<span class="comment"># Mailbox settings</span>
+<span class="directive">home_mailbox</span> = Maildir/
+<span class="directive">mailbox_command</span> =
+
+<span class="comment"># Virtual mail settings</span>
+<span class="directive">virtual_alias_domains</span> = 
+<span class="directive">virtual_alias_maps</span> = proxy:mysql:/etc/postfix/mysql/virtual_alias_maps.cf
+<span class="directive">virtual_mailbox_domains</span> = proxy:mysql:/etc/postfix/mysql/virtual_mailbox_domains.cf
+<span class="directive">virtual_mailbox_maps</span> = proxy:mysql:/etc/postfix/mysql/virtual_mailbox_maps.cf
+<span class="directive">virtual_mailbox_base</span> = /var/vmail
+<span class="directive">virtual_uid_maps</span> = static:5000
+<span class="directive">virtual_gid_maps</span> = static:5000
+
+<span class="comment"># SASL authentication</span>
+<span class="directive">smtpd_sasl_type</span> = dovecot
+<span class="directive">smtpd_sasl_path</span> = private/auth
+<span class="directive">smtpd_sasl_auth_enable</span> = yes
+<span class="directive">smtpd_sasl_security_options</span> = noanonymous
+<span class="directive">smtpd_sasl_tls_security_options</span> = $smtpd_sasl_security_options
+<span class="directive">smtpd_tls_auth_only</span> = yes
+
+<span class="comment"># TLS/SSL settings</span>
+<span class="directive">smtpd_tls_cert_file</span> = /etc/letsencrypt/live/mail.example.com/fullchain.pem
+<span class="directive">smtpd_tls_key_file</span> = /etc/letsencrypt/live/mail.example.com/privkey.pem
+<span class="directive">smtpd_use_tls</span> = yes
+
+<span class="comment"># Restrictions</span>
+<span class="directive">smtpd_recipient_restrictions</span> = permit_sasl_authenticated, permit_mynetworks, reject_unauth_destination, reject_rbl_client zen.spamhaus.org
+<span class="directive">smtpd_relay_restrictions</span> = permit_sasl_authenticated, permit_mynetworks, reject_unauth_destination
+</pre>
+        </div>
+
+        <h3>2.3 Create MySQL Config Files</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo mkdir -p /etc/postfix/mysql</span>
+</pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/postfix/mysql/virtual_mailbox_domains.cf</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+user = mailuser
+password = strong_password_here
+hosts = 127.0.0.1
+dbname = mailserver
+query = SELECT name FROM virtual_domains WHERE name='%s'
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/postfix/mysql/virtual_mailbox_maps.cf</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+user = mailuser
+password = strong_password_here
+hosts = 127.0.0.1
+dbname = mailserver
+query = SELECT CONCAT(email,'@',virtual_domains.name) FROM virtual_users JOIN virtual_domains ON virtual_users.domain_id = virtual_domains.id WHERE email='%u' AND virtual_domains.name='%d'
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/postfix/mysql/virtual_alias_maps.cf</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+user = mailuser
+password = strong_password_here
+hosts = 127.0.0.1
+dbname = mailserver
+query = SELECT destination FROM virtual_aliases JOIN virtual_domains ON virtual_aliases.domain_id = virtual_domains.id WHERE source='%u@%d'
+        </div>
+
+        <h3>2.4 Create Mail User</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo useradd -r -u 5000 -g mail -s /sbin/nologin -d /var/vmail vmail</span>
+<span class="prompt">$</span> <span class="command">sudo mkdir -p /var/vmail</span>
+<span class="prompt">$</span> <span class="command">sudo chown vmail:mail /var/vmail</span>
+</pre>
+        </div>
+
+        <h3>2.5 Configure Master.cf</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/postfix/master.cf</span>
+</pre>
+        </div>
+
+        <p>Make sure these lines exist (uncomment if needed):</p>
+        
+        <div class="config-block">
+submission inet n       -       -       -       -       smtpd
+  -o syslog_name=postfix/submission
+  -o smtpd_sasl_auth_enable=yes
+  -o smtpd_tls_auth_only=yes
+  -o smtpd_recipient_restrictions=permit_sasl_authenticated,reject
+  -o milter_macro_daemon_name=ORIGINATING
+        </div>
+
+        <h3>2.6 Restart Postfix</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo postfix check</span>
+<span class="comment"># Check for errors</span>
+<span class="prompt">$</span> <span class="command">sudo systemctl restart postfix</span>
+</pre>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="dovecot">
+        <h2>// Part 3: Configure Dovecot</h2>
+        
+        <p>Dovecot handles IMAP and POP3 - how you retrieve your emails.</p>
+
+        <h3>3.1 Configure Main Dovecot Settings</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/dovecot/dovecot.conf</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+<span class="directive">!include conf.d/*.conf</span>
+
+<span class="comment"># Enable protocols</span>
+<span class="directive">protocols</span> = imap pop3 lmtp
+
+<span class="comment"># Listen on all interfaces</span>
+<span class="directive">listen</span> = *
+
+<span class="comment"># Disable SSLv3 (security)</span>
+<span class="directive">ssl_protocols</span> = !SSLv3
+        </div>
+
+        <h3>3.2 Configure Authentication</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/dovecot/conf.d/10-auth.conf</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+<span class="directive">disable_plaintext_auth</span> = yes
+<span class="directive">auth_mechanisms</span> = plain login
+
+<span class="comment"># Use MySQL for authentication</span>
+<span class="directive">!include auth-sql.conf.ext</span>
+        </div>
+
+        <h3>3.3 Configure Mail Location</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/dovecot/conf.d/10-mail.conf</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+<span class="directive">mail_location</span> = maildir:/var/vmail/%d/%n
+<span class="directive">mail_uid</span> = 5000
+<span class="directive">mail_gid</span> = 5000
+<span class="directive">mail_privileged_group</span> = mail
+        </div>
+
+        <h3>3.4 Configure SQL Connection</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/dovecot/dovecot-sql.conf.ext</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+<span class="directive">driver</span> = mysql
+<span class="directive">connect</span> = host=127.0.0.1 dbname=mailserver user=mailuser password=strong_password_here
+<span class="directive">default_pass_scheme</span> = SHA512-CRYPT
+<span class="directive">password_query</span> = SELECT email AS user, password FROM virtual_users JOIN virtual_domains ON virtual_users.domain_id = virtual_domains.id WHERE email='%u';
+<span class="directive">user_query</span> = SELECT 5000 AS uid, 5000 AS gid, '/var/vmail/%d/%n' AS home FROM virtual_users JOIN virtual_domains ON virtual_users.domain_id = virtual_domains.id WHERE email='%u';
+        </div>
+
+        <h3>3.5 Configure SSL</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/dovecot/conf.d/10-ssl.conf</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+<span class="directive">ssl</span> = required
+<span class="directive">ssl_cert</span> = &lt;/etc/letsencrypt/live/mail.example.com/fullchain.pem
+<span class="directive">ssl_key</span> = &lt;/etc/letsencrypt/live/mail.example.com/privkey.pem
+        </div>
+
+        <h3>3.6 Configure SASL in Postfix</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/dovecot/conf.d/10-master.conf</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+<span class="directive">service imap-login</span> {
+  <span class="directive">inet_listener</span> imap {
+    <span class="directive">port</span> = 0
+  }
+  <span class="directive">inet_listener</span> imaps {
+    <span class="directive">port</span> = 993
+    <span class="directive">ssl</span> = yes
+  }
+}
+
+<span class="directive">service pop3-login</span> {
+  <span class="directive">inet_listener</span> pop3 {
+    <span class="directive">port</span> = 0
+  }
+  <span class="directive">inet_listener</span> pop3s {
+    <span class="directive">port</span> = 995
+    <span class="directive">ssl</span> = yes
+  }
+}
+
+<span class="directive">service lmtp</span> {
+  <span class="directive">unix_listener</span> /var/spool/postfix/private/dovecot-lmtp {
+    <span class="directive">mode</span> = 0600
+    <span class="directive">user</span> = postfix
+    <span class="directive">group</span> = postfix
+  }
+}
+
+<span class="directive">service auth</span> {
+  <span class="directive">unix_listener</span> /var/spool/postfix/private/auth {
+    <span class="directive">mode</span> = 0660
+    <span class="directive">user</span> = postfix
+    <span class="directive">group</span> = postfix
+  }
+}
+        </div>
+
+        <h3>3.7 Restart Dovecot</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo systemctl restart dovecot</span>
+</pre>
+        </div>
+
+        <h3>3.8 Test IMAP Connection</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">openssl s_client -connect mail.example.com:993</span>
+<span class="comment"># Test SSL connection</span>
+</pre>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="webmail">
+        <h2>// Part 4: Install Roundcube Webmail</h2>
+        
+        <p>Roundcube gives you a beautiful web interface to check your email.</p>
+
+        <h3>4.1 Install Roundcube</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install roundcube roundcube-mysql roundcube-php</span>
+</pre>
+        </div>
+
+        <h3>4.2 Configure Nginx for Roundcube</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/nginx/sites-available/mail.example.com</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+server {
+    listen 80;
+    server_name mail.example.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name mail.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/mail.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/mail.example.com/privkey.pem;
+
+    root /var/lib/roundcube;
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ /index.php;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+        </div>
+
+        <h3>4.3 Enable the Site</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo ln -s /etc/nginx/sites-available/mail.example.com /etc/nginx/sites-enabled/</span>
+<span class="prompt">$</span> <span class="command">sudo nginx -t</span>
+<span class="prompt">$</span> <span class="command">sudo systemctl reload nginx</span>
+</pre>
+        </div>
+
+        <h3>4.4 Configure Roundcube Database</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo mysql -u root -p < /usr/share/roundcube/SQL/mysql.initial.sql</span>
+</pre>
+        </div>
+
+        <h3>4.5 Configure Roundcube</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /var/lib/roundcube/config/config.inc.php</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+&lt;?php
+$config['db_dsnw'] = 'mysql://roundcube:roundcube_password@localhost/roundcube';
+$config['default_host'] = 'ssl://mail.example.com';
+$config['default_port'] = 993;
+$config['smtp_server'] = 'ssl://mail.example.com';
+$config['smtp_port'] = 465;
+$config['smtp_user'] = '%u';
+$config['smtp_pass'] = '%p';
+$config['support_url'] = 'https://example.com';
+$config['product_name'] = 'My Mail Server';
+$config['des_key'] = 'your-rcryption-key-here';
+        </div>
+
+        <div class="highlight-box">
+            <p><strong>Important:</strong> Generate a random des_key using: <code>openssl rand -base64 24</code></p>
+        </div>
+    </section>
+
+    <section class="lesson-content" id="security">
+        <h2>// Part 5: Email Security (SPF, DKIM, DMARC)</h2>
+        
+        <p>These DNS records prove your server is authorized to send email for your domain.</p>
+
+        <h3>5.1 What Are SPF, DKIM, DMARC?</h3>
+        
+        <ul>
+            <li><strong>SPF (Sender Policy Framework)</strong> - Lists which servers can send email for your domain</li>
+            <li><strong>DKIM (DomainKeys Identified Mail)</strong> - Cryptographic signature proving the email wasn't tampered with</li>
+            <li><strong>DMARC</strong> - Policy telling receivers what to do with failed checks</li>
+        </ul>
+
+        <h3>5.2 Configure SPF</h3>
+        <p>Add this TXT record to your domain's DNS:</p>
+        
+        <div class="config-block">
+TXT @ v=spf1 mx a:mail.example.com ~all
+        </div>
+
+        <h3>5.3 Install OpenDKIM</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo apt install opendkim opendkim-tools</span>
+</pre>
+        </div>
+
+        <h3>5.4 Configure OpenDKIM</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/opendkim.conf</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+AutoRestart             Yes
+AutoRestartRate         10/1M
+KeyTable                /etc/opendkim/key.table
+SigningTable            refile:/etc/opendkim/signing.table
+ExternalIgnoreList      refile:/etc/opendkim/trusted.hosts
+InternalHosts           refile:/etc/opendkim/trusted.hosts
+Syslog                  Yes
+SyslogSuccess           Yes
+LogWhy                  Yes
+
+KeyFile                 /etc/opendkim/keys/default.private
+Selector                default
+
+Socket                  inet:8891@127.0.0.1
+        </div>
+
+        <h3>5.5 Create Signing Keys</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo mkdir -p /etc/opendkim/keys</span>
+<span class="prompt">$</span> <span class="command">sudo opendkim-genkey -s default -d example.com -D /etc/opendkim/keys</span>
+<span class="prompt">$</span> <span class="command">sudo chown -R opendkim:opendkim /etc/opendkim/keys</span>
+</pre>
+        </div>
+
+        <h3>5.6 Configure Signing Table</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/opendkim/signing.table</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+*@example.com default._domainkey.example.com
+        </div>
+
+        <h3>5.7 Configure Key Table</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/opendkim/key.table</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+default._domainkey.example.com example.com:default:/etc/opendkim/keys/default.private
+        </div>
+
+        <h3>5.8 Configure Trusted Hosts</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/opendkim/trusted.hosts</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+127.0.0.1
+::1
+*.example.com
+        </div>
+
+        <h3>5.9 Connect Postfix to OpenDKIM</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo nano /etc/postfix/main.cf</span>
+</pre>
+        </div>
+
+        <div class="config-block">
+<span class="directive">milter_default_action</span> = accept
+<span class="directive">milter_protocol</span> = 6
+<span class="directive">smtpd_milters</span> = inet:127.0.0.1:8891
+<span class="directive">non_smtpd_milters</span> = inet:127.0.0.1:8891
+        </div>
+
+        <h3>5.10 Restart Services</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo systemctl restart opendkim postfix</span>
+</pre>
+        </div>
+
+        <h3>5.11 Add DKIM DNS Record</h3>
+        <p>Get your public key:</p>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">sudo cat /etc/opendkim/keys/default.txt</span>
+</pre>
+        </div>
+
+        <p>Add this TXT record to your DNS:</p>
+        
+        <div class="config-block">
+TXT default._domainkey v=DKIM1; k=rsa; p=YOUR_PUBLIC_KEY_HERE
+        </div>
+
+        <h3>5.12 Configure DMARC</h3>
+        <p>Add this TXT record to your DNS:</p>
+        
+        <div class="config-block">
+TXT _dmarc v=DMARC1; p=quarantine; rua=mailto:dmarc@example.com
+        </div>
+    </section>
+
+    <section class="lesson-content" id="dns">
+        <h2>// Part 6: DNS Configuration</h2>
+        
+        <p>Your domain's DNS tells the world how to deliver email to your server.</p>
+
+        <h3>6.1 MX Record</h3>
+        <p>Add this record to point mail to your server:</p>
+        
+        <div class="config-block">
+MX @ mail.example.com priority 10
+        </div>
+
+        <h3>6.2 A Record for Mail Server</h3>
+        
+        <div class="config-block">
+A mail Your_Server_IP_Address
+        </div>
+
+        <h3>6.3 Reverse DNS (PTR)</h3>
+        <p>Set your server's reverse DNS to mail.example.com. This must be done through your hosting provider.</p>
+
+        <h3>6.4 Test Your Setup</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">dig MX example.com</span>
+<span class="comment"># Check MX record</span>
+<span class="prompt">$</span> <span class="command">dig TXT example.com</span>
+<span class="comment"># Check SPF record</span>
+<span class="prompt">$</span> <span class="command">dig TXT default._domainkey.example.com</span>
+<span class="comment"># Check DKIM record</span>
+<span class="prompt">$</span> <span class="command">dig TXT _dmarc.example.com</span>
+<span class="comment"># Check DMARC record</span>
+</pre>
+        </div>
+
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">mail-tester.com</span>
+<span class="comment"># Test your email deliverability</span>
+</pre>
+        </div>
+    </section>
+
+    <section class="lesson-content">
+        <h2>// Part 7: Testing Your Mail Server</h2>
+        
+        <h3>7.1 Test SMTP Connection</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">openssl s_client -connect mail.example.com:465 -starttls smtp</span>
+</pre>
+        </div>
+
+        <h3>7.2 Test Sending Email</h3>
+        
+        <div class="terminal-block">
+<pre><span class="prompt">$</span> <span class="command">swaks --to test@example.com --from admin@example.com --server mail.example.com --port 587 --tls --auth-user admin@example.com --auth-password your_password</span>
+</pre>
+        </div>
+
+        <h3>7.3 Access Webmail</h3>
+        <p>Open in your browser:</p>
+        
+        <div class="config-block">
+https://mail.example.com
+        </div>
+
+        <p>Login with:</p>
+        <ul>
+            <li><strong>Username:</strong> admin@example.com</li>
+            <li><strong>Password:</strong> your_secure_password</li>
+        </ul>
+
+        <h3>7.4 Configure Email Client</h3>
+        <p>Connect your desktop or mobile email client:</p>
+        
+        <ul>
+            <li><strong>IMAP:</strong> mail.example.com:993 (SSL)</li>
+            <li><strong>POP3:</strong> mail.example.com:995 (SSL)</li>
+            <li><strong>SMTP:</strong> mail.example.com:587 (TLS)</li>
+        </ul>
+    </section>
+
+    <section class="lesson-content">
+        <h2>// What's Next?</h2>
+        
+        <p>Congratulations! You now have a fully functional mail server. Here's what you can add:</p>
+        
+        <ul>
+            <li><strong>Spam filtering</strong> - Add Rspamd or SpamAssassin</li>
+            <li><strong>ClamAV</strong> - Scan emails for viruses</li>
+            <li><strong>Fail2ban</strong> - Protect against brute force attacks</li>
+            <li><strong>Mail aliases</strong> - Create forwarding rules in the database</li>
+            <li><strong>DMARC reports</strong> - Monitor email authentication</li>
+            <li><strong>Dockerize</strong> - Containerize the entire stack</li>
+        </ul>
+
+        <div class="highlight-box">
+            <p><strong>Remember:</strong> Running a mail server requires ongoing maintenance. Monitor your logs, keep your system updated, and watch your sender reputation.</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        
+    </footer>
+
+    <script>
+        }
+    </script>
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    <script src="../nav.js" defer></script>
+</body>
+</html>

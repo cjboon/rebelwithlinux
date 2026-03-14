@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSH Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid #444444; }
+        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
+        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
+        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
+        .ssh-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .ssh-output-line { color: #aaaaaa; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .ssh-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1e; }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
+        
+        /* Light mode overrides */
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .ssh-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .ssh-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .ssh-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column-reverse;
+            }
+            .terminal-pane {
+                flex: none;
+                height: 50vh;
+            }
+            .right-pane {
+                border-bottom: 2px solid #444444;
+            }
+            .left-pane {
+                border-right: none;
+                border-top: 2px solid #444444;
+            }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea {
+                min-height: 60px !important;
+                font-size: 14px !important;
+            }
+            .mobile-run-btn { display: block !important; }
+        }
+        
+        .mobile-run-btn {
+            display: none;
+            background: #2d5016;
+            color: #98c379;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">SSH Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type SSH command:</div>
+                <textarea id="command-input" placeholder="ssh user@host" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="ssh-output-area" id="ssh-output">
+                <div class="ssh-output-line" style="color: #586e75;">SSH output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const sshOutput = document.getElementById('ssh-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=ssh');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'ssh', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addSshLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'ssh-error-line' : 'ssh-output-line';
+            line.textContent = text;
+            sshOutput.appendChild(line);
+            sshOutput.scrollTop = sshOutput.scrollHeight;
+        }
+        
+        function clearSshOutput() { sshOutput.innerHTML = ''; }
+        
+        function runSsh(cmd) {
+            addSshLine('$ ' + cmd);
+            
+            const responses = {
+                "ssh ": "Connecting...",
+                "ssh-keygen": "Generating public/private rsa key pair...",
+                "-t ed25519": "Key type: ed25519",
+                "-t rsa": "Key type: RSA",
+                "-b 4096": "Key size: 4096 bits",
+                "-f": "Key file specified",
+                "-N": "No passphrase",
+                "-p": "Change passphrase",
+                "-i": "Identity file",
+                "-p 22": "Port 22",
+                "-v": "Verbose mode",
+                "-o": "SSH config option",
+                "-L": "Local port forwarding",
+                "-R": "Remote port forwarding",
+                "-D": "Dynamic SOCKS proxy",
+                "-N": "No command (tunnel only)",
+                "-f": "Fork to background",
+                "-C": "Compress",
+                "-A": "Agent forwarding",
+                "scp": "Secure copy",
+                "ssh-copy-id": "Copy public key to server",
+                "~C": "SSH escape for port forwarding"
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addSshLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.toLowerCase().includes('ssh')) {
+                    addSshLine('(SSH command processed)');
+                } else {
+                    addSshLine('Try: ssh user@server.com', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "SSH Sam",
+            greeting: "Greetings! I'm SSH Sam - your guide to secure remote access! SSH (Secure Shell) is how you connect to servers securely. No more passwords - we're going key-based!",
+            encourage: ["Excellent!", "Secure connection!", "You're a pro!", "Keep connecting!", "Server ninja!", "Brilliant!"],
+            getEncouragement: function() { return this.encourage[Math.floor(Math.random() * this.encourage.length)]; }
+        };
+        
+        const beginnerLevels = [
+            { id: 1, title: "Basic Connection", intro: "Welcome! SSH connects to remote servers. Basic syntax is user@host.", content: "Connect to server:\nssh user@192.168.1.10", hint: "Type: ssh user@", answer: "ssh", success: "Connected! user@host is the basic syntax. Replace with your server address!", type: "contains" },
+            { id: 2, title: "Different Port", intro: "SSH defaults to port 22. Use -p to specify a different port.", content: "Connect on port 2222:\nssh -p 2222 user@server.com", hint: "Type: -p 2222", answer: "-p", success: "Port 2222! Many servers use non-standard ports for security. -p is essential!", type: "contains" },
+            { id: 3, title: "Generate Key Pair", intro: "Passwordless SSH uses key pairs. Generate with ssh-keygen.", content: "Generate key pair:\nssh-keygen -t ed25519", hint: "Type: ssh-keygen -t ed25519", answer: "ssh-keygen", success: "ed25519 key generated! Modern, secure, fast. Save to default location!", type: "contains" },
+            { id: 4, title: "Key with Comment", intro: "Add a comment to your key with -C. Helps identify keys.", content: "Generate with comment:\nssh-keygen -t ed25519 -C \"my laptop\"", hint: "Type: -C", answer: "-C", success: "Comment added! Useful when you have many keys. Your email is common too!", type: "contains" },
+            { id: 5, title: "Copy Public Key", intro: "ssh-copy-id copies your public key to the server for passwordless login.", content: "Copy key to server:\nssh-copy-id user@server.com", hint: "Type: ssh-copy-id", answer: "ssh-copy-id", success: "Key copied! Now passwordless login works. Magic!", type: "contains" },
+            { id: 6, title: "Specific Key File", intro: "Use -i to specify which key file to use.", content: "Use specific key:\nssh -i ~/.ssh/my_key user@server", hint: "Type: -i", answer: "-i", success: "Custom key used! Useful for different servers or key types.", type: "contains" },
+            { id: 7, title: "Execute Command", intro: "Run a command on remote server without interactive session.", content: "Run remote command:\nssh user@server 'ls -la'", hint: "Type: 'ls -la'", answer: "'ls", success: "Command executed! The quotes are important. Everything after host runs remotely!", type: "contains" },
+            { id: 8, title: "Verbose Mode", intro: "Use -v for verbose output. Great for debugging connection issues.", content: "Debug connection:\nssh -v user@server", hint: "Type: -v", answer: "-v", success: "Verbose output! Shows every step of the connection. Essential for troubleshooting!", type: "contains" },
+            { id: 9, title: "Copy Files (scp)", intro: "scp copies files over SSH. Syntax: scp source dest.", content: "Copy file to server:\nscp file.txt user@server:/path/", hint: "Type: scp", answer: "scp", success: "File copied! scp -r for directories. rsync -e ssh is better for big syncs!", type: "contains" },
+            { id: 10, title: "Change Key Passphrase", intro: "Use -p to change your key's passphrase without regenerating.", content: "Change passphrase:\nssh-keygen -p", hint: "Type: ssh-keygen -p", answer: "-p", success: "Passphrase changed! Always protect your keys with a passphrase!", type: "contains" },
+            { id: 11, title: "Agent Forwarding", intro: "Use -A to forward your SSH agent. Use keys on server to connect further.", content: "Enable agent forwarding:\nssh -A user@jumpbox", hint: "Type: -A", answer: "-A", success: "Agent forwarded! Now you can SSH from the jump server using your local keys. Chain jumping!", type: "contains" },
+            { id: 12, title: "Beginner Finale", intro: "Final challenge! Connect, run command, and exit all in one!", content: "Complete command:\nssh user@server 'uname -a'", hint: "Type: ssh", answer: "ssh", success: "BEGINNER COMPLETE! You can: connect, generate keys, copy, execute commands. SSH is YOURS!", type: "starts" }
+        ];
+        
+        const intermediateLevels = [
+            { id: 1, title: "Local Port Forward", intro: "INTERMEDIATE! -L forwards a local port to remote. Access remote services locally.", content: "Forward local 8080 to remote 80:\nssh -L 8080:localhost:80 user@server", hint: "Type: -L 8080", answer: "-L", success: "Port forwarded! Now localhost:8080 goes to server's port 80. Access internal services!", type: "contains" },
+            { id: 2, title: "Remote Port Forward", intro: "-R forwards remote port to local. Let remote access your local services.", content: "Remote forwards to local:\nssh -R 9000:localhost:3000 user@server", hint: "Type: -R 9000", answer: "-R", success: "Remote port 9000 now goes to your local 3000. Expose local to internet!", type: "contains" },
+            { id: 3, title: "Dynamic SOCKS Proxy", intro: "-D creates a SOCKS proxy. Route all traffic through SSH tunnel.", content: "Create SOCKS proxy:\nssh -D 1080 user@server", hint: "Type: -D 1080", answer: "-D", success: "SOCKS proxy on localhost:1080! Configure browser to use it. Encrypted browsing!", type: "contains" },
+            { id: 4, title: "SSH Config File", intro: "~/.ssh/config stores settings. Aliases make connections easy!", content: "Config entry:\nHost myserver\n  HostName server.com\n  User admin", hint: "Type: Host", answer: "Host", success: "Config saved! Now 'ssh myserver' works. Keep all your settings in one place!", type: "contains" },
+            { id: 5, title: "Jump Host", intro: "Use -J to jump through a bastion host.", content: "Jump via bastion:\nssh -J bastion@ip user@server", hint: "Type: -J", answer: "-J", success: "Jumped! Connect through bastion. No more jumping between terminals!", type: "contains" },
+            { id: 6, title: "Keep Alive", intro: "Server closes idle connections. Use ServerAliveInterval to keep alive.", content: "Keep alive:\nssh -o ServerAliveInterval=60 user@server", hint: "Type: ServerAliveInterval", answer: "ServerAlive", success: "Keeps alive! Add to config for permanent keep-alive. No more frozen sessions!", type: "contains" },
+            { id: 7, title: "Disable Password Auth", intro: "For max security, disable password auth in server's sshd_config.", content: "Disable passwords:\nPasswordAuthentication no", hint: "Type: PasswordAuthentication", answer: "PasswordAuthentication", success: "Passwords disabled! Now ONLY keys work. Much more secure!", type: "contains" },
+            { id: 8, title: "Use Specific Cipher", intro: "Use -c to specify encryption cipher.", content: "Use AES:\nssh -c aes256-ctr user@server", hint: "Type: -c aes", answer: "-c", success: "AES cipher! Some servers restrict ciphers. Pick what's supported!", type: "contains" },
+            { id: 9, title: "Escape Characters", intro: "~C in session opens command line. Add ports, tunnels on the fly.", content: "Escape to shell:\nType ~C during session", hint: "Type: ~C", answer: "~C", success: "Escape menu! ~? shows help. Add forwards mid-session. SSH within SSH!", type: "contains" },
+            { id: 10, title: "SCP Recursive", intro: "Copy entire directories with -r.", content: "Copy directory:\nscp -r /local/ user@server:/remote/", hint: "Type: scp -r", answer: "scp -r", success: "Directory copied! -r is recursive. -p preserves permissions, -a archives!", type: "contains" },
+            { id: 11, title: "Mosh for Mobile", intro: "Mosh works better on unstable connections. Install on both sides!", content: "Install mosh:\nsudo apt install mosh", hint: "Type: mosh", answer: "mosh", success: "Mosh installed! Mobile shell tolerates drops and IP changes. Perfect for traveling!", type: "contains" },
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Full tunnel setup with config.", content: "Full config:\nssh -L 8080:localhost:80 -N -f user@server", hint: "Type: -N -f", answer: "-N", success: "INTERMEDIATE COMPLETE! You command: tunnels, configs, security, jumps! You're an SSH MASTER!", type: "starts" }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') return user === answer;
+            else if (level.type === 'contains') return user.includes(answer);
+            else if (level.type === 'starts') return user.startsWith(answer);
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! SSH levels complete! You're a secure connectivity ninja!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: connections, keys, file transfer. I'll make you SSH secure!"); }
+            else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Tunnels, configs, security - advanced SSH power!"); }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                document.documentElement.requestFullscreen();
+            }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'action=updateTheme&theme=' + newTheme,
+                        credentials: 'include'
+                    });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearSshOutput();
+                runSsh(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearSshOutput();
+                runSsh(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) {
+                currentLevel = savedLevel - 1;
+            }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+                const toggle = document.getElementById('themeToggle');
+                if (toggle) toggle.checked = userTheme === 'dark';
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            // Add menu options
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basic connections & keys (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Tunnels & config (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Choose your path - click above or type --beginner, --intermediate, --fullscreen, --darkmode, or --exit", '', true);
+        }
+        init();
+    </script>
+</body>
+</html>

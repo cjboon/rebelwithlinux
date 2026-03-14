@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>curl Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        body {
+            background: #1a1a1a;
+            color: #cccccc;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        .terminal-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .left-pane {
+            border-right: 2px solid #444444;
+        }
+        
+        .terminal-header {
+            background: #333333;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        
+        .terminal-title {
+            margin-left: 1rem;
+            color: #cccccc;
+            font-size: 0.85rem;
+        }
+        
+        .pane-label {
+            background: #333333;
+            padding: 0.5rem 1rem;
+            color: #cccccc;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .input-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            background: #1a1a1a;
+        }
+        
+        .input-label {
+            color: #aaaaaa;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        #command-input {
+            flex: 1;
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #cccccc;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            resize: none;
+            outline: none;
+        }
+        
+        .hint {
+            color: #666666;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        .curl-output-area {
+            flex: 1;
+            border-top: 2px solid #444444;
+            padding: 0.5rem;
+            background: #222222;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            min-height: 100px;
+        }
+        
+        .curl-output-line {
+            color: #aaaaaa;
+            margin-bottom: 0.25rem;
+            white-space: pre-wrap;
+        }
+        
+        .curl-error-line {
+            color: #cc6666;
+            margin-bottom: 0.25rem;
+        }
+        
+        .curl-success-line {
+            color: #b5bd68;
+            margin-bottom: 0.25rem;
+        }
+        
+        .terminal-pane.right-pane {
+            flex: 1;
+        }
+        
+        .output-area {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: #1e1e1e;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .message .speaker {
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        
+        .message .text {
+            color: #cccccc;
+        }
+        
+        .message .text.fail {
+            color: #cc6666;
+        }
+        
+        .message .text.hint {
+            color: #81a2be;
+            font-style: italic;
+        }
+        
+        .message .text.success {
+            color: #b5bd68;
+        }
+        
+        .level-title {
+            color: #f0c674;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: #2d2d2d;
+            border-left: 3px solid #f0c674;
+        }
+        
+        .progress-bar {
+            background: #333333;
+            height: 20px;
+            border-radius: 3px;
+            margin: 1rem;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: #b5bd68;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        /* Light mode overrides */
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .curl-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .curl-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .curl-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #1a1a1a; }
+        [data-theme="light"] .message .text { color: #333333; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        [data-theme="light"] .progress-bar { background: #cccccc; }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column-reverse;
+            }
+            .terminal-pane {
+                flex: none;
+                height: 50vh;
+            }
+            .right-pane {
+                border-bottom: 2px solid #444444;
+            }
+            .left-pane {
+                border-right: none;
+                border-top: 2px solid #444444;
+            }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea {
+                min-height: 60px !important;
+                font-size: 14px !important;
+            }
+            .mobile-run-btn { display: block !important; }
+        }
+        
+        .mobile-run-btn {
+            display: none;
+            background: #2d5016;
+            color: #98c379;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">curl Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type curl command:</div>
+                <textarea id="command-input" placeholder="Type your answer here..." autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="curl-output-area" id="curl-output">
+                <div class="curl-output-line" style="color: #586e75;">curl output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    
+        
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const curlOutput = document.getElementById('curl-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=curl');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'curl', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addCurlLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'curl-error-line' : 'curl-output-line';
+            line.textContent = text;
+            curlOutput.appendChild(line);
+            curlOutput.scrollTop = curlOutput.scrollHeight;
+        }
+        
+        function clearCurlOutput() {
+            curlOutput.innerHTML = '';
+        }
+        
+        async function runCurl(cmd) {
+            addCurlLine('$ ' + cmd);
+            
+            // Simulated curl responses
+            const responses = {
+                'curl httpbin.org/get': '{\n  "args": {},\n  "headers": {\n    "Host": "httpbin.org"\n  },\n  "origin": "203.0.113.42",\n  "url": "https://httpbin.org/get"\n}',
+                'curl https://httpbin.org/get': '{\n  "args": {},\n  "headers": {\n    "Host": "httpbin.org"\n  },\n  "origin": "203.0.113.42",\n  "url": "https://httpbin.org/get"\n}',
+                'curl -i httpbin.org/get': 'HTTP/1.1 200 OK\ndate: Mon, 09 Mar 2026 22:00:00 GMT\ncontent-type: application/json\n{\n  "args": {},\n  "headers": {\n    "Host": "httpbin.org"\n  },\n  "origin": "203.0.113.42",\n  "url": "https://httpbin.org/get"\n}',
+                'curl -I httpbin.org/get': 'HTTP/1.1 200 OK\ndate: Mon, 09 Mar 2026 22:00:00 GMT\ncontent-type: application/json',
+                'curl -X POST httpbin.org/post': '{\n  "args": {},\n  "data": "",\n  "files": {},\n  "form": {},\n  "headers": {\n    "Content-Length": "0"\n  },\n  "json": null,\n  "origin": "203.0.113.42",\n  "url": "https://httpbin.org/post"\n}',
+                'curl -d "name=Alice" httpbin.org/post': '{\n  "args": {},\n  "data": "name=Alice",\n  "files": {},\n  "form": {},\n  "headers": {\n    "Content-Length": "11",\n    "Content-Type": "application/x-www-form-urlencoded"\n  },\n  "json": null,\n  "origin": "203.0.113.42",\n  "url": "https://httpbin.org/post"\n}',
+                'curl -H "Content-Type: application/json" httpbin.org/post': '{\n  "args": {},\n  "data": "",\n  "files": {},\n  "form": {},\n  "headers": {\n    "Content-Length": "0",\n    "Content-Type": "application/json"\n  },\n  "json": null,\n  "origin": "203.0.113.42",\n  "url": "https://httpbin.org/post"\n}',
+                'curl -A "Mozilla/5.0" httpbin.org/headers': '{\n  "headers": {\n    "Accept": "*/*",\n    "Host": "httpbin.org",\n    "User-Agent": "Mozilla/5.0"\n  }\n}',
+                'curl -v httpbin.org/get': '* Trying 203.0.113.42:80...\n* Connected to httpbin.org (203.0.113.42) port 80\n> GET /get HTTP/1.1\n> Host: httpbin.org\n> User-Agent: curl/8.0\n> Accept: */*\n< HTTP/1.1 200 OK\n< content-type: application/json\n{\n  "args": {},\n  "headers": {\n    "Host": "httpbin.org"\n  }\n}',
+                'curl -o output.txt httpbin.org/bytes/100': '  % Total    % Received  % Xfer  100  100      0     0 --:--:-- --:--:-- --:--:-- --:--:--\nSaved to bytes.txt',
+                'curl -u user:pass httpbin.org/basic-auth/user/pass': '{\n  "authenticated": true,\n  "user": "user"\n}',
+                'curl -b "session=abc123" httpbin.org/cookies': '{\n  "cookies": {\n    "session": "abc123"\n  }\n}',
+                'curl -c cookies.txt httpbin.org/cookies/set/session/abc123': '{\n  "cookies": {\n    "session": "abc123"\n  }\n}'
+            };
+            
+            // Check if command matches any response
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addCurlLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                // Generic responses based on patterns
+                if (cmd.toLowerCase().includes('curl') && cmd.toLowerCase().includes('get')) {
+                    addCurlLine('{\n  "args": {},\n  "origin": "203.0.113.42"\n}');
+                } else if (cmd.toLowerCase().includes('curl') && (cmd.toLowerCase().includes('post') || cmd.toLowerCase().includes('-d') || cmd.toLowerCase().includes('--data'))) {
+                    addCurlLine('{\n  "data": "...",\n  "origin": "203.0.113.42"\n}');
+                } else if (cmd.toLowerCase().includes('curl')) {
+                    addCurlLine('Command executed successfully (simulated response)');
+                } else {
+                    addCurlLine('Not a curl command. Start with: curl', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "curl Carl",
+            greeting: "Greetings! I'm curl Carl - your guide to mastering HTTP requests from the command line! curl is THE tool for talking to APIs, downloading files, and testing web services. Every web developer needs this in their toolkit!",
+            encourage: ["Excellent request!", "HTTP master!", "API virtuoso!", "You're a web pro!", "Speed increases with practice!", "Network ninja!"],
+            getEncouragement: function() {
+                return this.encouragement[Math.floor(Math.random() * this.encouragement.length)];
+            }
+        };
+        
+        const beginnerLevels = [
+            {
+                id: 1,
+                title: "Your First Request",
+                intro: "Welcome! Let's start with a simple GET request. curl sends HTTP requests to servers. Try fetching a URL!",
+                content: "Make a GET request:\ncurl httpbin.org/get",
+                hint: "Type: curl httpbin.org/get",
+                answer: "curl httpbin.org/get",
+                success: "That's HTTP! You just made your first request. curl defaults to GET. The server responded with JSON!",
+                type: "contains"
+            },
+            {
+                id: 2,
+                title: "HTTPS Secure",
+                intro: "Let's use HTTPS - the secure version! curl automatically follows redirects too.",
+                content: "Make a secure request:\ncurl https://httpbin.org/get",
+                hint: "Type: curl https://httpbin.org/get",
+                answer: "curl https://httpbin.org/get",
+                success: "HTTPS! The 's' means secure. curl verifies SSL certificates by default - safe by default!",
+                type: "contains"
+            },
+            {
+                id: 3,
+                title: "Show Response Headers",
+                intro: "The -i flag shows the response HEADERS along with the body. Essential for debugging!",
+                content: "Show headers with -i:\ncurl -i httpbin.org/get",
+                hint: "Type: curl -i httpbin.org/get",
+                answer: "curl -i httpbin.org/get",
+                success: "Headers! -i shows status line and headers. Look at that HTTP/1.1 200 OK! This is golden for debugging!",
+                type: "contains"
+            },
+            {
+                id: 4,
+                title: "Headers Only",
+                intro: "Need just headers? Use -I (capital) for HEAD request - gets headers only, no body.",
+                content: "Get headers only:\ncurl -I httpbin.org/get",
+                hint: "Type: curl -I httpbin.org/get",
+                answer: "curl -I httpbin.org/get",
+                success: "HEAD request! Perfect for checking if a resource exists without downloading the whole thing!",
+                type: "contains"
+            },
+            {
+                id: 5,
+                title: "Verbose Mode",
+                intro: "The -v flag gives VERBOSE output - shows the full request/response including connection details!",
+                content: "Run with verbose output:\ncurl -v httpbin.org/get",
+                hint: "Type: curl -v httpbin.org/get",
+                answer: "curl -v httpbin.org/get",
+                success: "Verbose! See the > request lines and < response lines. This is THE tool for troubleshooting connections!",
+                type: "contains"
+            },
+            {
+                id: 6,
+                title: "Follow Redirects",
+                intro: "By default curl follows redirects (301, 302). Use -L to explicitly follow them if you need more control.",
+                content: "Follow redirects explicitly:\ncurl -L httpbin.org/get",
+                hint: "Type: curl -L httpbin.org/get",
+                answer: "curl -L httpbin.org/get",
+                success: "Followed! -L makes curl follow redirects. Essential for APIs that redirect to the real endpoint!",
+                type: "contains"
+            },
+            {
+                id: 7,
+                title: "User Agent",
+                intro: "The -A flag sets the User-Agent header. Spoof your client or test responsive APIs!",
+                content: "Set custom User-Agent:\ncurl -A \"Mozilla/5.0\" httpbin.org/headers",
+                hint: "Type: curl -A \"Mozilla/5.0\" httpbin.org/headers",
+                answer: "curl -A",
+                success: "User-Agent set! -A changes what your client reports as. Test how websites respond to different browsers!",
+                type: "contains"
+            },
+            {
+                id: 8,
+                title: "Save to File",
+                intro: "Use -o to save output to a FILE instead of displaying it!",
+                content: "Save response to file:\ncurl -o output.txt httpbin.org/bytes/100",
+                hint: "Type: curl -o output.txt httpbin.org/bytes/100",
+                answer: "curl -o",
+                success: "Saved! -o saves to file. -O saves using the remote filename. Downloads made easy!",
+                type: "contains"
+            },
+            {
+                id: 9,
+                title: "Silent Mode",
+                intro: "The -s flag makes curl SILENT - no progress meter or error messages. Perfect for scripts!",
+                content: "Run silently:\ncurl -s httpbin.org/get",
+                hint: "Type: curl -s httpbin.org/get",
+                answer: "curl -s",
+                success: "Silent! -s is perfect for scripting - clean output, easy to parse!",
+                type: "contains"
+            },
+            {
+                id: 10,
+                title: "Download Progress",
+                intro: "Without -s, curl shows a PROGRESS meter. Use # to show it even with -s!",
+                content: "Show progress with #:\ncurl -# httpbin.org/bytes/1000",
+                hint: "Type: curl -# httpbin.org/bytes/1000",
+                answer: "curl -#",
+                success: "Progress! The # shows download progress even in silent mode. Balance between verbose and clean!",
+                type: "contains"
+            },
+            {
+                id: 11,
+                title: "Timeout",
+                intro: "Use --max-time to set a TIMEOUT. Don't let requests hang forever!",
+                content: "Set 5 second timeout:\ncurl --max-time 5 httpbin.org/delay/10",
+                hint: "Type: curl --max-time 5",
+                answer: "curl --max-time",
+                success: "Timed out! Good - you don't want hanging requests. Essential for production scripts!",
+                type: "contains"
+            },
+            {
+                id: 12,
+                title: "Beginner Finale",
+                intro: "Final challenge! Combine what you've learned: follow redirects, show headers, save to file!",
+                content: "GET with -iL and save:\ncurl -iL -o result.txt httpbin.org/get",
+                hint: "Type: curl -iL -o result.txt httpbin.org/get",
+                answer: "curl -iL",
+                success: "BEGINNER COMPLETE! You now know: GET, HTTPS, headers, verbose, redirects, User-Agent, save to file, silent mode, timeouts! curl is YOURS!",
+                type: "starts"
+            }
+        ];
+        
+        const intermediateLevels = [
+            {
+                id: 1,
+                title: "POST Requests",
+                intro: "Welcome to INTERMEDIATE! Let's send data with POST. Use -X POST or let curl auto-detect with -d!",
+                content: "Send POST request:\ncurl -X POST httpbin.org/post",
+                hint: "Type: curl -X POST httpbin.org/post",
+                answer: "curl -X POST",
+                success: "POST sent! Without data, it's an empty POST body. -X explicitly sets the HTTP method!",
+                type: "contains"
+            },
+            {
+                id: 2,
+                title: "Send Form Data",
+                intro: "The -d flag sends data as POST body AND sets Content-Type to application/x-www-form-urlencoded!",
+                content: "Send form data:\ncurl -d \"name=Alice\" httpbin.org/post",
+                hint: "Type: curl -d \"name=Alice\" httpbin.org/post",
+                answer: "curl -d",
+                success: "Form data sent! -d automatically adds headers and converts spaces. Perfect for HTML forms!",
+                type: "contains"
+            },
+            {
+                id: 3,
+                title: "JSON Data",
+                intro: "Send JSON with -d. You'll also want to set Content-Type header to application/json!",
+                content: "Send JSON with header:\ncurl -H \"Content-Type: application/json\" -d '{\"name\":\"Bob\"}' httpbin.org/post",
+                hint: "Type: curl -H \"Content-Type: application/json\"",
+                answer: "curl -H",
+                success: "JSON sent! -H adds custom headers. APIs love JSON - this is the standard way to send it!",
+                type: "contains"
+            },
+            {
+                id: 4,
+                title: "Multiple Headers",
+                intro: "Use multiple -H flags to send MULTIPLE headers!",
+                content: "Send multiple headers:\ncurl -H \"Accept: application/json\" -H \"Authorization: Bearer token123\" httpbin.org/headers",
+                hint: "Type: curl -H \"Accept: application/json\" -H",
+                answer: "curl -H",
+                success: "Multiple headers! Stack -H flags for all the headers you need. Auth + Accept + custom = no problem!",
+                type: "contains"
+            },
+            {
+                id: 5,
+                title: "Basic Authentication",
+                intro: "Use -u 'user:pass' for HTTP Basic Authentication! curl handles the encoding automatically!",
+                content: "Send basic auth:\ncurl -u user:pass httpbin.org/basic-auth/user/pass",
+                hint: "Type: curl -u user:pass",
+                answer: "curl -u",
+                success: "Authenticated! -u sends Basic Auth header. Many APIs use this - simple but effective!",
+                type: "contains"
+            },
+            {
+                id: 6,
+                title: "Bearer Tokens",
+                intro: "Modern APIs use Bearer tokens. Just send as Authorization header!",
+                content: "Send Bearer token:\ncurl -H \"Authorization: Bearer mytoken123\" httpbin.org/headers",
+                hint: "Type: curl -H \"Authorization: Bearer",
+                answer: "curl -H \"Authorization: Bearer",
+                success: "Bearer token! The standard for APIs. Simple header, secure your requests!",
+                type: "contains"
+            },
+            {
+                id: 7,
+                title: "Send Cookies",
+                intro: "Use -b to SEND cookies to the server! -c writes cookies TO a file!",
+                content: "Send a cookie:\ncurl -b \"session=abc123\" httpbin.org/cookies",
+                hint: "Type: curl -b",
+                answer: "curl -b",
+                success: "Cookies sent! Maintain sessions, test cookie-based auth. -b reads, -c writes to file!",
+                type: "contains"
+            },
+            {
+                id: 8,
+                title: "Save Cookies",
+                intro: "Use -c to SAVE cookies to a file. Then use -b to read them back in future requests!",
+                content: "Save cookies:\ncurl -c cookies.txt httpbin.org/cookies/set/session/abc123",
+                hint: "Type: curl -c cookies.txt",
+                answer: "curl -c",
+                success: "Cookies saved! Now use -b cookies.txt to send them back. Session management made easy!",
+                type: "contains"
+            },
+            {
+                id: 9,
+                title: "PUT Requests",
+                intro: "Use -X PUT for PUT requests - to update existing resources!",
+                content: "Send PUT request:\ncurl -X PUT -d \"name=Updated\" httpbin.org/put",
+                hint: "Type: curl -X PUT",
+                answer: "curl -X PUT",
+                success: "PUT sent! -X can set any method: PUT, DELETE, PATCH. REST APIs use them all!",
+                type: "contains"
+            },
+            {
+                id: 10,
+                title: "Delete Requests",
+                intro: "Use -X DELETE to send a DELETE request - removes resources!",
+                content: "Send DELETE request:\ncurl -X DELETE httpbin.org/delete",
+                hint: "Type: curl -X DELETE",
+                answer: "curl -X DELETE",
+                success: "DELETE sent! The full CRUD: GET, POST, PUT, DELETE. You can now do ANYTHING with APIs!",
+                type: "contains"
+            },
+            {
+                id: 11,
+                title: "Insecure HTTPS",
+                intro: "Use -k or --insecure to skip SSL verification. NEVER in production, sometimes needed for testing!",
+                content: "Skip SSL verify:\ncurl -k https://self-signed.badssl.com/",
+                hint: "Type: curl -k",
+                answer: "curl -k",
+                success: "Insecure mode! Skips SSL verification. Use only for testing with self-signed certs!",
+                type: "contains"
+            },
+            {
+                id: 12,
+                title: "Intermediate Finale",
+                intro: "Final challenge! POST JSON with auth and cookies - the full API request!",
+                content: "POST with auth + JSON:\ncurl -u user:pass -H \"Content-Type: application/json\" -d '{\"name\":\"Test\"}' httpbin.org/post",
+                hint: "Type: curl -u user:pass -H \"Content-Type: application/json\"",
+                answer: "curl -u",
+                success: "INTERMEDIATE COMPLETE! You can now: POST/PUT/DELETE, send JSON, add headers, auth, cookies. You're an API MASTER!",
+                type: "starts"
+            }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            
+            if (level.type === 'exact') {
+                return user === answer;
+            } else if (level.type === 'contains') {
+                return user.includes(answer);
+            } else if (level.type === 'starts') {
+                return user.startsWith(answer);
+            }
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! You've completed all curl levels! You're now an HTTP/API master - ready to build amazing web services!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') {
+                levels = beginnerLevels;
+                await showMessage(character.name, "Excellent! We'll start from the basics - GET requests, headers, downloading. I'll make you an HTTP hero!");
+            } else if (trackName === 'intermediate') {
+                levels = intermediateLevels;
+                await showMessage(character.name, "Welcome back! POST, JSON, authentication, cookies - these are the skills that make real API developers!");
+            }
+            
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                document.documentElement.requestFullscreen();
+            }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'action=updateTheme&theme=' + newTheme,
+                        credentials: 'include'
+                    });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') {
+                    startTrack('beginner');
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--intermediate') {
+                    startTrack('intermediate');
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--fullscreen') {
+                    toggleFullscreen();
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--darkmode') {
+                    toggleDarkMode();
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--exit') {
+                    window.location.href = '../index.html';
+                    return;
+                }
+                
+                await showMessage(character.name, "Press Ctrl+Enter to run curl commands. Use --beginner, --intermediate, --fullscreen, --darkmode, or --exit", 'hint');
+                input.value = '';
+                return;
+            }
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearCurlOutput();
+                await runCurl(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearCurlOutput();
+                await runCurl(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        // Initialize
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) {
+                currentLevel = savedLevel - 1;
+            }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+                const toggle = document.getElementById('themeToggle');
+                if (toggle) toggle.checked = userTheme === 'dark';
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basic GET requests & options (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - POST, headers, authentication (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Choose your path - click above or type --beginner, --intermediate, --fullscreen, --darkmode, or --exit", '', true);
+        }
+        init();
+    </script>
+</body>
+</html>

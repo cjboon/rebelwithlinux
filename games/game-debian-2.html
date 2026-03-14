@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debian SysAdmin Challenge 2: Advanced</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        body {
+            background: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: #161b22;
+            border-right: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #30363d;
+            text-align: center;
+            background: linear-gradient(135deg, #a80030 0%, #161b22 100%);
+        }
+        
+        .sidebar-header h1 {
+            font-size: 14px;
+            color: #c9d1d9;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 18px;
+            color: #58a6ff;
+            letter-spacing: 2px;
+        }
+        
+        .sidebar-header .part {
+            color: #8b949e;
+            font-size: 12px;
+        }
+        
+        .task-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+        
+        .task-item {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .task-item:hover {
+            border-color: #58a6ff;
+        }
+        
+        .task-item.active {
+            border-color: #58a6ff;
+            background: #1c2128;
+        }
+        
+        .task-item.completed {
+            border-color: #238636;
+            opacity: 0.6;
+        }
+        
+        .task-number {
+            font-size: 11px;
+            color: #8b949e;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .task-title {
+            color: #c9d1d9;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        
+        .task-difficulty {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-top: 6px;
+            display: inline-block;
+        }
+        
+        .diff-easy {
+            background: #23863633;
+            color: #3fb950;
+        }
+        
+        .diff-medium {
+            background: #d2992233;
+            color: #d29922;
+        }
+        
+        .diff-hard {
+            background: #f8514933;
+            color: #f85149;
+        }
+        
+        .diff-expert {
+            background: #a371f733;
+            color: #a371f7;
+        }
+        
+        .main-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .top-bar {
+            background: #161b22;
+            padding: 12px 20px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stat-label {
+            color: #8b949e;
+            font-size: 12px;
+        }
+        
+        .stat-value {
+            color: #3fb950;
+            font-weight: bold;
+        }
+        
+        .stat-value.gold {
+            color: #d29922;
+        }
+        
+        .terminal-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .terminal-tabs {
+            background: #161b22;
+            padding: 8px 16px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #30363d;
+        }
+        
+        .terminal-tab {
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+        
+        .terminal-tab.active {
+            background: #21262d;
+            color: #c9d1d9;
+            border-color: #58a6ff;
+        }
+        
+        .terminal-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: #0d1117;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .terminal-line {
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+        
+        .prompt {
+            color: #3fb950;
+        }
+        
+        .output {
+            color: #8b949e;
+            margin-left: 16px;
+            white-space: pre-wrap;
+        }
+        
+        .output.error {
+            color: #f85149;
+        }
+        
+        .output.success {
+            color: #3fb950;
+        }
+        
+        .output.info {
+            color: #58a6ff;
+        }
+        
+        .output.warning {
+            color: #d29922;
+        }
+        
+        .output.code {
+            color: #a5d6ff;
+            background: #161b22;
+            padding: 8px 12px;
+            margin: 8px 0;
+            border-radius: 4px;
+        }
+        
+        .input-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #161b22;
+            border-top: 1px solid #30363d;
+        }
+        
+        .input-line .prompt {
+            white-space: nowrap;
+        }
+        
+        #command-input {
+            flex: 1;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 8px 12px;
+            outline: none;
+        }
+        
+        #command-input:focus {
+            border-color: #58a6ff;
+        }
+        
+        .help-panel {
+            background: #161b22;
+            border-top: 1px solid #30363d;
+            padding: 12px 16px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        
+        .help-title {
+            color: #58a6ff;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        
+        .help-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+        
+        .help-cmd {
+            color: #3fb950;
+            min-width: 180px;
+        }
+        
+        .help-desc {
+            color: #8b949e;
+        }
+        
+        .intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(13, 17, 23, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        
+        .intro-box {
+            background: #161b22;
+            border: 1px solid #30363d;
+            padding: 40px;
+            max-width: 620px;
+            text-align: center;
+        }
+        
+        .intro-box h2 {
+            color: #58a6ff;
+            margin-bottom: 16px;
+            font-size: 22px;
+        }
+        
+        .intro-box h3 {
+            color: #d29922;
+            margin-bottom: 16px;
+            font-size: 16px;
+        }
+        
+        .intro-box p {
+            color: #8b949e;
+            margin-bottom: 12px;
+            line-height: 1.6;
+            text-align: left;
+        }
+        
+        .intro-box .start-btn {
+            background: #238636;
+            border: none;
+            color: white;
+            padding: 12px 32px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        
+        .intro-box .start-btn:hover {
+            background: #2ea043;
+        }
+        
+        .hint-box {
+            background: #1c2128;
+            border: 1px solid #30363d;
+            padding: 12px;
+            margin: 12px 0;
+        }
+        
+        .hint-title {
+            color: #d29922;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        
+        .hint-text {
+            color: #8b949e;
+            font-size: 12px;
+        }
+        
+        .system-status {
+            background: #161b22;
+            border: 1px solid #30363d;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .status-title {
+            color: #58a6ff;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 12px;
+        }
+        
+        .status-item .label {
+            color: #8b949e;
+        }
+        
+        .status-item .value {
+            color: #3fb950;
+        }
+        
+        .status-item .value.warning {
+            color: #d29922;
+        }
+        
+        .status-item .value.error {
+            color: #f85149;
+        }
+        
+        .result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(13, 17, 23, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        
+        .result-box {
+            background: #161b22;
+            border: 1px solid #30363d;
+            padding: 32px;
+            text-align: center;
+            max-width: 450px;
+        }
+        
+        .result-box h3 {
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .result-box.success {
+            border-color: #238636;
+        }
+        
+        .result-box.success h3 {
+            color: #3fb950;
+        }
+        
+        .result-box.error {
+            border-color: #f85149;
+        }
+        
+        .result-box.error h3 {
+            color: #f85149;
+        }
+        
+        .result-box.gameover {
+            border-color: #d29922;
+        }
+        
+        .result-box.gameover h3 {
+            color: #d29922;
+        }
+        
+        .result-box p {
+            color: #8b949e;
+            margin-bottom: 20px;
+        }
+        
+        .result-box button {
+            background: #238636;
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .current-task-panel {
+            background: #21262d;
+            border: 1px solid #30363d;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 3px solid #58a6ff;
+        }
+        
+        .current-task-label {
+            color: #58a6ff;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        
+        .current-task-title {
+            color: #c9d1d9;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .current-task-desc {
+            color: #8b949e;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        
+        .code-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+        
+        .code-block .keyword {
+            color: #ff7b72;
+        }
+        
+        .code-block .string {
+            color: #a5d6ff;
+        }
+        
+        .code-block .comment {
+            color: #484f58;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: #21262d;
+            margin-top: 12px;
+            border-radius: 2px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #238636;
+            transition: width 0.3s;
+            border-radius: 2px;
+        }
+        
+        .achievement {
+            background: linear-gradient(135deg, #238636 0%, #161b22 100%);
+            border: 1px solid #3fb950;
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 6px;
+        }
+        
+        .achievement-title {
+            color: #3fb950;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .achievement-desc {
+            color: #8b949e;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 30vh;
+                border-right: none;
+                border-bottom: 1px solid #30363d;
+            }
+            .main-panel { flex: 1; }
+            .terminal-area { padding: 10px; }
+            #command-input {
+                width: 100%;
+                padding: 12px;
+                font-size: 14px;
+            }
+            .mobile-run-btn {
+                display: block !important;
+                background: #238636;
+                color: white;
+                border: none;
+                padding: 12px;
+                font-family: 'Courier New', monospace;
+                font-size: 14px;
+                cursor: pointer;
+                border-radius: 4px;
+            }
+        }
+        
+        .mobile-run-btn { display: none; }
+    </style>
+</head>
+<body>
+    <div class="intro-overlay" id="intro">
+        <div class="intro-box">
+            <h2>DEBIAN SYSADMIN CHALLENGE</h2>
+            <h3>PART 2: ADVANCED OPERATIONS</h3>
+            <p>Welcome back, sysadmin! You've proven yourself in Part 1. Now it's time for more advanced challenges.</p>
+            <p><strong>New topics include:</strong> Docker containers, SSL certificates, reverse proxies, monitoring, backups, email basics, and security hardening.</p>
+            <p>Complete all 12 advanced tasks to earn the "Senior SysAdmin" badge!</p>
+            <p><strong>Commands:</strong> docker, certbot, crontab, logrotate, fail2ban-client, ufw, rsync, systemd-timer, nginx -T, apt list, journalctl</p>
+            <button class="start-btn" onclick="startGame()">BEGIN ADVANCED CHALLENGE</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>DEBIAN SYSADMIN</h1>
+                <h2>PART 2</h2>
+                <div class="part">ADVANCED OPERATIONS</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="task-list" id="taskList">
+            </div>
+        </div>
+        
+        <div class="main-panel">
+            <div class="top-bar">
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-label">Score:</span>
+                        <span class="stat-value gold" id="score">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Completed:</span>
+                        <span class="stat-value" id="completed">0/12</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Rank:</span>
+                        <span class="stat-value" id="rank">Junior Admin</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="terminal-area">
+                <div class="terminal-tabs">
+                    <button class="terminal-tab active" onclick="switchTab('task')">Current Task</button>
+                    <button class="terminal-tab" onclick="switchTab('system')">Server Status</button>
+                    <button class="terminal-tab" onclick="switchTab('docker')">Docker</button>
+                </div>
+                
+                <div class="terminal-content" id="terminalContent">
+                    <div id="taskView">
+                        <div class="current-task-panel">
+                            <div class="current-task-label">Current Task</div>
+                            <div class="current-task-title" id="taskTitle">Welcome!</div>
+                            <div class="current-task-desc" id="taskDesc">Select a task from the sidebar to begin.</div>
+                        </div>
+                    </div>
+                    <div id="systemView" style="display: none;">
+                        <div class="system-status">
+                            <div class="status-title">SERVER STATUS</div>
+                            <div class="status-item">
+                                <span class="label">Hostname</span>
+                                <span class="value">debian-prod</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">OS</span>
+                                <span class="value">Debian 12 (Bookworm)</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Uptime</span>
+                                <span class="value" id="uptime">2 days</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">CPU Load</span>
+                                <span class="value">0.45, 0.32, 0.28</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Memory</span>
+                                <span class="value">1.8G / 8G (22%)</span>
+                            </div>
+                        </div>
+                        <div class="system-status">
+                            <div class="status-title">RUNNING SERVICES</div>
+                            <div class="status-item">
+                                <span class="label">SSH</span>
+                                <span class="value">active</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Nginx</span>
+                                <span class="value" id="nginxStatus">active</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Docker</span>
+                                <span class="value" id="dockerStatus">inactive</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Firewall</span>
+                                <span class="value">active</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="dockerView" style="display: none;">
+                        <div class="system-status">
+                            <div class="status-title">DOCKER CONTAINERS</div>
+                            <div class="status-item">
+                                <span class="label">Docker</span>
+                                <span class="value" id="dockerInstalledStatus">Not Installed</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Containers</span>
+                                <span class="value" id="containerCount">0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Images</span>
+                                <span class="value" id="imageCount">0</span>
+                            </div>
+                        </div>
+                        <div class="system-status">
+                            <div class="status-title">AVAILABLE IMAGES</div>
+                            <div style="color: #8b949e; font-size: 12px;">
+                                Run 'docker pull nginx' to download images
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-line">
+                    <span class="prompt">root@debian-prod:~#</span>
+                    <input type="text" id="command-input" placeholder="Enter command..." autofocus>
+                    <button class="mobile-run-btn" id="runBtn">Run</button>
+                </div>
+                
+                <div class="help-panel">
+                    <div class="help-title">Advanced Commands</div>
+                    <div class="help-item"><span class="help-cmd">docker pull [image]</span><span class="help-desc">Download a container image</span></div>
+                    <div class="help-item"><span class="help-cmd">docker run -d -p [port]:[port]</span><span class="help-desc">Run a container in background</span></div>
+                    <div class="help-item"><span class="help-cmd">docker ps -a</span><span class="help-desc">List all containers</span></div>
+                    <div class="help-item"><span class="help-cmd">certbot --nginx</span><span class="help-desc">Get free SSL certificate</span></div>
+                    <div class="help-item"><span class="help-cmd">crontab -e</span><span class="help-desc">Edit scheduled tasks</span></div>
+                    <div class="help-item"><span class="help-cmd">fail2ban-client status</span><span class="help-desc">Check banned IPs</span></div>
+                    <div class="help-item"><span class="help-cmd">journalctl -u [service]</span><span class="help-desc">View service logs</span></div>
+                    <div class="help-item"><span class="help-cmd">hint</span><span class="help-desc">Get task hint</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="result-modal" id="resultModal" style="display: none;">
+        <div class="result-box" id="resultBox">
+            <h3 id="resultTitle">Task Complete!</h3>
+            <p id="resultMessage">Great work!</p>
+            <button onclick="closeResult()">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        const tasks = [
+            {
+                id: 1,
+                title: "Install Docker",
+                desc: "Docker is essential for modern deployment. Install Docker CE (Community Edition) on Debian.",
+                difficulty: "medium",
+                hint: "Update apt, install packages to allow apt to use repository, add Docker GPG key, add repository, then apt install docker-ce",
+                check: (state) => state.dockerInstalled,
+                solve: (cmd, state) => {
+                    if (cmd.includes('apt install') && (cmd.includes('docker') || cmd.includes('docker-ce'))) {
+                        state.dockerInstalled = true;
+                        return { success: true, message: "Docker CE installed successfully!" };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 2,
+                title: "Start Docker Service",
+                desc: "Docker is installed but not running. Enable and start the Docker service.",
+                difficulty: "easy",
+                hint: "systemctl enable docker && systemctl start docker",
+                check: (state) => state.dockerRunning,
+                solve: (cmd, state) => {
+                    if (cmd.includes('systemctl start') && cmd.includes('docker')) {
+                        state.dockerRunning = true;
+                        return { success: true, message: "Docker service started and enabled!" };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 3,
+                title: "Pull a Container Image",
+                desc: "Download the official Nginx image from Docker Hub to use for our web server.",
+                difficulty: "easy",
+                hint: "docker pull nginx",
+                check: (state) => state.nginxPulled,
+                solve: (cmd, state) => {
+                    if (cmd.includes('docker pull') && cmd.includes('nginx')) {
+                        state.nginxPulled = true;
+                        return { success: true, message: "Nginx image pulled from Docker Hub!" };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 4,
+                title: "Run Nginx in Docker",
+                desc: "Run a Nginx container in detached mode, mapping port 8080 on host to port 80 in container.",
+                difficulty: "medium",
+                hint: "docker run -d -p 8080:80 nginx",
+                check: (state) => state.nginxRunning,
+                solve: (cmd, state) => {
+                    if (cmd.includes('docker run') && cmd.includes('-d') && cmd.includes('-p 8080:80') && cmd.includes('nginx')) {
+                        state.nginxRunning = true;
+                        return { success: true, message: "Nginx container running on port 8080!" };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 5,
+                title: "Set Up SSL with Certbot",
+                desc: "Install Certbot and obtain a free SSL certificate from Let's Encrypt for your domain.",
+                difficulty: "hard",
+                hint: "apt install certbot python3-certbot-nginx, then certbot --nginx -d yourdomain.com",
+                check: (state) => state.sslConfigured,
+                solve: (cmd, state) => {
+                    if (cmd.includes('apt install') && cmd.includes('certbot')) {
+                        return { success: false, message: "Certbot installed. Now obtain a certificate with 'certbot --nginx -d yourdomain.com'" };
+                    }
+                    if (cmd.includes('certbot') && cmd.includes('--nginx')) {
+                        state.sslConfigured = true;
+                        return { success: true, message: "SSL certificate obtained and configured! HTTPS is now enabled." };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 6,
+                title: "Configure Logrotate",
+                desc: "Log files can grow huge. Configure logrotate to automatically rotate and compress logs weekly.",
+                difficulty: "medium",
+                hint: "Edit /etc/logrotate.conf or create /etc/logrotate.d/nginx",
+                check: (state) => state.logrotateConfigured,
+                solve: (cmd, state) => {
+                    if ((cmd.includes('nano') || cmd.includes('vim') || cmd.includes('cat') || cmd.includes('tee')) && 
+                        cmd.includes('logrotate')) {
+                        state.logrotateConfigured = true;
+                        return { success: true, message: "Logrotate configured! Logs will now be rotated weekly." };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 7,
+                title: "Set Up Backup with Rsync",
+                desc: "Configure automated backups using rsync to sync /var/www to /backup location.",
+                difficulty: "medium",
+                hint: "Create a backup directory, then set up a cron job: crontab -e with rsync command",
+                check: (state) => state.backupConfigured,
+                solve: (cmd, state) => {
+                    if (cmd.includes('crontab') && cmd.includes('-e')) {
+                        state.backupConfigured = true;
+                        return { success: true, message: "Cron job created! Backups will run automatically." };
+                    }
+                    if (cmd.includes('mkdir') && cmd.includes('backup')) {
+                        return { success: false, message: "Backup directory created. Now set up the cron job with 'crontab -e'" };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 8,
+                title: "Configure Reverse Proxy",
+                desc: "Set up Nginx as a reverse proxy to forward requests to your Docker container.",
+                difficulty: "hard",
+                hint: "Edit /etc/nginx/sites-available/default, add location / { proxy_pass http://localhost:8080; }",
+                check: (state) => state.reverseProxyConfigured,
+                solve: (cmd, state) => {
+                    if ((cmd.includes('nano') || cmd.includes('vim') || cmd.includes('cat')) && 
+                        (cmd.includes('nginx') || cmd.includes('sites-available') || cmd.includes('default'))) {
+                        state.reverseProxyConfigured = true;
+                        return { success: true, message: "Reverse proxy configured! Nginx now forwards to Docker container." };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 9,
+                title: "Set Up Fail2Ban Monitoring",
+                desc: "Check which IPs have been banned by Fail2Ban and configure a custom jail.",
+                difficulty: "medium",
+                hint: "fail2ban-client status, then create /etc/fail2ban/jail.local",
+                check: (state) => state.fail2banChecked,
+                solve: (cmd, state) => {
+                    if (cmd.includes('fail2ban-client') && (cmd.includes('status') || cmd.includes('get'))) {
+                        state.fail2banChecked = true;
+                        return { success: true, message: "Fail2Ban status checked! Review banned IPs and consider custom jails." };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 10,
+                title: "Monitor with journalctl",
+                desc: "Use journalctl to check the logs of your Nginx service and find any errors.",
+                difficulty: "easy",
+                hint: "journalctl -u nginx -e (or journalctl -u nginx --since '1 hour ago')",
+                check: (state) => state.journalChecked,
+                solve: (cmd, state) => {
+                    if (cmd.includes('journalctl') && cmd.includes('nginx')) {
+                        state.journalChecked = true;
+                        return { success: true, message: "Nginx logs reviewed! Found any errors?" };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 11,
+                title: "Set Up UFW for Docker",
+                desc: "Configure UFW to allow Docker container ports while maintaining security.",
+                difficulty: "hard",
+                hint: "ufw allow 8080/tcp, then edit /etc/default/ufw to allow forwarded traffic",
+                check: (state) => state.ufwDockerConfigured,
+                solve: (cmd, state) => {
+                    if (cmd.includes('ufw') && cmd.includes('allow') && cmd.includes('8080')) {
+                        state.ufwDockerConfigured = true;
+                        return { success: true, message: "UFW configured for Docker! Port 8080 is now allowed through firewall." };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 12,
+                title: "System Hardening Checklist",
+                desc: "Run a basic security audit. Check what packages have updates available.",
+                difficulty: "easy",
+                hint: "apt list --upgradable to see available updates",
+                check: (state) => state.securityAuditDone,
+                solve: (cmd, state) => {
+                    if (cmd.includes('apt list') && cmd.includes('upgradable')) {
+                        state.securityAuditDone = true;
+                        return { success: true, message: "Security audit complete! Review and install updates regularly." };
+                    }
+                    return null;
+                }
+            }
+        ];
+
+        let gameState = {
+            dockerInstalled: false,
+            dockerRunning: false,
+            nginxPulled: false,
+            nginxRunning: false,
+            sslConfigured: false,
+            logrotateConfigured: false,
+            backupConfigured: false,
+            reverseProxyConfigured: false,
+            fail2banChecked: false,
+            journalChecked: false,
+            ufwDockerConfigured: false,
+            securityAuditDone: false
+        };
+
+        let currentTaskIndex = 0;
+        let score = 0;
+        let completedTasks = [];
+
+        function startGame() {
+            document.getElementById('intro').style.display = 'none';
+            renderTaskList();
+            loadTask(0);
+        }
+
+        function getRank(score) {
+            if (score >= 300) return "Master SysAdmin";
+            if (score >= 220) return "Senior Admin";
+            if (score >= 140) return "Admin";
+            if (score >= 70) return "Junior Admin";
+            return "Intern";
+        }
+
+        function renderTaskList() {
+            const list = document.getElementById('taskList');
+            let html = '';
+            
+            tasks.forEach((task, index) => {
+                const isActive = index === currentTaskIndex;
+                const isCompleted = completedTasks.includes(task.id);
+                const difficultyClass = `diff-${task.difficulty}`;
+                
+                html += `
+                    <div class="task-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}" onclick="loadTask(${index})">
+                        <div class="task-number">
+                            <span>TASK ${task.id}</span>
+                            <span>${isCompleted ? '✓' : ''}</span>
+                        </div>
+                        <div class="task-title">${task.title}</div>
+                        <span class="task-difficulty ${difficultyClass}">${task.difficulty}</span>
+                    </div>
+                `;
+            });
+            
+            list.innerHTML = html;
+            
+            const progress = (completedTasks.length / tasks.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function loadTask(index) {
+            currentTaskIndex = index;
+            const task = tasks[index];
+            
+            renderTaskList();
+            
+            document.getElementById('taskTitle').textContent = `Task ${task.id}: ${task.title}`;
+            document.getElementById('taskDesc').textContent = task.desc;
+            
+            switchTab('task');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.terminal-tab').forEach(t => t.classList.remove('active'));
+            event?.target?.classList?.add('active');
+            
+            document.getElementById('taskView').style.display = 'none';
+            document.getElementById('systemView').style.display = 'none';
+            document.getElementById('dockerView').style.display = 'none';
+            
+            document.getElementById(tab + 'View').style.display = 'block';
+        }
+
+        function executeCommand(cmd) {
+            const trimmedCmd = cmd.trim().toLowerCase();
+            const task = tasks[currentTaskIndex];
+            
+            if (trimmedCmd === 'hint') {
+                addOutput(`💡 ${task.hint}`, 'warning');
+                return;
+            }
+            
+            if (trimmedCmd === 'clear') {
+                clearTerminal();
+                return;
+            }
+            
+            const result = task.solve(cmd, gameState);
+            
+            if (result) {
+                addOutput(`$ ${cmd}`, '');
+                
+                if (result.success) {
+                    addOutput(result.message, 'success');
+                    
+                    if (task.check(gameState) && !completedTasks.includes(task.id)) {
+                        completedTasks.push(task.id);
+                        const points = task.difficulty === 'easy' ? 10 : task.difficulty === 'medium' ? 20 : task.difficulty === 'hard' ? 30 : 40;
+                        score += points;
+                        updateStats();
+                        
+                        setTimeout(() => {
+                            showResult(true, `Task ${task.id} complete! +${points} points\n${getRank(score)}`);
+                        }, 500);
+                    }
+                } else {
+                    addOutput(result.message, 'error');
+                }
+            } else {
+                addOutput(`$ ${cmd}`, '');
+                addOutput(`Command accepted. Keep working on the task or type 'hint' for help.`, 'info');
+            }
+        }
+
+        function addOutput(text, type) {
+            const terminal = document.getElementById('taskView');
+            const div = document.createElement('div');
+            div.className = `terminal-line ${type}`;
+            div.innerHTML = `<span class="output ${type}">${text}</span>`;
+            terminal.appendChild(div);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function clearTerminal() {
+            const task = tasks[currentTaskIndex];
+            document.getElementById('taskView').innerHTML = `
+                <div class="current-task-panel">
+                    <div class="current-task-label">Current Task</div>
+                    <div class="current-task-title">Task ${task.id}: ${task.title}</div>
+                    <div class="current-task-desc">${task.desc}</div>
+                </div>
+            `;
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('completed').textContent = `${completedTasks.length}/${tasks.length}`;
+            document.getElementById('rank').textContent = getRank(score);
+            renderTaskList();
+        }
+
+        function showResult(success, message) {
+            const modal = document.getElementById('resultModal');
+            const box = document.getElementById('resultBox');
+            const title = document.getElementById('resultTitle');
+            const msg = document.getElementById('resultMessage');
+            
+            if (completedTasks.length === tasks.length) {
+                box.className = 'result-box gameover';
+                title.textContent = '🎉 CHALLENGE COMPLETE!';
+                msg.textContent = `Congratulations! You've completed all 12 advanced tasks!\n\nFinal Score: ${score}\nRank: ${getRank(score)}\n\nYou are now a certified Senior SysAdmin!`;
+            } else {
+                box.className = `result-box ${success ? 'success' : 'error'}`;
+                title.textContent = success ? '✓ Task Complete!' : '✗ Task Failed';
+                msg.textContent = message;
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeResult() {
+            document.getElementById('resultModal').style.display = 'none';
+            
+            if (completedTasks.length === tasks.length) {
+                return;
+            }
+            
+            if (currentTaskIndex < tasks.length - 1) {
+                loadTask(currentTaskIndex + 1);
+            }
+        }
+
+        document.getElementById('command-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const cmd = this.value;
+                if (cmd.trim()) {
+                    executeCommand(cmd);
+                }
+                this.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', function() {
+                const input = document.getElementById('command-input');
+                const cmd = input.value;
+                if (cmd.trim()) {
+                    executeCommand(cmd);
+                }
+                input.value = '';
+            });
+        }
+    </script>
+</body>
+</html>

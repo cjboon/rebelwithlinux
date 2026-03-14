@@ -1,0 +1,2917 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Networking - Master Network Configuration | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn Linux networking from basics to advanced. Master IP configuration, iptables, network troubleshooting, VPNs, and server networking.">
+    <meta name="keywords" content="Linux networking, IP configuration, iptables, network troubleshooting, VPN, SSH tunneling, port forwarding, network interfaces, routing, firewall">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        // Theme persistence - check and apply immediately in head
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        // Sync checkbox after DOM loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    <script src="../terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #FF6B35;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">LINUX NETWORKING</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#distros">DISTRO</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#projects">PROJECTS</a>
+                    <a href="../index.html#resources">RESOURCES</a>
+                    <a href="../index.html#references">REFERENCES</a>
+                    <a href="../index.html#scripts">SCRIPTS</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#contact">CONTACT</a>
+                    <a href="../index.html#stats">STATS</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>LINUX<br>NETWORKING</h1>
+        <p class="tagline">// Connect. Route. Secure.</p>
+        
+        <div class="manifesto">
+            <p><strong>NETWORKING IS THE LIFEBLOOD OF SERVERS.</strong></p>
+            <p>Every service runs on a network port. Every server needs an IP. Understanding how data flows through your system is fundamental to being a competent Linux administrator.</p>
+            <p><strong>FIREWALLS PROTECT WHAT YOU OWN.</strong></p>
+            <p>iptables isn't just a tool—it's your first line of defense. Learn to block threats, forward ports, and shape traffic. The internet is hostile. Your firewall is your shield.</p>
+            <p><strong>MASTER THE STACK.</strong></p>
+            <p>From IP addresses to SSH tunnels, from DNS resolution to packet filtering. This guide takes you from "it works" to "I understand exactly what's happening."</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">START LEARNING →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to Network Mastery</h2>
+            <p>12 lessons. Full network control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Linux Networking</h3>
+                <p class="lesson-desc">Understand networking fundamentals on Linux systems</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Network Interfaces and IP Configuration</h3>
+                <p class="lesson-desc">Configure IPs, subnets, and interfaces</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Routing and the Routing Table</h3>
+                <p class="lesson-desc">Master network routing and gateway configuration</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">DNS Configuration on Linux</h3>
+                <p class="lesson-desc">Set up and troubleshoot DNS resolution</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">iptables Basics - Your First Firewall</h3>
+                <p class="lesson-desc">Build basic firewall rules with iptables</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">NAT and Port Forwarding</h3>
+                <p class="lesson-desc">Configure network address translation</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Network Diagnostics and Troubleshooting</h3>
+                <p class="lesson-desc">Use ping, traceroute, tcpdump, and netstat</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">SSH Tunneling and Port Forwarding</h3>
+                <p class="lesson-desc">Secure remote access and tunneling techniques</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">VPNs with WireGuard</h3>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Network Monitoring and Performance</h3>
+                <p class="lesson-desc">Monitor bandwidth, latency, and packet loss</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">VPN Setup</h3>
+                <p class="lesson-desc">Configure OpenVPN and WireGuard VPN servers</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Advanced Networking</h3>
+                <p class="lesson-desc">Load balancing, high availability, and network automation</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why Networking Matters</h2>
+            <p>Linux powers the vast majority of servers on the internet. Understanding networking on Linux means you can:</p>
+            <ul>
+                <li><strong>Configure servers:</strong> Set static IPs, configure DNS, manage routes</li>
+                <li><strong>Secure your systems:</strong> Build firewalls that actually protect</li>
+                <li><strong>Debug issues:</strong> Trace connectivity problems to their source</li>
+                <li><strong>Enable services:</strong> Run web servers, databases, and APIs</li>
+                <li><strong>Create VPNs:</strong> Access your servers securely from anywhere</li>
+            </ul>
+            <p>Every network service, every web application, every container—everything depends on networking. Master this, and you can build anything.</p>
+            <p><strong>The internet runs on Linux. Now you'll know how.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>📖 iptables Manual</h3>
+                <p>Linux firewall documentation</p>
+                <a href="https://linux.die.net/man/8/iptables" target="_blank">linux.die.net/man/8/iptables</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔧 ip Command</h3>
+                <p>Network configuration tool</p>
+                <a href="https://man7.org/linux/man-pages/man8/ip.8.html" target="_blank">man7.org/linux/man-pages</a>
+            </div>
+            <div class="resource-card">
+                <h3>🛡️ nftables</h3>
+                <p>Next-generation firewall</p>
+                <a href="https://wiki.nftables.org/" target="_blank">wiki.nftables.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>📡 SS Command</h3>
+                <p>Socket statistics tool</p>
+                <a href="https://man7.org/linux/man-pages/man8/ss.8.html" target="_blank">man7.org/linux/man-pages</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔍 netstat</h3>
+                <p>Network statistics</p>
+                <a href="https://man7.org/linux/man-pages/man1/netstat.1.html" target="_blank">man7.org/linux/man-pages</a>
+            </div>
+            <div class="resource-card">
+                <h3>🌐 WireGuard</h3>
+                <p>Modern VPN solution</p>
+                <a href="https://www.wireguard.com/" target="_blank">wireguard.com</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        
+    </footer>
+
+    <div class="lesson-content" id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const lessons = [
+            {
+                id: 1,
+                title: "Introduction to Linux Networking",
+                difficulty: "beginner",
+                content: `
+                    <h3>How Linux Handles Networking</h3>
+                    <p>Linux has a powerful networking stack built into the kernel. Every packet that enters or leaves your system goes through this stack, and you can configure every aspect of it.</p>
+                    
+                    <h3>The OSI Model Refresher</h3>
+                    <p>Understanding networking requires knowing the OSI model layers:</p>
+                    <ul>
+                        <li><strong>Layer 1 (Physical):</strong> Cables, NICs, hardware</li>
+                        <li><strong>Layer 2 (Data Link):</strong> MAC addresses, switches</li>
+                        <li><strong>Layer 3 (Network):</strong> IP addresses, routing</li>
+                        <li><strong>Layer 4 (Transport):</strong> TCP/UDP, ports</li>
+                        <li><strong>Layer 7 (Application):</strong> HTTP, DNS, SSH</li>
+                    </ul>
+                    
+                    <h3>Key Networking Concepts</h3>
+                    <ul>
+                        <li><strong>IP Address:</strong> A unique identifier for your machine on a network</li>
+                        <li><strong>Subnet Mask:</strong> Defines which addresses are "local"</li>
+                        <li><strong>Gateway:</strong> The router that connects your network to the internet</li>
+                        <li><strong>DNS:</strong> Translates domain names to IP addresses</li>
+                        <li><strong>Port:</strong> A logical endpoint for network communication (1-65535)</li>
+                    </ul>
+                    
+                    <h3>Your First Network Commands</h3>
+                    <pre><span class="prompt">$</span> <span class="command">ip addr show</span>           <span class="comment"># Show all network interfaces and IPs</span>
+<span class="prompt">$</span> <span class="command">ip route show</span>          <span class="comment"># Show routing table</span>
+<span class="prompt">$</span> <span class="command">cat /etc/resolv.conf</span>   <span class="comment"># Show DNS servers</span>
+<span class="prompt">$</span> <span class="command">hostname -I</span>           <span class="comment"># Show all IP addresses</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="layer 3">
+                        <p>What layer of the OSI model handles IP addresses?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="osi model">
+                        <p>What model has 7 layers for networking?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="tcp">
+                        <p>What protocol provides reliable, ordered delivery?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="udp">
+                        <p>What protocol is faster but unreliable?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ip addr">
+                        <p>What command shows network interfaces?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ip route">
+                        <p>What command shows the routing table?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="mac address">
+                        <p>What address identifies a network card?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="subnet mask">
+                        <p>What determines network vs host portion of IP?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>layer 3</li>
+                                <li>osi model</li>
+                                <li>tcp</li>
+                                <li>udp</li>
+                                <li>ip addr</li>
+                                <li>ip route</li>
+                                <li>mac address</li>
+                                <li>subnet mask</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 2,
+                title: "Network Interfaces and IP Configuration",
+                difficulty: "beginner",
+                content: `
+                    <h3>Understanding Network Interfaces</h3>
+                    <p>In Linux, network interfaces are represented as files in /sys/class/net/. Common interface names:</p>
+                    <ul>
+                        <li><strong>eth0, eth1:</strong> Traditional Ethernet interfaces</li>
+                        <li><strong>ens, enp:</strong> Predictable network interface names (systemd)</li>
+                        <li><strong>wlan0, wlan1:</strong> Wireless interfaces</li>
+                        <li><strong>lo:</strong> The loopback interface (127.0.0.1)</li>
+                        <li><strong>tun0, tap0:</strong> VPN tunnel interfaces</li>
+                        <li><strong>docker0:</strong> Docker bridge interface</li>
+                    </ul>
+                    
+                    <h3>Viewing Interface Information</h3>
+                    <pre><span class="prompt">$</span> <span class="command">ip link show</span>              <span class="comment"># Show all interfaces</span>
+<span class="prompt">$</span> <span class="command">ip addr show eth0</span>         <span class="comment"># Show specific interface details</span>
+<span class="prompt">$</span> <span class="command">ip -s link</span>               <span class="comment"># Show interface statistics</span>
+<span class="prompt">$</span> <span class="command">ethtool eth0</span>             <span class="comment"># Show hardware info (if installed)</span></pre>
+                    
+                    <h3>Configuring IP Addresses</h3>
+                    <p><strong>Temporary Configuration (lost on reboot):</strong></p>
+                    <pre><span class="prompt">$</span> <span class="command">sudo ip addr add 192.168.1.100/24 dev eth0</span>   <span class="comment"># Add an IP</span>
+<span class="prompt">$</span> <span class="command">sudo ip addr del 192.168.1.100/24 dev eth0</span>   <span class="comment"># Remove an IP</span>
+<span class="prompt">$</span> <span class="command">sudo ip link set eth0 up</span>                       <span class="comment"># Bring interface up</span>
+<span class="prompt">$</span> <span class="command">sudo ip link set eth0 down</span>                     <span class="comment"># Bring interface down</span></pre>
+                    
+                    <h3>Permanent Configuration</h3>
+                    <p><strong>Debian/Ubuntu (/etc/network/interfaces):</strong></p>
+                    <pre><span class="keyword">auto</span> eth0
+<span class="keyword">iface</span> eth0 inet static
+    <span class="variable">address</span> 192.168.1.100
+    <span class="variable">netmask</span> 255.255.255.0
+    <span class="variable">gateway</span> 192.168.1.1
+    <span class="variable">dns-nameservers</span> 8.8.8.8 8.8.4.4</pre>
+                    
+                    <p><strong>RHEL/CentOS (/etc/sysconfig/network-scripts/ifcfg-eth0):</strong></p>
+                    <pre><span class="variable">TYPE</span>=Ethernet
+<span class="variable">DEVICE</span>=eth0
+<span class="variable">ONBOOT</span>=yes
+<span class="variable">IPADDR</span>=192.168.1.100
+<span class="variable">NETMASK</span>=255.255.255.0
+<span class="variable">GATEWAY</span>=192.168.1.1
+<span class="variable">DNS1</span>=8.8.8.8</pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="ip link set eth0 down">
+                        <p>Which command brings a network interface down?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="eth0">
+                        <p>What is the traditional name for first Ethernet interface?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="lo">
+                        <p>What is the loopback interface name?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ip addr add">
+                        <p>What command assigns an IP address?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="127.0.0.1">
+                        <p>What is the loopback IP address?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="dhcp">
+                        <p>What protocol automatically assigns IPs?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="mtu">
+                        <p>What setting controls maximum packet size?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ethtool">
+                        <p>What command shows interface hardware info?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>ip link set eth0 down</li>
+                                <li>eth0</li>
+                                <li>lo</li>
+                                <li>ip addr add</li>
+                                <li>127.0.0.1</li>
+                                <li>dhcp</li>
+                                <li>mtu</li>
+                                <li>ethtool</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 3,
+                title: "Routing and the Routing Table",
+                difficulty: "intermediate",
+                content: `
+                    <h3>Understanding Linux Routing</h3>
+                    <p>Routing is the process of deciding where to send a packet. The routing table contains rules that determine the path packets take.</p>
+                    
+                    <h3>Viewing the Routing Table</h3>
+                    <pre><span class="prompt">$</span> <span class="command">ip route show</span>
+<span class="output">default via 192.168.1.1 dev eth0 proto dhcp src 192.168.1.100 metric 100</span>
+<span class="output">192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.100</span>
+<span class="output">192.168.2.0/24 via 192.168.1.254 dev eth0</span></pre>
+                    
+                    <h3>Understanding the Output</h3>
+                    <ul>
+                        <li><strong>default:</strong> The default gateway (route of last resort)</li>
+                        <li><strong>via 192.168.1.1:</strong> Next hop IP address</li>
+                        <li><strong>dev eth0:</strong> Output interface</li>
+                        <li><strong>proto dhcp:</strong> How the route was learned</li>
+                        <li><strong>metric 100:</strong> Route priority (lower is preferred)</li>
+                        <li><strong>scope link:</strong> Only reachable on this link</li>
+                    </ul>
+                    
+                    <h3>Adding Static Routes</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo ip route add 10.0.0.0/8 via 192.168.1.1 dev eth0</span>   <span class="comment"># Add route to private network</span>
+<span class="prompt">$</span> <span class="command">sudo ip route add 172.16.0.0/12 via 192.168.1.1</span>        <span class="comment"># Another private network</span>
+<span class="prompt">$</span> <span class="command">sudo ip route add default via 192.168.1.1</span>             <span class="comment"># Default gateway</span>
+<span class="prompt">$</span> <span class="command">sudo ip route del 10.0.0.0/8</span>                            <span class="comment"># Remove a route</span></pre>
+                    
+                    <h3>Policy Routing</h3>
+                    <p>Linux supports advanced routing with multiple tables:</p>
+                    <pre><span class="prompt">$</span> <span class="command">ip route show table all</span>              <span class="comment"># Show all tables</span>
+<span class="prompt">$</span> <span class="command">cat /etc/iproute2/rt_tables</span>       <span class="comment"># View routing tables</span>
+<span class="prompt">$</span> <span class="command">sudo ip rule add from 192.168.1.100 table internal</span>   <span class="comment"># Add routing rule</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="the route of last resort">
+                        <p>What does "default" in the routing table represent?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="gateway">
+                        <p>What device connects your network to internet?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ip route add">
+                        <p>What command adds a static route?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="metric">
+                        <p>What determines route priority?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="via">
+                        <p>What keyword specifies next hop in route?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="scope">
+                        <p>What limits route to local network?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="rt_tables">
+                        <p>What file defines custom routing tables?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ip rule">
+                        <p>What command manages routing policy?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>the route of last resort</li>
+                                <li>gateway</li>
+                                <li>ip route add</li>
+                                <li>metric</li>
+                                <li>via</li>
+                                <li>scope</li>
+                                <li>rt_tables</li>
+                                <li>ip rule</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 4,
+                title: "DNS Configuration on Linux",
+                difficulty: "beginner",
+                content: `
+                    <h3>How Linux Resolves Names</h3>
+                    <p>Linux uses a system called NSS (Name Service Switch) and /etc/nsswitch.conf to determine how to resolve hostnames:</p>
+                    
+                    <pre><span class="prompt">$</span> <span class="command">cat /etc/nsswitch.conf | grep hosts</span>
+<span class="output">hosts: files dns myhostname</span></pre>
+                    
+                    <p>This means Linux looks in:</p>
+                    <ol>
+                        <li><strong>files:</strong> /etc/hosts first</li>
+                        <li><strong>dns:</strong> Then queries DNS servers</li>
+                        <li><strong>myhostname:</strong> Falls back to local hostname</li>
+                    </ol>
+                    
+                    <h3>/etc/hosts - Local Name Resolution</h3>
+                    <pre><span class="prompt">$</span> <span class="command">cat /etc/hosts</span>
+<span class="output">127.0.0.1   localhost</span>
+<span class="output">127.0.1.1   myserver</span>
+<span class="output">192.168.1.10    dbserver.internal</span>
+<span class="output">192.168.1.11    webserver.internal</span></pre>
+                    
+                    <h3>/etc/resolv.conf - DNS Servers</h3>
+                    <pre><span class="prompt">$</span> <span class="command">cat /etc/resolv.conf</span>
+<span class="output">nameserver 8.8.8.8</span>
+<span class="output">nameserver 8.8.4.4</span>
+<span class="output">search internal.local</span></pre>
+                    
+                    <h3>DNS Lookup Tools</h3>
+                    <pre><span class="prompt">$ class="command"></span> <spannslookup google.com</span>        <span class="comment"># Basic DNS lookup (deprecated)</span>
+<span class="prompt">$</span> <span class="command">dig google.com</span>            <span class="comment"># Detailed DNS query</span>
+<span class="prompt">$</span> <span class="command">dig +short google.com</span>     <span class="comment"># Just get the IP</span>
+<span class="prompt">$</span> <span class="command">host google.com</span>           <span class="comment"># Simple lookup</span>
+<span class="prompt">$</span> <span class="command">getent hosts google.com</span>   <span class="comment"># Use NSS resolver</span></pre>
+                    
+                    <h3>Systemd-Resolved</h3>
+                    <p>Modern systems use systemd-resolved which manages /etc/resolv.conf:</p>
+                    <pre><span class="prompt">$</span> <span class="command">resolvectl status</span>        <span class="comment"># Show DNS servers</span>
+<span class="prompt">$</span> <span class="command">resolvectl query google.com</span>   <span class="comment"># Query DNS</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="/etc/hosts">
+                        <p>In /etc/nsswitch.conf, what does "files" refer to for host resolution?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="resolv.conf">
+                        <p>What file contains DNS server addresses?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="nslookup">
+                        <p>What command queries DNS servers?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="dig">
+                        <p>What command provides detailed DNS info?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="systemd-resolved">
+                        <p>What service manages DNS on modern Linux?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>/etc/hosts</li>
+                                <li>resolv.conf</li>
+                                <li>nslookup</li>
+                                <li>dig</li>
+                                <li>systemd-resolved</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 5,
+                title: "iptables Basics - Your First Firewall",
+                difficulty: "intermediate",
+                content: `
+                    <h3>Understanding iptables</h3>
+                    <p>iptables is the Linux firewall that filters packets based on rules. It uses "chains" that packets pass through:</p>
+                    <ul>
+                        <li><strong>INPUT:</strong> Packets destined for local processes</li>
+                        <li><strong>OUTPUT:</strong> Packets generated locally</li>
+                        <li><strong>FORWARD:</strong> Packets being routed through (not for local)</li>
+                        <li><strong>PREROUTING:</strong> Before routing decision (NAT)</li>
+                        <li><strong>POSTROUTING:</strong> After routing decision (NAT)</li>
+                    </ul>
+                    
+                    <h3>Viewing Rules</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo iptables -L -v -n</span>        <span class="comment"># List all rules with details</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -L INPUT -n</span>     <span class="comment"># List INPUT chain</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -t nat -L -v</span>    <span class="comment"># View NAT table</span></pre>
+                    
+                    <h3>Basic Rule Syntax</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT</span>   <span class="comment"># Allow SSH</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT</span>   <span class="comment"># Allow HTTP</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -j DROP</span>                      <span class="comment"># Drop everything else</span></pre>
+                    
+                    <h3>Common Options</h3>
+                    <ul>
+                        <li><strong>-A:</strong> Append rule to chain</li>
+                        <li><strong>-I:</strong> Insert rule at position</li>
+                        <li><strong>-D:</strong> Delete rule</li>
+                        <li><strong>-p:</strong> Protocol (tcp, udp, icmp)</li>
+                        <li><strong>--dport:</strong> Destination port</li>
+                        <li><strong>--sport:</strong> Source port</li>
+                        <li><strong>-s:</strong> Source address</li>
+                        <li><strong>-d:</strong> Destination address</li>
+                        <li><strong>-j:</strong> Jump (target): ACCEPT, DROP, REJECT, LOG</li>
+                        <li><strong>-i:</strong> Input interface</li>
+                        <li><strong>-o:</strong> Output interface</li>
+                    </ul>
+                    
+                    <h3>Practical Examples</h3>
+                    <pre><span class="comment"># Allow established connections (important!)</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT</span>
+
+<span class="comment"># Allow SSH on custom port</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -p tcp --dport 2222 -j ACCEPT</span>
+
+<span class="comment"># Allow HTTP and HTTPS</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT</span>
+
+<span class="comment"># Allow ping</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT</span>
+
+<span class="comment"># Drop everything else</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -j DROP</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="input">
+                        <p>Which chain handles packets destined for a local service?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="output">
+                        <p>Which chain handles locally generated packets?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="forward">
+                        <p>Which chain handles routed packets?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="accept">
+                        <p>What target allows traffic?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="drop">
+                        <p>What target blocks traffic silently?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>input</li>
+                                <li>output</li>
+                                <li>forward</li>
+                                <li>accept</li>
+                                <li>drop</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 6,
+                title: "NAT and Port Forwarding",
+                difficulty: "intermediate",
+                content: `
+                    <h3>Understanding NAT</h3>
+                    <p>Network Address Translation (NAT) allows multiple devices to share a single public IP address. The NAT table has two main purposes:</p>
+                    <ul>
+                        <li><strong>SNAT (Source NAT):</strong> Change source IP of outgoing packets</li>
+                        <li><strong>DNAT (Destination NAT):</strong> Change destination IP of incoming packets</li>
+                    </ul>
+                    
+                    <h3>Common NAT Scenarios</h3>
+                    <pre><span class="comment"># Masquerade (hide private network behind public IP)</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</span>
+
+<span class="comment"># Port forward (external port 8080 to internal 192.168.1.100:80)</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -t nat -A PREROUTING -p tcp --dport 8080 -j DNAT --to-destination 192.168.1.100:80</span>
+
+<span class="comment"># Forward to internal host</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -t nat -A PREROUTING -p tcp --dport 2222 -j DNAT --to-destination 192.168.1.50:22</span></pre>
+                    
+                    <h3>Enable IP Forwarding</h3>
+                    <pre><span class="comment"># Temporarily enable (for routing)</span>
+<span class="prompt">$</span> <span class="command">sudo sysctl -w net.ipv4.ip_forward=1</span>
+
+<span class="comment"># Permanently (add to /etc/sysctl.conf)</span>
+<span class="prompt">$</span> <span class="command">echo "net.ipv4.ip_forward=1" | sudo tee /etc/sysctl.d/99-ip-forward.conf</span>
+<span class="prompt">$</span> <span class="command">sudo sysctl -p /etc/sysctl.d/99-ip-forward.conf</span></pre>
+                    
+                    <h3>Persistent NAT Rules</h3>
+                    <p>iptables rules are lost on reboot. Save them:</p>
+                    <pre><span class="comment"># Debian/Ubuntu</span>
+<span class="prompt">$</span> <span class="command">sudo iptables-save | sudo tee /etc/iptables/rules.v4</span>
+
+<span class="comment"># RHEL/CentOS</span>
+<span class="prompt">$</span> <span class="command">sudo service iptables save</span>
+
+<span class="comment"># Restore on boot (add to startup)</span>
+<span class="prompt">$</span> <span class="command">sudo iptables-restore < /etc/iptables/rules.v4</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="nat">
+                        <p>Which iptables table is used for NAT?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="snat">
+                        <p>What changes source IP for outgoing traffic?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="dnat">
+                        <p>What changes destination IP for incoming traffic?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="masquerade">
+                        <p>What is dynamic SNAT called?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="port forwarding">
+                        <p>What redirects traffic to different port?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>nat</li>
+                                <li>snat</li>
+                                <li>dnat</li>
+                                <li>masquerade</li>
+                                <li>port forwarding</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 7,
+                title: "Network Diagnostics and Troubleshooting",
+                difficulty: "intermediate",
+                content: `
+                    <h3>Essential Diagnostic Tools</h3>
+                    <p>When network issues arise, these tools are your best friends:</p>
+                    
+                    <h3>ping - Test Connectivity</h3>
+                    <pre><span class="prompt">$</span> <span class="command">ping google.com</span>              <span class="comment"># Continuous ping</span>
+<span class="prompt">$</span> <span class="command">ping -c 4 google.com</span>         <span class="comment"># Ping 4 times</span>
+<span class="prompt">$</span> <span class="command">ping -i 0.2 google.com</span>       <span class="comment"># Faster interval</span>
+<span class="prompt">$</span> <span class="command">ping -I eth0 google.com</span>       <span class="comment"># Specific interface</span></pre>
+                    
+                    <h3>traceroute - Path Discovery</h3>
+                    <pre><span class="prompt">$</span> <span class="command">traceroute google.com</span>       <span class="comment"># Trace route</span>
+<span class="prompt">$</span> <span class="command">traceroute -I google.com</span>      <span class="comment"># ICMP traceroute</span>
+<span class="prompt">$</span> <span class="command">traceroute -T google.com</span>      <span class="comment"># TCP traceroute</span>
+<span class="prompt">$</span> <span class="command">mtr google.com</span>                <span class="comment"># Continuous traceroute</span></pre>
+                    
+                    <h3>netstat/ss - Port and Connection Info</h3>
+                    <pre><span class="prompt">$</span> <span class="command">ss -tuln</span>                  <span class="comment"># Listening TCP/UDP ports</span>
+<span class="prompt">$</span> <span class="command">ss -tn</span>                    <span class="comment"># Active connections</span>
+<span class="prompt">$</span> <span class="command">ss -tp</span>                    <span class="comment"># Show process using socket</span>
+<span class="prompt">$</span> <span class="command">ss -s</span>                     <summary <span class="comment"># Socket summary</span></pre>
+                    
+                    <h3>tcpdump - Packet Capture</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo tcpdump -i eth0</span>                    <span class="comment"># Capture all traffic</span>
+<span class="prompt">$</span> <span class="command">sudo tcpdump -i eth0 port 80</span>              <span class="comment"># HTTP traffic only</span>
+<span class="prompt">$</span> <span class="command">sudo tcpdump -i eth0 host 8.8.8.8</span>         <span class="comment"># Specific host</span>
+<span class="prompt">$</span> <span class="command">sudo tcpdump -i eth0 -w capture.pcap</span>      <span class="comment"># Save to file</span>
+<span class="prompt">$</span> <span class="command">tcpdump -r capture.pcap</span>                   <span class="comment"># Read from file</span></pre>
+                    
+                    <h3>Other Essential Tools</h3>
+                    <pre><span class="prompt">$</span> <span class="command">ip neighbor show</span>          <span class="comment"># ARP table</span>
+<span class="prompt">$</span> <span class="command">netstat -i</span>               <span class="comment"># Interface statistics</span>
+<span class="prompt">$</span> <span class="command">dig +trace google.com</span>     <span class="comment"># Full DNS resolution</span>
+<span class="prompt">$</span> <span class="command">curl -v google.com</span>        <span class="comment"># HTTP request with details</span>
+<span class="prompt">$</span> <span class="command">nc -zv host 80</span>             <span class="comment"># Check if port is open</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="ss -tp">
+                        <p>Which tool shows which process is using a network port?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="netstat">
+                        <p>What is the older alternative to ss?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="tcpdump">
+                        <p>What captures network packets?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ping">
+                        <p>What tests connectivity to a host?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="traceroute">
+                        <p>What shows the path packets take?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>ss -tp</li>
+                                <li>netstat</li>
+                                <li>tcpdump</li>
+                                <li>ping</li>
+                                <li>traceroute</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 8,
+                title: "SSH Tunneling and Port Forwarding",
+                difficulty: "advanced",
+                content: `
+                    <h3>Why SSH Tunnels?</h3>
+                    <p>SSH tunnels encrypt your traffic and can bypass firewalls. They're essential for:</p>
+                    <ul>
+                        <li>Secure browsing on public WiFi</li>
+                        <li>Accessing internal services remotely</li>
+                        <li>Bypassing restrictive firewalls</li>
+                        <li>Securing unencrypted protocols</li>
+                    </ul>
+                    
+                    <h3>Local Port Forwarding (-L)</h3>
+                    <p>Forward a local port to a remote destination:</p>
+                    <pre><span class="comment"># Access remote MySQL through SSH tunnel</span>
+<span class="prompt">$</span> <span class="command">ssh -L 3306:localhost:3306 user@remote-server</span>
+
+<span class="comment"># Access internal web server</span>
+<span class="prompt">$</span> <span class="command">ssh -L 8080:internal-web:80 user@gateway</span>
+
+<span class="comment"># Background tunnel with key</span>
+<span class="prompt">$</span> <span class="command">ssh -f -N -L 8080:internal-web:80 user@gateway</span></pre>
+                    
+                    <h3>Remote Port Forwarding (-R)</h3>
+                    <p>Allow remote host to access local services:</p>
+                    <pre><span class="comment"># Expose local web server to remote</span>
+<span class="prompt">$</span> <span class="command">ssh -R 8080:localhost:80 user@remote-server</span>
+
+<span class="comment"># Share local port with internet (requires GatewayPorts)</span>
+<span class="prompt">$</span> <span class="command">ssh -R 0.0.0.0:8080:localhost:80 user@remote-server</span></pre>
+                    
+                    <h3>Dynamic Port Forwarding (-D)</h3>
+                    <p>Create a SOCKS proxy for dynamic forwarding:</p>
+                    <pre><span class="comment"># Create SOCKS proxy on local port 1080</span>
+<span class="prompt">$</span> <span class="command">ssh -D 1080 user@remote-server</span>
+
+<span class="comment"># Use with browser: localhost:1080 as SOCKS5 proxy</span>
+<span class="prompt">$</span> <span class="command">ssh -f -N -D 1080 user@remote-server</span></pre>
+                    
+                    <h3>SSH Config for Easy Tunnels</h3>
+                    <pre><span class="prompt">$</span> <span class="command">cat ~/.ssh/config</span>
+<span class="output">Host tunnel</span>
+<span class="output">    HostName remote-server.com</span>
+<span class="output">    User admin</span>
+<span class="output">    LocalForward 8080 internal-web:80</span>
+<span class="output">    IdentityFile ~/.ssh/id_rsa</span></pre>
+                    
+                    <p>Now just run: <code>ssh tunnel</code></p>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="-d">
+                        <p>Which SSH flag creates a SOCKS proxy for dynamic forwarding?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="-l">
+                        <p>Which SSH flag enables local port forwarding?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="-r">
+                        <p>Which SSH flag enables remote port forwarding?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="-n">
+                        <p>Which SSH flag redirects stdin from /dev/null?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="-f">
+                        <p>Which SSH flag runs in background?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>-d</li>
+                                <li>-l</li>
+                                <li>-r</li>
+                                <li>-n</li>
+                                <li>-f</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 9,
+                title: "VPNs with WireGuard",
+                difficulty: "advanced",
+                content: `
+                    <h3>Why WireGuard?</h3>
+                    <p>WireGuard is a modern, fast, and simple VPN. Compared to OpenVPN:</p>
+                    <ul>
+                        <li><strong>Faster:</strong> ~4x faster than OpenVPN</li>
+                        <li><strong>Simpler:</strong> ~4,000 lines vs ~100,000</li>
+                        <li><strong>Secure:</strong> Modern cryptography (Curve25519, ChaCha20)</li>
+                        <li><strong>Kernel-native:</strong> Built into Linux kernel</li>
+                    </ul>
+                    
+                    <h3>Installing WireGuard</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo apt install wireguard</span>        <span class="comment"># Debian/Ubuntu</span>
+<span class="prompt">$</span> <span class="command">sudo dnf install wireguard-tools</span>   <span class="comment"># RHEL/Fedora</span></pre>
+                    
+                    <h3>Generating Keys</h3>
+                    <pre><span class="prompt">$</span> <span class="command">wg genkey | tee privatekey | wg pubkey > publickey</span></pre>
+                    
+                    <h3>Server Configuration</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo cat > /etc/wireguard/wg0.conf << 'EOF'</span>
+<span class="output">[Interface]</span>
+<span class="output">Address = 10.0.0.1/24</span>
+<span class="output">ListenPort = 51820</span>
+<span class="output">PrivateKey = SERVER_PRIVATE_KEY</span>
+<span class="output">PostUp = iptables -A FORWARD -i %i -j ACCEPT</span>
+<span class="output">PostUp = iptables -A FORWARD -o %i -j ACCEPT</span>
+<span class="output">PostUp = iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</span>
+<span class="output">PostDown = iptables -D FORWARD -i %i -j ACCEPT</span>
+<span class="output">PostDown = iptables -D FORWARD -o %i -j ACCEPT</span>
+<span class="output">PostDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE</span>
+<span class="output"></span>
+<span class="output">[Peer]</span>
+<span class="output">PublicKey = CLIENT_PUBLIC_KEY</span>
+<span class="output">AllowedIPs = 10.0.0.2/32</span>
+<span class="output">EOF</span></pre>
+                    
+                    <h3>Client Configuration</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo cat > wg0.conf << 'EOF'</span>
+<span class="output">[Interface]</span>
+<span class="output">Address = 10.0.0.2/24</span>
+<span class="output">PrivateKey = CLIENT_PRIVATE_KEY</span>
+<span class="output">DNS = 1.1.1.1</span>
+<span class="output"></span>
+<span class="output">[Peer]</span>
+<span class="output">PublicKey = SERVER_PUBLIC_KEY</span>
+<span class="output">Endpoint = your-server.com:51820</span>
+<span class="output">AllowedIPs = 0.0.0.0/0</span>
+<span class="output">PersistentKeepalive = 25</span>
+<span class="output">EOF</span></pre>
+                    
+                    <h3>Starting WireGuard</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo wg-quick up wg0</span>      <span class="comment"># Start VPN</span>
+<span class="prompt">$</span> <span class="command">sudo wg-quick down wg0</span>    <span class="comment"># Stop VPN</span>
+<span class="prompt">$</span> <span class="command">sudo wg show</span>            <span class="comment"># Show status</span>
+<span class="prompt">$</span> <span class="command">sudo systemctl enable wg-quick@wg0</span>  <span class="comment"># Enable on boot</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="51820">
+                        <p>What port does WireGuard use by default?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="wg0">
+                        <p>What is the default WireGuard interface name?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="wg-quick">
+                        <p>What tool manages WireGuard interfaces?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="privatekey">
+                        <p>What key must stay secret in WireGuard?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="peer">
+                        <p>What represents a remote VPN endpoint?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>51820</li>
+                                <li>wg0</li>
+                                <li>wg-quick</li>
+                                <li>privatekey</li>
+                                <li>peer</li>
+                            </ol>
+                        </div>
+                    </details>`
+            {
+                id: 10,
+                title: "Network Monitoring and Performance",
+                difficulty: "advanced",
+                content: `
+                    <h3>Monitoring Network Traffic</h3>
+                    <p>Understanding your network traffic patterns is crucial for security and performance.</p>
+                    
+                    <h3>iftop - Real-Time Traffic</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo iftop</span>                    <span class="comment"># Monitor all traffic</span>
+<span class="prompt">$</span> <span class="command">sudo iftop -i eth0</span>           <span class="comment"># Specific interface</span>
+<span class="prompt">$</span> <span class="command">sudo iftop -B</span>                <span class="comment"># Bytes instead of bits</span></pre>
+                    
+                    <h3>nethogs - Per-Process Traffic</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo nethogs</span>                <span class="comment"># Show per-process bandwidth</span>
+<span class="prompt">$</span> <span class="command">sudo nethogs eth0</span>           <span class="comment"># Specific interface</span></pre>
+                    
+                    <h3>Bandwidth Monitoring with vnstat</h3>
+                    <pre><span class="prompt">$</span> <span class="command">vnstat -l</span>                   <span class="comment"># Live monitoring</span>
+<span class="prompt">$</span> <span class="command">vnstat -h</span>                   <span class="comment"># Hourly stats</span>
+<span class="prompt">$</span> <span class="command">vnstat -d</span>                   <span class="comment"># Daily stats</span>
+<span class="prompt">$</span> <span class="command">vnstat -m</span>                   <span class="comment"># Monthly stats</span></pre>
+                    
+                    <h3>Network Performance Metrics</h3>
+                    <pre><span class="prompt">$</span> <span class="command">cat /proc/net/dev</span>           <span class="comment"># Interface statistics</span>
+<span class="prompt">$</span> <span class="command">ip -s link</span>                 <span class="comment"># Packet error counters</span>
+<span class="prompt">$</span> <span class="command">netstat -s</span>                 <span class="comment"># Protocol statistics</span>
+<span class="prompt">$</span> <span class="command">sar -n DEV 1 5</span>             <span class="comment"># Network I/O rates</span></pre>
+                    
+                    <h3>Custom Traffic Scripts</h3>
+                    <pre><span class="comment"># Simple traffic monitor script</span>
+<span class="prompt">$</span> <span class="command">cat traffic-monitor.sh</span>
+<span class="output">#!/bin/bash</span>
+<span class="output">INTERFACE="eth0"</span>
+<span class="output">while true; do</span>
+<span class="output">    RX1=$(cat /sys/class/net/$INTERFACE/statistics/rx_bytes)</span>
+<span class="output">    TX1=$(cat /sys/class/net/$INTERFACE/statistics/tx_bytes)</span>
+<span class="output">    sleep 1</span>
+<span class="output">    RX2=$(cat /sys/class/net/$INTERFACE/statistics/rx_bytes)</span>
+<span class="output">    TX2=$(cat /sys/class/net/$INTERFACE/statistics/tx_bytes)</span>
+<span class="output">    echo "RX: $(( (RX2-RX1)/1024 )) KB/s TX: $(( (TX2-TX1)/1024 )) KB/s"</span>
+<span class="output">done</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="nethogs">
+                        <p>Which tool shows bandwidth usage per process?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="iftop">
+                        <p>What shows bandwidth per host connection?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="vnstat">
+                        <p>What monitors long-term traffic history?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="bmon">
+                        <p>What is a curses-based bandwidth monitor?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="/sys/class/net">
+                        <p>Where does Linux store interface statistics?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>nethogs</li>
+                                <li>iftop</li>
+                                <li>vnstat</li>
+                                <li>bmon</li>
+                                <li>/sys/class/net</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 11,
+                title: "VPN Setup",
+                difficulty: "advanced",
+                content: `
+                    <h3>VPN Fundamentals</h3>
+                    <p>A Virtual Private Network (VPN) creates an encrypted tunnel over an untrusted network, allowing secure remote access and privacy protection.</p>
+                    
+                    <h3>WireGuard Setup</h3>
+                    <p>WireGuard is a modern, fast, and secure VPN protocol. Here's how to configure it:</p>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span class="command">sudo apt install wireguard wireguard-tools</span>
+                        <span class="comment"># Install WireGuard on Debian/Ubuntu</span>
+                        <span class="prompt">$</span> <span class="command">sudo dnf install wireguard-tools</span>
+                        <span class="comment"># Install on RHEL/CentOS/Fedora</span>
+                    </div>
+                    
+                    <h3>Generating WireGuard Keys</h3>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span class="command">wg genkey | tee privatekey | wg pubkey > publickey</span>
+                        <span class="comment"># Generate private and public keys</span>
+                        <span class="prompt">$</span> <span class="command">cat privatekey</span>
+                        <span class="comment"># View private key (keep secret!)</span>
+                        <span class="prompt">$</span> <span class="command">cat publickey</span>
+                        <span class="comment"># View public key (share with peers)</span>
+                    </div>
+                    
+                    <h3>WireGuard Server Configuration</h3>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span class="command">sudo nano /etc/wireguard/wg0.conf</span>
+                        <span class="output">[Interface]</span>
+                        <span class="output">Address = 10.0.0.1/24</span>
+                        <span class="output">ListenPort = 51820</span>
+                        <span class="output">PrivateKey = SERVER_PRIVATE_KEY</span>
+                        <span class="output">PostUp = iptables -A FORWARD -i wg0 -j ACCEPT</span>
+                        <span class="output">PostUp = iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</span>
+                        <span class="output">PostDown = iptables -D FORWARD -i wg0 -j ACCEPT</span>
+                        <span class="output">PostDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE</span>
+                        <span class="output"></span>
+                        <span class="output">[Peer]</span>
+                        <span class="output"># Client 1</span>
+                        <span class="output">PublicKey = CLIENT1_PUBLIC_KEY</span>
+                        <span class="output">AllowedIPs = 10.0.0.2/32</span>
+                    </div>
+                    
+                    <h3>OpenVPN Setup (Alternative)</h3>
+                    <p>OpenVPN is a mature VPN solution with wide compatibility:</p>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span class="command">sudo apt install openvpn easy-rsa</span>
+                        <span class="comment"># Install OpenVPN</span>
+                        <span class="prompt">$</span> <span class="command">sudo systemctl enable --now openvpn-server@server</span>
+                        <span class="comment"># Start and enable OpenVPN service</span>
+                    </div>
+                    
+                    <div class="highlight-box">
+                        <strong>Security Tip:</strong> Always use strong encryption (AES-256-GCM), perfect forward secrecy, and keep your VPN software updated to protect against vulnerabilities.
+                    </div>
+                    
+                    <h3>Client Configuration</h3>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span class="command">sudo wg-quick up wg0</span>
+                        <span class="comment"># Start WireGuard interface</span>
+                        <span class="prompt">$</span> <span class="command">sudo wg-quick down wg0</span>
+                        <span class="comment"># Stop WireGuard interface</span>
+                        <span class="prompt">$</span> <span class="command">sudo systemctl enable wg-quick@wg0</span>
+                        <span class="comment"># Enable on boot</span>
+                    </div>
+                    
+                    <h3>Troubleshooting VPN Connections</h3>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span class="command">sudo wg show</span>
+                        <span class="comment"># Check WireGuard status</span>
+                        <span class="prompt">$</span> <span class="command">sudo tcpdump -i wg0</span>
+                        <span class="comment"># Monitor VPN interface traffic</span>
+                        <span class="prompt">$</span> <span class="command">ping 10.0.0.1</span>
+                        <span class="comment"># Test VPN connectivity</span>
+                    </div>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-section">
+                        <div class="quiz-question" data-answer="wg-quick">
+                            <p>What command is used to start a WireGuard interface?</p>
+                            <input type="text" class="quiz-input" placeholder="Type your answer...">
+                            <button class="quiz-submit">Check</button>
+                            <p class="quiz-feedback"></p>
+                        </div>
+                        <div class="quiz-question" data-answer="51820">
+                            <p>What is WireGuard's default UDP port?</p>
+                            <input type="text" class="quiz-input" placeholder="Type your answer...">
+                            <button class="quiz-submit">Check</button>
+                            <p class="quiz-feedback"></p>
+                        </div>
+                        <div class="quiz-question" data-answer="masquerade">
+                            <p>What iptables target allows VPN clients to access the internet?</p>
+                            <input type="text" class="quiz-input" placeholder="Type your answer...">
+                            <button class="quiz-submit">Check</button>
+                            <p class="quiz-feedback"></p>
+                        </div>
+                        <div class="quiz-question" data-answer="publickey">
+                            <p>Which key can be safely shared with VPN peers?</p>
+                            <input type="text" class="quiz-input" placeholder="Type your answer...">
+                            <button class="quiz-submit">Check</button>
+                            <p class="quiz-feedback"></p>
+                        </div>
+                    </div>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary>Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>wg-quick</li>
+                                <li>51820</li>
+                                <li>masquerade</li>
+                                <li>publickey</li>
+                            </ol>
+                        </div>
+                    </details>`
+            },
+            {
+                id: 12,
+                title: "Advanced Networking",
+                difficulty: "advanced",
+                content: `
+                    <h3>Load Balancing</h3>
+                    <p>Load balancing distributes network traffic across multiple servers to improve performance and reliability.</p>
+                    
+                    <h3>HAProxy for Load Balancing</h3>
+                    <p>HAProxy is a high-performance TCP/HTTP load balancer:</p>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span class="command">sudo apt install haproxy</span>
+                        <span class="comment"># Install HAProxy</span>
+                        <span class="prompt">$</span> <span class="command">sudo nano /etc/haproxy/haproxy.cfg</span>
+                        <span class="output">frontend web_frontend</span>
+                        <span class="output">    bind *:80</span>
+                        <span class="output">    default_backend web_servers</span>
+                        <span class="output"></span>
+                        <span class="output">backend web_servers</span>
+                        <span class="output">    balance roundrobin</span>
+                        <span class="output">    server web1 192.168.1.10:80 check</span>
+                        <span class="output">    server web2 192.168.1.11:80 check</span>
+                        <span class="output">    server web3 192.168.1.12:80 check</span>
+                    </div>
+                    
+                    <h3>Nginx Load Balancing</h3>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span class="command">sudo nano /etc/nginx/nginx.conf</span>
+                        <span class="output">upstream backend {</span>
+                        <span class="output">    least_conn;</span>
+                        <span class="output">    server 192.168.1.10:8080 weight=5;</span>
+                        <span class="output">    server 192.168.1.11:8080 weight=5;</span>
+                        <span class="output">    server 192.168.1.12:8080 backup;</span>
+                        <span class="output">}</span>
+                        <span class="output"></span>
+                        <span class="output">server {</span>
+                        <span class="output">    location / {</span>
+                        <span class="output">        proxy_pass http://backend;</span>
+                        <span class="output">    }</span>
+                        <span class="output">}</span>
+                    </div>
+                    
+                    <h3>High Availability with Keepalived</h3>
+                    <p>Keepalived provides VRRP (Virtual Router Redundancy Protocol) for automatic failover:</p>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span class="command">sudo apt install keepalived</span>
+                        <span class="comment"># Install Keepalived</span>
+                        <span class="prompt">$</span> <span class="command">sudo nano /etc/keepalived/keepalived.conf</span>
+                        <span class="output">vrrp_instance VI_1 {</span>
+                        <span class="output">    state MASTER</span>
+                        <span class="output">    interface eth0</span>
+                        <span class="output">    virtual_router_id 51</span>
+                        <span class="output">    priority 100</span>
+                        <span class="output">    authentication {</span>
+                        <span class="output">        auth_type PASS</span>
+                        <span class="output">        auth_pass secret123</span>
+                        <span class="output">    }</span>
+                        <span class="output">    virtual_ipaddress {</span>
+                        <span class="output">        192.168.1.100/24</span>
+                        <span class="output">    }</span>
+                        <span class="output">}</span>
+                    </div>
+                    
+                    <div class="highlight-box">
+                        <strong>High Availability:</strong> Configure a BACKUP node with lower priority (e.g., 90) on another server. If the MASTER fails, the BACKUP automatically takes over the virtual IP.
+                    </div>
+                    
+                    <h3>Network Automation with Ansible</h3>
+                    <p>Ansible automates network configuration across multiple devices:</p>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span class="command">sudo apt install ansible</span>
+                        <span class="comment"># Install Ansible</span>
+                        <span class="prompt">$</span> <span class="command">cat > network.yml << 'EOF'</span>
+                        <span class="output">---</span>
+                        <span class="output">- name: Configure Network</span>
+                        <span class="output">  hosts: webservers</span>
+                        <span class="output">  become: yes</span>
+                        <span class="output">  tasks:</span>
+                        <span class="output">    - name: Configure static IP</span>
+                        <span class="output">      template:</span>
+                        <span class="output">        src: interfaces.j2</span>
+                        <span class="output">        dest: /etc/network/interfaces</span>
+                        <span class="output">      notify: restart networking</span>
+                        <span class="output">    - name: Configure firewall</span>
+                        <span class="output">      ufw:</span>
+                        <span class="output">        rule: allow</span>
+                        <span class="output">        port: '80'</span>
+                        <span class="output">  handlers:</span>
+                        <span class="output">    - name: restart networking</span>
+                        <span class="output">      service: name=networking state=restarted</span>
+                        <span class="output">EOF</span>
+                        <span class="prompt">$</span> <span class="command">ansible-playbook network.yml</span>
+                        <span class="comment"># Run the playbook</span>
+                    </div>
+                    
+                    <h3>Network Bonding</h3>
+                    <p>Bonding combines multiple network interfaces for redundancy or increased bandwidth:</p>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span class="command">sudo nano /etc/netplan/01-netcfg.yaml</span>
+                        <span class="output">network:</span>
+                        <span class="output">  version: 2</span>
+                        <span class="output">  ethernets:</span>
+                        <span class="output">    eth0: {}</span>
+                        <span class="output">    eth1: {}</span>
+                        <span class="output">  bonds:</span>
+                        <span class="output">    bond0:</span>
+                        <span class="output">      dhcp4: yes</span>
+                        <span class="output">      interfaces:</span>
+                        <span class="output">        - eth0</span>
+                        <span class="output">        - eth1</span>
+                        <span class="output">      parameters:</span>
+                        <span class="output">        mode: active-backup</span>
+                        <span class="output">        primary: eth0</span>
+                    </div>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-section">
+                        <div class="quiz-question" data-answer="haproxy">
+                            <p>What software is commonly used for TCP/HTTP load balancing?</p>
+                            <input type="text" class="quiz-input" placeholder="Type your answer...">
+                            <button class="quiz-submit">Check</button>
+                            <p class="quiz-feedback"></p>
+                        </div>
+                        <div class="quiz-question" data-answer="keepalived">
+                            <p>What provides VRRP for automatic IP failover?</p>
+                            <input type="text" class="quiz-input" placeholder="Type your answer...">
+                            <button class="quiz-submit">Check</button>
+                            <p class="quiz-feedback"></p>
+                        </div>
+                        <div class="quiz-question" data-answer="ansible">
+                            <p>What tool is used for network automation and configuration management?</p>
+                            <input type="text" class="quiz-input" placeholder="Type your answer...">
+                            <button class="quiz-submit">Check</button>
+                            <p class="quiz-feedback"></p>
+                        </div>
+                        <div class="quiz-question" data-answer="roundrobin">
+                            <p>What load balancing algorithm distributes requests equally in sequence?</p>
+                            <input type="text" class="quiz-input" placeholder="Type your answer...">
+                            <button class="quiz-submit">Check</button>
+                            <p class="quiz-feedback"></p>
+                        </div>
+                    </div>
+                    
+                    <details class="quiz-answers-reveal">
+                        <summary>Show All Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>haproxy</li>
+                                <li>keepalived</li>
+                                <li>ansible</li>
+                                <li>roundrobin</li>
+                            </ol>
+                        </div>
+                    </details>`
+            }
+        ];
+
+        // =============================================================================
+        // PROGRESS TRACKING SYSTEM
+        // =============================================================================
+        // Uses Set() to track completed lessons (unique values only)
+        // Progress is saved to localStorage for persistence across sessions
+        // The progress bar and lesson cards update in real-time
+        // =============================================================================
+        
+        let completedLessons = new Set();
+
+        // Load saved progress from localStorage when page loads
+        // Parses JSON string back into array and adds to Set
+        function loadProgress() {
+            const saved = localStorage.getItem('networking_progress');
+            if (saved) {
+                JSON.parse(saved).forEach(id => completedLessons.add(id));
+            }
+            updateProgressBar();
+            renderLessons();
+        }
+
+        // Save current Set to localStorage as JSON string
+        // Set is spread into array before stringifying
+        function saveProgress() {
+            localStorage.setItem('networking_progress', JSON.stringify([...completedLessons]));
+        }
+
+        // Calculate completion percentage and update progress bar width
+        // Percentage = (completed / total) * 100
+        function updateProgressBar() {
+            const total = lessons.length;
+            const completed = completedLessons.size;
+            const percentage = (completed / total) * 100;
+            document.getElementById('progressBar').style.width = percentage + '%';
+        }
+
+        // Helper function to strip HTML tags for description preview
+        function stripHtml(html) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        }
+
+        // Render lesson cards dynamically from the lessons array
+        // Each card shows: lesson number, title, description preview, difficulty badge
+        // Cards get 'completed' class if lesson ID exists in completedLessons Set
+        function renderLessons() {
+            const grid = document.getElementById('lessonsGrid');
+            grid.innerHTML = lessons.map(lesson => `
+                <a href="#" class="lesson-card ${completedLessons.has(lesson.id) ? 'completed' : ''}" data-lesson="${lesson.id}">
+                    <div class="lesson-number">LESSON ${lesson.id.toString().padStart(2, '0')}</div>
+                    <h3 class="lesson-title">${lesson.title}</h3>
+                    <p class="lesson-desc">${stripHtml(lesson.content).substring(0, 100)}...</p>
+                    <span class="badge badge-${lesson.difficulty}">${lesson.difficulty.charAt(0).toUpperCase() + lesson.difficulty.slice(1)}</span>
+                </a>
+            `).join('');
+        }
+
+        // Click handler for lesson cards
+        // Prevents default link behavior, finds clicked card, loads lesson content into modal
+        // Lesson is marked complete when viewed
+        document.getElementById('lessonsGrid').addEventListener('click', (e) => {
+            e.preventDefault();
+            const card = e.target.closest('.lesson-card');
+            if (!card) return;
+            
+            const lessonId = parseInt(card.dataset.lesson);
+            const lesson = lessons.find(l => l.id === lessonId);
+            
+            if (lesson) {
+                document.getElementById('modalTitle').textContent = lesson.title;
+                document.getElementById('modalContent').innerHTML = lesson.content;
+                document.getElementById('modalOverlay').classList.add('active');
+                
+                // Mark as completed on view
+                completedLessons.add(lessonId);
+                saveProgress();
+                updateProgressBar();
+                renderLessons();
+                
+                // Setup quiz for this lesson
+            }
+        });
+
+        function checkAnswer(button) {
+            const quizQuestion = button.closest('.quiz-question');
+            const input = quizQuestion.querySelector('.quiz-input');
+            const feedback = quizQuestion.querySelector('.quiz-feedback');
+            const answer = quizQuestion.getAttribute('data-answer').toLowerCase();
+            const userAnswer = input.value.toLowerCase().trim();
+
+            if (userAnswer === answer) {
+                input.classList.add('correct');
+                input.classList.remove('incorrect');
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                feedback.textContent = 'Correct!';
+            } else {
+                input.classList.add('incorrect');
+                input.classList.remove('correct');
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                feedback.textContent = 'Incorrect. Try again!';
+            }
+        }
+
+        // Close modal when X button is clicked
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('modalOverlay').classList.remove('active');
+        });
+
+        // Close modal when clicking outside the modal content (on the overlay)
+        // Allows user to click away to close
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modalOverlay')) {
+                document.getElementById('modalOverlay').classList.remove('active');
+            }
+        });
+
+        // Initialize: load progress and render lessons on page load
+        loadProgress();
+
+    </script>
+
+    <!-- Lesson 1 --><div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Introduction to Linux Networking</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>How Linux Handles Networking</h3>
+                    <p>Linux has a powerful networking stack built into the kernel. Every packet that enters or leaves your system goes through this stack, and you can configure every aspect of it.</p>
+                    
+                    <h3>The OSI Model Refresher</h3>
+                    <p>Understanding networking requires knowing the OSI model layers:</p>
+                    <ul>
+                        <li><strong>Layer 1 (Physical):</strong> Cables, NICs, hardware</li>
+                        <li><strong>Layer 2 (Data Link):</strong> MAC addresses, switches</li>
+                        <li><strong>Layer 3 (Network):</strong> IP addresses, routing</li>
+                        <li><strong>Layer 4 (Transport):</strong> TCP/UDP, ports</li>
+                        <li><strong>Layer 7 (Application):</strong> HTTP, DNS, SSH</li>
+                    </ul>
+                    
+                    <h3>Key Networking Concepts</h3>
+                    <ul>
+                        <li><strong>IP Address:</strong> A unique identifier for your machine on a network</li>
+                        <li><strong>Subnet Mask:</strong> Defines which addresses are "local"</li>
+                        <li><strong>Gateway:</strong> The router that connects your network to the internet</li>
+                        <li><strong>DNS:</strong> Translates domain names to IP addresses</li>
+                        <li><strong>Port:</strong> A logical endpoint for network communication (1-65535)</li>
+                    </ul>
+                    
+                    <h3>Your First Network Commands</h3>
+                    <pre><span class="prompt">$</span> <span class="command">ip addr show</span>           <span class="comment"># Show all network interfaces and IPs</span>
+<span class="prompt">$</span> <span class="command">ip route show</span>          <span class="comment"># Show routing table</span>
+<span class="prompt">$</span> <span class="command">cat /etc/resolv.conf</span>   <span class="comment"># Show DNS servers</span>
+<span class="prompt">$</span> <span class="command">hostname -I</span>           <span class="comment"># Show all IP addresses</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="layer 3">
+                        <p>What layer of the OSI model handles IP addresses?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="osi model">
+                        <p>What model has 7 layers for networking?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="tcp">
+                        <p>What protocol provides reliable, ordered delivery?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="udp">
+                        <p>What protocol is faster but unreliable?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ip addr">
+                        <p>What command shows network interfaces?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ip route">
+                        <p>What command shows the routing table?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="mac address">
+                        <p>What address identifies a network card?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="subnet mask">
+                        <p>What determines network vs host portion of IP?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>layer 3</li>
+                                <li>osi model</li>
+                                <li>tcp</li>
+                                <li>udp</li>
+                                <li>ip addr</li>
+                                <li>ip route</li>
+                                <li>mac address</li>
+                                <li>subnet mask</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 2 --><div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Network Interfaces and IP Configuration</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Understanding Network Interfaces</h3>
+                    <p>In Linux, network interfaces are represented as files in /sys/class/net/. Common interface names:</p>
+                    <ul>
+                        <li><strong>eth0, eth1:</strong> Traditional Ethernet interfaces</li>
+                        <li><strong>ens, enp:</strong> Predictable network interface names (systemd)</li>
+                        <li><strong>wlan0, wlan1:</strong> Wireless interfaces</li>
+                        <li><strong>lo:</strong> The loopback interface (127.0.0.1)</li>
+                        <li><strong>tun0, tap0:</strong> VPN tunnel interfaces</li>
+                        <li><strong>docker0:</strong> Docker bridge interface</li>
+                    </ul>
+                    
+                    <h3>Viewing Interface Information</h3>
+                    <pre><span class="prompt">$</span> <span class="command">ip link show</span>              <span class="comment"># Show all interfaces</span>
+<span class="prompt">$</span> <span class="command">ip addr show eth0</span>         <span class="comment"># Show specific interface details</span>
+<span class="prompt">$</span> <span class="command">ip -s link</span>               <span class="comment"># Show interface statistics</span>
+<span class="prompt">$</span> <span class="command">ethtool eth0</span>             <span class="comment"># Show hardware info (if installed)</span></pre>
+                    
+                    <h3>Configuring IP Addresses</h3>
+                    <p><strong>Temporary Configuration (lost on reboot):</strong></p>
+                    <pre><span class="prompt">$</span> <span class="command">sudo ip addr add 192.168.1.100/24 dev eth0</span>   <span class="comment"># Add an IP</span>
+<span class="prompt">$</span> <span class="command">sudo ip addr del 192.168.1.100/24 dev eth0</span>   <span class="comment"># Remove an IP</span>
+<span class="prompt">$</span> <span class="command">sudo ip link set eth0 up</span>                       <span class="comment"># Bring interface up</span>
+<span class="prompt">$</span> <span class="command">sudo ip link set eth0 down</span>                     <span class="comment"># Bring interface down</span></pre>
+                    
+                    <h3>Permanent Configuration</h3>
+                    <p><strong>Debian/Ubuntu (/etc/network/interfaces):</strong></p>
+                    <pre><span class="keyword">auto</span> eth0
+<span class="keyword">iface</span> eth0 inet static
+    <span class="variable">address</span> 192.168.1.100
+    <span class="variable">netmask</span> 255.255.255.0
+    <span class="variable">gateway</span> 192.168.1.1
+    <span class="variable">dns-nameservers</span> 8.8.8.8 8.8.4.4</pre>
+                    
+                    <p><strong>RHEL/CentOS (/etc/sysconfig/network-scripts/ifcfg-eth0):</strong></p>
+                    <pre><span class="variable">TYPE</span>=Ethernet
+<span class="variable">DEVICE</span>=eth0
+<span class="variable">ONBOOT</span>=yes
+<span class="variable">IPADDR</span>=192.168.1.100
+<span class="variable">NETMASK</span>=255.255.255.0
+<span class="variable">GATEWAY</span>=192.168.1.1
+<span class="variable">DNS1</span>=8.8.8.8</pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="ip link set eth0 down">
+                        <p>Which command brings a network interface down?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="eth0">
+                        <p>What is the traditional name for first Ethernet interface?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="lo">
+                        <p>What is the loopback interface name?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ip addr add">
+                        <p>What command assigns an IP address?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="127.0.0.1">
+                        <p>What is the loopback IP address?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="dhcp">
+                        <p>What protocol automatically assigns IPs?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="mtu">
+                        <p>What setting controls maximum packet size?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ethtool">
+                        <p>What command shows interface hardware info?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>ip link set eth0 down</li>
+                                <li>eth0</li>
+                                <li>lo</li>
+                                <li>ip addr add</li>
+                                <li>127.0.0.1</li>
+                                <li>dhcp</li>
+                                <li>mtu</li>
+                                <li>ethtool</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 3 --><div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Routing and the Routing Table</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Understanding Linux Routing</h3>
+                    <p>Routing is the process of deciding where to send a packet. The routing table contains rules that determine the path packets take.</p>
+                    
+                    <h3>Viewing the Routing Table</h3>
+                    <pre><span class="prompt">$</span> <span class="command">ip route show</span>
+<span class="output">default via 192.168.1.1 dev eth0 proto dhcp src 192.168.1.100 metric 100</span>
+<span class="output">192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.100</span>
+<span class="output">192.168.2.0/24 via 192.168.1.254 dev eth0</span></pre>
+                    
+                    <h3>Understanding the Output</h3>
+                    <ul>
+                        <li><strong>default:</strong> The default gateway (route of last resort)</li>
+                        <li><strong>via 192.168.1.1:</strong> Next hop IP address</li>
+                        <li><strong>dev eth0:</strong> Output interface</li>
+                        <li><strong>proto dhcp:</strong> How the route was learned</li>
+                        <li><strong>metric 100:</strong> Route priority (lower is preferred)</li>
+                        <li><strong>scope link:</strong> Only reachable on this link</li>
+                    </ul>
+                    
+                    <h3>Adding Static Routes</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo ip route add 10.0.0.0/8 via 192.168.1.1 dev eth0</span>   <span class="comment"># Add route to private network</span>
+<span class="prompt">$</span> <span class="command">sudo ip route add 172.16.0.0/12 via 192.168.1.1</span>        <span class="comment"># Another private network</span>
+<span class="prompt">$</span> <span class="command">sudo ip route add default via 192.168.1.1</span>             <span class="comment"># Default gateway</span>
+<span class="prompt">$</span> <span class="command">sudo ip route del 10.0.0.0/8</span>                            <span class="comment"># Remove a route</span></pre>
+                    
+                    <h3>Policy Routing</h3>
+                    <p>Linux supports advanced routing with multiple tables:</p>
+                    <pre><span class="prompt">$</span> <span class="command">ip route show table all</span>              <span class="comment"># Show all tables</span>
+<span class="prompt">$</span> <span class="command">cat /etc/iproute2/rt_tables</span>       <span class="comment"># View routing tables</span>
+<span class="prompt">$</span> <span class="command">sudo ip rule add from 192.168.1.100 table internal</span>   <span class="comment"># Add routing rule</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="the route of last resort">
+                        <p>What does "default" in the routing table represent?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="gateway">
+                        <p>What device connects your network to internet?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ip route add">
+                        <p>What command adds a static route?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="metric">
+                        <p>What determines route priority?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="via">
+                        <p>What keyword specifies next hop in route?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="scope">
+                        <p>What limits route to local network?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="rt_tables">
+                        <p>What file defines custom routing tables?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ip rule">
+                        <p>What command manages routing policy?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>the route of last resort</li>
+                                <li>gateway</li>
+                                <li>ip route add</li>
+                                <li>metric</li>
+                                <li>via</li>
+                                <li>scope</li>
+                                <li>rt_tables</li>
+                                <li>ip rule</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 4 --><div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// DNS Configuration on Linux</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>How Linux Resolves Names</h3>
+                    <p>Linux uses a system called NSS (Name Service Switch) and /etc/nsswitch.conf to determine how to resolve hostnames:</p>
+                    
+                    <pre><span class="prompt">$</span> <span class="command">cat /etc/nsswitch.conf | grep hosts</span>
+<span class="output">hosts: files dns myhostname</span></pre>
+                    
+                    <p>This means Linux looks in:</p>
+                    <ol>
+                        <li><strong>files:</strong> /etc/hosts first</li>
+                        <li><strong>dns:</strong> Then queries DNS servers</li>
+                        <li><strong>myhostname:</strong> Falls back to local hostname</li>
+                    </ol>
+                    
+                    <h3>/etc/hosts - Local Name Resolution</h3>
+                    <pre><span class="prompt">$</span> <span class="command">cat /etc/hosts</span>
+<span class="output">127.0.0.1   localhost</span>
+<span class="output">127.0.1.1   myserver</span>
+<span class="output">192.168.1.10    dbserver.internal</span>
+<span class="output">192.168.1.11    webserver.internal</span></pre>
+                    
+                    <h3>/etc/resolv.conf - DNS Servers</h3>
+                    <pre><span class="prompt">$</span> <span class="command">cat /etc/resolv.conf</span>
+<span class="output">nameserver 8.8.8.8</span>
+<span class="output">nameserver 8.8.4.4</span>
+<span class="output">search internal.local</span></pre>
+                    
+                    <h3>DNS Lookup Tools</h3>
+                    <pre><span class="prompt">$ class="command"></span> <spannslookup google.com</span>        <span class="comment"># Basic DNS lookup (deprecated)</span>
+<span class="prompt">$</span> <span class="command">dig google.com</span>            <span class="comment"># Detailed DNS query</span>
+<span class="prompt">$</span> <span class="command">dig +short google.com</span>     <span class="comment"># Just get the IP</span>
+<span class="prompt">$</span> <span class="command">host google.com</span>           <span class="comment"># Simple lookup</span>
+<span class="prompt">$</span> <span class="command">getent hosts google.com</span>   <span class="comment"># Use NSS resolver</span></pre>
+                    
+                    <h3>Systemd-Resolved</h3>
+                    <p>Modern systems use systemd-resolved which manages /etc/resolv.conf:</p>
+                    <pre><span class="prompt">$</span> <span class="command">resolvectl status</span>        <span class="comment"># Show DNS servers</span>
+<span class="prompt">$</span> <span class="command">resolvectl query google.com</span>   <span class="comment"># Query DNS</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="/etc/hosts">
+                        <p>In /etc/nsswitch.conf, what does "files" refer to for host resolution?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="resolv.conf">
+                        <p>What file contains DNS server addresses?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="nslookup">
+                        <p>What command queries DNS servers?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="dig">
+                        <p>What command provides detailed DNS info?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="systemd-resolved">
+                        <p>What service manages DNS on modern Linux?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>/etc/hosts</li>
+                                <li>resolv.conf</li>
+                                <li>nslookup</li>
+                                <li>dig</li>
+                                <li>systemd-resolved</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 5 --><div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// iptables Basics - Your First Firewall</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Understanding iptables</h3>
+                    <p>iptables is the Linux firewall that filters packets based on rules. It uses "chains" that packets pass through:</p>
+                    <ul>
+                        <li><strong>INPUT:</strong> Packets destined for local processes</li>
+                        <li><strong>OUTPUT:</strong> Packets generated locally</li>
+                        <li><strong>FORWARD:</strong> Packets being routed through (not for local)</li>
+                        <li><strong>PREROUTING:</strong> Before routing decision (NAT)</li>
+                        <li><strong>POSTROUTING:</strong> After routing decision (NAT)</li>
+                    </ul>
+                    
+                    <h3>Viewing Rules</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo iptables -L -v -n</span>        <span class="comment"># List all rules with details</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -L INPUT -n</span>     <span class="comment"># List INPUT chain</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -t nat -L -v</span>    <span class="comment"># View NAT table</span></pre>
+                    
+                    <h3>Basic Rule Syntax</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT</span>   <span class="comment"># Allow SSH</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT</span>   <span class="comment"># Allow HTTP</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -j DROP</span>                      <span class="comment"># Drop everything else</span></pre>
+                    
+                    <h3>Common Options</h3>
+                    <ul>
+                        <li><strong>-A:</strong> Append rule to chain</li>
+                        <li><strong>-I:</strong> Insert rule at position</li>
+                        <li><strong>-D:</strong> Delete rule</li>
+                        <li><strong>-p:</strong> Protocol (tcp, udp, icmp)</li>
+                        <li><strong>--dport:</strong> Destination port</li>
+                        <li><strong>--sport:</strong> Source port</li>
+                        <li><strong>-s:</strong> Source address</li>
+                        <li><strong>-d:</strong> Destination address</li>
+                        <li><strong>-j:</strong> Jump (target): ACCEPT, DROP, REJECT, LOG</li>
+                        <li><strong>-i:</strong> Input interface</li>
+                        <li><strong>-o:</strong> Output interface</li>
+                    </ul>
+                    
+                    <h3>Practical Examples</h3>
+                    <pre><span class="comment"># Allow established connections (important!)</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT</span>
+
+<span class="comment"># Allow SSH on custom port</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -p tcp --dport 2222 -j ACCEPT</span>
+
+<span class="comment"># Allow HTTP and HTTPS</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT</span>
+
+<span class="comment"># Allow ping</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT</span>
+
+<span class="comment"># Drop everything else</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -A INPUT -j DROP</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="input">
+                        <p>Which chain handles packets destined for a local service?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="output">
+                        <p>Which chain handles locally generated packets?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="forward">
+                        <p>Which chain handles routed packets?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="accept">
+                        <p>What target allows traffic?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="drop">
+                        <p>What target blocks traffic silently?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>input</li>
+                                <li>output</li>
+                                <li>forward</li>
+                                <li>accept</li>
+                                <li>drop</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 6 --><div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// NAT and Port Forwarding</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Understanding NAT</h3>
+                    <p>Network Address Translation (NAT) allows multiple devices to share a single public IP address. The NAT table has two main purposes:</p>
+                    <ul>
+                        <li><strong>SNAT (Source NAT):</strong> Change source IP of outgoing packets</li>
+                        <li><strong>DNAT (Destination NAT):</strong> Change destination IP of incoming packets</li>
+                    </ul>
+                    
+                    <h3>Common NAT Scenarios</h3>
+                    <pre><span class="comment"># Masquerade (hide private network behind public IP)</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</span>
+
+<span class="comment"># Port forward (external port 8080 to internal 192.168.1.100:80)</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -t nat -A PREROUTING -p tcp --dport 8080 -j DNAT --to-destination 192.168.1.100:80</span>
+
+<span class="comment"># Forward to internal host</span>
+<span class="prompt">$</span> <span class="command">sudo iptables -t nat -A PREROUTING -p tcp --dport 2222 -j DNAT --to-destination 192.168.1.50:22</span></pre>
+                    
+                    <h3>Enable IP Forwarding</h3>
+                    <pre><span class="comment"># Temporarily enable (for routing)</span>
+<span class="prompt">$</span> <span class="command">sudo sysctl -w net.ipv4.ip_forward=1</span>
+
+<span class="comment"># Permanently (add to /etc/sysctl.conf)</span>
+<span class="prompt">$</span> <span class="command">echo "net.ipv4.ip_forward=1" | sudo tee /etc/sysctl.d/99-ip-forward.conf</span>
+<span class="prompt">$</span> <span class="command">sudo sysctl -p /etc/sysctl.d/99-ip-forward.conf</span></pre>
+                    
+                    <h3>Persistent NAT Rules</h3>
+                    <p>iptables rules are lost on reboot. Save them:</p>
+                    <pre><span class="comment"># Debian/Ubuntu</span>
+<span class="prompt">$</span> <span class="command">sudo iptables-save | sudo tee /etc/iptables/rules.v4</span>
+
+<span class="comment"># RHEL/CentOS</span>
+<span class="prompt">$</span> <span class="command">sudo service iptables save</span>
+
+<span class="comment"># Restore on boot (add to startup)</span>
+<span class="prompt">$</span> <span class="command">sudo iptables-restore < /etc/iptables/rules.v4</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="nat">
+                        <p>Which iptables table is used for NAT?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="snat">
+                        <p>What changes source IP for outgoing traffic?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="dnat">
+                        <p>What changes destination IP for incoming traffic?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="masquerade">
+                        <p>What is dynamic SNAT called?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="port forwarding">
+                        <p>What redirects traffic to different port?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>nat</li>
+                                <li>snat</li>
+                                <li>dnat</li>
+                                <li>masquerade</li>
+                                <li>port forwarding</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 7 --><div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Network Diagnostics and Troubleshooting</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Essential Diagnostic Tools</h3>
+                    <p>When network issues arise, these tools are your best friends:</p>
+                    
+                    <h3>ping - Test Connectivity</h3>
+                    <pre><span class="prompt">$</span> <span class="command">ping google.com</span>              <span class="comment"># Continuous ping</span>
+<span class="prompt">$</span> <span class="command">ping -c 4 google.com</span>         <span class="comment"># Ping 4 times</span>
+<span class="prompt">$</span> <span class="command">ping -i 0.2 google.com</span>       <span class="comment"># Faster interval</span>
+<span class="prompt">$</span> <span class="command">ping -I eth0 google.com</span>       <span class="comment"># Specific interface</span></pre>
+                    
+                    <h3>traceroute - Path Discovery</h3>
+                    <pre><span class="prompt">$</span> <span class="command">traceroute google.com</span>       <span class="comment"># Trace route</span>
+<span class="prompt">$</span> <span class="command">traceroute -I google.com</span>      <span class="comment"># ICMP traceroute</span>
+<span class="prompt">$</span> <span class="command">traceroute -T google.com</span>      <span class="comment"># TCP traceroute</span>
+<span class="prompt">$</span> <span class="command">mtr google.com</span>                <span class="comment"># Continuous traceroute</span></pre>
+                    
+                    <h3>netstat/ss - Port and Connection Info</h3>
+                    <pre><span class="prompt">$</span> <span class="command">ss -tuln</span>                  <span class="comment"># Listening TCP/UDP ports</span>
+<span class="prompt">$</span> <span class="command">ss -tn</span>                    <span class="comment"># Active connections</span>
+<span class="prompt">$</span> <span class="command">ss -tp</span>                    <span class="comment"># Show process using socket</span>
+<span class="prompt">$</span> <span class="command">ss -s</span>                     <summary <span class="comment"># Socket summary</span></pre>
+                    
+                    <h3>tcpdump - Packet Capture</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo tcpdump -i eth0</span>                    <span class="comment"># Capture all traffic</span>
+<span class="prompt">$</span> <span class="command">sudo tcpdump -i eth0 port 80</span>              <span class="comment"># HTTP traffic only</span>
+<span class="prompt">$</span> <span class="command">sudo tcpdump -i eth0 host 8.8.8.8</span>         <span class="comment"># Specific host</span>
+<span class="prompt">$</span> <span class="command">sudo tcpdump -i eth0 -w capture.pcap</span>      <span class="comment"># Save to file</span>
+<span class="prompt">$</span> <span class="command">tcpdump -r capture.pcap</span>                   <span class="comment"># Read from file</span></pre>
+                    
+                    <h3>Other Essential Tools</h3>
+                    <pre><span class="prompt">$</span> <span class="command">ip neighbor show</span>          <span class="comment"># ARP table</span>
+<span class="prompt">$</span> <span class="command">netstat -i</span>               <span class="comment"># Interface statistics</span>
+<span class="prompt">$</span> <span class="command">dig +trace google.com</span>     <span class="comment"># Full DNS resolution</span>
+<span class="prompt">$</span> <span class="command">curl -v google.com</span>        <span class="comment"># HTTP request with details</span>
+<span class="prompt">$</span> <span class="command">nc -zv host 80</span>             <span class="comment"># Check if port is open</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="ss -tp">
+                        <p>Which tool shows which process is using a network port?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="netstat">
+                        <p>What is the older alternative to ss?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="tcpdump">
+                        <p>What captures network packets?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ping">
+                        <p>What tests connectivity to a host?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="traceroute">
+                        <p>What shows the path packets take?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>ss -tp</li>
+                                <li>netstat</li>
+                                <li>tcpdump</li>
+                                <li>ping</li>
+                                <li>traceroute</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 8 --><div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// SSH Tunneling and Port Forwarding</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Why SSH Tunnels?</h3>
+                    <p>SSH tunnels encrypt your traffic and can bypass firewalls. They're essential for:</p>
+                    <ul>
+                        <li>Secure browsing on public WiFi</li>
+                        <li>Accessing internal services remotely</li>
+                        <li>Bypassing restrictive firewalls</li>
+                        <li>Securing unencrypted protocols</li>
+                    </ul>
+                    
+                    <h3>Local Port Forwarding (-L)</h3>
+                    <p>Forward a local port to a remote destination:</p>
+                    <pre><span class="comment"># Access remote MySQL through SSH tunnel</span>
+<span class="prompt">$</span> <span class="command">ssh -L 3306:localhost:3306 user@remote-server</span>
+
+<span class="comment"># Access internal web server</span>
+<span class="prompt">$</span> <span class="command">ssh -L 8080:internal-web:80 user@gateway</span>
+
+<span class="comment"># Background tunnel with key</span>
+<span class="prompt">$</span> <span class="command">ssh -f -N -L 8080:internal-web:80 user@gateway</span></pre>
+                    
+                    <h3>Remote Port Forwarding (-R)</h3>
+                    <p>Allow remote host to access local services:</p>
+                    <pre><span class="comment"># Expose local web server to remote</span>
+<span class="prompt">$</span> <span class="command">ssh -R 8080:localhost:80 user@remote-server</span>
+
+<span class="comment"># Share local port with internet (requires GatewayPorts)</span>
+<span class="prompt">$</span> <span class="command">ssh -R 0.0.0.0:8080:localhost:80 user@remote-server</span></pre>
+                    
+                    <h3>Dynamic Port Forwarding (-D)</h3>
+                    <p>Create a SOCKS proxy for dynamic forwarding:</p>
+                    <pre><span class="comment"># Create SOCKS proxy on local port 1080</span>
+<span class="prompt">$</span> <span class="command">ssh -D 1080 user@remote-server</span>
+
+<span class="comment"># Use with browser: localhost:1080 as SOCKS5 proxy</span>
+<span class="prompt">$</span> <span class="command">ssh -f -N -D 1080 user@remote-server</span></pre>
+                    
+                    <h3>SSH Config for Easy Tunnels</h3>
+                    <pre><span class="prompt">$</span> <span class="command">cat ~/.ssh/config</span>
+<span class="output">Host tunnel</span>
+<span class="output">    HostName remote-server.com</span>
+<span class="output">    User admin</span>
+<span class="output">    LocalForward 8080 internal-web:80</span>
+<span class="output">    IdentityFile ~/.ssh/id_rsa</span></pre>
+                    
+                    <p>Now just run: <code>ssh tunnel</code></p>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="-d">
+                        <p>Which SSH flag creates a SOCKS proxy for dynamic forwarding?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="-l">
+                        <p>Which SSH flag enables local port forwarding?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="-r">
+                        <p>Which SSH flag enables remote port forwarding?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="-n">
+                        <p>Which SSH flag redirects stdin from /dev/null?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="-f">
+                        <p>Which SSH flag runs in background?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>-d</li>
+                                <li>-l</li>
+                                <li>-r</li>
+                                <li>-n</li>
+                                <li>-f</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 9 --><div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// VPNs with WireGuard</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Why WireGuard?</h3>
+                    <p>WireGuard is a modern, fast, and simple VPN. Compared to OpenVPN:</p>
+                    <ul>
+                        <li><strong>Faster:</strong> ~4x faster than OpenVPN</li>
+                        <li><strong>Simpler:</strong> ~4,000 lines vs ~100,000</li>
+                        <li><strong>Secure:</strong> Modern cryptography (Curve25519, ChaCha20)</li>
+                        <li><strong>Kernel-native:</strong> Built into Linux kernel</li>
+                    </ul>
+                    
+                    <h3>Installing WireGuard</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo apt install wireguard</span>        <span class="comment"># Debian/Ubuntu</span>
+<span class="prompt">$</span> <span class="command">sudo dnf install wireguard-tools</span>   <span class="comment"># RHEL/Fedora</span></pre>
+                    
+                    <h3>Generating Keys</h3>
+                    <pre><span class="prompt">$</span> <span class="command">wg genkey | tee privatekey | wg pubkey > publickey</span></pre>
+                    
+                    <h3>Server Configuration</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo cat > /etc/wireguard/wg0.conf << 'EOF'</span>
+<span class="output">[Interface]</span>
+<span class="output">Address = 10.0.0.1/24</span>
+<span class="output">ListenPort = 51820</span>
+<span class="output">PrivateKey = SERVER_PRIVATE_KEY</span>
+<span class="output">PostUp = iptables -A FORWARD -i %i -j ACCEPT</span>
+<span class="output">PostUp = iptables -A FORWARD -o %i -j ACCEPT</span>
+<span class="output">PostUp = iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</span>
+<span class="output">PostDown = iptables -D FORWARD -i %i -j ACCEPT</span>
+<span class="output">PostDown = iptables -D FORWARD -o %i -j ACCEPT</span>
+<span class="output">PostDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE</span>
+<span class="output"></span>
+<span class="output">[Peer]</span>
+<span class="output">PublicKey = CLIENT_PUBLIC_KEY</span>
+<span class="output">AllowedIPs = 10.0.0.2/32</span>
+<span class="output">EOF</span></pre>
+                    
+                    <h3>Client Configuration</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo cat > wg0.conf << 'EOF'</span>
+<span class="output">[Interface]</span>
+<span class="output">Address = 10.0.0.2/24</span>
+<span class="output">PrivateKey = CLIENT_PRIVATE_KEY</span>
+<span class="output">DNS = 1.1.1.1</span>
+<span class="output"></span>
+<span class="output">[Peer]</span>
+<span class="output">PublicKey = SERVER_PUBLIC_KEY</span>
+<span class="output">Endpoint = your-server.com:51820</span>
+<span class="output">AllowedIPs = 0.0.0.0/0</span>
+<span class="output">PersistentKeepalive = 25</span>
+<span class="output">EOF</span></pre>
+                    
+                    <h3>Starting WireGuard</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo wg-quick up wg0</span>      <span class="comment"># Start VPN</span>
+<span class="prompt">$</span> <span class="command">sudo wg-quick down wg0</span>    <span class="comment"># Stop VPN</span>
+<span class="prompt">$</span> <span class="command">sudo wg show</span>            <span class="comment"># Show status</span>
+<span class="prompt">$</span> <span class="command">sudo systemctl enable wg-quick@wg0</span>  <span class="comment"># Enable on boot</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="51820">
+                        <p>What port does WireGuard use by default?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="wg0">
+                        <p>What is the default WireGuard interface name?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="wg-quick">
+                        <p>What tool manages WireGuard interfaces?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="privatekey">
+                        <p>What key must stay secret in WireGuard?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="peer">
+                        <p>What represents a remote VPN endpoint?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>51820</li>
+                                <li>wg0</li>
+                                <li>wg-quick</li>
+                                <li>privatekey</li>
+                                <li>peer</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 10 --><div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Network Monitoring and Performance</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Monitoring Network Traffic</h3>
+                    <p>Understanding your network traffic patterns is crucial for security and performance.</p>
+                    
+                    <h3>iftop - Real-Time Traffic</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo iftop</span>                    <span class="comment"># Monitor all traffic</span>
+<span class="prompt">$</span> <span class="command">sudo iftop -i eth0</span>           <span class="comment"># Specific interface</span>
+<span class="prompt">$</span> <span class="command">sudo iftop -B</span>                <span class="comment"># Bytes instead of bits</span></pre>
+                    
+                    <h3>nethogs - Per-Process Traffic</h3>
+                    <pre><span class="prompt">$</span> <span class="command">sudo nethogs</span>                <span class="comment"># Show per-process bandwidth</span>
+<span class="prompt">$</span> <span class="command">sudo nethogs eth0</span>           <span class="comment"># Specific interface</span></pre>
+                    
+                    <h3>Bandwidth Monitoring with vnstat</h3>
+                    <pre><span class="prompt">$</span> <span class="command">vnstat -l</span>                   <span class="comment"># Live monitoring</span>
+<span class="prompt">$</span> <span class="command">vnstat -h</span>                   <span class="comment"># Hourly stats</span>
+<span class="prompt">$</span> <span class="command">vnstat -d</span>                   <span class="comment"># Daily stats</span>
+<span class="prompt">$</span> <span class="command">vnstat -m</span>                   <span class="comment"># Monthly stats</span></pre>
+                    
+                    <h3>Network Performance Metrics</h3>
+                    <pre><span class="prompt">$</span> <span class="command">cat /proc/net/dev</span>           <span class="comment"># Interface statistics</span>
+<span class="prompt">$</span> <span class="command">ip -s link</span>                 <span class="comment"># Packet error counters</span>
+<span class="prompt">$</span> <span class="command">netstat -s</span>                 <span class="comment"># Protocol statistics</span>
+<span class="prompt">$</span> <span class="command">sar -n DEV 1 5</span>             <span class="comment"># Network I/O rates</span></pre>
+                    
+                    <h3>Custom Traffic Scripts</h3>
+                    <pre><span class="comment"># Simple traffic monitor script</span>
+<span class="prompt">$</span> <span class="command">cat traffic-monitor.sh</span>
+<span class="output">#!/bin/bash</span>
+<span class="output">INTERFACE="eth0"</span>
+<span class="output">while true; do</span>
+<span class="output">    RX1=$(cat /sys/class/net/$INTERFACE/statistics/rx_bytes)</span>
+<span class="output">    TX1=$(cat /sys/class/net/$INTERFACE/statistics/tx_bytes)</span>
+<span class="output">    sleep 1</span>
+<span class="output">    RX2=$(cat /sys/class/net/$INTERFACE/statistics/rx_bytes)</span>
+<span class="output">    TX2=$(cat /sys/class/net/$INTERFACE/statistics/tx_bytes)</span>
+<span class="output">    echo "RX: $(( (RX2-RX1)/1024 )) KB/s TX: $(( (TX2-TX1)/1024 )) KB/s"</span>
+<span class="output">done</span></pre>
+                    
+                    <h3>Quiz</h3>
+                    <div class="quiz-question" data-answer="nethogs">
+                        <p>Which tool shows bandwidth usage per process?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="iftop">
+                        <p>What shows bandwidth per host connection?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="vnstat">
+                        <p>What monitors long-term traffic history?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="bmon">
+                        <p>What is a curses-based bandwidth monitor?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="/sys/class/net">
+                        <p>Where does Linux store interface statistics?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+
+            
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>nethogs</li>
+                                <li>iftop</li>
+                                <li>vnstat</li>
+                                <li>bmon</li>
+                                <li>/sys/class/net</li>
+                            </ol>
+                        </div>
+                    </details></div>
+        </div>
+    </div>
+    <!-- Lesson 11 --><div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// VPN Setup</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>VPN Fundamentals</h3>
+                <p>A Virtual Private Network (VPN) creates an encrypted tunnel over an untrusted network, allowing secure remote access and privacy protection.</p>
+                
+                <h3>WireGuard Setup</h3>
+                <p>WireGuard is a modern, fast, and secure VPN protocol. Here's how to configure it:</p>
+                <div class="terminal-block">
+                    <span class="prompt">$</span> <span class="command">sudo apt install wireguard wireguard-tools</span>
+                    <span class="comment"># Install WireGuard on Debian/Ubuntu</span>
+                    <span class="prompt">$</span> <span class="command">sudo dnf install wireguard-tools</span>
+                    <span class="comment"># Install on RHEL/CentOS/Fedora</span>
+                </div>
+                
+                <h3>Generating WireGuard Keys</h3>
+                <div class="terminal-block">
+                    <span class="prompt">$</span> <span class="command">wg genkey | tee privatekey | wg pubkey > publickey</span>
+                    <span class="comment"># Generate private and public keys</span>
+                    <span class="prompt">$</span> <span class="command">cat privatekey</span>
+                    <span class="comment"># View private key (keep secret!)</span>
+                    <span class="prompt">$</span> <span class="command">cat publickey</span>
+                    <span class="comment"># View public key (share with peers)</span>
+                </div>
+                
+                <h3>WireGuard Server Configuration</h3>
+                <div class="terminal-block">
+                    <span class="prompt">$</span> <span class="command">sudo nano /etc/wireguard/wg0.conf</span>
+                    <span class="output">[Interface]</span>
+                    <span class="output">Address = 10.0.0.1/24</span>
+                    <span class="output">ListenPort = 51820</span>
+                    <span class="output">PrivateKey = SERVER_PRIVATE_KEY</span>
+                    <span class="output">PostUp = iptables -A FORWARD -i wg0 -j ACCEPT</span>
+                    <span class="output">PostUp = iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</span>
+                    <span class="output">PostDown = iptables -D FORWARD -i wg0 -j ACCEPT</span>
+                    <span class="output">PostDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE</span>
+                    <span class="output"></span>
+                    <span class="output">[Peer]</span>
+                    <span class="output"># Client 1</span>
+                    <span class="output">PublicKey = CLIENT1_PUBLIC_KEY</span>
+                    <span class="output">AllowedIPs = 10.0.0.2/32</span>
+                </div>
+                
+                <h3>OpenVPN Setup (Alternative)</h3>
+                <p>OpenVPN is a mature VPN solution with wide compatibility:</p>
+                <div class="terminal-block">
+                    <span class="prompt">$</span> <span class="command">sudo apt install openvpn easy-rsa</span>
+                    <span class="comment"># Install OpenVPN</span>
+                    <span class="prompt">$</span> <span class="command">sudo systemctl enable --now openvpn-server@server</span>
+                    <span class="comment"># Start and enable OpenVPN service</span>
+                </div>
+                
+                <div class="highlight-box">
+                    <strong>Security Tip:</strong> Always use strong encryption (AES-256-GCM), perfect forward secrecy, and keep your VPN software updated to protect against vulnerabilities.
+                </div>
+                
+                <h3>Client Configuration</h3>
+                <div class="terminal-block">
+                    <span class="prompt">$</span> <span class="command">sudo wg-quick up wg0</span>
+                    <span class="comment"># Start WireGuard interface</span>
+                    <span class="prompt">$</span> <span class="command">sudo wg-quick down wg0</span>
+                    <span class="comment"># Stop WireGuard interface</span>
+                    <span class="prompt">$</span> <span class="command">sudo systemctl enable wg-quick@wg0</span>
+                    <span class="comment"># Enable on boot</span>
+                </div>
+                
+                <h3>Troubleshooting VPN Connections</h3>
+                <div class="terminal-block">
+                    <span class="prompt">$</span> <span class="command">sudo wg show</span>
+                    <span class="comment"># Check WireGuard status</span>
+                    <span class="prompt">$</span> <span class="command">sudo tcpdump -i wg0</span>
+                    <span class="comment"># Monitor VPN interface traffic</span>
+                    <span class="prompt">$</span> <span class="command">ping 10.0.0.1</span>
+                    <span class="comment"># Test VPN connectivity</span>
+                </div>
+                
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question" data-answer="wg-quick">
+                        <p>What command is used to start a WireGuard interface?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="51820">
+                        <p>What is WireGuard's default UDP port?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="masquerade">
+                        <p>What iptables target allows VPN clients to access the internet?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="publickey">
+                        <p>Which key can be safely shared with VPN peers?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                </div>
+                
+                <details class="quiz-answers-reveal">
+                    <summary>Show All Answers</summary>
+                    <div class="quiz-answers-display">
+                        <h4>Answers</h4>
+                        <ol>
+                            <li>wg-quick</li>
+                            <li>51820</li>
+                            <li>masquerade</li>
+                            <li>publickey</li>
+                        </ol>
+                    </div>
+                </details></div>
+        </div>
+    </div>
+    <!-- Lesson 12 --><div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Advanced Networking</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Load Balancing</h3>
+                <p>Load balancing distributes network traffic across multiple servers to improve performance and reliability.</p>
+                
+                <h3>HAProxy for Load Balancing</h3>
+                <p>HAProxy is a high-performance TCP/HTTP load balancer:</p>
+                <div class="terminal-block">
+                    <span class="prompt">$</span> <span class="command">sudo apt install haproxy</span>
+                    <span class="comment"># Install HAProxy</span>
+                    <span class="prompt">$</span> <span class="command">sudo nano /etc/haproxy/haproxy.cfg</span>
+                    <span class="output">frontend web_frontend</span>
+                    <span class="output">    bind *:80</span>
+                    <span class="output">    default_backend web_servers</span>
+                    <span class="output"></span>
+                    <span class="output">backend web_servers</span>
+                    <span class="output">    balance roundrobin</span>
+                    <span class="output">    server web1 192.168.1.10:80 check</span>
+                    <span class="output">    server web2 192.168.1.11:80 check</span>
+                    <span class="output">    server web3 192.168.1.12:80 check</span>
+                </div>
+                
+                <h3>Nginx Load Balancing</h3>
+                <div class="terminal-block">
+                    <span class="prompt">$</span> <span class="command">sudo nano /etc/nginx/nginx.conf</span>
+                    <span class="output">upstream backend {</span>
+                    <span class="output">    least_conn;</span>
+                    <span class="output">    server 192.168.1.10:8080 weight=5;</span>
+                    <span class="output">    server 192.168.1.11:8080 weight=5;</span>
+                    <span class="output">    server 192.168.1.12:8080 backup;</span>
+                    <span class="output">}</span>
+                    <span class="output"></span>
+                    <span class="output">server {</span>
+                    <span class="output">    location / {</span>
+                    <span class="output">        proxy_pass http://backend;</span>
+                    <span class="output">    }</span>
+                    <span class="output">}</span>
+                </div>
+                
+                <h3>High Availability with Keepalived</h3>
+                <p>Keepalived provides VRRP (Virtual Router Redundancy Protocol) for automatic failover:</p>
+                <div class="terminal-block">
+                    <span class="prompt">$</span> <span class="command">sudo apt install keepalived</span>
+                    <span class="comment"># Install Keepalived</span>
+                    <span class="prompt">$</span> <span class="command">sudo nano /etc/keepalived/keepalived.conf</span>
+                    <span class="output">vrrp_instance VI_1 {</span>
+                    <span class="output">    state MASTER</span>
+                    <span class="output">    interface eth0</span>
+                    <span class="output">    virtual_router_id 51</span>
+                    <span class="output">    priority 100</span>
+                    <span class="output">    authentication {</span>
+                    <span class="output">        auth_type PASS</span>
+                    <span class="output">        auth_pass secret123</span>
+                    <span class="output">    }</span>
+                    <span class="output">    virtual_ipaddress {</span>
+                    <span class="output">        192.168.1.100/24</span>
+                    <span class="output">    }</span>
+                    <span class="output">}</span>
+                </div>
+                
+                <div class="highlight-box">
+                    <strong>High Availability:</strong> Configure a BACKUP node with lower priority (e.g., 90) on another server. If the MASTER fails, the BACKUP automatically takes over the virtual IP.
+                </div>
+                
+                <h3>Network Automation with Ansible</h3>
+                <p>Ansible automates network configuration across multiple devices:</p>
+                <div class="terminal-block">
+                    <span class="prompt">$</span> <span class="command">sudo apt install ansible</span>
+                    <span class="comment"># Install Ansible</span>
+                    <span class="prompt">$</span> <span class="command">cat > network.yml << 'EOF'</span>
+                    <span class="output">---</span>
+                    <span class="output">- name: Configure Network</span>
+                    <span class="output">  hosts: webservers</span>
+                    <span class="output">  become: yes</span>
+                    <span class="output">  tasks:</span>
+                    <span class="output">    - name: Configure static IP</span>
+                    <span class="output">      template:</span>
+                    <span class="output">        src: interfaces.j2</span>
+                    <span class="output">        dest: /etc/network/interfaces</span>
+                    <span class="output">      notify: restart networking</span>
+                    <span class="output">    - name: Configure firewall</span>
+                    <span class="output">      ufw:</span>
+                    <span class="output">        rule: allow</span>
+                    <span class="output">        port: '80'</span>
+                    <span class="output">  handlers:</span>
+                    <span class="output">    - name: restart networking</span>
+                    <span class="output">      service: name=networking state=restarted</span>
+                    <span class="output">EOF</span>
+                    <span class="prompt">$</span> <span class="command">ansible-playbook network.yml</span>
+                    <span class="comment"># Run the playbook</span>
+                </div>
+                
+                <h3>Network Bonding</h3>
+                <p>Bonding combines multiple network interfaces for redundancy or increased bandwidth:</p>
+                <div class="terminal-block">
+                    <span class="prompt">$</span> <span class="command">sudo nano /etc/netplan/01-netcfg.yaml</span>
+                    <span class="output">network:</span>
+                    <span class="output">  version: 2</span>
+                    <span class="output">  ethernets:</span>
+                    <span class="output">    eth0: {}</span>
+                    <span class="output">    eth1: {}</span>
+                    <span class="output">  bonds:</span>
+                    <span class="output">    bond0:</span>
+                    <span class="output">      dhcp4: yes</span>
+                    <span class="output">      interfaces:</span>
+                    <span class="output">        - eth0</span>
+                    <span class="output">        - eth1</span>
+                    <span class="output">      parameters:</span>
+                    <span class="output">        mode: active-backup</span>
+                    <span class="output">        primary: eth0</span>
+                </div>
+                
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question" data-answer="haproxy">
+                        <p>What software is commonly used for TCP/HTTP load balancing?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="keepalived">
+                        <p>What provides VRRP for automatic IP failover?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="ansible">
+                        <p>What tool is used for network automation and configuration management?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                    <div class="quiz-question" data-answer="roundrobin">
+                        <p>What load balancing algorithm distributes requests equally in sequence?</p>
+                        <input type="text" class="quiz-input" placeholder="Type your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <p class="quiz-feedback"></p>
+                    </div>
+                </div>
+                
+                <details class="quiz-answers-reveal">
+                    <summary>Show All Answers</summary>
+                    <div class="quiz-answers-display">
+                        <h4>Answers</h4>
+                        <ol>
+                            <li>haproxy</li>
+                            <li>keepalived</li>
+                            <li>ansible</li>
+                            <li>roundrobin</li>
+                        </ol>
+                    </div>
+                </details></div>
+        </div>
+    </div>
+
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    <script src="../nav.js" defer></script>
+</body>
+</html>

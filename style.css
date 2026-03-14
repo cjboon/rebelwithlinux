@@ -36,19 +36,19 @@
    - dark-green: For success states
    ============================================================================= */
 :root {
-    --ivory: #FFFFF0;
+    --ivory: #FFFFFF;
     --white: #FFFFFF;
-    --black: #0A0A0A;
-    --charcoal: #2A2A2A;
-    --beige: #F5F5DC;
-    --dark-red: #8B0000;
-    --dark-green: #006400;
+    --black: #000000;
+    --charcoal: #666666;
+    --beige: #FFFFFF;
+    --dark-red: #666666;
+    --dark-green: #666666;
     --nav-color: #FFFFFF;
 }
 
 [data-theme="dark"] {
     --ivory: #1a1a1a;
-    --white: #2a2a2a;
+    --white: #1a1a1a;
     --black: #e0e0e0;
     --charcoal: #c0c0c0;
     --beige: #3a3a3a;
@@ -58,7 +58,7 @@
 [data-theme="dark"] .form-group input {
     background: #2a2a2a;
     color: #e0e0e0;
-    border-color: #e0e0e0;
+    border-color: transparent;
 }
 
 [data-theme="dark"] .quiz-input::placeholder {
@@ -76,7 +76,7 @@
 /* Pure CSS dark mode toggle using data-theme attribute */
 :root[data-theme="dark"] {
     --ivory: #1a1a1a;
-    --white: #2a2a2a;
+    --white: #1a1a1a;
     --black: #e0e0e0;
     --charcoal: #c0c0c0;
     --beige: #3a3a3a;
@@ -85,7 +85,7 @@
 /* JS-free fallback: use checkbox state to switch theme */
 :root:has(#themeToggle:checked) {
     --ivory: #1a1a1a;
-    --white: #2a2a2a;
+    --white: #1a1a1a;
     --black: #e0e0e0;
     --charcoal: #c0c0c0;
     --beige: #3a3a3a;
@@ -214,14 +214,14 @@ nav {
     top: 0;
     left: 0;
     right: 0;
-    background: var(--black);
-    color: var(--white);
+    background: var(--white);
+    color: var(--black);
     padding: 12px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 1000;
-    border-bottom: 4px solid var(--white);
+    border-bottom: none;
 }
 
 .nav-left {
@@ -236,7 +236,7 @@ nav {
 }
 
 .nav-right > a {
-    color: var(--white);
+    color: var(--black);
     text-decoration: none;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.875rem;
@@ -245,25 +245,23 @@ nav {
 }
 
 .nav-right > a:hover {
-    opacity: 0.8;
 }
 
 .nav-title {
     font-size: 1.1rem;
     font-weight: 700;
     white-space: nowrap;
-    color: var(--white);
+    color: var(--black);
     text-decoration: none;
     display: inline-block;
     cursor: pointer;
 }
 
 .nav-title:visited {
-    color: var(--white);
+    color: var(--black);
 }
 
 .nav-title:hover {
-    opacity: 0.8;
 }
 }
 
@@ -303,7 +301,7 @@ nav {
     display: block;
     width: 100%;
     height: 3px;
-    background: var(--white);
+    background: var(--black);
     transition: all 0.3s ease;
 }
 
@@ -329,7 +327,9 @@ nav {
     top: 60px;
     left: 0;
     right: 0;
-    background: var(--black);
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #ccc;
     flex-direction: column;
     padding: 20px;
     gap: 0;
@@ -337,7 +337,7 @@ nav {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    border-bottom: 4px solid var(--white);
+    border-bottom: none;
     max-height: calc(100vh - 60px);
     overflow-y: auto;
     z-index: 999;
@@ -420,9 +420,9 @@ nav {
 
 .nav-links a {
     padding: 16px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
+    border-bottom: 1px solid #eee;
     font-size: 1rem;
-    color: var(--white);
+    color: #000000 !important;
     text-decoration: none;
     font-family: 'IBM Plex Mono', monospace;
     display: block;
@@ -461,11 +461,14 @@ nav {
 #show-more-guides,
 #show-more-projects,
 #show-more-resources,
+#show-more-scripts,
+#show-more-contact,
 #show-more-games,
 #show-more-distros,
 #show-more-references,
 #show-more-blog,
-#show-more-about {
+#show-more-about,
+#show-more-contact {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -477,52 +480,150 @@ nav {
     border: 0;
 }
 
-/* Hide cards initially */
-.lesson-card.hidden,
-.about-preview {
+/* Show cards by default - hide only in specific sections */
+.lesson-card {
     display: block;
-    font-size: 1rem;
-    color: var(--charcoal);
+}
+
+#about .about-preview {
+    min-height: 24px;
+    transition: all 0.3s ease;
+}
+
+#manifesto:has(#show-more-manifesto:checked) .manifesto {
+    display: block;
+}
+
+.manifesto {
+    padding: 32px 32px;
+    max-width: 1030px;
+    margin: 0 auto 32px;
+    background: var(--white);
+    opacity: 0;
+    visibility: hidden;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+#manifesto:has(#show-more-manifesto:checked) .manifesto {
+    opacity: 1;
+    visibility: visible;
+    max-height: 2000px;
+}
+
+#manifesto:has(#show-more-manifesto:checked) .section-header {
     margin-bottom: 16px;
 }
 
-#about:has(#show-more-about:checked) .about-preview {
+#manifesto .section-header {
+    padding: 0 32px;
+    margin-bottom: 16px;
+    max-width: 1030px;
+    margin-left: auto;
+    margin-right: auto;
+    min-height: 80px;
+}
+
+.about-preview {
+    margin-top: 0;
+    padding-top: 0;
+    margin-bottom: 0;
+    min-height: 24px;
+}
+
+#about .about-content {
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+    max-height: 0;
+    overflow: hidden;
+    margin-top: 32px;
+}
+
+#about:has(#show-more-about:checked) .about-content {
+    opacity: 1;
+    visibility: visible;
+    max-height: 2000px;
+}
+
+.about-section .section-header {
+    margin-bottom: 16px;
+    min-height: 80px;
+}
+
+#about .about-preview {
+    min-height: 24px;
+    margin-bottom: 0;
+}
+
+.project-card,
+.resource-card {
     display: none;
 }
 
-.project-card.hidden,
-.resource-card.hidden,
-.about-hidden {
+/* Hide cards in specific sections on homepage */
+#guides .lesson-card,
+#games .lesson-card,
+#blog .lesson-card,
+#references .lesson-card,
+#distros .lesson-card {
     display: none;
 }
 
-/* Show cards when checkbox is checked - using :has() for better compatibility */
-#guides:has(#show-more-guides:checked) .lesson-card.hidden {
+/* Show featured cards by default in games section */
+#games .lesson-card.visible {
     display: block;
 }
 
-#projects:has(#show-more-projects:checked) .project-card.hidden {
+/* Show featured cards by default in guides section */
+#guides .lesson-card.visible {
     display: block;
 }
 
-#resources:has(#show-more-resources:checked) .resource-card.hidden {
+/* Show featured cards by default in blog section */
+#blog .lesson-card.visible {
     display: block;
 }
 
-#games:has(#show-more-games:checked) .lesson-card.hidden {
+/* Show featured cards by default in distros section */
+#distros .lesson-card.visible {
     display: block;
 }
 
-#distros .lesson-card.hidden {
-    display: none;
+/* Hide contact section by default */
+#contact .contact-hidden {
+    display: none !important;
 }
 
-#distros:has(#show-more-distros:checked) .lesson-card.hidden {
+/* Show contact section when checked */
+#contact:has(#show-more-contact:checked) .contact-hidden {
+    display: flex !important;
+}
+
+/* Show cards when checkbox is checked */
+#guides:has(#show-more-guides:checked) .lesson-card {
     display: block;
 }
 
-#games .lesson-card.hidden {
-    display: none;
+#projects:has(#show-more-projects:checked) .project-card {
+    display: block;
+}
+
+#resources:has(#show-more-resources:checked) .resource-card {
+    display: block;
+}
+
+#scripts:has(#show-more-scripts:checked) .resource-card {
+    display: block;
+}
+
+#games:has(#show-more-games:checked) .lesson-card {
+    display: block;
+}
+
+#distros:has(#show-more-distros:checked) .lesson-card {
+    display: block;
 }
 
 #games .browser-games-header {
@@ -533,32 +634,16 @@ nav {
     display: block;
 }
 
-#games:has(#show-more-games:checked) .lesson-card.hidden {
+#references:has(#show-more-references:checked) .lesson-card {
     display: block;
 }
 
-#guides .lesson-card.hidden {
-    display: none;
-}
-
-#guides:has(#show-more-guides:checked) .lesson-card.hidden {
+#blog:has(#show-more-blog:checked) .lesson-card {
     display: block;
 }
 
-#references .lesson-card.hidden {
-    display: none;
-}
-
-#references:has(#show-more-references:checked) .lesson-card.hidden {
-    display: block;
-}
-
-#blog .lesson-card.hidden {
-    display: none;
-}
-
-#blog:has(#show-more-blog:checked) .lesson-card.hidden {
-    display: block;
+#about .about-content {
+    transition: opacity 0.3s ease;
 }
 
 #about:has(#show-more-about:checked) .about-hidden {
@@ -569,12 +654,16 @@ nav {
 #guides:has(#show-more-guides:checked) .show-more-btn,
 #projects:has(#show-more-projects:checked) .show-more-btn,
 #resources:has(#show-more-resources:checked) .show-more-btn,
+#scripts:has(#show-more-scripts:checked) .show-more-btn,
+#contact:has(#show-more-contact:checked) .show-more-btn,
 #games:has(#show-more-games:checked) .show-more-btn,
 #browser-games:has(#show-more-browser-games:checked) .show-more-btn,
 #distros:has(#show-more-distros:checked) .show-more-btn,
 #references:has(#show-more-references:checked) .show-more-btn,
 #blog:has(#show-more-blog:checked) .show-more-btn,
-#about:has(#show-more-about:checked) .show-more-btn {
+#about:has(#show-more-about:checked) .show-more-btn,
+#manifesto:has(#show-more-manifesto:checked) .show-more-btn,
+#contact:has(#show-more-contact:checked) .show-more-btn {
     /* display: none; - removed to show arrow instead */
 }
 
@@ -582,11 +671,15 @@ nav {
 #guides:has(#show-more-guides:checked) .show-more-btn::after,
 #projects:has(#show-more-projects:checked) .show-more-btn::after,
 #resources:has(#show-more-resources:checked) .show-more-btn::after,
+#scripts:has(#show-more-scripts:checked) .show-more-btn::after,
+#contact:has(#show-more-contact:checked) .show-more-btn::after,
 #games:has(#show-more-games:checked) .show-more-btn::after,
 #distros:has(#show-more-distros:checked) .show-more-btn::after,
 #references:has(#show-more-references:checked) .show-more-btn::after,
 #blog:has(#show-more-blog:checked) .show-more-btn::after,
-#about:has(#show-more-about:checked) .show-more-btn::after {
+#about:has(#show-more-about:checked) .show-more-btn::after,
+#manifesto:has(#show-more-manifesto:checked) .show-more-btn::after,
+#contact:has(#show-more-contact:checked) .show-more-btn::after {
     transform: rotate(90deg);
 }
 
@@ -600,32 +693,24 @@ nav {
     background: var(--black);
     color: var(--white);
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.875rem;
+    font-size: 1.5rem;
     cursor: pointer;
-    border: 2px solid var(--black);
+    border: none;
     transition: all 0.2s ease;
     position: relative;
+    line-height: 1;
 }
 
 .show-more-btn::after {
-    content: '';
-    display: inline-block;
-    width: 0;
-    height: 0;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-    border-left: 10px solid var(--white);
+    content: '▼';
     transform: rotate(180deg);
     transition: transform 0.3s ease;
 }
 
 .show-more-btn:hover {
-    background: var(--white);
-    color: var(--black);
 }
 
 .show-more-btn:hover::after {
-    border-left-color: var(--black);
 }
 
 .show-more-container {
@@ -658,7 +743,7 @@ nav {
     left: 0;
     width: 0;
     height: 2px;
-    background: var(--white);
+    background: var(--black);
     transition: width 0.2s;
 }
 
@@ -701,7 +786,7 @@ nav {
    ============================================================================= */
 .hero {
     padding: 120px 32px 64px;
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
     background: var(--ivory);
     color: var(--black);
@@ -732,10 +817,10 @@ nav {
    ============================================================================= */
 .manifesto {
     background: var(--white);
-    border: 3px solid var(--black);
+    border: none;
     padding: 32px;
     margin-bottom: 32px;
-    box-shadow: 8px 8px 0 var(--black);
+    box-shadow: none;
     color: var(--black);
 }
 
@@ -769,16 +854,13 @@ nav {
     font-size: 1rem;
     font-weight: 600;
     text-decoration: none;
-    border: 3px solid var(--black);
+    border: none;
     cursor: pointer;
     transition: all 0.1s;
 }
 
 .cta-button:hover {
-    background: var(--white);
-    color: var(--black);
-    box-shadow: 8px 8px 0 var(--black);
-    transform: translate(-4px, -4px);
+    box-shadow: none;
 }
 
 /* =============================================================================
@@ -808,6 +890,7 @@ nav {
 .section-header .section-title-wrap {
     flex: 1;
     min-width: 200px;
+    min-height: 60px;
 }
 
 .section-header h2 {
@@ -850,7 +933,7 @@ nav {
    ============================================================================= */
 .lesson-card {
     background: var(--white);
-    border: 3px solid var(--black);
+    border: 1px solid #ccc;
     padding: 24px;
     cursor: pointer;
     transition: all 0.1s;
@@ -865,21 +948,7 @@ nav {
 }
 
 .lesson-card:hover {
-    background: var(--nav-color);
-    color: var(--black);
-    box-shadow: 8px 8px 0 var(--black);
-    transform: translate(-4px, -4px);
-}
-
-.lesson-card:hover .lesson-number,
-.lesson-card:hover .lesson-title,
-.lesson-card:hover .lesson-desc {
-    color: var(--black);
-}
-
-.lesson-card:hover .badge {
-    background: var(--white);
-    color: var(--black);
+    box-shadow: none;
 }
 
 /* =============================================================================
@@ -892,7 +961,7 @@ nav {
    position: absolute places it in the corner
    ============================================================================= */
 .lesson-card.completed {
-    border-color: var(--dark-green);
+    border-color: transparent;
 }
 
 .lesson-card.completed::after {
@@ -940,7 +1009,7 @@ nav {
     padding: 4px 12px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.75rem;
-    border: 2px solid var(--black);
+    border: none;
     text-transform: uppercase;
 }
 
@@ -1020,7 +1089,7 @@ nav {
     top: 0;
     max-width: 900px;
     margin: 40px auto 0;
-    border: 4px solid var(--black);
+    border: none;
     border-bottom: none;
 }
 
@@ -1032,8 +1101,8 @@ nav {
     background: var(--ivory);
     max-width: 900px;
     margin: 0 auto 40px;
-    border: 4px solid var(--black);
-    box-shadow: 12px 12px 0 var(--black);
+    border: none;
+    box-shadow: none;
 }
 
 .lesson-modal .lesson-body {
@@ -1044,8 +1113,8 @@ nav {
     background: var(--ivory);
     max-width: 900px;
     margin: 40px auto;
-    border: 4px solid var(--black);
-    box-shadow: 12px 12px 0 var(--black);
+    border: none;
+    box-shadow: none;
     padding: 0;
 }
 
@@ -1067,7 +1136,7 @@ nav {
 .close-btn {
     background: var(--white);
     color: var(--black);
-    border: 2px solid var(--white);
+    border: none;
     width: 40px;
     height: 40px;
     font-size: 1.5rem;
@@ -1079,8 +1148,6 @@ nav {
 }
 
 .close-btn:hover {
-    background: var(--black);
-    color: var(--white);
 }
 
 .modal-content {
@@ -1103,7 +1170,7 @@ nav {
     font-size: 1.25rem;
     margin: 32px 0 16px;
     padding-bottom: 8px;
-    border-bottom: 2px solid var(--black);
+    border-bottom: none;
 }
 
 .lesson-content p {
@@ -1124,7 +1191,7 @@ nav {
     color: var(--ivory);
     padding: 20px;
     margin: 16px 0;
-    border: 3px solid var(--black);
+    border: none;
     overflow-x: auto;
     font-size: 0.9rem;
     line-height: 1.5;
@@ -1168,7 +1235,7 @@ nav {
     color: var(--ivory);
     padding: 20px;
     margin: 16px 0;
-    border: 3px solid var(--black);
+    border: none;
     overflow-x: auto;
     font-size: 0.9rem;
     line-height: 1.5;
@@ -1197,7 +1264,7 @@ nav {
 [data-theme="dark"] .config-block,
 [data-theme="dark"] .code-block {
     background: #0f0f0f;
-    border-color: #0f0f0f;
+    border-color: transparent;
     color: #f2f2f2;
 }
 
@@ -1221,7 +1288,7 @@ nav {
 :root:has(#themeToggle:checked) .config-block,
 :root:has(#themeToggle:checked) .code-block {
     background: #0f0f0f;
-    border-color: #0f0f0f;
+    border-color: transparent;
     color: #f2f2f2;
 }
 
@@ -1245,7 +1312,7 @@ nav {
     color: var(--ivory);
     padding: 20px;
     margin: 16px 0;
-    border: 3px solid var(--black);
+    border: none;
     overflow-x: auto;
     font-size: 0.9rem;
     line-height: 1.5;
@@ -1256,7 +1323,7 @@ nav {
     color: var(--ivory);
     padding: 20px;
     margin: 16px 0;
-    border: 3px solid var(--black);
+    border: none;
     overflow-x: auto;
     font-size: 0.9rem;
     line-height: 1.5;
@@ -1280,7 +1347,7 @@ nav {
    ============================================================================= */
 .highlight-box {
     background: var(--beige);
-    border-left: 4px solid var(--black);
+    border-left: none;
     padding: 16px;
     margin: 16px 0;
     font-style: italic;
@@ -1297,7 +1364,7 @@ nav {
    ============================================================================= */
 .quiz-section {
     background: var(--white);
-    border: 3px solid var(--black);
+    border: none;
     padding: 32px;
     margin-top: 32px;
     color: var(--black);
@@ -1307,13 +1374,13 @@ nav {
     font-size: 1.5rem;
     margin-bottom: 24px;
     padding-bottom: 16px;
-    border-bottom: 2px solid var(--black);
+    border-bottom: none;
 }
 
 .quiz-question {
     margin-bottom: 20px;
     padding-bottom: 16px;
-    border-bottom: 1px dashed var(--charcoal);
+    border-bottom: none;
 }
 
 .quiz-question:last-child {
@@ -1328,7 +1395,7 @@ nav {
 .question-text .blank {
     display: inline-block;
     min-width: 120px;
-    border-bottom: 2px solid var(--black);
+    border-bottom: none;
     text-align: center;
     font-family: 'IBM Plex Mono', monospace;
     color: var(--charcoal);
@@ -1340,23 +1407,23 @@ nav {
     padding: 12px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 1rem;
-    border: 2px solid var(--black);
+    border: none;
     background: var(--white);
     margin-bottom: 12px;
 }
 
 .quiz-input:focus {
     outline: none;
-    box-shadow: 4px 4px 0 var(--black);
+    box-shadow: none;
 }
 
 .quiz-input.correct {
-    border-color: var(--dark-green);
+    border-color: transparent;
     background: #f0fff0;
 }
 
 .quiz-input.incorrect {
-    border-color: var(--dark-red);
+    border-color: transparent;
     background: #fff0f0;
 }
 
@@ -1393,7 +1460,7 @@ nav {
     margin-top: 16px;
     padding: 16px;
     background: var(--beige);
-    border: 2px solid var(--nav-color);
+    border: none;
     font-weight: bold;
 }
 
@@ -1410,13 +1477,11 @@ nav {
     padding: 8px 12px;
     margin: 8px 0;
     background: var(--white);
-    border: 2px solid var(--charcoal);
+    border: none;
     cursor: pointer;
 }
 
 .quiz-options label:hover {
-    border-color: var(--nav-color);
-    background: var(--beige);
 }
 
 .quiz-submit {
@@ -1425,14 +1490,12 @@ nav {
     padding: 12px 24px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.9rem;
-    border: 2px solid var(--black);
+    border: none;
     cursor: pointer;
     margin-right: 12px;
 }
 
 .quiz-submit:hover {
-    background: var(--white);
-    color: var(--black);
 }
 
 .quiz-score {
@@ -1441,7 +1504,7 @@ nav {
     margin-top: 24px;
     padding: 16px;
     background: var(--beige);
-    border: 2px solid var(--black);
+    border: none;
     display: none;
 }
 
@@ -1451,7 +1514,7 @@ nav {
 
 .quiz-answers-reveal {
     margin-top: 16px;
-    border: 2px solid var(--black);
+    border: none;
     background: var(--beige);
 }
 
@@ -1461,7 +1524,7 @@ nav {
     background: var(--white);
     color: var(--black);
     font-family: 'IBM Plex Mono', monospace;
-    border-bottom: 2px solid var(--black);
+    border-bottom: none;
 }
 
 .quiz-answers-reveal[open] > summary {
@@ -1486,10 +1549,10 @@ nav {
     max-width: 1100px;
     margin: 0 auto;
     background: var(--white);
-    border-top: 4px solid var(--black);
-    border-bottom: 4px solid var(--black);
-    border-left: 2px solid var(--black);
-    border-right: 2px solid var(--black);
+    border-top: none;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
 }
 
 .links-section {
@@ -1520,9 +1583,9 @@ nav {
 
 .link-category {
     background: var(--white);
-    border: 3px solid var(--black);
+    border: 1px solid #ccc;
     padding: 24px;
-    box-shadow: 8px 8px 0 var(--black);
+    box-shadow: none;
 }
 
 .link-category h3 {
@@ -1550,7 +1613,6 @@ nav {
 }
 
 .link-category a:hover {
-    text-decoration: underline;
 }
 
 .about-content {
@@ -1593,7 +1655,7 @@ nav {
 
 .resource-card {
     background: var(--white);
-    border: 3px solid var(--black);
+    border: 1px solid #ccc;
     padding: 24px;
 }
 
@@ -1622,7 +1684,7 @@ nav {
     height: 48px;
     background: var(--black);
     color: var(--white);
-    border: 3px solid var(--black);
+    border: none;
     font-size: 1.5rem;
     cursor: pointer;
     z-index: 998;
@@ -1637,10 +1699,7 @@ nav {
 }
 
 .back-to-top:hover {
-    background: var(--white);
-    color: var(--black);
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 var(--black);
+    box-shadow: none;
 }
 
 .back-to-top.visible {
@@ -1666,14 +1725,14 @@ nav {
    that free software should remain free.
    ============================================================================= */
 footer {
-    background: var(--black);
-    color: var(--white);
+    background: var(--white);
+    color: var(--black);
     padding: 48px 32px;
     text-align: center;
 }
 
 footer a {
-    color: var(--white);
+    color: var(--black);
 }
 
 footer p {
@@ -1820,12 +1879,12 @@ footer .copyleft {
 
 .auth-box {
     background: var(--white);
-    border: 4px solid var(--black);
+    border: none;
     padding: 32px;
     max-width: 400px;
     width: 90%;
     position: relative;
-    box-shadow: 12px 12px 0 var(--black);
+    box-shadow: none;
 }
 
 .close-auth {
@@ -1841,7 +1900,6 @@ footer .copyleft {
 }
 
 .close-auth:hover {
-    color: var(--charcoal);
 }
 
 .auth-tabs {
@@ -1852,7 +1910,7 @@ footer .copyleft {
 
 .auth-tab {
     background: var(--white);
-    border: 2px solid var(--black);
+    border: none;
     padding: 8px 24px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.875rem;
@@ -1887,7 +1945,7 @@ footer .copyleft {
 .form-group input {
     width: 100%;
     padding: 12px;
-    border: 2px solid var(--black);
+    border: none;
     background: var(--white);
     font-family: 'IBM Plex Mono', monospace;
     font-size: 1rem;
@@ -1895,7 +1953,7 @@ footer .copyleft {
 
 .form-group input:focus {
     outline: none;
-    box-shadow: 4px 4px 0 var(--black);
+    box-shadow: none;
 }
 
 /* Error and success messages */
@@ -1929,7 +1987,7 @@ footer .copyleft {
     color: var(--white);
     width: 32px;
     height: 32px;
-    border-radius: 50%;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1949,7 +2007,6 @@ footer .copyleft {
 }
 
 .logout-btn:hover {
-    text-decoration: underline;
 }
 
 /* =============================================================================
@@ -1993,35 +2050,16 @@ footer .copyleft {
 
 .project-card {
     background: var(--white);
-    border: 3px solid var(--black);
+    border: 1px solid #ccc;
     padding: 32px;
     text-decoration: none;
     color: var(--black);
     transition: all 0.1s;
-    box-shadow: 8px 8px 0 var(--black);
+    box-shadow: none;
 }
 
 .project-card:hover {
-    background: var(--black);
-    color: var(--white);
-    transform: translate(-4px, -4px);
-    box-shadow: 12px 12px 0 var(--black);
-}
-
-.project-card:hover .project-icon,
-.project-card:hover h3,
-.project-card:hover p,
-.project-card:hover .project-level {
-    color: var(--white);
-}
-
-.project-card:hover .project-level {
-    border-color: var(--white);
-}
-
-.project-card:hover .stack-item {
-    background: var(--white);
-    color: var(--black);
+    box-shadow: none;
 }
 
 .project-icon {
@@ -2052,13 +2090,13 @@ footer .copyleft {
     padding: 4px 12px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.75rem;
-    border: 1px solid var(--black);
+    border: none;
 }
 
 .project-level {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.875rem;
-    border: 2px solid var(--black);
+    border: none;
     padding: 4px 12px;
     display: inline-block;
 }
@@ -2082,8 +2120,8 @@ footer .copyleft {
     margin-bottom: 48px;
     padding: 32px;
     background: var(--white);
-    border: 3px solid var(--black);
-    box-shadow: 8px 8px 0 var(--black);
+    border: none;
+    box-shadow: none;
     flex-wrap: wrap;
     gap: 24px;
 }
@@ -2097,7 +2135,7 @@ footer .copyleft {
 .user-avatar-large {
     width: 80px;
     height: 80px;
-    border-radius: 50%;
+    border-radius: 0;
     background: var(--black);
     color: var(--white);
     display: flex;
@@ -2127,12 +2165,12 @@ footer .copyleft {
 .level-circle {
     width: 60px;
     height: 60px;
-    border-radius: 50%;
+    border-radius: 0;
     background: var(--black);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 3px solid var(--black);
+    border: none;
 }
 
 .level-circle.level-1 { background: #8B4513; }
@@ -2186,15 +2224,14 @@ footer .copyleft {
 
 .stat-card {
     background: var(--white);
-    border: 3px solid var(--black);
+    border: 1px solid #ccc;
     padding: 24px;
     text-align: center;
     transition: all 0.1s;
 }
 
 .stat-card:hover {
-    box-shadow: 8px 8px 0 var(--black);
-    transform: translate(-4px, -4px);
+    box-shadow: none;
 }
 
 .stat-number {
@@ -2222,7 +2259,7 @@ footer .copyleft {
 
 .level-bar-container {
     background: var(--white);
-    border: 3px solid var(--black);
+    border: none;
     padding: 24px;
 }
 
@@ -2245,7 +2282,7 @@ footer .copyleft {
 .progress-bar-large {
     height: 24px;
     background: var(--ivory);
-    border: 2px solid var(--black);
+    border: none;
     position: relative;
     overflow: hidden;
 }
@@ -2281,7 +2318,7 @@ footer .copyleft {
 
 .achievement-card {
     background: var(--white);
-    border: 3px solid var(--black);
+    border: 1px solid #ccc;
     padding: 20px;
     position: relative;
     transition: all 0.1s;
@@ -2297,8 +2334,7 @@ footer .copyleft {
 }
 
 .achievement-card:hover {
-    box-shadow: 8px 8px 0 var(--black);
-    transform: translate(-4px, -4px);
+    box-shadow: none;
 }
 
 .achievement-card-icon {
@@ -2349,14 +2385,14 @@ footer .copyleft {
 .projects-list,
 .games-list {
     background: var(--white);
-    border: 3px solid var(--black);
+    border: none;
 }
 
 .progress-row {
     display: flex;
     align-items: center;
     padding: 16px 24px;
-    border-bottom: 1px solid var(--beige);
+    border-bottom: none;
     transition: background 0.2s;
 }
 
@@ -2365,7 +2401,6 @@ footer .copyleft {
 }
 
 .progress-row:hover {
-    background: var(--ivory);
 }
 
 .progress-row.completed {
@@ -2402,13 +2437,11 @@ footer .copyleft {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.85rem;
     padding: 4px 12px;
-    border: 2px solid var(--black);
+    border: none;
     transition: all 0.1s;
 }
 
 .progress-link:hover {
-    background: var(--black);
-    color: var(--white);
 }
 
 .logout-btn {
@@ -2432,11 +2465,9 @@ footer .copyleft {
 }
 
 .nav-links .logout-btn:hover {
-    text-decoration: none;
 }
 
 .logout-btn:hover {
-    text-decoration: underline;
 }
 
 @media (max-width: 768px) {
@@ -2490,7 +2521,7 @@ footer .copyleft {
 /* Override hover for blog and games - remove box shadow and transition */
 .blog-grid .lesson-card,
 #games .lesson-card {
-    border: 1px solid var(--charcoal);
+    border: 1px solid #e0e0e0;
     outline: none;
     transition: none !important;
 }
@@ -2500,33 +2531,11 @@ footer .copyleft {
     border: 1px solid #444;
 }
 
-[data-theme="dark"] .blog-grid .lesson-card:hover,
-[data-theme="dark"] #games .lesson-card:hover {
-    box-shadow: 8px 8px 0 #666 !important;
-}
-
 .blog-grid .lesson-card:hover,
 .blog-grid .lesson-card:focus,
 #games .lesson-card:hover,
 #games .lesson-card:focus {
-    box-shadow: 8px 8px 0 var(--black) !important;
-    transform: translate(-2px, -2px);
-    border: 1px solid var(--black) !important;
-    outline: none !important;
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.blog-grid .lesson-card:hover article,
-#games .lesson-card:hover article,
-.blog-grid .lesson-card:hover h3,
-#games .lesson-card:hover h3,
-.blog-grid .lesson-card:hover p,
-#games .lesson-card:hover p,
-.blog-grid .lesson-card:hover div,
-#games .lesson-card:hover div {
-    background: transparent !important;
-    color: var(--charcoal) !important;
     box-shadow: none !important;
-    border: none !important;
+    border: 1px solid #e0e0e0 !important;
     outline: none !important;
 }

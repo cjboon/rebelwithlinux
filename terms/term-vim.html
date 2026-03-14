@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vim Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        body {
+            background: #1a1a1a;
+            color: #cccccc;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        .terminal-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .left-pane {
+            border-right: 2px solid #444444;
+        }
+        
+        .terminal-header {
+            background: #333333;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        
+        .terminal-title {
+            margin-left: 1rem;
+            color: #cccccc;
+            font-size: 0.85rem;
+        }
+        
+        .pane-label {
+            background: #333333;
+            padding: 0.5rem 1rem;
+            color: #cccccc;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .input-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            background: #1a1a1a;
+        }
+        
+        .input-label {
+            color: #aaaaaa;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        #command-input {
+            flex: 1;
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #cccccc;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            resize: none;
+            outline: none;
+        }
+        
+        .hint {
+            color: #666666;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        .vim-output-area {
+            flex: 1;
+            border-top: 2px solid #444444;
+            padding: 0.5rem;
+            background: #222222;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            min-height: 100px;
+        }
+        
+        .vim-output-line {
+            color: #aaaaaa;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .vim-error-line {
+            color: #cc6666;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .terminal-pane.right-pane {
+            flex: 1;
+        }
+        
+        .output-area {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: #1e1e1e;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .message .speaker {
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        
+        .message .text {
+            color: #cccccc;
+        }
+        
+        .message .text.fail {
+            color: #cc6666;
+        }
+        
+        .message .text.hint {
+            color: #81a2be;
+            font-style: italic;
+        }
+        
+        .message .text.success {
+            color: #cccccc;
+        }
+        
+        .level-title {
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: #2d2d2d;
+            border-left: 3px solid #f0c674;
+        }
+        
+        /* Light mode overrides */
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .vim-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .vim-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .vim-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #1a1a1a; }
+        [data-theme="light"] .message .text { color: #333333; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .message .text.success { color: #333333; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column-reverse;
+            }
+            .terminal-pane {
+                flex: none;
+                height: 50vh;
+            }
+            .right-pane {
+                border-bottom: 2px solid #444444;
+            }
+            .left-pane {
+                border-right: none;
+                border-top: 2px solid #444444;
+            }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea {
+                min-height: 60px !important;
+                font-size: 14px !important;
+            }
+            .mobile-run-btn { display: block !important; }
+        }
+        
+        .mobile-run-btn {
+            display: none;
+            background: #2d5016;
+            color: #98c379;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">Vim Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type vim key or command:</div>
+                <textarea id="command-input" placeholder="Type j, k, w, i, x, :wq, etc" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Type the key/command, then press Ctrl+Enter</div>
+            </div>
+            <div class="vim-output-area" id="vim-output">
+                <div class="vim-output-line" style="color: #586e75;">Vim output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    
+        
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const vimOutput = document.getElementById('vim-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=vim');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'vim', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addVimLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'vim-error-line' : 'vim-output-line';
+            line.textContent = text;
+            vimOutput.appendChild(line);
+            vimOutput.scrollTop = vimOutput.scrollHeight;
+        }
+        
+        function clearVimOutput() {
+            vimOutput.innerHTML = '';
+        }
+        
+        async function showCharacterMessage(text, showName = true) {
+            const line = document.createElement('div');
+            line.className = 'output-line';
+            history.appendChild(line);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                let currentText = '';
+                
+                function type() {
+                    if (i < text.length) {
+                        currentText += text.charAt(i);
+                        if (showName) {
+                            line.innerHTML = '<span class="character-name">' + character.name + ':</span> ' + currentText;
+                        } else {
+                            line.innerHTML = '<span class="character-name">' + character.name + '</span> ' + currentText;
+                        }
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        const character = {
+            name: "Vim Vince",
+            greeting: "Greetings! I'm Vim Vince - your guide to the most powerful text editor! Vim is modal - different modes for different tasks. Steep learning curve, but SO worth it!",
+            encourage: ["Excellent!", "You're a natural!", "Vim mastery!", "Keep going!", "Speed comes with practice!", "You're a Vim ninja!"],
+            getEncouragement: function() {
+                return this.encourage[Math.floor(Math.random() * this.encourage.length)];
+            }
+        };
+        
+        const beginnerLevels = [
+            {
+                id: 1,
+                title: "Normal Mode",
+                intro: "Welcome! Vim starts in NORMAL mode. Keys h,j,k,l move the cursor. Try j to move down!",
+                content: "Move cursor DOWN:\nType 'j'",
+                hint: "Type: j",
+                answer: "j",
+                success: "You're moving! h=left, j=down, k=up, l=right. These home row keys are WAY faster than arrows!",
+                type: "exact"
+            },
+            {
+                id: 2,
+                title: "Move Up",
+                intro: "Now 'k' moves UP one line. Practice!",
+                content: "Move cursor UP:\nType 'k'",
+                hint: "Type: k",
+                answer: "k",
+                success: "Navigating like a pro! h,j,k,l - the holy quartet of Vim movement!",
+                type: "exact"
+            },
+            {
+                id: 3,
+                title: "Word Navigation",
+                intro: "w moves to start of next word, e to end, b back to start.",
+                content: "Move forward a WORD:\nType 'w'",
+                hint: "Type: w",
+                answer: "w",
+                success: "Word navigation! w=forward, e=end, b=back. Huge for fast editing!",
+                type: "exact"
+            },
+            {
+                id: 4,
+                title: "Insert Mode",
+                intro: "Press 'i' to enter INSERT mode - where you type normally. ESC returns to Normal!",
+                content: "Enter INSERT mode:\nType 'i'",
+                hint: "Type: i",
+                answer: "i",
+                success: "INSERT mode! Type normally now. Press ESC to return to Normal. This is Vim's power!",
+                type: "exact"
+            },
+            {
+                id: 5,
+                title: "Back to Normal",
+                intro: "Press ESC to return to Normal mode. MOST important key!",
+                content: "Return to NORMAL mode:\nType 'ESC'",
+                hint: "Type: ESC or press Escape",
+                answer: "esc",
+                success: "Back to Normal! ESC is your safety key. Start building muscle memory!",
+                type: "contains"
+            },
+            {
+                id: 6,
+                title: "Delete Character",
+                intro: "In Normal mode, 'x' deletes the character under cursor.",
+                content: "Delete character:\nType 'x'",
+                hint: "Type: x",
+                answer: "x",
+                success: "Gone! '3x' deletes 3 characters. Numbers + commands = repeat action!",
+                type: "exact"
+            },
+            {
+                id: 7,
+                title: "Delete Word",
+                intro: "'dw' deletes from cursor to end of word. d is operator, w is motion!",
+                content: "Delete current WORD:\nType 'dw'",
+                hint: "Type: dw",
+                answer: "dw",
+                success: "Word destroyed! Operators (d,y,c) + motions (w,b,e,j,k,$). This combo system is Vim's power!",
+                type: "exact"
+            },
+            {
+                id: 8,
+                title: "Undo",
+                intro: "'u' undoes your last change. Ctrl+r redoes!",
+                content: "UNDO:\nType 'u'",
+                hint: "Type: u",
+                answer: "u",
+                success: "Undone! 'u'=undo, Ctrl+r=redo. Full control of your editing timeline!",
+                type: "exact"
+            },
+            {
+                id: 9,
+                title: "Save and Exit",
+                intro: "The famous ':wq' saves and exits! ':q!' exits without saving.",
+                content: "Save and exit:\nType ':wq'",
+                hint: "Type: :wq",
+                answer: ":wq",
+                success: "Saved and exited! :w=write, :q=quit. You're a Vim survivor!",
+                type: "contains"
+            },
+            {
+                id: 10,
+                title: "Yank (Copy) & Paste",
+                intro: "'yy' yanks (copies) a line, 'p' pastes below cursor!",
+                content: "Yank current line:\nType 'yy'",
+                hint: "Type: yy",
+                answer: "yy",
+                success: "Copied! 'p' pastes. 'y2w' yanks 2 words. Copy-paste mastery!",
+                type: "exact"
+            },
+            {
+                id: 11,
+                title: "Go to Line",
+                intro: "'G' goes to end of file, 'gg' goes to start, '5G' goes to line 5.",
+                content: "Go to start of file:\nType 'gg'",
+                hint: "Type: gg",
+                answer: "gg",
+                success: "At the top! No more scrolling through 1000 lines!",
+                type: "exact"
+            },
+            {
+                id: 12,
+                title: "Beginner Finale",
+                intro: "Final challenge! Move, delete, yank, and exit!",
+                content: "Move down, delete word, save:\nj dw :wq",
+                hint: "Type: j then dw then :wq",
+                answer: "j",
+                success: "BEGINNER COMPLETE! You know: movement, insert, delete, yank, undo, save/exit. Vim is YOURS!",
+                type: "starts"
+            }
+        ];
+        
+        const intermediateLevels = [
+            {
+                id: 1,
+                title: "Visual Mode",
+                intro: "INTERMEDIATE! Press 'v' for Visual mode - select text visually!",
+                content: "Enter VISUAL mode:\nType 'v'",
+                hint: "Type: v",
+                answer: "v",
+                success: "Visual mode! Move to select, then operators work on selection. Like highlighting but WAY faster!",
+                type: "exact"
+            },
+            {
+                id: 2,
+                title: "Visual Line",
+                intro: "'V' selects entire lines at once. Easier for line operations!",
+                content: "Enter VISUAL LINE:\nType 'V'",
+                hint: "Type: V",
+                answer: "V",
+                success: "Line selection! 'd' deletes selected, 'y' yanks. Perfect for moving code blocks!",
+                type: "exact"
+            },
+            {
+                id: 3,
+                title: "Search Forward",
+                intro: "Press '/' to search forward. 'n' next match, 'N' previous.",
+                content: "Search forward:\nType '/'",
+                hint: "Type: /",
+                answer: "/",
+                success: "Search mode! Type term and Enter. 'n' jumps next, 'N' previous. Faster than dialogs!",
+                type: "exact"
+            },
+            {
+                id: 4,
+                title: "Replace One",
+                intro: ":s/old/new replaces on current line. :s/old/new/g replaces all on line.",
+                content: "Replace 'hello' with 'hi':\nType :s/hello/hi/",
+                hint: "Type: :s/hello/hi/",
+                answer: ":s/",
+                success: "Replaced! Add /g for all. :%s/all/none/g replaces everywhere! Find/replace elevated to art!",
+                type: "contains"
+            },
+            {
+                id: 5,
+                title: "Append Text",
+                intro: "'a' enters Insert AFTER cursor. 'A' goes to end of line and inserts!",
+                content: "Append after cursor:\nType 'a'",
+                hint: "Type: a",
+                answer: "a",
+                success: "Appending! 'i'=before, 'a'=after, 'I'=start, 'A'=end. Four ways to start typing!",
+                type: "exact"
+            },
+            {
+                id: 6,
+                title: "Open Lines",
+                intro: "'o' opens new line below, 'O' opens above. Instant new line!",
+                content: "Open line below:\nType 'o'",
+                hint: "Type: o",
+                answer: "o",
+                success: "New line! 'o'=below, 'O'=above. Start typing immediately. Perfect for code!",
+                type: "exact"
+            },
+            {
+                id: 7,
+                title: "Change Command",
+                intro: "'c' deletes and enters Insert. 'cw' changes word, 'cc' changes line!",
+                content: "Change current word:\nType 'cw'",
+                hint: "Type: cw",
+                answer: "cw",
+                success: "Changed! 'c' deletes and inserts. 'cw', 'cb', 'c$', 'c0' - all motion combos work!",
+                type: "exact"
+            },
+            {
+                id: 8,
+                title: "Find Character",
+                intro: "'f' finds character on line. 'fX' jumps to X. ';' repeats, ',' reverses.",
+                content: "Find character 'o':\nType 'fo'",
+                hint: "Type: fo",
+                answer: "fo",
+                success: "Found! 'f'=forward, 'F'=backward. ; repeats, , reverses. Record-line navigation!",
+                type: "exact"
+            },
+            {
+                id: 9,
+                title: "Macros",
+                intro: "'qX' records to register (X=a-z), do stuff, 'q' stops. Play with '@X'!",
+                content: "Record macro to register 'a':\nType 'qa'",
+                hint: "Type: qa",
+                answer: "qa",
+                success: "Recording! Do actions, 'q' stops. '@a' plays it. '100@a' repeats 100 times!",
+                type: "exact"
+            },
+            {
+                id: 10,
+                title: "Window Split",
+                intro: ":sp splits horizontally, :vsp vertically. Ctrl+w w cycles windows.",
+                content: "Split window:\nType :sp",
+                hint: "Type: :sp",
+                answer: ":sp",
+                success: "Split! :sp=horizontal, :vsp=vertical. View multiple files, compare code!",
+                type: "contains"
+            },
+            {
+                id: 11,
+                title: "Delete to End",
+                intro: "d$ (or D) deletes to end of line. Very useful!",
+                content: "Delete to end of line:\nType 'd$'",
+                hint: "Type: d$",
+                answer: "d$",
+                success: "Deleted to end! 'd0' deletes to start. Combine d with any motion!",
+                type: "exact"
+            },
+            {
+                id: 12,
+                title: "Intermediate Finale",
+                intro: "Final challenge! Visual select, yank, paste, save!",
+                content: "v j y p :wq",
+                hint: "Type: v then j then y then p then :wq",
+                answer: "v",
+                success: "INTERMEDIATE COMPLETE! You command: visual, search, replace, macros, splits! You're a VIM MASTER!",
+                type: "starts"
+            }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            
+            const speakerSpan = document.createElement('div');
+            speakerSpan.className = 'speaker';
+            speakerSpan.textContent = speaker + ':';
+            div.appendChild(speakerSpan);
+            
+            const textSpan = document.createElement('div');
+            textSpan.className = 'text ' + className;
+            div.appendChild(textSpan);
+            history.appendChild(div);
+            
+            // Type out the text
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textSpan.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            
+            if (level.type === 'exact') {
+                return user === answer;
+            } else if (level.type === 'contains') {
+                return user.includes(answer);
+            } else if (level.type === 'starts') {
+                return user.startsWith(answer);
+            }
+            return false;
+        }
+        
+        function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            showMessage(character.name, level.intro);
+            showMessage(character.name, level.content);
+            showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                showMessage(character.name, "CONGRATULATIONS! Vim levels complete! You're a Vim ninja - edit at the speed of thought!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        function startTrack(trackName) {
+            if (trackName === 'beginner') {
+                levels = beginnerLevels;
+                showMessage(character.name, "Excellent! Basics: navigation, insert, delete. I'll make you a Vim master!");
+            } else if (trackName === 'intermediate') {
+                levels = intermediateLevels;
+                showMessage(character.name, "Welcome back! Visual mode, search, replace, macros - Vim's power features!");
+            }
+            
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                document.documentElement.requestFullscreen();
+            }
+        };
+        window.toggleDarkMode = function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'action=updateTheme&theme=' + newTheme,
+                        credentials: 'include'
+                    });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                // Check special commands
+                if (userAnswer === '--beginner') {
+                    startTrack('beginner');
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--intermediate') {
+                    startTrack('intermediate');
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--fullscreen') {
+                    toggleFullscreen();
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--darkmode') {
+                    toggleDarkMode();
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--exit') {
+                    window.location.href = '../index.html';
+                    return;
+                }
+                if (userAnswer === '--start' || userAnswer === '--restart') {
+                    startGame();
+                    input.value = '';
+                    return;
+                }
+                
+                const level = levels[currentLevel];
+                clearVimOutput();
+                addVimLine('> ' + userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    showMessage(character.name, level.success, 'success');
+                    showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                // Check special commands
+                if (userAnswer === '--beginner') {
+                    startTrack('beginner');
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--intermediate') {
+                    startTrack('intermediate');
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--fullscreen') {
+                    toggleFullscreen();
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--darkmode') {
+                    toggleDarkMode();
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--exit') {
+                    window.location.href = '../index.html';
+                    return;
+                }
+                if (userAnswer === '--start' || userAnswer === '--restart') {
+                    startGame();
+                    input.value = '';
+                    return;
+                }
+                
+                const level = levels[currentLevel];
+                clearVimOutput();
+                addVimLine('> ' + userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    showMessage(character.name, level.success, 'success');
+                    showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        // Initialize
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) {
+                currentLevel = savedLevel - 1;
+            }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+                const toggle = document.getElementById('themeToggle');
+                if (toggle) toggle.checked = userTheme === 'dark';
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            // Add menu options
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Navigation & basic editing (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Visual mode, search & macros (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Choose your path - click above or type --beginner, --intermediate, --fullscreen, --darkmode, or --exit", '', true);
+        }
+        init();
+    </script>
+</body>
+</html>

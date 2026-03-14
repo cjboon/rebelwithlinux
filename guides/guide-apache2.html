@@ -1,0 +1,2407 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache2 Web Server - Host Your Own Websites | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn Apache2 from setup to advanced configuration. Master virtual hosts, SSL/TLS, mod_rewrite, authentication, and secure web server administration.">
+    <meta name="keywords" content="Apache, Apache2, Apache web server, virtual hosts, SSL, TLS, HTTPS, mod_rewrite, web server configuration, Apache tutorial">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        // Theme persistence - check and apply immediately in head
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        // Sync checkbox after DOM loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    
+    <script src="../terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #D22128;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">APACHE2 MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#distros">DISTRO</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#projects">PROJECTS</a>
+                    <a href="../index.html#resources">RESOURCES</a>
+                    <a href="../index.html#references">REFERENCES</a>
+                    <a href="../index.html#scripts">SCRIPTS</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#contact">CONTACT</a>
+                    <a href="../index.html#stats">STATS</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>MASTER YOUR<br>WEB SERVER</h1>
+        <p class="tagline">// The world's most popular web server.</p>
+        
+        <div class="manifesto">
+            <p><strong>APACHE2 IS THE BACKBONE OF THE WEB.</strong></p>
+            <p>Serving over 30% of all websites, Apache HTTP Server is the most widely used web server software. It's free, open-source, and incredibly powerful.</p>
+            <p><strong>WHY APACHE2?</strong></p>
+            <p>Apache2 offers unmatched flexibility through its module system, supports all major protocols, and runs on virtually every operating system. The .htaccess feature allows per-directory configuration without access to main config files.</p>
+            <p><strong>TAKE CONTROL.</strong></p>
+            <p>Learn to configure, secure, and optimize Apache2. Host multiple websites, enable SSL/TLS, implement rewrite rules, and master the art of web server administration.</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to Mastery</h2>
+            <p>12 lessons. Complete Apache2 control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Apache2</h3>
+                <p class="lesson-desc">World's most popular web server fundamentals.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Installing Apache2</h3>
+                <p class="lesson-desc">Install and configure on any Linux distribution.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Configuration Files & Directives</h3>
+                <p class="lesson-desc">Master httpd.conf and configuration syntax.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Virtual Hosts</h3>
+                <p class="lesson-desc">Host multiple websites on one server.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Apache2 Modules</h3>
+                <p class="lesson-desc">Extend functionality with loadable modules.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">SSL/TLS & HTTPS</h3>
+                <p class="lesson-desc">Secure sites with Let's Encrypt certificates.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">.htaccess & URL Rewriting</h3>
+                <p class="lesson-desc">Per-directory config and mod_rewrite rules.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Authentication & Authorization</h3>
+                <p class="lesson-desc">Password protection and access control.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Reverse Proxy Setup</h3>
+                <p class="lesson-desc">Forward requests to backend applications.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Apache Security</h3>
+                <p class="lesson-desc">Harden Apache against attacks and exploits.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">High Availability</h3>
+                <p class="lesson-desc">Clustering and failover configurations.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Troubleshooting & Debugging</h3>
+                <p class="lesson-desc">Fix configuration errors and optimize.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why Apache2</h2>
+            <p>Apache HTTP Server has been the backbone of the internet since 1995. Its modular architecture, vast ecosystem, and rock-solid stability make it the choice for everything from personal blogs to enterprise deployments.</p>
+            <p>Unlike proprietary web servers, Apache2 is completely free and open source. You have full access to the source code, can modify it, and distribute your changes. This transparency is essential for security and trust.</p>
+            <p>Apache2's configuration system is incredibly powerful. With virtual hosts, you can host hundreds of websites on a single server. With mod_rewrite, you have complete control over URLs. With SSL/TLS, you can secure every connection.</p>
+            <p><strong>The web runs on Apache. Now you can too.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>📖 Official Docs</h3>
+                <p>Apache HTTP Server Documentation</p>
+                <a href="https://httpd.apache.org/docs/" target="_blank">httpd.apache.org/docs</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔧 Apache Utils</h3>
+                <p>Server-side includes, htpasswd, ab</p>
+                <a href="https://httpd.apache.org/docs/2.4/programs/" target="_blank">apache.org/utils</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔐 SSL Certificates</h3>
+                <p>Let's Encrypt - Free SSL/TLS</p>
+                <a href="https://letsencrypt.org" target="_blank">letsencrypt.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>🖥️ Module Reference</h3>
+                <p>All Apache2 modules</p>
+                <a href="https://httpd.apache.org/docs/2.4/mod/" target="_blank">apache.org/modules</a>
+            </div>
+            <div class="resource-card">
+                <h3>⚡ Performance Tuning</h3>
+                <p>MPM modules and optimization</p>
+                <a href="https://httpd.apache.org/docs/2.4/mpm.html" target="_blank">apache.org/mpm</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔒 Security Guide</h3>
+                <p>Apache Security Best Practices</p>
+                <a href="https://httpd.apache.org/docs/2.4/misc/security_tips.html" target="_blank">apache.org/security</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        
+    </footer>
+
+    <div class="modal-content" id="modalContent"></div>
+        </div>
+    </div>
+
+    
+
+    <!-- Lesson 1 --><div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Introduction to Apache2</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>What is Apache2?</h3>
+                    <p>Apache HTTP Server (Apache2) is the world's most widely-used web server software. Originally created in 1995, Apache has been the dominant web server for over two decades. The "2" in Apache2 refers to the major version number, representing a complete rewrite of the original codebase.</p>
+                    
+                    <h3>Why Apache2?</h3>
+                    <p>Apache2 offers several advantages:</p>
+                    <ul>
+                        <li><strong>Open Source:</strong> Completely free with full source code access</li>
+                        <li><strong>Cross-Platform:</strong> Runs on Linux, Windows, macOS, and more</li>
+                        <li><strong>Modular:</strong> Enable only the features you need</li>
+                        <li><strong>Flexible:</strong> Extensive configuration options</li>
+                        <li><strong>Mature:</strong> 30+ years of development and security hardening</li>
+                    </ul>
+                    
+                    <div class="highlight-box">
+                        <strong>MARKET SHARE:</strong> Apache2 still serves approximately 30% of all websites worldwide, making it one of the most popular web servers in existence.
+                    </div>
+
+                    <h3>Key Apache2 Concepts</h3>
+                    <ul>
+                        <li><strong>Modules:</strong> Apache2 is modular - enable/disable functionality</li>
+                        <li><strong>Virtual Hosts:</strong> Host multiple websites on one server</li>
+                        <li><strong>.htaccess:</strong> Per-directory configuration files</li>
+                        <li><strong>MPM:</strong> Multi-Processing Modules (how Apache handles requests)</li>
+                        <li><strong>Directives:</strong> Configuration commands</li>
+                    </ul>
+
+                    <h3>Checking Apache2 Status</h3>
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">apache2 -v</span>
+<span class="output">Server version: Apache/2.4.52 (Ubuntu)
+Server built:   2023-03-01T12:00:00</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">systemctl status apache2</span>
+<span class="output">● apache2.service - The Apache HTTP Server
+     Loaded: loaded (/lib/systemd/system/apache2.service; enabled)
+     Active: active (running)</span>
+                    </div>
+
+                    <h3>Apache2 File Structure (Ubuntu/Debian)</h3>
+                    <ul>
+                        <li><strong>/etc/apache2/</strong> - Main configuration directory</li>
+                        <li><strong>/etc/apache2/apache2.conf</strong> - Main config file</li>
+                        <li><strong>/etc/apache2/sites-available/</strong> - Virtual host configs</li>
+                        <li><strong>/etc/apache2/sites-enabled/</strong> - Enabled sites (symlinks)</li>
+                        <li><strong>/etc/apache2/mods-available/</strong> - Available modules</li>
+                        <li><strong>/var/log/apache2/</strong> - Log files</li>
+                        <li><strong>/var/www/html/</strong> - Default document root</li>
+                    </ul>
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Apache2 was first released in _____.</p>
+                        <input type="text" class="quiz-input" data-answer="1995" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Mid-1990s</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. The </p>
+                        <input type="text" class="quiz-input" data-answer="version number" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Major version</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Apache2 is an example of _____ software.</p>
+                        <input type="text" class="quiz-input" data-answer="open source" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Free with source code</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. The default document root on Ubuntu is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="/var/www/html" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Under /var/www</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. Virtual hosts allow hosting _____ websites on one server.</p>
+                        <input type="text" class="quiz-input" data-answer="multiple" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: More than one</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">6. The main Apache2 configuration file is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="apache2.conf" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: In /etc/apache2/</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">7. Apache2 uses _____ to enable/disable functionality.</p>
+                        <input type="text" class="quiz-input" data-answer="modules" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Like plugins</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">8. To check Apache2 version, use _____ -v.</p>
+                        <input type="text" class="quiz-input" data-answer="apache2" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: The binary name</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>1995</li>
+                                <li>version number</li>
+                                <li>open source</li>
+                                <li>/var/www/html</li>
+                                <li>multiple</li>
+                                <li>apache2.conf</li>
+                                <li>modules</li>
+                                <li>apache2</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Lesson 2 --><div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Installing Apache2</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Installation on Ubuntu/Debian</h3>
+                    <p>Installing Apache2 on Debian-based systems is straightforward using apt:</p>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apt update</span>
+<span class="output">Hit:1 http://archive.ubuntu.com/ubuntu jammy InRelease
+Reading package lists... Done</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apt install apache2</span>
+<span class="output">Reading package lists... Done
+Building dependency tree...
+The following NEW packages will be installed:
+  apache2 apache2-bin apache2-data apache2-utils
+Do you want to continue? [Y/n] y</span>
+                    </div>
+
+                    <h3>Installation on CentOS/RHEL/Fedora</h3>
+                    <p>On RHEL-based systems, use dnf or yum:</p>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo dnf install httpd</span>
+<span class="output">Last metadata expiration check: 0:00:01 ago
+Package httpd-2.4.52-1.el9.x86_64 is already installed.</span>
+                    </div>
+
+                    <div class="highlight-box">
+                        <strong>NOTE:</strong> On CentOS/RHEL, the package is called "httpd" not "apache2". The configuration is also in /etc/httpd/ instead of /etc/apache2/.
+                    </div>
+
+                    <h3>Starting and Enabling Apache2</h3>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo systemctl start apache2</span>
+<span class="comment"># Start Apache2</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo systemctl enable apache2</span>
+<span class="comment"># Enable on boot</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo systemctl restart apache2</span>
+<span class="comment"># Restart (after config changes)</span>
+                    </div>
+
+                    <h3>Testing Your Installation</h3>
+                    <p>After installation, verify Apache2 is serving pages:</p>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">curl localhost</span>
+<span class="output"><!DOCTYPE html>
+<html><head>
+<title>Welcome to Apache2</title>
+...</span>
+                    </div>
+
+                    <p>Or open http://localhost in your browser. You should see the default Apache2 page.</p>
+
+                    <h3>Essential Apache2 Packages</h3>
+                    <ul>
+                        <li><strong>apache2</strong> - Main server package</li>
+                        <li><strong>apache2-utils</strong> - Utility programs (htpasswd, ab, etc.)</li>
+                        <li><strong>apache2-bin</strong> - Binaries and modules</li>
+                        <li><strong>apache2-data</strong> - Documentation and default files</li>
+                    </ul>
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. On Ubuntu, Apache2 is installed with the _____ command.</p>
+                        <input type="text" class="quiz-input" data-answer="apt install apache2" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Uses apt package manager</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. On CentOS, the package is called _____.</p>
+                        <input type="text" class="quiz-input" data-answer="httpd" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Not apache2</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. To start Apache2 on systemd, use _____.</p>
+                        <input type="text" class="quiz-input" data-answer="systemctl start apache2" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: systemctl</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. To enable Apache2 on boot, use _____ enable.</p>
+                        <input type="text" class="quiz-input" data-answer="systemctl" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: systemctl enable</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. The apache2-utils package contains _____.</p>
+                        <input type="text" class="quiz-input" data-answer="utility programs" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Like htpasswd</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">6. You can test Apache2 with _____ localhost.</p>
+                        <input type="text" class="quiz-input" data-answer="curl" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Command-line HTTP client</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">7. On RHEL, config files are in _____ instead of /etc/apache2/.</p>
+                        <input type="text" class="quiz-input" data-answer="/etc/httpd" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Different path</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">8. After config changes, you should _____ Apache2.</p>
+                        <input type="text" class="quiz-input" data-answer="restart" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: systemctl restart</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>apt install apache2</li>
+                                <li>httpd</li>
+                                <li>systemctl start apache2</li>
+                                <li>systemctl</li>
+                                <li>utility programs</li>
+                                <li>curl</li>
+                                <li>/etc/httpd</li>
+                                <li>restart</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Lesson 3 --><div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Configuration Files & Directives</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Understanding Apache2 Configuration</h3>
+                    <p>Apache2 configuration is organized in a hierarchical structure. Understanding this structure is key to effective server administration.</p>
+                    
+                    <h3>Main Configuration Files</h3>
+                    
+                    <h4>apache2.conf</h4>
+                    <p>The primary configuration file. On Ubuntu/Debian, it's designed to be modular:</p>
+                    
+                    <div class="config-block">
+<span class="directive">ServerRoot</span> <span class="value">"/etc/apache2"</span>
+<span class="directive">ServerName</span> <span class="value">example.com</span>
+<span class="directive">ServerAdmin</span> <span class="value">admin@example.com</span>
+<span class="directive">DocumentRoot</span> <span class="value">"/var/www/html"</span>
+                    </div>
+
+                    <h3>Key Directives</h3>
+                    
+                    <h4>ServerRoot</h4>
+                    <p>The top-level directory containing configuration files:</p>
+                    <div class="config-block">
+<span class="directive">ServerRoot</span> <span class="value">"/etc/apache2"</span>
+                    </div>
+
+                    <h4>Listen</h4>
+                    <p>Specify IP addresses and ports Apache2 listens on:</p>
+                    <div class="config-block">
+<span class="directive">Listen</span> <span class="value">80</span>
+<span class="directive">Listen</span> <span class="value">443</span>
+                    </div>
+
+                    <h4>DocumentRoot</h4>
+                    <p>The directory containing web files:</p>
+                    <div class="config-block">
+<span class="directive">DocumentRoot</span> <span class="value">"/var/www/html"</span>
+<Directory <span class="value">"/var/www/html"</span>>
+    <span class="directive">Options</span> <span class="value">Indexes FollowSymLinks</span>
+    <span class="directive">AllowOverride</span> <span class="value">None</span>
+    <span class="directive">Require</span> <span class="value">all granted</span>
+</Directory>
+                    </div>
+
+                    <h3>Directory Configuration</h3>
+                    <p>The <Directory> block controls access to specific directories:</p>
+                    
+                    <div class="config-block">
+<Directory <span class="value">"/var/www"</span>>
+    <span class="directive">Options</span> <span class="value">Indexes FollowSymLinks</span>
+    <span class="directive">AllowOverride</span> <span class="value">None</span>
+    <span class="directive">Require</span> <span class="value">all granted</span>
+</Directory>
+                    </div>
+
+                    <h3>Testing Configuration</h3>
+                    <p>Always test configuration before restarting:</p>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apache2ctl configtest</span>
+<span class="output">Syntax OK</span>
+                    </div>
+
+                    <div class="highlight-box">
+                        <strong>IMPORTANT:</strong> A syntax error in Apache2 configuration can prevent the server from starting. Always test with apache2ctl configtest first.
+                    </div>
+
+                    <h3>Configuration Include Files</h3>
+                    <p>Apache2 uses Include directives to load additional configuration:</p>
+                    
+                    <div class="config-block">
+<span class="directive">IncludeOptional</span> <span class="value">mods-enabled/*.load</span>
+<span class="directive">IncludeOptional</span> <span class="value">mods-enabled/*.conf</span>
+<span class="directive">Include</span> <span class="value">ports.conf</span>
+<span class="directive">IncludeOptional</span> <span class="value">conf-enabled/*.conf</span>
+<span class="directive">IncludeOptional</span> <span class="value">sites-enabled/*.conf</span>
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. The main Apache2 configuration file is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="apache2.conf" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: In /etc/apache2/</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. The _____ directive specifies the web root directory.</p>
+                        <input type="text" class="quiz-input" data-answer="documentroot" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Where files are served from</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. To specify which ports Apache listens on, use _____.</p>
+                        <input type="text" class="quiz-input" data-answer="listen" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Listen 80</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. The _____ block controls access to directories.</p>
+                        <input type="text" class="quiz-input" data-answer="<directory>" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: XML-like tag</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. To test config syntax, use _____.</p>
+                        <input type="text" class="quiz-input" data-answer="apache2ctl configtest" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: apache2ctl</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">6. On RHEL, Apache2 config is in _____ directory.</p>
+                        <input type="text" class="quiz-input" data-answer="/etc/httpd" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Different from Debian</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">7. The ServerAdmin directive sets the _____ email.</p>
+                        <input type="text" class="quiz-input" data-answer="administrator" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: For error pages</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">8. Include directives load additional _____ files.</p>
+                        <input type="text" class="quiz-input" data-answer="configuration" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Config files</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>apache2.conf</li>
+                                <li>DocumentRoot</li>
+                                <li>Listen</li>
+                                <li><Directory></li>
+                                <li>apache2ctl configtest</li>
+                                <li>/etc/httpd</li>
+                                <li>administrator</li>
+                                <li>configuration</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Lesson 4 --><div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Virtual Hosts</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>What are Virtual Hosts?</h3>
+                    <p>Virtual hosts allow Apache2 to serve multiple websites from a single server. This is essential for web hosting and development.</p>
+                    
+                    <h3>Types of Virtual Hosts</h3>
+                    <ul>
+                        <li><strong>Name-based:</strong> Multiple domains, one IP (most common)</li>
+                        <li><strong>IP-based:</strong> Different IP per website</li>
+                        <li><strong>Port-based:</strong> Different port per website</li>
+                    </ul>
+
+                    <h3>Creating a Name-based Virtual Host</h3>
+                    <p>Create a configuration file in /etc/apache2/sites-available/:</p>
+                    
+                    <div class="config-block">
+<VirtualHost *:80>
+    <span class="directive">ServerName</span> <span class="value">example.com</span>
+    <span class="directive">ServerAlias</span> <span class="value">www.example.com</span>
+    <span class="directive">DocumentRoot</span> <span class="value">"/var/www/example.com"</span>
+    
+    <Directory <span class="value">"/var/www/example.com"</span>>
+        <span class="directive">Options</span> <span class="value">-Indexes +FollowSymLinks</span>
+        <span class="directive">AllowOverride</span> <span class="value">All</span>
+        <span class="directive">Require</span> <span class="value">all granted</span>
+    </Directory>
+    
+    <span class="directive">ErrorLog</span> <span class="value">\${APACHE_LOG_DIR}/example.com-error.log</span>
+    <span class="directive">CustomLog</span> <span class="value">\${APACHE_LOG_DIR}/example.com-access.log combined</span>
+</VirtualHost>
+                    </div>
+
+                    <h3>Enabling Sites</h3>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2ensite example.com.conf</span>
+<span class="output">Enabling site example.com.
+To activate the new configuration, you need to run:
+  service apache2 reload</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2dissite example.com.conf</span>
+<span class="comment"># Disable a site</span>
+                    </div>
+
+                    <h3>Default Virtual Host</h3>
+                    <p>The default site serves requests that don't match any ServerName:</p>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls /etc/apache2/sites-enabled/</span>
+<span class="output">000-default.conf
+default-ssl.conf</span>
+                    </div>
+
+                    <h3>Multiple Sites on Same Server</h3>
+                    <p>You can have multiple virtual hosts:</p>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls /etc/apache2/sites-available/</span>
+<span class="output">example.com.conf
+blog.example.com.conf
+api.example.com.conf
+000-default.conf
+default-ssl.conf</span>
+                    </div>
+
+                    <h3>Virtual Host with Different Ports</h3>
+                    
+                    <div class="config-block">
+<VirtualHost *:8080>
+    <span class="directive">ServerName</span> <span class="value">internal.example.com</span>
+    <span class="directive">DocumentRoot</span> <span class="value">"/var/www/internal"</span>
+</VirtualHost>
+                    </div>
+
+                    <p>Make sure Listen 8080 is in ports.conf:</p>
+                    
+                    <div class="config-block">
+<span class="directive">Listen</span> <span class="value">8080</span>
+                    </div>
+
+                    <h3>Restarting Apache2</h3>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo systemctl reload apache2</span>
+<span class="comment"># Graceful reload (serves existing requests)</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo systemctl restart apache2</span>
+<span class="comment"># Full restart (interrupts active connections)</span>
+                    </div>
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. _____ virtual hosts use one IP for multiple domains.</p>
+                        <input type="text" class="quiz-input" data-answer="name-based" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Most common type</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. To enable a site, use _____.</p>
+                        <input type="text" class="quiz-input" data-answer="a2ensite" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Apache2 enable site</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. To disable a site, use _____.</p>
+                        <input type="text" class="quiz-input" data-answer="a2dissite" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Apache2 disable site</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. The ServerAlias directive creates _____ names for a site.</p>
+                        <input type="text" class="quiz-input" data-answer="alternative" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Additional domain names</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. Virtual host configs are in _____ directory.</p>
+                        <input type="text" class="quiz-input" data-answer="/etc/apache2/sites-available" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Available sites</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">6. To listen on port 8080, add _____ 8080.</p>
+                        <input type="text" class="quiz-input" data-answer="listen" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: In ports.conf</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">7. _____ reload gracefully updates the config.</p>
+                        <input type="text" class="quiz-input" data-answer="systemctl reload apache2" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Without interrupting</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">8. The default site serves requests matching no _____.</p>
+                        <input type="text" class="quiz-input" data-answer="servername" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Domain name</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>name-based</li>
+                                <li>a2ensite</li>
+                                <li>a2dissite</li>
+                                <li>alternative</li>
+                                <li>/etc/apache2/sites-available</li>
+                                <li>Listen</li>
+                                <li>systemctl reload apache2</li>
+                                <li>ServerName</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Lesson 5 --><div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Apache2 Modules</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Apache2 Module System</h3>
+                    <p>One of Apache2's greatest strengths is its modular architecture. Modules can be enabled or disabled to add or remove functionality.</p>
+                    
+                    <h3>Commonly Used Core Modules</h3>
+                    <ul>
+                        <li><strong>mod_ssl</strong> - SSL/TLS support</li>
+                        <li><strong>mod_rewrite</strong> - URL rewriting</li>
+                        <li><strong>mod_proxy</strong> - Proxying functionality</li>
+                        <li><strong>mod_auth_basic</strong> - Basic authentication</li>
+                        <li><strong>mod_headers</strong> - Custom HTTP headers</li>
+                        <li><strong>mod_expires</strong> - Cache control headers</li>
+                        <li><strong>mod_compress</strong> - Gzip compression</li>
+                    </ul>
+
+                    <h3>Listing Enabled Modules</h3>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">apache2ctl -M</span>
+<span class="output">Loaded Modules:
+ core_module (static)
+ log_config_module (static)
+ logio_module (static)
+ mpm_prefork_module (static)
+ authz_core_module (static)
+ ...
+ rewrite_module (shared)
+ ssl_module (shared)
+</span>
+                    </div>
+
+                    <h3>Enabling Modules</h3>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod rewrite</span>
+<span class="output">Enabling module rewrite.
+To activate the new configuration, you need to run:
+  service apache2 reload</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod ssl</span>
+<span class="output">Enabling module ssl.
+To activate the new configuration, you need to run:
+  service apache2 reload</span>
+                    </div>
+
+                    <h3>Disabling Modules</h3>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2dismod rewrite</span>
+<span class="comment"># Disable a module</span>
+                    </div>
+
+                    <h3>Checking Available Modules</h3>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls /etc/apache2/mods-available/</span>
+<span class="output">access_compat.load  autoindex.load  deflate.load
+alias.load         authn_file.load  dir.load
+...</span>
+                    </div>
+
+                    <h3>Module Configuration</h3>
+                    <p>Some modules have their own configuration files:</p>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">ls /etc/apache2/mods-enabled/</span>
+<span .output>access_compat.load  authz_host.load  dir.load
+alias.conf         authz_user.load  mime.load
+...</span>
+                    </div>
+
+                    <h3>Loading External Modules</h3>
+                    <p>Load external modules using LoadDirective:</p>
+                    
+                    <div class="config-block">
+<span class="directive">LoadModule</span> <span class="value">php_module /usr/lib/apache2/modules/libphp.so</span>
+                    </div>
+
+                    <h3>MPM (Multi-Processing Modules)</h3>
+                    <p>MPMs handle how Apache2 accepts and handles connections:</p>
+                    <ul>
+                        <li><strong>prefork</strong> - One process per request (compatible)</li>
+                        <li><strong>worker</strong> - Multiple threads per process</li>
+                        <li><strong>event</strong> - Async, best for keep-alive</li>
+                    </ul>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2dismod mpm_prefork && sudo a2enmod mpm_event</span>
+<span class="comment"># Switch from prefork to event MPM</span>
+                    </div>
+
+                    <div class="highlight-box">
+                        <strong>NOTE:</strong> If using PHP, you must use prefork MPM. Threaded MPMs require thread-safe PHP (php-fpm).
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. To enable a module, use _____.</p>
+                        <input type="text" class="quiz-input" data-answer="a2enmod" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Apache2 enable module</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. To list loaded modules, use _____.</p>
+                        <input type="text" class="quiz-input" data-answer="apache2ctl -m" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: List modules</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. mod_rewrite provides _____ rewriting.</p>
+                        <input type="text" class="quiz-input" data-answer="url" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Clean URLs</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. mod_ssl provides _____ support.</p>
+                        <input type="text" class="quiz-input" data-answer="ssl/tls" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: HTTPS</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. The _____ MPM uses threads for connections.</p>
+                        <input type="text" class="quiz-input" data-answer="worker" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Threaded MPM</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">6. PHP requires the _____ MPM.</p>
+                        <input type="text" class="quiz-input" data-answer="prefork" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Non-threaded</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">7. To disable a module, use _____.</p>
+                        <input type="text" class="quiz-input" data-answer="a2dismod" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Apache2 disable module</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">8. Modules are stored in _____ directory.</p>
+                        <input type="text" class="quiz-input" data-answer="/etc/apache2/mods-available" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Available modules</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>a2enmod</li>
+                                <li>apache2ctl -M</li>
+                                <li>URL</li>
+                                <li>SSL/TLS</li>
+                                <li>worker</li>
+                                <li>prefork</li>
+                                <li>a2dismod</li>
+                                <li>/etc/apache2/mods-available</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Lesson 6 --><div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// SSL/TLS & HTTPS</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>Why SSL/TLS?</h3>
+                    <p>SSL/TLS encrypts communication between the server and clients, protecting sensitive data from interception. It's essential for security and SEO.</p>
+                    
+                    <h3>SSL Certificate Types</h3>
+                    <ul>
+                        <li><strong>DV (Domain Validation):</strong> Basic, verifies domain ownership</li>
+                        <li><strong>OV (Organization Validation):</strong> Verifies organization identity</li>
+                        <li><strong>EV (Extended Validation):</strong> Highest trust, green bar</li>
+                        <li><strong>Self-signed:</strong> For testing only, not trusted by browsers</li>
+                    </ul>
+
+                    <h3>Enabling SSL Module</h3>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod ssl</span>
+                    </div>
+
+                    <h3>Creating Self-Signed Certificate (Testing)</h3>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt</span>
+<span class="output">Generating a 2048 bit RSA private key
+.......................+++
+....+++
+writing new private key to '/etc/ssl/private/apache-selfsigned.key'</span>
+                    </div>
+
+                    <h3>Creating SSL Virtual Host</h3>
+                    
+                    <div class="config-block">
+<VirtualHost *:443>
+    <span class="directive">ServerName</span> <span class="value">example.com</span>
+    <span class="directive">DocumentRoot</span> <span class="value">"/var/www/html"</span>
+    
+    <span class="directive">SSLEngine</span> <span class="value">on</span>
+    <span class="directive">SSLCertificateFile</span> <span class="value">/etc/ssl/certs/apache-selfsigned.crt</span>
+    <span class="directive">SSLCertificateKeyFile</span> <span class="value">/etc/ssl/private/apache-selfsigned.key</span>
+    
+    <Directory <span class="value">"/var/www/html"</span>>
+        <span class="directive">Options</span> <span class="value">-Indexes +FollowSymLinks</span>
+        <span class="directive">AllowOverride</span> <span class="value">All</span>
+        <span class="directive">Require</span> <span class="value">all granted</span>
+    </Directory>
+</VirtualHost>
+                    </div>
+
+                    <h3>SSL Configuration Options</h3>
+                    
+                    <div class="config-block">
+<span class="directive">SSLProtocol</span> <span class="value">all -SSLv3 -TLSv1 -TLSv1.1</span>
+<span class="directive">SSLCipherSuite</span> <span class="value">ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512</span>
+<span class="directive">SSLHonorCipherOrder</span> <span class="value">on</span>
+<span class="directive">SSLCompression</span> <span class="value">off</span>
+<span class="directive">SSLOpenSSLConfCmd</span> <span class="value">ECDHEParameters secp521r1</span>
+<span class="directive">SSLOpenSSLConfCmd</span> <span class="value">CipherSuites ECDHE-RSA-AES256-GCM-SHA384</span>
+                    </div>
+
+                    <h3>Forcing HTTPS</h3>
+                    <p>Redirect all HTTP traffic to HTTPS:</p>
+                    
+                    <div class="config-block">
+<VirtualHost *:80>
+    <span class="directive">ServerName</span> <span class="value">example.com</span>
+    <span class="directive">Redirect</span> <span class="value">permanent / https://example.com/</span>
+</VirtualHost>
+                    </div>
+
+                    <h3>Using Let's Encrypt (Production)</h3>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apt install certbot python3-certbot-apache</span>
+                    </div>
+
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo certbot --apache -d example.com -d www.example.com</span>
+<span class="output">Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Successfully received certificate.
+Certificate is saved at: /etc/letsencrypt/live/example.com/fullchain.pem
+Key is saved at: /etc/letsencrypt/live/example.com/privkey.pem</span>
+                    </div>
+
+                    <h3>Testing SSL Configuration</h3>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">openssl s_client -connect example.com:443</span>
+<span class="output">CONNECTED(00000003)
+...
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher   : TLS_AES_256_GCM_SHA384</span>
+                    </div>
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. _____ encrypts communication between server and client.</p>
+                        <input type="text" class="quiz-input" data-answer="ssl/tls" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: HTTPS</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. To enable SSL, use _____.</p>
+                        <input type="text" class="quiz-input" data-answer="a2enmod ssl" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Enable SSL module</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Let</p>
+                        <input type="text" class="quiz-input" data-answer="free" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: DV certificates</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. The SSLCertificateFile directive specifies the _____.</p>
+                        <input type="text" class="quiz-input" data-answer="certificate" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Public key file</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. The SSLCertificateKeyFile directive specifies the _____.</p>
+                        <input type="text" class="quiz-input" data-answer="private key" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Secret key file</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">6. To redirect HTTP to HTTPS, use _____ directive.</p>
+                        <input type="text" class="quiz-input" data-answer="redirect" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Permanent redirect</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">7. Self-signed certificates are for _____ only.</p>
+                        <input type="text" class="quiz-input" data-answer="testing" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Not production</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">8. certbot is used to obtain _____ certificates.</p>
+                        <input type="text" class="quiz-input" data-answer="ssl/tls" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: From Let</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>SSL/TLS</li>
+                                <li>a2enmod ssl</li>
+                                <li>free</li>
+                                <li>certificate</li>
+                                <li>private key</li>
+                                <li>Redirect</li>
+                                <li>testing</li>
+                                <li>SSL/TLS</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Lesson 7 --><div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// .htaccess & URL Rewriting</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+<h3>What is .htaccess?</h3>
+                    <p>The .htaccess file allows per-directory configuration without access to the main server configuration. It's incredibly powerful for shared hosting and per-site customization.</p>
+                    
+                    <h3>Enabling .htaccess</h3>
+                    <p>First, enable AllowOverride in your virtual host:</p>
+                    
+                    <div class="config-block">
+<Directory <span class="value">"/var/www/html"</span>>
+    <span class="directive">Options</span> <span class="value">Indexes FollowSymLinks</span>
+    <span class="directive">AllowOverride</span> <span class="value">All</span>
+    <span class="directive">Require</span> <span class="value">all granted</span>
+</Directory>
+                    </div>
+
+                    <h3>AllowOverride Options</h3>
+                    <ul>
+                        <li><strong>None:</strong> Disable .htaccess</li>
+                        <li><strong>All:</strong> Enable all directives</li>
+                        <li><strong>AuthConfig:</strong> Allow auth directives</li>
+                        <li><strong>FileInfo:</strong> Allow rewrite directives</li>
+                        <li><strong>Indexes:</strong> Allow directory indexing</li>
+                        <li><strong>Limit:</strong> Allow access control</li>
+                    </ul>
+
+                    <h3>Password Protection</h3>
+                    <p>Create a password file:</p>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">htpasswd -c /etc/apache2/.htpasswd username</span>
+<span class="output">New password: 
+Re-type new password:
+Adding password for user username</span>
+                    </div>
+
+                    <p>Create .htaccess:</p>
+                    
+                    <div class="config-block">
+<span class="directive">AuthType</span> <span class="value">Basic</span>
+<span class="directive">AuthName</span> <span class="value">"Restricted Area"</span>
+<span class="directive">AuthUserFile</span> <span class="value">/etc/apache2/.htpasswd</span>
+<span class="directive">Require</span> <span class="value">valid-user</span>
+                    </div>
+
+                    <h3>mod_rewrite Basics</h3>
+                    <p>Enable mod_rewrite first:</p>
+                    
+                    <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod rewrite</span>
+                    </div>
+
+                    <h3>Simple Redirects</h3>
+                    
+                    <div class="config-block">
+<span class="directive">RewriteEngine</span> <span class="value">On</span>
+<span class="directive">RewriteRule</span> <span class="value">^oldpage\.html$ /newpage.html [R=301,L]</span>
+                    </div>
+
+                    <h3>Clean URLs</h3>
+                    <p>Convert /article.php?id=123 to /article/123:</p>
+                    
+                    <div class="config-block">
+<span class="directive">RewriteEngine</span> <span class="value">On</span>
+<span class="directive">RewriteRule</span> <span class="value">^article/([0-9]+)$ /article.php?id=$1 [L]</span>
+                    </div>
+
+                    <h3>Forcing HTTPS</h3>
+                    
+                    <div class="config-block">
+<span class="directive">RewriteEngine</span> <span class="value">On</span>
+<span class="directive">RewriteCond</span> <span class="value">%{HTTPS} off</span>
+<span class="directive">RewriteRule</span> <span class="value">^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]</span>
+                    </div>
+
+                    <h3>Blocking IP Addresses</h3>
+                    
+                    <div class="config-block">
+<span class="directive">Order</span> <span class="value">deny,allow</span>
+<span class="directive">Deny from</span> <span class="value">192.168.1.100</span>
+<span class="directive">Deny from</span> <span class="value">10.0.0.0/8</span>
+                    </div>
+
+                    <h3>Custom Error Pages</h3>
+                    
+                    <div class="config-block">
+<span class="directive">ErrorDocument</span> <span class="value">404 /errors/404.html</span>
+<span class="directive">ErrorDocument</span> <span class="value">403 /errors/403.html</span>
+<span class="directive">ErrorDocument</span> <span class="value">500 /errors/500.html</span>
+                    </div>
+
+                    <h3>Directory Index</h3>
+                    
+                    <div class="config-block">
+<span class="directive">DirectoryIndex</span> <span class="value">index.php index.html</span>
+<span class="directive">Options</span> <span class="value">-Indexes</span>
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. The .htaccess file allows _____ configuration.</p>
+                        <input type="text" class="quiz-input" data-answer="per-directory" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Without main config</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. To enable .htaccess, set AllowOverride to _____.</p>
+                        <input type="text" class="quiz-input" data-answer="all" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Allow all directives</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. htpasswd creates a _____ file.</p>
+                        <input type="text" class="quiz-input" data-answer="password" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: For authentication</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. mod_rewrite provides _____ rewriting.</p>
+                        <input type="text" class="quiz-input" data-answer="url" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Clean URLs</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. The R=301 flag means _____ redirect.</p>
+                        <input type="text" class="quiz-input" data-answer="permanent" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: HTTP 301</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">6. The [L] flag means _____ rule.</p>
+                        <input type="text" class="quiz-input" data-answer="last" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Last rule, stop processing</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">7. ErrorDocument handles _____ pages.</p>
+                        <input type="text" class="quiz-input" data-answer="error" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: 404, 500, etc.</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">8. To block an IP, use _____ from.</p>
+                        <input type="text" class="quiz-input" data-answer="deny" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Deny from IP</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>per-directory</li>
+                                <li>All</li>
+                                <li>password</li>
+                                <li>URL</li>
+                                <li>permanent</li>
+                                <li>last</li>
+                                <li>error</li>
+                                <li>Deny</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Lesson 8 --><div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Authentication & Authorization</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Apache Authentication Methods</h3>
+                <p>Apache2 provides multiple authentication mechanisms to protect your web resources. Understanding these methods is essential for securing sensitive content.</p>
+                
+                <h3>Basic Authentication</h3>
+                <p>The simplest form of authentication. Credentials are sent base64-encoded (not encrypted) and should only be used with HTTPS:</p>
+                
+                <div class="config-block">
+<span class="directive">AuthType</span> <span class="value">Basic</span>
+<span class="directive">AuthName</span> <span class="value">"Restricted Area"</span>
+<span class="directive">AuthUserFile</span> <span class="value">/etc/apache2/.htpasswd</span>
+<span class="directive">Require</span> <span class="value">valid-user</span>
+                </div>
+
+                <h3>Creating Password Files</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo htpasswd -c /etc/apache2/.htpasswd admin</span>
+<span class="output">New password: 
+Re-type new password:
+Adding password for user admin</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo htpasswd /etc/apache2/.htpasswd user2</span>
+<span class="comment"># Add another user (without -c flag)</span>
+                </div>
+
+                <h3>Digest Authentication</h3>
+                <p>More secure than Basic auth as passwords are never sent over the network:</p>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod auth_digest</span>
+                </div>
+
+                <div class="config-block">
+<span class="directive">AuthType</span> <span class="value">Digest</span>
+<span class="directive">AuthName</span> <span class="value">"Private Area"</span>
+<span class="directive">AuthDigestProvider</span> <span class="value">file</span>
+<span class="directive">AuthUserFile</span> <span class="value">/etc/apache2/.htdigest</span>
+<span class="directive">Require</span> <span class="value">valid-user</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo htdigest -c /etc/apache2/.htdigest "Private Area" admin</span>
+                </div>
+
+                <div class="highlight-box">
+<strong>SECURITY NOTE:</strong> Always use HTTPS with Basic authentication. Without SSL/TLS, credentials are sent in base64 which is easily decoded.
+                </div>
+
+                <h3>LDAP Integration</h3>
+                <p>Authenticate against an LDAP directory server:</p>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod authnz_ldap</span>
+                </div>
+
+                <div class="config-block">
+<span class="directive">AuthType</span> <span class="value">Basic</span>
+<span class="directive">AuthName</span> <span class="value">"LDAP Authentication"</span>
+<span class="directive">AuthBasicProvider</span> <span class="value">ldap</span>
+<span class="directive">AuthLDAPURL</span> <span class="value">"ldap://ldap.example.com/ou=People,dc=example,dc=com?uid"</span>
+<span class="directive">AuthLDAPBindDN</span> <span class="value">"cn=apache,dc=example,dc=com"</span>
+<span class="directive">AuthLDAPBindPassword</span> <span class="value">"secret"</span>
+<span class="directive">Require</span> <span class="value">valid-user</span>
+                </div>
+
+                <h3>.htaccess Authentication</h3>
+                <p>Place authentication directives in .htaccess for per-directory protection:</p>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat /var/www/html/admin/.htaccess</span>
+<span class="output">AuthType Basic
+AuthName "Admin Panel"
+AuthUserFile /etc/apache2/.htpasswd
+Require user admin</span>
+                </div>
+
+                <h3>Access Control by IP</h3>
+                
+                <div class="config-block">
+<span class="directive">Require</span> <span class="value">ip 192.168.1.0/24</span>
+                </div>
+
+                <div class="config-block">
+<span class="directive">Require</span> <span class="value">host example.com</span>
+                </div>
+
+                <h3>Combining Requirements</h3>
+                
+                <div class="config-block">
+<span class="directive"><RequireAll></span>
+    <span class="directive">Require</span> <span class="value">valid-user</span>
+    <span class="directive">Require</span> <span class="value">ip 10.0.0.0/8</span>
+<span class="directive"></RequireAll></span>
+                </div>
+
+                <h3>Group-Based Authorization</h3>
+                
+                <div class="config-block">
+<span class="directive">AuthGroupFile</span> <span class="value">/etc/apache2/.htgroup</span>
+<span class="directive">Require</span> <span class="value">group admins</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">cat /etc/apache2/.htgroup</span>
+<span class="output">admins: admin user1 user2
+users: user3 user4 user5</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Basic auth sends credentials _____ encoded.</p>
+                        <input type="text" class="quiz-input" data-answer="base64" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Not encrypted</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. _____ authentication never sends passwords over the network.</p>
+                        <input type="text" class="quiz-input" data-answer="digest" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Uses MD5 hash</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Use _____ to create password files for Basic auth.</p>
+                        <input type="text" class="quiz-input" data-answer="htpasswd" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Apache utility</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. _____ integrates Apache with directory servers.</p>
+                        <input type="text" class="quiz-input" data-answer="ldap" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Lightweight Directory</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. Require _____ grants access to valid users only.</p>
+                        <input type="text" class="quiz-input" data-answer="valid-user" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Any valid user</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">6. _____ files allow per-directory auth config.</p>
+                        <input type="text" class="quiz-input" data-answer=".htaccess" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Distributed config</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">7. Require _____ 192.168.1.0/24 allows that subnet.</p>
+                        <input type="text" class="quiz-input" data-answer="ip" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: IP-based access</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">8. AuthGroupFile defines user _____ for authorization.</p>
+                        <input type="text" class="quiz-input" data-answer="groups" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: User collections</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>base64</li>
+                                <li>digest</li>
+                                <li>htpasswd</li>
+                                <li>LDAP</li>
+                                <li>valid-user</li>
+                                <li>.htaccess</li>
+                                <li>ip</li>
+                                <li>groups</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 --><div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Reverse Proxy Setup</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is a Reverse Proxy?</h3>
+                <p>A reverse proxy sits between clients and backend servers, forwarding client requests to the appropriate backend. It's essential for load balancing, SSL termination, and application delivery.</p>
+                
+                <h3>Enabling Proxy Modules</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod proxy</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod proxy_http</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod proxy_balancer</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod lbmethod_byrequests</span>
+                </div>
+
+                <h3>Basic Reverse Proxy</h3>
+                
+                <div class="config-block">
+<span class="directive">ProxyPreserveHost</span> <span class="value">On</span>
+<span class="directive">ProxyPass</span> <span class="value">/ http://localhost:3000/</span>
+<span class="directive">ProxyPassReverse</span> <span class="value">/ http://localhost:3000/</span>
+                </div>
+
+                <div class="highlight-box">
+<strong>IMPORTANT:</strong> ProxyPreserveHost preserves the original Host header, essential for virtual host routing on the backend.
+                </div>
+
+                <h3>Proxy with Path Mapping</h3>
+                
+                <div class="config-block">
+<span class="directive">ProxyPass</span> <span class="value">/api http://backend.local:8080/api</span>
+<span class="directive">ProxyPassReverse</span> <span class="value">/api http://backend.local:8080/api</span>
+                </div>
+
+                <h3>Load Balancing Backend Servers</h3>
+                
+                <div class="config-block">
+<span class="directive"><Proxy balancer://mycluster></span>
+    <span class="directive">BalancerMember</span> <span class="value">http://backend1:8080 loadfactor=3</span>
+    <span class="directive">BalancerMember</span> <span class="value">http://backend2:8080 loadfactor=2</span>
+    <span class="directive">BalancerMember</span> <span class="value">http://backend3:8080 status=+H</span>
+<span class="directive"></Proxy></span>
+
+<span class="directive">ProxyPass</span> <span class="value">/app balancer://mycluster/</span>
+<span class="directive">ProxyPassReverse</span> <span class="value">/app balancer://mycluster/</span>
+                </div>
+
+                <h3>Load Balancer Methods</h3>
+                <ul>
+                    <li><strong>byrequests:</strong> Request counting (default)</li>
+                    <li><strong>bytraffic:</strong> Traffic bytes balancing</li>
+                    <li><strong>bybusyness:</strong> Based on current requests</li>
+                    <li><strong>heartbeat:</strong> Heartbeat monitoring</li>
+                </ul>
+
+                <h3>WebSocket Proxy</h3>
+                <p>Enable WebSocket support for real-time applications:</p>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod proxy_wstunnel</span>
+                </div>
+
+                <div class="config-block">
+<span class="directive">ProxyPass</span> <span class="value">/ws ws://backend.local:8080/ws</span>
+<span class="directive">ProxyPassReverse</span> <span class="value">/ws ws://backend.local:8080/ws</span>
+                </div>
+
+                <div class="config-block">
+<span class="directive">RewriteEngine</span> <span class="value">On</span>
+<span class="directive">RewriteCond</span> <span class="value">%{HTTP:Upgrade} websocket [NC]</span>
+<span class="directive">RewriteCond</span> <span class="value">%{HTTP:Connection} upgrade [NC]</span>
+<span class="directive">RewriteRule</span> <span class="value">^/ws(.*)$ "ws://backend.local:8080/ws$1" [P,L]</span>
+                </div>
+
+                <h3>Proxy with SSL Termination</h3>
+                
+                <div class="config-block">
+<span class="directive"><VirtualHost *:443></span>
+    <span class="directive">ServerName</span> <span class="value">api.example.com</span>
+    <span class="directive">SSLEngine</span> <span class="value">On</span>
+    <span class="directive">SSLCertificateFile</span> <span class="value">/etc/ssl/certs/api.crt</span>
+    <span class="directive">SSLCertificateKeyFile</span> <span class="value">/etc/ssl/private/api.key</span>
+    
+    <span class="directive">ProxyPass</span> <span class="value">/ http://internal-backend:8080/</span>
+    <span class="directive">ProxyPassReverse</span> <span class="value">/ http://internal-backend:8080/</span>
+<span class="directive"></VirtualHost></span>
+                </div>
+
+                <h3>Proxy Timeouts and Retry</h3>
+                
+                <div class="config-block">
+<span class="directive">ProxyTimeout</span> <span class="value">600</span>
+<span class="directive">ProxyBadHeader</span> <span class="value">Ignore</span>
+<span class="directive">ProxyErrorOverride</span> <span class="value">On</span>
+                </div>
+
+                <h3>Health Checks</h3>
+                
+                <div class="config-block">
+<span class="directive"><Proxy balancer://webcluster></span>
+    <span class="directive">BalancerMember</span> <span class="value">http://web1:80 hcmethod=GET hcuri=/health hcinterval=10</span>
+    <span class="directive">BalancerMember</span> <span class="value">http://web2:80 hcmethod=GET hcuri=/health hcinterval=10</span>
+<span class="directive"></Proxy></span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. ProxyPass forwards requests to _____ servers.</p>
+                        <input type="text" class="quiz-input" data-answer="backend" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Upstream servers</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. _____ preserves the original Host header.</p>
+                        <input type="text" class="quiz-input" data-answer="proxypreservehost" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Keep original host</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. BalancerMember defines _____ in a cluster.</p>
+                        <input type="text" class="quiz-input" data-answer="backend servers" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Pool members</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. mod_proxy_ enables WebSocket proxy support.</p>
+                        <input type="text" class="quiz-input" data-answer="wstunnel" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: WS tunnel module</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. _____ handles SSL at the proxy level.</p>
+                        <input type="text" class="quiz-input" data-answer="ssl termination" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: SSL offloading</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">6. loadfactor controls the _____ of traffic.</p>
+                        <input type="text" class="quiz-input" data-answer="distribution" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Traffic split</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">7. _____ monitors backend server health.</p>
+                        <input type="text" class="quiz-input" data-answer="health checks" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: hcmethod/hcuri</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">8. status=+H marks a server as _____.</p>
+                        <input type="text" class="quiz-input" data-answer="hot standby" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Standby mode</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>backend</li>
+                                <li>ProxyPreserveHost</li>
+                                <li>backend servers</li>
+                                <li>wstunnel</li>
+                                <li>SSL termination</li>
+                                <li>distribution</li>
+                                <li>health checks</li>
+                                <li>hot standby</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 --><div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Apache Security</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Web Application Firewall (ModSecurity)</h3>
+                <p>ModSecurity is an open-source WAF that protects against SQL injection, XSS, and other attacks. It provides real-time monitoring and blocking.</p>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apt install libapache2-mod-security2</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod security2</span>
+                </div>
+
+                <h3>Basic ModSecurity Configuration</h3>
+                
+                <div class="config-block">
+<span class="directive">SecRuleEngine</span> <span class="value">On</span>
+<span class="directive">SecRequestBodyAccess</span> <span class="value">On</span>
+<span class="directive">SecRequestBodyLimit</span> <span class="value">13107200</span>
+<span class="directive">SecResponseBodyAccess</span> <span class="value">On</span>
+<span class="directive">SecResponseBodyLimit</span> <span class="value">524288</span>
+                </div>
+
+                <h3>OWASP Core Rule Set</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apt install modsecurity-crs</span>
+                </div>
+
+                <div class="highlight-box">
+<strong>WAF PROTECTION:</strong> The OWASP CRS protects against the OWASP Top 10 vulnerabilities including SQL injection, XSS, CSRF, and more.
+                </div>
+
+                <h3>Security Headers</h3>
+                <p>Enable mod_headers to add security headers:</p>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod headers</span>
+                </div>
+
+                <div class="config-block">
+<span class="directive">Header always set</span> <span class="value">X-Frame-Options "SAMEORIGIN"</span>
+<span class="directive">Header always set</span> <span class="value">X-Content-Type-Options "nosniff"</span>
+<span class="directive">Header always set</span> <span class="value">X-XSS-Protection "1; mode=block"</span>
+<span class="directive">Header always set</span> <span class="value">Referrer-Policy "strict-origin-when-cross-origin"</span>
+                </div>
+
+                <h3>Content Security Policy (CSP)</h3>
+                <p>CSP prevents XSS by controlling which resources can load:</p>
+                
+                <div class="config-block">
+<span class="directive">Header always set</span> <span class="value">Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"</span>
+                </div>
+
+                <h3>Rate Limiting</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod reqtimeout</span>
+                </div>
+
+                <div class="config-block">
+<span class="directive">RequestReadTimeout</span> <span class="value">header=20-40,MinRate=500 body=20,MinRate=500</span>
+                </div>
+
+                <h3>DDoS Protection with mod_evasive</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apt install libapache2-mod-evasive</span>
+                </div>
+
+                <div class="config-block">
+<span class="directive">DOSHashTableSize</span> <span class="value">3097</span>
+<span class="directive">DOSPageCount</span> <span class="value">2</span>
+<span class="directive">DOSSiteCount</span> <span class="value">50</span>
+<span class="directive">DOSPageInterval</span> <span class="value">1</span>
+<span class="directive">DOSSiteInterval</span> <span class="value">1</span>
+<span class="directive">DOSBlockingPeriod</span> <span class="value">10</span>
+<span class="directive">DOSEmailNotify</span> <span class="value">admin@example.com</span>
+<span class="directive">DOSLogDir</span> <span class="value">"/var/log/mod_evasive"</span>
+                </div>
+
+                <h3>Hide Server Information</h3>
+                
+                <div class="config-block">
+<span class="directive">ServerTokens</span> <span class="value">Prod</span>
+<span class="directive">ServerSignature</span> <span class="value">Off</span>
+                </div>
+
+                <h3>Disable Unnecessary Methods</h3>
+                
+                <div class="config-block">
+<span class="directive"><Location /></span>
+    <span class="directive">AllowMethods</span> <span class="value">GET POST HEAD OPTIONS</span>
+<span class="directive"></Location></span>
+                </div>
+
+                <h3>Strict Transport Security (HSTS)</h3>
+                
+                <div class="config-block">
+<span class="directive">Header always set</span> <span class="value">Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. ModSecurity is a _____ firewall.</p>
+                        <input type="text" class="quiz-input" data-answer="web application" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: WAF</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. _____ prevents clickjacking attacks.</p>
+                        <input type="text" class="quiz-input" data-answer="x-frame-options" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Frame control</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. CSP stands for Content _____ Policy.</p>
+                        <input type="text" class="quiz-input" data-answer="security" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Security policy</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. mod_ provides DDoS protection.</p>
+                        <input type="text" class="quiz-input" data-answer="evasive" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Evasive</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. _____ hides Apache version info.</p>
+                        <input type="text" class="quiz-input" data-answer="servertokens" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Server tokens</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">6. HSTS enforces _____ connections.</p>
+                        <input type="text" class="quiz-input" data-answer="https" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Secure transport</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">7. _____ prevents MIME type sniffing.</p>
+                        <input type="text" class="quiz-input" data-answer="x-content-type-options" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Content type header</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">8. CRS stands for Core Rule _____.</p>
+                        <input type="text" class="quiz-input" data-answer="set" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Rule collection</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>Web application</li>
+                                <li>X-Frame-Options</li>
+                                <li>Security</li>
+                                <li>evasive</li>
+                                <li>ServerTokens</li>
+                                <li>HTTPS</li>
+                                <li>X-Content-Type-Options</li>
+                                <li>Set</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 --><div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// High Availability</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Apache High Availability Architecture</h3>
+                <p>High availability ensures your web services remain accessible even during server failures. This involves multiple Apache instances, load balancing, and session persistence.</p>
+                
+                <h3>Multiple Apache Instances</h3>
+                <p>Run multiple Apache instances on different ports or servers:</p>
+                
+                <div class="config-block">
+<span class="directive"># Instance 1 - Port 80</span>
+<span class="directive">Listen</span> <span class="value">80</span>
+<span class="directive">ServerName</span> <span class="value">web1.example.com</span>
+
+<span class="directive"># Instance 2 - Port 8080</span>
+<span class="directive">Listen</span> <span class="value">8080</span>
+<span class="directive">ServerName</span> <span class="value">web2.example.com</span>
+                </div>
+
+                <h3>Session Sharing with Memcached</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apt install memcached libapache2-mod-session-memcached</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod session session_cookie session_memcached</span>
+                </div>
+
+                <div class="config-block">
+<span class="directive">Session</span> <span class="value">On</span>
+<span class="directive">SessionCookieName</span> <span class="value">session path=/</span>
+<span class="directive">SessionMemcachedServers</span> <span class="value">memcached.example.com:11211</span>
+<span class="directive">SessionMemcachedPrefix</span> <span class="value">apache_session_</span>
+<span class="directive">SessionMaxAge</span> <span class="value">3600</span>
+                </div>
+
+                <h3>Session Sharing with Redis</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apt install libapache2-mod-session-redis</span>
+                </div>
+
+                <div class="config-block">
+<span class="directive">Session</span> <span class="value">On</span>
+<span class="directive">SessionCookieName</span> <span class="value">session path=/</span>
+<span class="directive">SessionRedisHost</span> <span class="value">redis.example.com</span>
+<span class="directive">SessionRedisPort</span> <span class="value">6379</span>
+<span class="directive">SessionRedisPrefix</span> <span class="value">apache_session_</span>
+                </div>
+
+                <div class="highlight-box">
+<strong>SESSION PERSISTENCE:</strong> Shared sessions allow users to maintain login state across multiple Apache servers, essential for horizontal scaling.
+                </div>
+
+                <h3>Cluster Configuration with mod_proxy_balancer</h3>
+                
+                <div class="config-block">
+<span class="directive"><Proxy balancer://cluster></span>
+    <span class="directive">BalancerMember</span> <span class="value">http://apache1:80 route=node1</span>
+    <span class="directive">BalancerMember</span> <span class="value">http://apache2:80 route=node2</span>
+    <span class="directive">BalancerMember</span> <span class="value">http://apache3:80 route=node3</span>
+    
+    <span class="directive">ProxySet</span> <span class="value">stickysession=session|jsessionid</span>
+    <span class="directive">ProxySet</span> <span class="value">lbmethod=byrequests</span>
+<span class="directive"></Proxy></span>
+
+<span class="directive">ProxyPass</span> <span class="value">/ balancer://cluster/</span>
+<span class="directive">ProxyPassReverse</span> <span class="value">/ balancer://cluster/</span>
+                </div>
+
+                <h3>Sticky Sessions</h3>
+                
+                <div class="config-block">
+<span class="directive">Header add</span> <span class="value">Set-Cookie "session=.%{BALANCER_WORKER_ROUTE}e; path=/; HttpOnly; Secure" env=BALANCER_ROUTE_CHANGED</span>
+                </div>
+
+                <h3>Active-Passive Failover</h3>
+                
+                <div class="config-block">
+<span class="directive"><Proxy balancer://ha></span>
+    <span class="directive">BalancerMember</span> <span class="value">http://primary:80</span>
+    <span class="directive">BalancerMember</span> <span class="value">http://backup:80 status=+H</span>
+<span class="directive"></Proxy></span>
+                </div>
+
+                <h3>Health Check Configuration</h3>
+                
+                <div class="config-block">
+<span class="directive">ProxyHCExpr</span> <span class="value">is_up {%{REMOTE_ADDR} =~ /127\.0\.0\.1/}</span>
+<span class="directive">ProxyHCTemplate</span> <span class="value">check method=GET uri=/health.html interval=5 timeout=2</span>
+
+<span class="directive"><Proxy balancer://web></span>
+    <span class="directive">BalancerMember</span> <span class="value">http://server1:80 hctemplate=check</span>
+    <span class="directive">BalancerMember</span> <span class="value">http://server2:80 hctemplate=check</span>
+<span class="directive"></Proxy></span>
+                </div>
+
+                <h3>HAProxy Alternative Setup</h3>
+                <p>External load balancer in front of Apache cluster:</p>
+                
+                <div class="config-block">
+<span class="directive"># haproxy.cfg</span>
+<span class="directive">frontend</span> <span class="value">web_frontend</span>
+    <span class="directive">bind</span> <span class="value">*:80</span>
+    <span class="directive">default_backend</span> <span class="value">apache_backend</span>
+
+<span class="directive">backend</span> <span class="value">apache_backend</span>
+    <span class="directive">balance</span> <span class="value">roundrobin</span>
+    <span class="directive">cookie</span> <span class="value">SESSION insert indirect nocache</span>
+    <span class="directive">server</span> <span class="value">apache1 192.168.1.10:80 check cookie node1</span>
+    <span class="directive">server</span> <span class="value">apache2 192.168.1.11:80 check cookie node2</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Multiple Apache instances run on different _____.</p>
+                        <input type="text" class="quiz-input" data-answer="ports" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Network ports</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. _____ stores session data in memory cache.</p>
+                        <input type="text" class="quiz-input" data-answer="memcached" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Memory cache daemon</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. _____ provides in-memory data structure store.</p>
+                        <input type="text" class="quiz-input" data-answer="redis" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Remote dictionary server</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Sticky _____ keeps users on the same server.</p>
+                        <input type="text" class="quiz-input" data-answer="sessions" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Session affinity</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. status=+H marks a server as _____.</p>
+                        <input type="text" class="quiz-input" data-answer="hot standby" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Backup server</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">6. _____ checks monitor server health.</p>
+                        <input type="text" class="quiz-input" data-answer="health" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Health checks</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">7. A cluster of servers provides _____ availability.</p>
+                        <input type="text" class="quiz-input" data-answer="high" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: HA</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">8. _____ insert adds session cookies.</p>
+                        <input type="text" class="quiz-input" data-answer="cookie" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Cookie directive</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>ports</li>
+                                <li>Memcached</li>
+                                <li>Redis</li>
+                                <li>sessions</li>
+                                <li>hot standby</li>
+                                <li>health</li>
+                                <li>high</li>
+                                <li>cookie</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 --><div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Troubleshooting & Debugging</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Systematic Troubleshooting</h3>
+                <p>When Apache2 fails or behaves unexpectedly, a systematic approach saves time. This lesson covers diagnostic tools and common issues.</p>
+                
+                <h3>Error Logs</h3>
+                <p>The first place to check when something goes wrong:</p>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo tail -f /var/log/apache2/error.log</span>
+<span class="output">[Wed Jan 15 10:30:45.123456 2025] [mpm_prefork:error] [pid 1234] AH00161: server reached MaxRequestWorkers setting</span>
+                </div>
+
+                <h3>Log Levels</h3>
+                <p>Increase verbosity for detailed debugging:</p>
+                
+                <div class="config-block">
+<span class="directive">LogLevel</span> <span class="value">debug</span>
+                </div>
+
+                <div class="config-block">
+<span class="directive">LogLevel</span> <span class="value">info ssl:warn rewrite:trace8</span>
+                </div>
+
+                <h3>Access Pattern Analysis</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">awk '{print $9}' /var/log/apache2/access.log | sort | uniq -c | sort -rn</span>
+<span class="output">   5432 200
+    234 404
+     56 500
+     12 403</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">awk '{print $1}' /var/log/apache2/access.log | sort | uniq -c | sort -rn | head -10</span>
+<span class="comment"># Top 10 client IPs</span>
+                </div>
+
+                <div class="highlight-box">
+<strong>LOG ANALYSIS:</strong> Use awk, grep, and sort to extract insights from access logs. Look for error patterns, traffic spikes, and suspicious activity.
+                </div>
+
+                <h3>Common Issues and Solutions</h3>
+
+                <h4>Permission Denied Errors</h4>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo ls -la /var/www/html/</span>
+<span class="comment"># Check file ownership</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo chmod -R 755 /var/www/html</span>
+<span class="prompt">$</span> <span class="command">sudo chown -R www-data:www-data /var/www/html</span>
+                </div>
+
+                <h4>Port Already in Use</h4>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo lsof -i :80</span>
+<span class="output">COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+nginx   1234 root    6u  IPv4  12345      0t0  TCP *:http (LISTEN)</span>
+                </div>
+
+                <h4>Configuration Syntax Errors</h4>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apache2ctl configtest</span>
+<span class="output">AH00526: Syntax error on line 10 of /etc/apache2/sites-enabled/example.conf:
+Invalid command 'SSLEngine', perhaps misspelled or defined by a module not included in the server configuration</span>
+                </div>
+
+                <h3>Debugging Modules</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo a2enmod dumpio</span>
+<span class="comment"># Log request/response bodies</span>
+                </div>
+
+                <div class="config-block">
+<span class="directive">DumpIOInput</span> <span class="value">On</span>
+<span class="directive">DumpIOOutput</span> <span class="value">On</span>
+<span class="directive">LogLevel</span> <span class="value">dumpio:trace7</span>
+                </div>
+
+                <h3>Rewrite Rule Debugging</h3>
+                
+                <div class="config-block">
+<span class="directive">LogLevel</span> <span class="value">rewrite:trace8</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo tail -f /var/log/apache2/error.log | grep rewrite</span>
+                </div>
+
+                <h3>Using strace</h3>
+                <p>Trace system calls for deep debugging:</p>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo strace -p $(pgrep -o apache2) -e trace=file 2>&1 | grep -E "open|stat|access"</span>
+                </div>
+
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo strace -f -e trace=network -p $(pgrep -o apache2) 2>&1</span>
+<span class="comment"># Trace network operations</span>
+                </div>
+
+                <h3>Debug Mode</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apache2 -X</span>
+<span class="comment"># Run in foreground (single process, debug mode)</span>
+                </div>
+
+                <h3>Module Loading Verification</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">apache2ctl -M 2>&1 | grep ssl</span>
+<span class="output"> ssl_module (shared)</span>
+                </div>
+
+                <h3>Checking Virtual Host Configuration</h3>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apache2ctl -S</span>
+<span class="output">VirtualHost configuration:
+*:80                   is a NameVirtualHost
+         default server example.com (/etc/apache2/sites-enabled/000-default.conf:1)
+         port 80 namevhost example.com (/etc/apache2/sites-enabled/000-default.conf:1)</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. _____ logs contain detailed error information.</p>
+                        <input type="text" class="quiz-input" data-answer="error" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: error.log</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. _____ analyzes access log patterns.</p>
+                        <input type="text" class="quiz-input" data-answer="awk" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Text processing</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Permission denied means check file _____.</p>
+                        <input type="text" class="quiz-input" data-answer="ownership" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: chown/chmod</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. mod_dumpio logs request and response _____.</p>
+                        <input type="text" class="quiz-input" data-answer="bodies" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Full content</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. _____ traces system calls.</p>
+                        <input type="text" class="quiz-input" data-answer="strace" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: System trace</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">6. apache2ctl -X runs in _____ mode.</p>
+                        <input type="text" class="quiz-input" data-answer="debug" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Foreground mode</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">7. _____ configtest checks syntax.</p>
+                        <input type="text" class="quiz-input" data-answer="apache2ctl" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Apache control</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">8. _____ -S shows virtual host config.</p>
+                        <input type="text" class="quiz-input" data-answer="apache2ctl" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Apache control</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>error</li>
+                                <li>awk</li>
+                                <li>ownership</li>
+                                <li>bodies</li>
+                                <li>strace</li>
+                                <li>debug</li>
+                                <li>apache2ctl</li>
+                                <li>apache2ctl</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    <script src="../nav.js" defer></script>
+</body>
+</html>

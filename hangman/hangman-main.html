@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman Games - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <script>
+        // Auto-open sections when navigating via hash from another page
+        document.addEventListener('DOMContentLoaded', function() {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const section = document.getElementById(hash);
+                if (section) {
+                    const checkbox = section.querySelector('.show-more-checkbox');
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                }
+            }
+        });
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        .builder-section {
+            padding: 64px 32px;
+            background: var(--white);
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .builder-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .builder-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .builder-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+        }
+        
+        .builder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+    </style>
+</head>
+<body id="top">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html#games" class="nav-title" aria-label="Go to home">
+                REBEL WITH LINUX
+            </a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: #000000;">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: #000000;">× Close</a>
+                    <a href="../index.html#distros" style="color: #000000;">DISTRO</a>
+                    <a href="../index.html#games" style="color: #000000;">GAMES</a>
+                    <a href="../index.html#guides" style="color: #000000;">GUIDES</a>
+                    <a href="../index.html#projects" style="color: #000000;">PROJECTS</a>
+                    <a href="../index.html#resources" style="color: #000000;">RESOURCES</a>
+                    <a href="../index.html#references" style="color: #000000;">REFERENCES</a>
+                    <a href="../index.html#scripts" style="color: #000000;">SCRIPTS</a>
+                    <a href="../index.html#blog" style="color: #000000;">BLOG</a>
+                    <a href="../index.html#about" style="color: #000000;">ABOUT</a>
+                    <a href="../index.html#contact" style="color: #000000;">CONTACT</a>
+                    <a href="../index.html#stats" style="color: #000000;">STATS</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: #000000;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none; color: #000000;">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <section class="builder-section">
+            <div class="builder-header">
+                <h1>// HANGMAN GAMES</h1>
+                <p>Guess the code from definitions</p>
+            </div>
+            
+            <div class="builder-grid">
+                <!-- HTML Hangman -->
+                <a href="hangman-html.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🌐 HTML</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: HTML</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess HTML tags (div, span, form, table & more)</p>
+                    </article>
+                </a>
+                
+                <!-- CSS Hangman -->
+                <a href="hangman-css.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🎨 CSS</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: CSS</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess CSS properties (color, margin, padding, flex & more)</p>
+                    </article>
+                </a>
+                
+                <!-- JavaScript Hangman -->
+                <a href="hangman-javascript.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">⚡ JAVASCRIPT</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: JavaScript</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess JavaScript keywords (function, const, class & more)</p>
+                    </article>
+                </a>
+                
+                <!-- Linux Hangman -->
+                <a href="hangman-linux.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🐧 LINUX</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: Linux</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess Linux commands (ls, cd, mkdir, grep & more)</p>
+                    </article>
+                </a>
+                
+                <!-- Bash Hangman -->
+                <a href="hangman-bash.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">💻 BASH</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: Bash</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess Bash commands (echo, export, source & more)</p>
+                    </article>
+                </a>
+                
+                <!-- Git Hangman -->
+                <a href="hangman-git.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">📦 GIT</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: Git</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess Git commands (commit, push, pull, merge & more)</p>
+                    </article>
+                </a>
+                
+                <!-- Network Hangman -->
+                <a href="hangman-network.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🌐 NETWORK</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: Network</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess network commands (ping, curl, wget, ssh & more)</p>
+                    </article>
+                </a>
+                
+                <!-- SQL Hangman -->
+                <a href="hangman-sql.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🗄️ SQL</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: SQL</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess SQL commands (SELECT, INSERT, UPDATE & more)</p>
+                    </article>
+                </a>
+                
+                <!-- Python Hangman -->
+                <a href="hangman-python.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🐍 PYTHON</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: Python</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess Python keywords (def, class, import & more)</p>
+                    </article>
+                </a>
+
+                <!-- Terraform Hangman -->
+                <a href="hangman-terraform.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">☁️ TERRAFORM</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: Terraform</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess Terraform commands (init, apply, resource & more)</p>
+                    </article>
+                </a>
+
+                <!-- Ansible Hangman -->
+                <a href="hangman-ansible.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">⚙️ ANSIBLE</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: Ansible</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess Ansible modules (copy, template, roles & more)</p>
+                    </article>
+                </a>
+
+                <!-- CI/CD Hangman -->
+                <a href="hangman-cicd.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🔄 CI/CD</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: CI/CD</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess CI/CD terms (workflow, runner, artifact & more)</p>
+                    </article>
+                </a>
+
+                <!-- Docker Hangman -->
+                <a href="hangman-docker.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🐳 DOCKER</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: Docker</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess Docker commands (run, build, pull, exec & more)</p>
+                    </article>
+                </a>
+
+                <!-- Kubernetes Hangman -->
+                <a href="hangman-kubernetes.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">☸️ KUBERNETES</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: Kubernetes</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess K8s terms (pod, service, deploy, ingress & more)</p>
+                    </article>
+                </a>
+
+                <!-- Nginx Hangman -->
+                <a href="hangman-nginx.html" class="lesson-card visible" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🚀 NGINX</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman: Nginx</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Guess Nginx terms (server, location, proxy_pass & more)</p>
+                    </article>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <a class="back-to-top" href="#top" aria-label="Back to top">↑</a>
+
+    <footer id="contact">
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p><a href="../site-map.html">All pages</a></p>
+    </footer>
+</body>
+</html>
