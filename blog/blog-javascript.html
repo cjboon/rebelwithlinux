@@ -37,103 +37,107 @@
         <p>March 2026 • JavaScript • 20 min read</p>
     </div>
     <article class="blog-content">
-        <p>So you want to learn JavaScript. Cool. It's the language that makes websites do stuff—dropdown menus, animations, fetching data without reloading pages. Pretty much every website uses it.</p>
+        <p>Before we start: JavaScript is dangerous. It runs code directly in your browser, can track you, can exploit vulnerabilities, and runs on nearly every website you visit. That's why Tor Browser bundles NoScript. That's why security researchers warn against it.</p>
 
-        <p>Don't worry if you've never coded before. We'll take it slow.</p>
+        <p>That said, JavaScript is everywhere. You can't avoid it entirely. So here's how it works—so you can understand what websites are doing to your browser.</p>
 
-        <h2>What's JavaScript?</h2>
-        <p>HTML builds the structure. CSS makes it pretty. JavaScript makes it <em>do</em> things.</p>
+        <h2>The Risk</h2>
+        <p>When you enable JavaScript, you're letting any website run arbitrary code on your machine. They can:</p>
+        <ul>
+            <li>Track your movements across sites (fingerprinting)</li>
+            <li>Exploit browser vulnerabilities</li>
+            <li>Run cryptomining scripts</li>
+            <li>Load tracking pixels</li>
+            <li>Access clipboard, local storage, and more</li>
+        </ul>
 
-        <p>When you click a button and something happens—that's JavaScript. When a form validates your email before submitting—that's JavaScript. When Google Maps loads new data as you scroll—that's JavaScript too.</p>
+        <p>NoScript blocks JavaScript by default. You can also disable it in Firefox via <code>about:config</code> by setting <code>javascript.enabled</code> to false.</p>
 
-        <h2>Variables: Where You Store Stuff</h2>
-        <p>Think of variables as labeled boxes. You put something in, give it a name, and can grab it later.</p>
+        <p>Some websites work fine without JavaScript. E-commerce, social networks, email—they exist that work entirely without it. You'll find them sometimes when browsing with NoScript on "safest" mode in Tor Browser.</p>
 
+        <h2>What Does JavaScript Do?</h2>
+        <p>HTML builds the structure. CSS makes it pretty. JavaScript makes it <em>do</em> things—sometimes things you didn't ask for.</p>
+
+        <p>Dropdowns. Animations. Form validation. Data fetching. But also: tracking scripts. Fingerprinting. Exploits.</p>
+
+        <h2>Variables: Where Stuff Lives</h2>
         <pre><code>let name = "cjboon";
 const PI = 3.14159;
 var oldWay = "don't use var";</code></pre>
 
-        <p>Quick breakdown:</p>
-        <ul>
-            <li><code>let</code> - use this. It's a box you can change later.</li>
-            <li><code>const</code> - use this when you don't want the value to change. Like PI.</li>
-            <li><code>var</code> - the old way. Just don't use it.</li>
-        </ul>
+        <p><code>let</code> = can change. <code>const</code> = locked. <code>var</code> = old way, avoid it.</p>
 
-        <h2>Data Types: What Goes In The Boxes</h2>
-        <pre><code>let text = "hello";      // string - just text
-let num = 42;            // number - self explanatory
-let bool = true;         // boolean - true or false
-let arr = [1, 2, 3];    // array - a list of things
-let obj = {a: 1};       // object - key-value pairs</code></pre>
+        <h2>Data Types</h2>
+        <pre><code>let text = "hello";      // string
+let num = 42;            // number
+let bool = true;         // boolean
+let arr = [1, 2, 3];    // array
+let obj = {a: 1};       // object</code></pre>
 
-        <p>Arrays are great for lists. Objects are great for describing things with properties.</p>
+        <p>Arrays store lists. Objects store structured data. Everything's mutable by default—which is part of the danger.</p>
 
-        <h2>Functions: Reusable Recipes</h2>
-        <p>Functions are like recipes. You write the instructions once, then use them whenever you need.</p>
-
-        <pre><code>// A named function
-function greet(name) {
+        <h2>Functions: Running Code</h2>
+        <pre><code>function greet(name) {
     return "Hello, " + name;
 }
 
-// Arrow function - shorter syntax
 const add = (a, b) => a + b;</code></pre>
 
-        <h2>Making Decisions: If Statements</h2>
+        <p>Functions are reusable code. But every function you run is more attack surface.</p>
+
+        <h2>Conditionals: Making Decisions</h2>
         <pre><code>if (age >= 18) {
     console.log("You can vote!");
 } else {
-    console.log("Not yet, kiddo.");
+    console.log("Not yet.");
 }</code></pre>
 
-        <p>The computer checks the condition and picks a path. Simple as that.</p>
+        <p>The logic is simple. But websites use conditionals to make decisions about what to track, what to load, what to hide.</p>
 
-        <h2>Loops: Doing Things Repeatedly</h2>
-        <p>Don't repeat yourself. Loops let you run the same code on every item in a list.</p>
-
-        <pre><code>// Classic for loop
-for (let i = 0; i < 5; i++) {
+        <h2>Loops: Repeating Stuff</h2>
+        <pre><code>for (let i = 0; i < 5; i++) {
     console.log(i);
 }
 
-// For each item in a list
-const fruits = ["apple", "banana", "orange"];
+const fruits = ["apple", "banana"];
 fruits.forEach(fruit => console.log(fruit));</code></pre>
 
-        <h2>Interacting With The Page</h2>
-        <p>This is where it gets fun. You can grab HTML elements and mess with them.</p>
+        <p>Loops process data. They can also iterate through everything you've typed, every form field, every element on the page.</p>
 
-        <pre><code>// Find a button
-const btn = document.querySelector('#myButton');
-
-// When someone clicks it
+        <h2>DOM Manipulation: Touching The Page</h2>
+        <pre><code>const btn = document.querySelector('#myButton');
 btn.addEventListener('click', () => {
-    alert('You clicked it!');
+    alert('Clicked!');
 });
 
-// Change text on the page
 document.getElementById('output').textContent = 'New text';</code></pre>
 
-        <h2>Getting Data From Elsewhere: Fetch</h2>
-        <p>Want to get data from an API? That's where fetch comes in.</p>
+        <p>This is what makes sites interactive. But also what lets scripts modify content, read form inputs, and intercept clicks.</p>
 
-        <pre><code>// Old way with .then()
-fetch('https://api.example.com/data')
+        <h2>Fetch: Getting Data</h2>
+        <pre><code>fetch('https://api.example.com/data')
     .then(res => res.json())
     .then(data => console.log(data));
 
-// New way with async/await - cleaner
 async function getData() {
     const res = await fetch('https://api.example.com/data');
     const data = await res.json();
     console.log(data);
 }</code></pre>
 
-        <p>The async/await version reads almost like English. Much nicer.</p>
+        <p>Fetch sends requests to servers. Sites use this to load content dynamically—and to send data about you to third parties.</p>
 
-        <h2>That's It (For Now)</h2>
-        <p>You now know enough JavaScript to build actual things. Try making a simple button that changes the page content. Experiment. Break stuff. That's how you learn.</p>
+        <h2>The Bottom Line</h2>
+        <p>JavaScript isn't going anywhere. But you should:</p>
+        <ul>
+            <li>Use NoScript or similar extensions</li>
+            <li>Disable JavaScript in browser when you don't need it</li>
+            <li>Use Tor Browser with "safest" settings for sensitive browsing</li>
+            <li>Understand what websites are doing with your browser</li>
+            <li>Support sites that work without JavaScript</li>
+        </ul>
+
+        <p>Learn JavaScript if you must. But use it sparingly. Trust nothing running in your browser.</p>
     </article>
 
     <nav class="blog-nav">
