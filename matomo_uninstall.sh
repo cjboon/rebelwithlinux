@@ -3,6 +3,12 @@
 # Matomo Uninstaller
 # Run with: sudo bash matomo_uninstall.sh
 
+# === CONFIG ===
+SITE_NAME="rebelwithlinux.com"
+WEB_ROOT="/var/www/${SITE_NAME}"
+MATOMO_DIR="/var/www/matomo"
+# === END CONFIG ===
+
 set -e
 
 RED='\033[0;31m'
@@ -31,9 +37,9 @@ fi
 
 # Remove Matomo files
 print_header "Removing Matomo Files"
-if [ -d "/var/www/matomo" ]; then
-    rm -rf /var/www/matomo
-    print_success "Removed /var/www/matomo"
+if [ -d "$MATOMO_DIR" ]; then
+    rm -rf "$MATOMO_DIR"
+    print_success "Removed $MATOMO_DIR"
 else
     print_warning "Matomo directory not found"
 fi
@@ -63,7 +69,7 @@ fi
 
 # Remove tracking code from website
 print_header "Removing Tracking Code"
-cd /var/www/rebelwithlinux.com 2>/dev/null || cd /var/www/html
+cd "${WEB_ROOT}" 2>/dev/null || cd /var/www/html
 if [ -f "index.html" ]; then
     sed -i '/<!-- Matomo Analytics -->/d' index.html
     sed -i '/<script src="matomo.js"><\/script>/d' index.html

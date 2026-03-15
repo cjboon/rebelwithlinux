@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# === CONFIG ===
+SITE_NAME="rebelwithlinux.com"
+WEB_ROOT="/var/www/${SITE_NAME}"
 DB_NAME="learning_platform"
 DB_USER="webuser"
 DB_PASS="webpass"
+# === END CONFIG ===
 
 echo "Installing PHP + MySQL extension for Apache..."
 sudo apt update
