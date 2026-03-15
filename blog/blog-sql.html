@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Basics - Rebel With Linux</title>
+    <meta name="description" content="Learn SQL fundamentals.">
+    <meta name="author" content="cjboon">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../fonts.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-sql.html" />
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--charcoal); padding-bottom: 8px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title">REBEL WITH LINUX</a>
+        </div>
+    </nav>
+    <div class="blog-header">
+        <h1>SQL Basics</h1>
+        <p>March 2026 • SQL • 15 min read</p>
+    </div>
+    <article class="blog-content">
+        <p>SQL (Structured Query Language) is how you talk to databases. Every app needs data. SQL is how you get it.</p>
+
+        <h2>What is a Database?</h2>
+        <p>A database is a structured collection of data. Relational databases (like MySQL, PostgreSQL) organize data into tables with rows and columns.</p>
+
+        <h2>Creating a Database</h2>
+        <pre><code>CREATE DATABASE myapp;
+USE myapp;</code></pre>
+
+        <h2>Creating a Table</h2>
+        <pre><code>CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+
+        <h2>INSERT - Adding Data</h2>
+        <pre><code>INSERT INTO users (name, email) VALUES ("cjboon", "test@test.com");
+INSERT INTO users (name, email) VALUES ("alice", "alice@test.com");</code></pre>
+
+        <h2>SELECT - Reading Data</h2>
+        <pre><code>-- All users
+SELECT * FROM users;
+
+-- Specific columns
+SELECT name, email FROM users;
+
+-- With condition
+SELECT * FROM users WHERE id = 1;</code></pre>
+
+        <h2>UPDATE - Modifying Data</h2>
+        <pre><code>UPDATE users SET email = "new@test.com" WHERE id = 1;</code></pre>
+
+        <h2>DELETE - Removing Data</h2>
+        <pre><code>DELETE FROM users WHERE id = 1;</code></pre>
+
+        <h2>JOINs - Combining Tables</h2>
+        <pre><code>-- Users and their posts
+SELECT users.name, posts.title
+FROM users
+JOIN posts ON users.id = posts.user_id;</code></pre>
+
+        <h2>Types of JOINs</h2>
+        <ul>
+            <li><strong>INNER</strong> - Only matching rows</li>
+            <li><strong>LEFT</strong> - All from left table, matching from right</li>
+            <li><strong>RIGHT</strong> - All from right table, matching from left</li>
+        </ul>
+
+        <h2>ORDER BY & LIMIT</h2>
+        <pre><code>-- Newest users first
+SELECT * FROM users ORDER BY created_at DESC LIMIT 10;</code></pre>
+
+        <h2>Aggregate Functions</h2>
+        <pre><code>SELECT COUNT(*) FROM users;
+SELECT SUM(amount) FROM orders;
+SELECT AVG(age) FROM users;
+SELECT MAX(price) FROM products;</code></pre>
+
+        <h2>GROUP BY</h2>
+        <pre><code>-- Count posts per user
+SELECT user_id, COUNT(*) as post_count
+FROM posts
+GROUP BY user_id;</code></pre>
+
+        <p>You can now query any database!</p>
+    </article>
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+    </footer>
+</body>
+</html>

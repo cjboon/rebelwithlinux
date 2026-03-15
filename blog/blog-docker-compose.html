@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Compose - Rebel With Linux</title>
+    <meta name="description" content="Learn Docker Compose for multi-container apps.">
+    <meta name="author" content="cjboon">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../fonts.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-docker-compose.html" />
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--charcoal); padding-bottom: 8px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title">REBEL WITH LINUX</a>
+        </div>
+    </nav>
+    <div class="blog-header">
+        <h1>Docker Compose</h1>
+        <p>March 2026 • DevOps • 15 min read</p>
+    </div>
+    <article class="blog-content">
+        <p>Running one container is easy. Running a dozen that need to talk to each other? That's where Docker Compose shines.</p>
+
+        <h2>What is Docker Compose?</h2>
+        <p>Compose lets you define a multi-container application in a single YAML file. Then start everything with one command.</p>
+
+        <h2>Installing</h2>
+        <pre><code>sudo apt install docker-compose
+# or
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose</code></pre>
+
+        <h2>A Basic docker-compose.yml</h2>
+        <pre><code>version: '3.8'
+
+services:
+  web:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html</code></pre>
+
+        <h2>The Power: Multi-Container</h2>
+        <p>Here's a real WordPress setup:</p>
+        <pre><code>version: '3.8'
+
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp
+      MYSQL_PASSWORD: wppass
+    volumes:
+      - db_data:/var/lib/mysql
+
+  wordpress:
+    image: wordpress:latest
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wp
+      WORDPRESS_DB_PASSWORD: wppass
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - ./wp-content:/var/www/html/wp-content
+
+volumes:
+  db_data:</code></pre>
+
+        <h2>Key Commands</h2>
+        <pre><code># Start everything
+docker-compose up -d
+
+# Stop everything
+docker-compose down
+
+# View logs
+docker-compose logs -f
+
+# Rebuild (after changes)
+docker-compose up -d --build
+
+# Scale a service
+docker-compose up -d --scale web=3</code></pre>
+
+        <h2>Why This Matters</h2>
+        <ul>
+            <li>One command to start your entire stack</li>
+            <li>Services can talk to each other by name</li>
+            <li>Environment variables make it portable</li>
+            <li>Version control your infrastructure</li>
+        </ul>
+
+        <p>Your dev environment becomes reproducible. New developer joins? They run <code>docker-compose up</code> and have a working system in minutes.</p>
+    </article>
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+    </footer>
+</body>
+</html>

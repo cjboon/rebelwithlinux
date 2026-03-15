@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Grid & Flexbox - Rebel With Linux</title>
+    <meta name="description" content="Master CSS layouts with Grid and Flexbox.">
+    <meta name="author" content="cjboon">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../fonts.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-css.html" />
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--charcoal); padding-bottom: 8px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title">REBEL WITH LINUX</a>
+        </div>
+    </nav>
+    <div class="blog-header">
+        <h1>CSS Grid & Flexbox</h1>
+        <p>March 2026 • CSS • 15 min read</p>
+    </div>
+    <article class="blog-content">
+        <p>Two layout systems rule modern CSS: Flexbox and Grid. Use Flexbox for one-dimensional layouts (row OR column). Use Grid for two-dimensional layouts (rows AND columns).</p>
+
+        <h2>Flexbox: One Dimension</h2>
+        <p>Perfect for navigation bars, centering content, distributing space.</p>
+        <pre><code>.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}</code></pre>
+
+        <h3>Key Properties</h3>
+        <ul>
+            <li><strong>justify-content</strong> - main axis (horizontal)</li>
+            <li><strong>align-items</strong> - cross axis (vertical)</li>
+            <li><strong>flex-direction</strong> - row or column</li>
+            <li><strong>flex-wrap</strong> - wrap items to new line</li>
+        </ul>
+
+        <h3>Common Values</h3>
+        <pre><code>justify-content: flex-start | flex-end | center | space-between | space-around
+align-items: flex-start | flex-end | center | stretch</code></pre>
+
+        <h2>Grid: Two Dimensions</h2>
+        <p>Perfect for page layouts, galleries, dashboards.</p>
+        <pre><code>.container {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 20px;
+}</code></pre>
+
+        <h3>Key Properties</h3>
+        <ul>
+            <li><strong>grid-template-columns</strong> - column widths</li>
+            <li><strong>grid-template-rows</strong> - row heights</li>
+            <li><strong>gap</strong> - space between items</li>
+            <li><strong>grid-column</strong> - span columns</li>
+            <li><strong>grid-row</strong> - span rows</li>
+        </ul>
+
+        <h3>fr Unit</h3>
+        <p><code>1fr</code> means "one fraction" of available space.</p>
+        <pre><code>/* Three equal columns */
+grid-template-columns: 1fr 1fr 1fr;
+
+/* Sidebar + main content */
+grid-template-columns: 300px 1fr;</code></pre>
+
+        <h2>Responsive Grid</h2>
+        <pre><code>.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+}</code></pre>
+        <p>This creates responsive columns that auto-wrap! No media queries needed.</p>
+
+        <h2>Centering: The Old Way vs Flexbox</h2>
+        <pre><code>/* The easy way */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}</code></pre>
+
+        <h2>Grid Areas: Name Your Layout</h2>
+        <pre><code>.container {
+    display: grid;
+    grid-template-areas:
+        "header header header"
+        "sidebar main main"
+        "footer footer footer";
+    grid-template-rows: auto 1fr auto;
+}
+
+.header { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.main { grid-area: main; }
+.footer { grid-area: footer; }</code></pre>
+
+        <p>Use these together. Grid for page structure, Flexbox for component internals.</p>
+    </article>
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+    </footer>
+</body>
+</html>

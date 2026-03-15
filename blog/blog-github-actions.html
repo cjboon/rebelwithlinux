@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Actions - Rebel With Linux</title>
+    <meta name="description" content="Automate your workflow with GitHub Actions.">
+    <meta name="author" content="cjboon">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../fonts.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-github-actions.html" />
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--charcoal); padding-bottom: 8px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title">REBEL WITH LINUX</a>
+        </div>
+    </nav>
+    <div class="blog-header">
+        <h1>GitHub Actions</h1>
+        <p>March 2026 • DevOps • 15 min read</p>
+    </div>
+    <article class="blog-content">
+        <p>Push code. Tests run. Deploy happens. No manual work. That's CI/CD with GitHub Actions.</p>
+
+        <h2>What is CI/CD?</h2>
+        <ul>
+            <li><strong>CI</strong> (Continuous Integration) - Automatically test your code on every push</li>
+            <li><strong>CD</strong> (Continuous Deployment) - Automatically deploy when tests pass</li>
+        </ul>
+
+        <h2>Your First Workflow</h2>
+        <p>Create <code>.github/workflows/test.yml</code> in your repo:</p>
+        <pre><code>name: Run Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm test</code></pre>
+
+        <h2>How It Works</h2>
+        <ul>
+            <li><strong>on</strong> - When to trigger (push, PR, schedule)</li>
+            <li><strong>jobs</strong> - What to run</li>
+            <li><strong>steps</strong> - Individual actions</li>
+            <li><strong>runs-on</strong> - Which machine</li>
+        </ul>
+
+        <h2>Deploy on Success</h2>
+        <pre><code>jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # ... run tests ...
+      
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to server
+        run: |
+          echo "Deploying to production..."
+          # Add your deploy commands</code></pre>
+        <p><code>needs: test</code> means "only run after test job succeeds".</p>
+
+        <h2>Common Use Cases</h2>
+        <ul>
+            <li>Run test suites automatically</li>
+            <li>Lint code (check style)</li>
+            <li>Build Docker images</li>
+            <li>Deploy to cloud servers</li>
+            <li>Send notifications (Slack, Discord)</li>
+            <li>Schedule nightly builds</li>
+        </ul>
+
+        <h2>Matrix Testing</h2>
+        <p>Test against multiple versions simultaneously:</p>
+        <pre><code>jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [16, 18, 20, 22]
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test</code></pre>
+
+        <p>Now your code is tested on Node 16, 18, 20, and 22 in parallel.</p>
+    </article>
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+    </footer>
+</body>
+</html>
