@@ -98,11 +98,8 @@ except:
     location = os.environ.get('DEFAULT_LOCATION', 'Unknown')
 
 # Read current values from HTML and replace with new values
-# Replace Location in Stats section (line 1562: <div><strong>Location</strong><br>Ogden, Utah</div>)
-content = re.sub(r'(<div><strong>Location</strong><br>)[^<]+(</div>)', f'\g<1>{location}\g<2>', content, 1)
-
-# Replace Location in script tag (line 1629: <script>Ogden, Utah</script>)
-content = re.sub(r'(<script>)[^<]+(</script>)', f'\g<1>{location}\g<2>', content, 1)
+# Replace Location in Stats section
+content = re.sub(r'(<div><strong>Location</strong><br>)[^<]+(</div>)', r'\1' + location + r'\2', content)
 
 uptime_match = re.search(r'>([^<]+uptime[^<]*)<', content, re.IGNORECASE)
 if uptime_match:
