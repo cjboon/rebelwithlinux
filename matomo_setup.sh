@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# === CONFIG ===
+SITE_NAME="rebelwithlinux.com"
+WEB_ROOT="/var/www/${SITE_NAME}"
+MATOMO_DIR="/var/www/matomo"
+# === END CONFIG ===
+
 set -e
 
 RED='\033[0;31m'
@@ -87,83 +93,48 @@ echo ""
 
 # Download Matomo
 print_header "Downloading Matomo"
-if [ -d "/var/www/matomo" ]; then
-    print_warning "Matomo already exists at /var/www/matomo"
+if [ -d "$MATOMO_DIR" ]; then
+    print_warning "Matomo already exists at $MATOMO_DIR"
     if ! confirm "Overwrite existing installation?"; then
         print_info "Skipping download."
     else
-        rm -rf /var/www/matomo
-        cd /var/www
+        rm -rf "$MATOMO_DIR"
+        cd "$(dirname "$MATOMO_DIR")"
         curl -L -o matomo.tar.gz "https://builds.matomo.org/matomo.tar.gz"
         tar -xzf matomo.tar.gz
         rm matomo.tar.gz
         print_success "Matomo downloaded."
     fi
 else
-    cd /var/www
-    curl -L -o matomo.tar.gz "https://builds.matomo.org/matomo.tar.gz"
-    tar -xzf matomo.tar.gz
-    rm matomo.tar.gz
-    print_success "Matomo downloaded."
-fi
+    cd "$(dirname "$MATOMO_DIR")"
 
-# Create database
-print_header "Setting up Database"
-mysql -u root <<EOF || print_warning "Database may already exist."
-CREATE DATABASE IF NOT EXISTS ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
-GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
-FLUSH PRIVILEGES;
-EOF
-print_success "Database '${DB_NAME}' created for user '${DB_USER}'."
+    chown -R www-data:www-data "$MATOMO_DIR"
+    chmod -R 755 "$MATOMO_DIR"
 
-# Set permissions
-print_header "Setting Permissions"
-chown -R www-data:www-data /var/www/matomo
-chmod -R 755 /var/www/matomo
-print_success "Permissions set."
+    cat > /etc/apache2/sites-available/matomo.conf <<EOF
+    <VirtualHost *:80>
+        ServerName analytics.${SITE_NAME}
+        DocumentRoot $MATOMO_DIR
 
-# Configure Apache
-print_header "Configuring Apache"
-cat > /etc/apache2/sites-available/${MATOMO_DOMAIN}.conf <<EOF
-<VirtualHost *:80>
-    ServerName ${MATOMO_DOMAIN}
-    DocumentRoot /var/www/matomo
+        <Directory $MATOMO_DIR>
+            DirectoryIndex index.php
+            Options -Indexes +FollowSymLinks
+            AllowOverride All
+            Require all granted
+        </Directory>
 
-    <Directory /var/www/matomo>
-        Options FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    <Directory /var/www/matomo/tmp>
-        Require all denied
-    </Directory>
-
-    <Directory /var/www/matomo/config>
-        Require all denied
-    </Directory>
-</VirtualHost>
+        <Directory $MATOMO_DIR/tmp>
+            Require all denied
+        </Directory>
+        <Directory $MATOMO_DIR/config>
+            Require all denied
+        </Directory>
+    </VirtualHost>
 EOF
 
-a2ensite ${MATOMO_DOMAIN}.conf
-print_success "Apache site enabled."
-
-# Get SSL certificate
-print_header "Getting SSL Certificate"
-if confirm "Get free SSL certificate from Let's Encrypt?"; then
-    certbot --apache -d ${MATOMO_DOMAIN} --non-interactive --agree-tos --email admin@${MATOMO_DOMAIN} --redirect
-    print_success "SSL certificate installed."
-else
-    print_warning "Skipping SSL. You'll need to configure it manually."
-    systemctl reload apache2
-fi
-
-# Force SSL in Matomo config
-print_header "Configuring Matomo Security"
-if [ -f /var/www/matomo/config/config.ini.php ]; then
-    if ! grep -q "force_ssl" /var/www/matomo/config/config.ini.php; then
-        sed -i '/^\[General\]/a force_ssl = 1' /var/www/matomo/config/config.ini.php
+    if [ -f "$MATOMO_DIR/config/config.ini.php" ]; then
+        if ! grep -q "force_ssl" "$MATOMO_DIR/config/config.ini.php"; then
+            sed -i '/^\[General\]/a force_ssl = 1' "$MATOMO_DIR/config/config.ini.php"
         print_success "Force SSL enabled in Matomo."
     else
         print_info "Force SSL already configured."
