@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-grafana.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Grafana: See Everything - REBEL WITH LINUX</title>
+    <meta name="description" content="Transform your metrics into beautiful dashboards. Grafana is the open-source observability platform that lets you visualize data from anywhere.">
+    <meta name="keywords" content="Grafana, dashboards, visualization, monitoring, metrics, Prometheus, time series, observability, Grafana Loki, Grafana Tempo">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Grafana: See Everything">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-grafana.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-grafana.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: var(--black); border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: var(--white); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 40px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content h4 { font-size: 1.05rem; margin: 20px 0 8px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .blog-content a { color: var(--black); }
+        .warning-box { background: #fff3cd; border: 2px solid #ffc107; padding: 16px; margin: 24px 0; border-radius: 4px; }
+        .tip-box { background: #d4edda; border: 2px solid #28a745; padding: 16px; margin: 24px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <header class="blog-header">
+        <h1>Grafana</h1>
+        <p>See everything. Understand everything.</p>
+    </header>
+
+    <nav class="blog-nav">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#blog">Blog</a>
+        <a href="../projects.html">Projects</a>
+    </nav>
+
+    <article class="blog-content">
+        <p>Data is useless if you can't understand it. Numbers in a spreadsheet don't tell a story. But a well-designed dashboard? That tells you everything at a glance.</p>
+        
+        <p>That's Grafana. It takes the metrics from your systems — servers, applications, databases, IoT devices, whatever — and turns them into dashboards that actually make sense. It's the tool you didn't know you needed until you have it.</p>
+        
+        <p>And here's the best part: it's free and open source. Run it yourself. Own your data. Visualize anything.</p>
+        
+        <h2>What Can Grafana Do?</h2>
+        
+        <p>Short answer: visualize time-series data. Long answer: pretty much anything involving metrics, logs, and traces.</p>
+        
+        <ul>
+            <li><strong>Infrastructure monitoring</strong> — CPU, memory, disk, network from all your servers</li>
+            <li><strong>Application metrics</strong> — Request rates, response times, error rates, custom app metrics</li>
+            <li><strong>Database queries</strong> — Visualize query performance, connections, cache hits</li>
+            <li><strong>IoT and sensors</strong> — Temperature, humidity, motion, anything with a reading</li>
+            <li><strong>Business metrics</strong> — Signups, revenue, user activity, whatever matters to you</li>
+            <li><strong>Logs</strong> — With Loki integration, search and visualize logs alongside metrics</li>
+            <li><strong>Distributed traces</strong> — With Tempo, see request flow through your system</li>
+        </ul>
+        
+        <p>Grafana connects to almost anything: Prometheus, InfluxDB, Elasticsearch, MySQL, PostgreSQL, Graphite, CloudWatch, Stackdriver, and dozens more.</p>
+        
+        <h2>Installing Grafana</h2>
+        
+        <p>Let's get Grafana running. I'll show a few options, starting with Docker because it's the easiest.</p>
+        
+        <h3>The Docker Way</h3>
+        
+        <pre><code>docker run -d \
+  --name grafana \
+  -p 3000:3000 \
+  -v grafana_data:/var/lib/grafana \
+  grafana/grafana:latest</code></pre>
+        
+        <p>Wait a moment, then visit <code>http://localhost:3000</code>. Default login is <code>admin</code> / <code>admin</code>. You'll be prompted to change your password.</p>
+        
+        <h3>Installing on a Server</h3>
+        
+        <p>For a permanent installation on Debian/Ubuntu:</p>
+        
+        <pre><code># Install dependencies
+sudo apt install -y apt-transport-https software-properties-common
+
+# Add Grafana repository
+sudo add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"
+wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+
+# Install Grafana
+sudo apt update
+sudo apt install grafana
+
+# Start and enable
+sudo systemctl start grafana-server
+sudo systemctl enable grafana-server</code></pre>
+        
+        <p>Grafana runs on port 3000 by default. Visit <code>http://your-server:3000</code>.</p>
+        
+        <div class="tip-box">
+            <strong>Pro tip:</strong> Run Grafana behind a reverse proxy (nginx or Apache) with HTTPS. Then use authentication providers (OAuth, LDAP) for team access.
+        </div>
+        
+        <h2>Your First Dashboard</h2>
+        
+        <p>Let's build something. I'll assume you're connecting to Prometheus — if you're using something else, the concepts are the same.</p>
+        
+        <h3>Step 1: Add a Data Source</h3>
+        
+        <ol>
+            <li>Click the gear icon (Configuration) in the sidebar</li>
+            <li>Select "Data Sources"</li>
+            <li>Click "Add data source"</li>
+            <li>Select "Prometheus"</li>
+            <li>Enter your Prometheus URL (e.g., <code>http://localhost:9090</code> for local)</li>
+            <li>Click "Save & Test"</li>
+        </ol>
+        
+        <h3>Step 2: Create a Dashboard</h3>
+        
+        <ol>
+            <li>Click the "+" icon in the sidebar</li>
+            <li>Select "Dashboard"</li>
+            <li>Click "Add new panel"</li>
+        </ol>
+        
+        <p>In the panel editor:</p>
+        
+        <ul>
+            <li>Enter a PromQL query, like <code>node_cpu_seconds_total{mode="idle"}</code></li>
+            <li>Choose "Time series" visualization</li>
+            <li>Set a title like "CPU Usage"</li>
+        </ul>
+        
+        <p>Click "Apply" in the top right. You've got a graph.</p>
+        
+        <h3>Step 3: Add More Panels</h3>
+        
+        <p>Click "Add panel" again. Try these queries:</p>
+        
+        <pre><code># Memory usage
+node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes
+
+# Disk usage
+100 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} * 100)
+
+# Network traffic
+rate(node_network_receive_bytes_total[5m])
+rate(node_network_transmit_bytes_total[5m])
+
+# Request rate (if you have a web server)
+rate(http_requests_total[5m])</code></pre>
+        
+        <p>Arrange panels in a grid. Add titles. Configure units (bytes, seconds, percentages). This is your dashboard now.</p>
+        
+        <h3>Step 4: Save</h3>
+        
+        <p>Click the save icon (or press Ctrl+S). Give your dashboard a name. Now it's saved and you can access it from the sidebar.</p>
+        
+        <h2>Visualization Types</h2>
+        
+        <p>Grafana has more visualization options than you can shake a stick at. Here's when to use each:</p>
+        
+        <ul>
+            <li><strong>Time series</strong> — The default. Lines, areas, points over time.</li>
+            <li><strong>Stat</strong> — Single big number. "Total requests" or "Current temperature".</li>
+            <li><strong>Gauge</strong> — A gauge showing current value within a range.</li>
+            <li><strong>Bar chart</strong> — Compare values across categories.</li>
+            <li><strong>Heatmap</strong> — See density of values over time.</li>
+            <li><strong>Table</strong> — Tabular data. Good for sorted lists.</li>
+            <li><strong>Log panel</strong> — With Loki, show and search logs.</li>
+            <li><strong>Node graph</strong> — Visualize service connections (with Tempo).</li>
+            <li><strong>Geomap</strong> — Geographic visualizations.</li>
+            <li><strong>State timeline</strong> — State changes over time.</li>
+        </ul>
+        
+        <p>Don't overcomplicate. Usually, a time series and some stat panels tell the story best.</p>
+        
+        <h2>Variables: Dynamic Dashboards</h2>
+        
+        <p>One of Grafana's most powerful features is variables. A variable lets users select values (like a server name or service) and the whole dashboard updates.</p>
+        
+        <p>To add a variable:</p>
+        
+        <ol>
+            <li>Go to Dashboard Settings (the gear icon when viewing a dashboard)</li>
+            <li>Click "Variables"</li>
+            <li>Click "Add variable"</li>
+        </ol>
+        
+        <p>Configure it like this:</p>
+        
+        <ul>
+            <li>Name: <code>server</code></li>
+            <li>Type: <strong>Query</strong></label>
+            <li>Data source: <strong>Prometheus</strong></li>
+            <li>Query: <code>label_names(node_cpu_seconds_total)</code></li>
+        </ul>
+        
+        <p>Now in your panel queries, use <code>$server</code> instead of hardcoding values:</p>
+        
+        <pre><code>node_cpu_seconds_total{instance="$server", mode="idle"}</code></pre>
+        
+        <p>Now users can select which server to view from a dropdown. One dashboard, multiple servers.</p>
+        
+        <div class="tip-box">
+            <strong>Pro tip:</strong> Use variables to create "drill-down" dashboards. Select an application, see its metrics. Select a region, see regional stats. Make one dashboard work for everything.
+        </div>
+        
+        <h2>Alerts: Know Before Things Break</h2>
+        
+        <p>Grafana isn't just for looking at pretty graphs. It can alert you when things go wrong.</p>
+        
+        <h3>Setting Up Alerts</h3>
+        
+        <ol>
+            <li>Edit a panel</li>
+            <li>Click the "Alert" tab</li>
+            <li>Click "Create Alert"</li>
+            <li>Configure conditions</li>
+        </ol>
+        
+        <p>Example alert rule:</p>
+        
+        <ul>
+            <li><strong>Evaluate:</strong> every 1 minute</li>
+            <li><strong>FOR:</strong> 5 minutes</li>
+            <li><strong>Conditions:</strong> <code>avg() OF query(A, 1m, now) IS ABOVE 90</code></li>
+        </ul>
+        
+        <p>This fires when the metric stays above 90 for 5 minutes.</p>
+        
+        <h3>Notification Channels</h3>
+        
+        <p>Where should alerts go? Configure notification channels in Configuration → Notification Channels:</p>
+        
+        <ul>
+            <li><strong>Email</strong> — Simple, but often ends up in spam</li>
+            <li><strong>Slack</strong> — Great for team visibility</li>
+            <li><strong>PagerDuty</strong> — For serious incident management</li>
+            <li><strong>OpsGenie</strong> — Another PagerDuty alternative</li>
+            <li><strong>Webhook</strong> — Call anything else</li>
+            <li><strong>Telegram</strong> — Direct bot messages</li>
+        </ul>
+        
+        <p>Pro tip: Don't alert on everything. Alert fatigue is real. Only alert on things that genuinely need attention.</p>
+        
+        <h2>The Grafana Ecosystem</h2>
+        
+        <p>Grafana isn't just Grafana anymore. It's a whole suite of observability tools:</p>
+        
+        <h3>Prometheus</h3>
+        <p>The go-to metrics database. Scrapes targets, stores time series, powerful query language. If you're monitoring anything, start with Prometheus.</p>
+        
+        <h3>Loki</h3>
+        <p>Log aggregation done right. Unlike Elasticsearch, Loki indexes just the labels, not the full log content. It's cheaper and faster for most use cases. Integrates perfectly with Grafana — see logs right next to your metrics.</p>
+        
+        <h3>Tempo</h3>
+        <p>Distributed tracing. See how a request flows through your microservices. Click a trace in Grafana and see exactly where time was spent.</p>
+        
+        <h3>Mimir</h3>
+        <p>Long-term storage for Prometheus. If you need to keep metrics for months or years, Mimir scales horizontally and handles Petabytes of data.</p>
+        
+        <h3>OnCall</h3>
+        <p>Incident management. On-call schedules, escalation policies, automatic paging. Now Grafana does the whole observability stack.</p>
+        
+        <h2>Dashboards as Code</h2>
+        
+        <p>Clicking around in the UI is fine for learning, but for production, you want your dashboards in version control.</p>
+        
+        <h3>Export JSON</h3>
+        
+        <p>Every dashboard can be exported as JSON. Share it, commit it to Git, import it elsewhere.</p>
+        
+        <h3>Provisioning</h3>
+        
+        <p>Grafana can auto-provision dashboards from files. Put JSON files in <code>/etc/grafana/provisioning/dashboards/</code> (or the docker equivalent):</p>
+        
+        <pre><code># provisioning/dashboards/dashboards.yaml
+apiVersion: 1
+
+providers:
+  - name: 'My Dashboards'
+    folder: 'Ops'
+    type: file
+    options:
+      path: /etc/grafana/provisioning/dashboards</code></pre>
+        
+        <p>Now your dashboards are infrastructure as code. Review changes in pull requests. Roll back if something breaks.</p>
+        
+        <h3>Grafonnet</h3>
+        
+        <p>For ultimate control, use Grafonnet — a Jsonnet library for generating Grafana dashboards. Write code that produces dashboards. Templates, loops, abstractions. It's like Terraform for dashboards.</p>
+        
+        <h2>Real-World Dashboard Ideas</h2>
+        
+        <p>Need inspiration? Here are dashboards I build on every project:</p>
+        
+        <h3>System Overview</h3>
+        <ul>
+            <li>CPU usage (per core)</li>
+            <li>Memory usage</li>
+            <li>Disk I/O and usage</li>
+            <li>Network in/out</li>
+            <li>Load average</li>
+        </ul>
+        
+        <h3>Application Health</h3>
+        <ul>
+            <li>Request rate (RPM/RPS)</li>
+            <li>Response time (p50, p95, p99)</li>
+            <li>Error rate</li>
+            <li>Active connections</li>
+            <li>Queue depth</li>
+        </ul>
+        
+        <h3>Business Metrics</h3>
+        <ul>
+            <li>User signups</li>
+            <li>Active users</li>
+            <li>Revenue (if applicable)</li>
+            <li>API usage</li>
+            <li>Feature adoption</li>
+        </ul>
+        
+        <h3>Database</h3>
+        <ul>
+            <li>Query rate</li>
+            <li>Slow queries</li>
+            <li>Connections</li>
+            <li>Cache hit rate</li>
+            <li>Replication lag</li>
+        </ul>
+        
+        <h2>Styling and Theming</h>
+        
+        <p>Grafana dashboards can be beautiful. Or they can be information-dense and ugly. Your choice.</p>
+        
+        <p>Tips for better dashboards:</p>
+        
+        <ul>
+            <li><strong>Consistent colors</strong> — Use the same color for CPU across all dashboards</li>
+            <li><strong>Units matter</strong> — Don't show "1234567890 bytes", show "1.23 GB"</li>
+            <li><strong>Legend placement</strong> — Right or bottom, avoid covering data</li>
+            <li><strong>Time ranges</strong> — Default to reasonable ranges (1h, 6h, 24h)</li>
+            <li><strong>Dark mode</strong> — Easier on eyes in ops rooms</li>
+            <li><strong>Annotations</strong> — Mark deployments, incidents on the graph</li>
+        </ul>
+        
+        <h2>Wrapping Up</h2>
+        
+        <p>Grafana transforms your understanding of systems. What was once abstract numbers becomes clear patterns. What was once "something seems slow" becomes "this endpoint is 200ms slower than yesterday."</p>
+        
+        <p>Start simple. One server, basic metrics. Then add more. Add alerts. Add logs. Add traces. Before you know it, you've got full observability.</p>
+        
+        <p>And it all runs on your infrastructure. Your data. Your dashboards.</p>
+        
+        <p>That's the way it should be.</p>
+        
+        <p><strong>The revolution will not be proprietary.</strong></p>
+    </article>
+
+    <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+        <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+        <div id="comments-list" style="margin-bottom: 32px;"></div>
+        <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+            <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+            <div style="display: grid; gap: 16px;">
+                <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                <button onclick="submitComment('blog-grafana')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+            </div>
+        </div>
+    </section>
+    <script src="../comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-grafana');
+        });
+    </script>
+</body>
+</html>

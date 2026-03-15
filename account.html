@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/account.html" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -48,12 +49,12 @@
                 </a>
                 <div class="nav-links" id="navLinks">
                     <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
-                    <a href="index.html">HOME</a>
+                    <a href="index.html#games">GAMES</a>
                     <a href="index.html#guides">GUIDES</a>
-                    <a href="index.html#projects">PROJECTS</a>
                     <a href="index.html#blog">BLOG</a>
-                    <a href="index.html#contact">CONTACT</a>
-                    <a href="index.html" class="logout-btn" onclick="logout(); return false;" aria-label="Log out">LOGOUT</a>
+                    <a href="index.html#about">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
                 </div>
             </div>
         </div>
@@ -74,7 +75,7 @@
                 </div>
                 <div class="level-info">
                     <span class="level-title" id="levelTitle">Newbie</span>
-                    <span class="xp-total" id="xpTotal">0 XP</span>
+                    <span class="xp-total" id="xpTotal">0 total XP</span>
                 </div>
             </div>
         </div>
@@ -95,13 +96,14 @@
                     <div class="stat-label">Games Completed</div>
                 </div>
                 <div class="stat-card">
+                    <div class="stat-number" id="testsCompleted">0</div>
+                    <div class="stat-label">Tests Passed</div>
+                </div>
+                <div class="stat-card">
                     <div class="stat-number" id="achievementsCount">0</div>
                     <div class="stat-label">Achievements</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="totalXP">0</div>
-                    <div class="stat-label">Total XP</div>
-                </div>
+            </div>
             </div>
         </section>
 
@@ -142,6 +144,13 @@
             </div>
         </section>
 
+        <section class="tests-progress-section">
+            <h2>// Test Progress</h2>
+            <div class="tests-list" id="testsList">
+                <!-- Tests will be populated by JavaScript -->
+            </div>
+        </section>
+
         <section class="games-progress-section">
             <h2>// Game Progress</h2>
             <div class="games-list" id="gamesList">
@@ -164,6 +173,7 @@
         let completedCourses = [];
         let completedProjects = [];
         let completedGames = [];
+        let completedTests = [];
 
         // Guide and project definitions
         const GUIDES = [
@@ -239,7 +249,42 @@
             { id: 'python-builder-3', name: 'Python Builder 3', file: 'builders/builder-python-3.html', icon: '🐍' },
             { id: 'command-builder', name: 'Command Builder', file: 'builders/builder-command.html', icon: '⌨️' },
             { id: 'command-builder-2', name: 'Command Builder 2', file: 'builders/builder-command-2.html', icon: '⌨️' },
-            { id: 'command-builder-3', name: 'Command Builder 3', file: 'builders/builder-command-3.html', icon: '⌨️' }
+            { id: 'command-builder-3', name: 'Command Builder 3', file: 'builders/builder-command-3.html', icon: '⌨️' },
+            { id: 'hangman-linux', name: 'Hangman Linux', file: 'hangman/hangman-linux.html', icon: '🎯' },
+            { id: 'hangman-html', name: 'Hangman HTML', file: 'hangman/hangman-html.html', icon: '🎯' },
+            { id: 'hangman-python', name: 'Hangman Python', file: 'hangman/hangman-python.html', icon: '🎯' },
+            { id: 'hangman-nginx', name: 'Hangman Nginx', file: 'hangman/hangman-nginx.html', icon: '🎯' },
+            { id: 'hangman-ansible', name: 'Hangman Ansible', file: 'hangman/hangman-ansible.html', icon: '🎯' },
+            { id: 'hangman-network', name: 'Hangman Network', file: 'hangman/hangman-network.html', icon: '🎯' },
+            { id: 'hangman-vault', name: 'Hangman Vault', file: 'hangman/hangman-vault.html', icon: '🎯' },
+            { id: 'hangman-terraform', name: 'Hangman Terraform', file: 'hangman/hangman-terraform.html', icon: '🎯' },
+            { id: 'hangman-prometheus', name: 'Hangman Prometheus', file: 'hangman/hangman-prometheus.html', icon: '🎯' },
+            { id: 'hangman-cicd', name: 'Hangman CI/CD', file: 'hangman/hangman-cicd.html', icon: '🎯' }
+        ];
+
+        const TESTS = [
+            { id: 'test-linux', name: 'Linux Test', file: 'tests/test-linux.html', icon: '🧪' },
+            { id: 'test-bash', name: 'Bash Test', file: 'tests/test-bash.html', icon: '🧪' },
+            { id: 'test-vim', name: 'Vim Test', file: 'tests/test-vim.html', icon: '🧪' },
+            { id: 'test-html', name: 'HTML Test', file: 'tests/test-html.html', icon: '🧪' },
+            { id: 'test-css', name: 'CSS Test', file: 'tests/test-css.html', icon: '🧪' },
+            { id: 'test-javascript', name: 'JavaScript Test', file: 'tests/test-javascript.html', icon: '🧪' },
+            { id: 'test-python', name: 'Python Test', file: 'tests/test-python.html', icon: '🧪' },
+            { id: 'test-php', name: 'PHP Test', file: 'tests/test-php.html', icon: '🧪' },
+            { id: 'test-sql', name: 'SQL Test', file: 'tests/test-sql.html', icon: '🧪' },
+            { id: 'test-git', name: 'Git Test', file: 'tests/test-git.html', icon: '🧪' },
+            { id: 'test-docker', name: 'Docker Test', file: 'tests/test-docker.html', icon: '🧪' },
+            { id: 'test-kubernetes', name: 'Kubernetes Test', file: 'tests/test-kubernetes.html', icon: '🧪' },
+            { id: 'test-nginx', name: 'Nginx Test', file: 'tests/test-nginx.html', icon: '🧪' },
+            { id: 'test-apache', name: 'Apache Test', file: 'tests/test-apache.html', icon: '🧪' },
+            { id: 'test-networking', name: 'Networking Test', file: 'tests/test-networking.html', icon: '🧪' },
+            { id: 'test-security', name: 'Security Test', file: 'tests/test-security.html', icon: '🧪' },
+            { id: 'test-vps', name: 'VPS Test', file: 'tests/test-vps.html', icon: '🧪' },
+            { id: 'test-terraform', name: 'Terraform Test', file: 'tests/test-terraform.html', icon: '🧪' },
+            { id: 'test-ansible', name: 'Ansible Test', file: 'tests/test-ansible.html', icon: '🧪' },
+            { id: 'test-aws', name: 'AWS Test', file: 'tests/test-aws.html', icon: '🧪' },
+            { id: 'test-monitoring', name: 'Monitoring Test', file: 'tests/test-monitoring.html', icon: '🧪' },
+            { id: 'test-cicd', name: 'CI/CD Test', file: 'tests/test-cicd.html', icon: '🧪' }
         ];
 
         // Check authentication on page load
@@ -294,8 +339,7 @@
             document.getElementById('levelCircle').className = `level-circle level-${level.level}`;
             document.getElementById('levelNumber').textContent = level.level;
             document.getElementById('levelTitle').textContent = level.title;
-            document.getElementById('xpTotal').textContent = `${userAchievements.xp} XP`;
-            document.getElementById('totalXP').textContent = userAchievements.xp;
+            document.getElementById('xpTotal').textContent = `${userAchievements.xp} total XP`;
             
             document.getElementById('currentLevel').textContent = `Level ${level.level} - ${level.title}`;
             if (nextLevel) {
@@ -316,11 +360,13 @@
             completedCourses = [];
             completedProjects = [];
             completedGames = [];
+            completedTests = [];
             
             // Show loading state
             document.getElementById('guidesList').innerHTML = '<div class="progress-row"><div class="progress-name">Loading progress...</div></div>';
             document.getElementById('projectsList').innerHTML = '<div class="progress-row"><div class="progress-name">Loading progress...</div></div>';
             document.getElementById('gamesList').innerHTML = '<div class="progress-row"><div class="progress-name">Loading progress...</div></div>';
+            document.getElementById('testsList').innerHTML = '<div class="progress-row"><div class="progress-name">Loading progress...</div></div>';
             
             // Load guide progress
             for (const guide of GUIDES) {
@@ -367,22 +413,39 @@
                 }
             }
             
+            // Load test progress
+            for (const test of TESTS) {
+                try {
+                    const response = await fetch(`api/progress.php?course=${test.id}`, { credentials: 'include' });
+                    const progress = await response.json();
+                    console.log(`Test ${test.id} progress:`, progress);
+                    if (progress.length > 0 && progress.some(p => p.completed == 1 || p.completed === true || p.completed === "1")) {
+                        completedTests.push(test);
+                    }
+                } catch (e) {
+                    console.error('Could not load progress for', test.id, e);
+                }
+            }
+            
             console.log('Completed courses:', completedCourses);
             console.log('Completed projects:', completedProjects);
             console.log('Completed games:', completedGames);
+            console.log('Completed tests:', completedTests);
             
             // Update stats
             document.getElementById('guidesCompleted').textContent = completedCourses.length;
             document.getElementById('projectsCompleted').textContent = completedProjects.length;
             document.getElementById('gamesCompleted').textContent = completedGames.length;
+            document.getElementById('testsCompleted').textContent = completedTests.length;
             
             // Update progress lists
             renderGuidesList();
             renderProjectsList();
             renderGamesList();
+            renderTestsList();
             
             // Check achievements based on completed items
-            checkAchievements([...completedCourses.map(c => c.file), ...completedProjects.map(p => p.file), ...completedGames.map(g => g.file)]);
+            checkAchievements([...completedCourses.map(c => c.file), ...completedProjects.map(p => p.file), ...completedGames.map(g => g.file), ...completedTests.map(t => t.file)]);
             updateLevelUI();
         }
 
@@ -441,6 +504,26 @@
                         ${isCompleted ? '✓ Completed' : '○ In Progress'}
                     </div>
                     <a href="${game.file}" class="progress-link">Play →</a>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function renderTestsList() {
+            const container = document.getElementById('testsList');
+            container.innerHTML = '';
+            
+            TESTS.forEach(test => {
+                const isCompleted = completedTests.some(t => t.id === test.id);
+                const row = document.createElement('div');
+                row.className = `progress-row ${isCompleted ? 'completed' : ''}`;
+                row.innerHTML = `
+                    <div class="progress-icon">${test.icon}</div>
+                    <div class="progress-name">${test.name}</div>
+                    <div class="progress-status">
+                        ${isCompleted ? '✓ Passed' : '○ Not Taken'}
+                    </div>
+                    <a href="${test.file}" class="progress-link">Take Test →</a>
                 `;
                 container.appendChild(row);
             });

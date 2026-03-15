@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-wireguard.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Build Your Own VPN with WireGuard - REBEL WITH LINUX</title>
+    <meta name="description" content="Stop paying for VPNs. Learn to set up your own WireGuard VPN to secure your traffic on public WiFi and access your home network from anywhere.">
+    <meta name="keywords" content="VPN, WireGuard, privacy, security, self-hosted, networking">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Build Your Own VPN with WireGuard">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-wireguard.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-wireguard.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: var(--black); border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: var(--white); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 40px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content h4 { font-size: 1.05rem; margin: 20px 0 8px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .blog-content a { color: var(--black); }
+        .blog-content .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px; margin: 20px 0; }
+        .blog-content .info { background: #e7f3ff; border-left: 4px solid #2196F3; padding: 16px; margin: 20px 0; }
+        .blog-content .success { background: #d4edda; border-left: 4px solid #28a745; padding: 16px; margin: 20px 0; }
+        .toc { background: var(--light-gray); padding: 20px; border-radius: 4px; margin: 20px 0; }
+        .toc ul { margin: 0; padding-left: 20px; }
+        .toc li { margin-bottom: 4px; }
+        .toc a { text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="blog-header">
+        <h1>Build Your Own VPN with WireGuard</h1>
+        <p>March 14, 2026 • Networking • 15 min read</p>
+    </div>
+    
+    <nav class="blog-nav">
+        <a href="../index.html">← Home</a>
+        <a href="../index.html#blog">All Posts</a>
+    </nav>
+
+    <article class="blog-content">
+        <p>You're on a coffee shop WiFi. The kind with no password. Anyone else on this network can see what you're doing—your emails, your passwords, everything. It's terrifying if you think about it. And you should think about it.</p>
+        
+        <p>So you use a VPN. Great. Except now you're trusting some company you've never met to route all your traffic through their servers. They're collecting data. They're selling data. They're probably logging everything. You're paying $70/year to be tracked by a different company.</p>
+        
+        <p>Here's an alternative: build your own VPN. It costs nothing but time. You control it completely. Nobody's selling your data because there's nobody else involved. It's just you and your server.</p>
+        
+        <p>This guide is about WireGuard. It's the VPN protocol I use. It's fast, simple, and modern. It's built into Linux. It's what the cool kids use.</p>
+
+        <h2 id="toc">What We'll Cover</h2>
+        <div class="toc">
+            <ul>
+                <li><a href="#why">Why WireGuard?</a></li>
+                <li><a href="#how">How WireGuard Works</a></li>
+                <li><a href="#server">Setting Up the Server</a></li>
+                <li><a href="#client">Connecting a Client</a></li>
+                <li><a href="#usecases">Practical Use Cases</a></li>
+                <li><a href="#persistence">Persistent Configuration</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+            </ul>
+        </div>
+
+        <h2 id="why">Why WireGuard?</h2>
+        
+        <p>WireGuard is a VPN protocol—it's the method your computer uses to create an encrypted tunnel to another computer. Here's why it's better than what most people use:</p>
+        
+        <ul>
+            <li><strong>It's fast</strong> – WireGuard is dramatically faster than OpenVPN. Like, 3-4x faster. Your internet feels almost normal.</li>
+            <li><strong>It's simple</strong> – OpenVPN configuration files are hundreds of lines. WireGuard is like 20 lines. There's less that can go wrong.</li>
+            <li><strong>It's modern</strong> – Built in 2019, using modern cryptography (Curve25519, ChaCha20, Poly1305). It doesn't use outdated stuff.</li>
+            <li><strong>It's in the kernel</strong> – WireGuard is built into Linux. That means it's stable, fast, and always there.</li>
+            <li><strong>It's free and open source</strong> – No subscriptions, no companies, no proprietary nonsense.</li>
+        </ul>
+        
+        <p>Compare this to the big VPN companies pushing their apps on YouTube. They use OpenVPN or their own protocols. They're collecting data. They're logging. They cost $70+/year.</p>
+        
+        <p>WireGuard is the VPN equivalent of self-hosting your email. It's the right thing to do.</p>
+
+        <h2 id="how">How WireGuard Works</h2>
+        
+        <p>Before we set it up, let's talk about how this actually works. You don't need to understand the cryptography, but understanding the architecture helps when things don't work.</p>
+        
+        <p>WireGuard connects devices. One device is the <strong>server</strong>—this is the computer that stays online, probably at your house or on a VPS. The other devices are <strong>clients</strong>—your laptop, phone, tablet.</p>
+        
+        <p>When you connect, your client creates an encrypted tunnel to the server. All your internet traffic goes through this tunnel to the server, then out to the internet. To the websites you visit, it looks like the server is making the request—not you.</p>
+        
+        <p>This gives you two things:</p>
+        
+        <ol>
+            <li><strong>Privacy on public WiFi</strong> – Everyone on the coffee shop network can only see encrypted WireGuard traffic going to your server. They can't see what you're doing.</li>
+            <li><strong>Access to your home network</strong> – You can reach your home computers, NAS, smart home devices—anything on your home network—from anywhere.</li>
+        </ol>
+        
+        <div class="info">
+            <strong>Two scenarios:</strong> If your server is at home and you're away, your traffic goes through your home connection (slower but you get home network access). If your server is a VPS somewhere else, you're just routing your traffic through that server (faster, but no home network access).
+        </div>
+
+        <h2 id="server">Setting Up the Server</h2>
+        
+        <p>We'll set up a WireGuard server on your Linux machine. This could be:</p>
+        <ul>
+            <li>A Raspberry Pi at home</li>
+            <li>A VPS somewhere (DigitalOcean, Hetzner, etc.)</li>
+            <li>An old computer you have running 24/7</li>
+        </ul>
+        
+        <p>For this guide, I'll assume it's a Debian/Ubuntu machine. If you're on something else, the package manager commands differ, but the config is the same.</p>
+        
+        <h3>Install WireGuard</h3>
+        
+        <pre><code>sudo apt update
+sudo apt install wireguard</code></pre>
+        
+        <p>That's it. WireGuard is installed. See? Simple.</p>
+        
+        <h3>Generate Keys</h3>
+        
+        <p>WireGuard uses cryptographic keys. You need a private key (keep secret) and a public key (share with clients). Generate them:</p>
+        
+        <pre><code>wg genkey | tee privatekey | wg pubkey > publickey</code></pre>
+        
+        <p>This creates two files: <code>privatekey</code> (your server's secret) and <code>publickey</code> (your server's public key). Keep <code>privatekey</code> safe—anyone who has it can impersonate your server.</p>
+        
+        <h3>Configure the Server</h3>
+        
+        <pre><code>sudo nano /etc/wireguard/wg0.conf</code></pre>
+        
+        <p>Paste in this configuration (I'll explain below):</p>
+        
+        <pre><code>[Interface]
+Address = 10.0.0.1/24
+ListenPort = 51820
+PrivateKey = &lt;YOUR-SERVER-PRIVATE-KEY&gt;
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
+# Client 1 (your laptop)
+[Peer]
+PublicKey = &lt;CLIENT-PUBLIC-KEY&gt;
+AllowedIPs = 10.0.0.2/32</code></pre>
+        
+        <p>Let's break this down:</p>
+        
+        <ul>
+            <li><strong>Address</strong> – The IP address your server uses on the VPN. Clients will get IPs in this range.</li>
+            <li><strong>ListenPort</strong> – The port WireGuard listens on. 51820 is the default.</li>
+            <li><strong>PrivateKey</strong> – Paste your server's private key here (from the file we created).</li>
+            <li><strong>PostUp/PostDown</strong> – These are firewall rules that run when the VPN starts/stops. They allow forwarding traffic through the VPN and NAT it out to the internet.</li>
+            <li><strong>[Peer]</strong> – This is a client that's allowed to connect. You'll add one of these for each device.</li>
+        </ul>
+        
+        <div class="warning">
+            <strong>Important:</strong> Replace <code>&lt;YOUR-SERVER-PRIVATE-KEY&gt;</code> with the actual key from your privatekey file. I'll show you how to add clients shortly.
+        </div>
+        
+        <h3>Start WireGuard</h3>
+        
+        <pre><code>sudo wg-quick up wg0
+sudo wg-quick enable wg0</code></pre>
+        
+        <p>The first command brings up the VPN. The second makes it start automatically on boot.</p>
+        
+        <p>Check if it's running:</p>
+        
+        <pre><code>sudo wg</code></pre>
+        
+        <p>You should see your interface listed. It's alive.</p>
+        
+        <h3>Firewall Rules</h3>
+        
+        <p>If you have UFW (you should), you need to allow the WireGuard port:</p>
+        
+        <pre><code>sudo ufw allow 51820/udp</code></pre>
+        
+        <p>If your server is behind a router (like at home), you'll also need to forward port 51820/UDP to your server's local IP. That's router-specific—check your router's documentation for port forwarding.</p>
+
+        <h2 id="client">Connecting a Client</h2>
+        
+        <p>Now we need to set up a client. This could be your laptop, phone, or another computer. Let's start with a Linux client, then I'll mention options for other devices.</p>
+        
+        <h3>Install on Client</h3>
+        
+        <pre><code>sudo apt install wireguard</code></pre>
+        
+        <h3>Generate Client Keys</h3>
+        
+        <pre><code>wg genkey | tee client-privatekey | wg pubkey > client-publickey</code></pre>
+        
+        <p>Save these keys somewhere safe. You'll need the public key on the server and the private key on this client.</p>
+        
+        <h3>Configure the Client</h3>
+        
+        <pre><code>sudo nano /etc/wireguard/wg0.conf</code></pre>
+        
+        <pre><code>[Interface]
+Address = 10.0.0.2/24
+PrivateKey = &lt;CLIENT-PRIVATE-KEY&gt;
+DNS = 1.1.1.1
+
+[Peer]
+PublicKey = &lt;SERVER-PUBLIC-KEY&gt;
+Endpoint = your-server-ip-or-domain:51820
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25</code></pre>
+        
+        <p>Replace the keys with your actual keys. For the endpoint, put your server's IP address or domain name.</p>
+        
+        <div class="info">
+            <strong>AllowedIPs explained:</strong> <code>0.0.0.0/0</code> means "route everything through the VPN." This is what you want when you're on public WiFi. If you only want to access your home network, you'd change this to something like <code>10.0.0.0/24</code>.
+        </div>
+        
+        <h3>Connect</h3>
+        
+        <pre><code>sudo wg-quick up wg0</code></pre>
+        
+        <p>Now test it:</p>
+        
+        <pre><code>curl ipinfo.io</code></pre>
+        
+        <p>It should show your server's IP address, not your client's. You're now routing all your traffic through your VPN.</p>
+        
+        <div class="warning">
+            <strong>Before you continue:</strong> You need to add this client's public key to the server's config! See below.
+        </div>
+        
+        <h3>Add Client to Server</h3>
+        
+        <p>The server doesn't know about this client yet. On the server, run:</p>
+        
+        <pre><code>sudo wg set wg0 peer &lt;CLIENT-PUBLIC-KEY&gt; allowed-ips 10.0.0.2/32</code></pre>
+        
+        <p>Replace with the actual public key from your client. This makes the server accept connections from this client.</p>
+        
+        <p>To make this permanent (so it survives server restarts), add the client to the server's config file:</p>
+        
+        <pre><code>sudo nano /etc/wireguard/wg0.conf</code></pre>
+        
+        <p>Add this under the [Peer] section:</p>
+        
+        <pre><code># Client laptop
+[Peer]
+PublicKey = &lt;CLIENT-PUBLIC-KEY&gt;
+AllowedIPs = 10.0.0.2/32</code></pre>
+
+        <h3>Non-Linux Clients</h3>
+        
+        <p>If you want to connect from Windows, macOS, iOS, or Android, WireGuard has official apps for all of them:</p>
+        
+        <ul>
+            <li><strong>Windows/macOS</strong> – Download from wireguard.com</li>
+            <li><strong>iOS</strong> – Search "WireGuard" in the App Store</li>
+            <li><strong>Android</strong> – Search in Play Store or get it from F-Droid</li>
+        </ul>
+        
+        <p>These apps have a QR code feature. On your Linux client, generate a QR code:</p>
+        
+        <pre><code>sudo wg showconf wg0</code></pre>
+        
+        <p>Or use the qrencode package to generate a scannable QR code:</p>
+        
+        <pre><code>sudo apt install qrencode
+qrencode -t ansiutf8 < /etc/wireguard/wg0.conf</code></pre>
+        
+        <p>Scan this with your phone's WireGuard app and it'll import the config automatically.</p>
+
+        <h2 id="usecases">Practical Use Cases</h2>
+        
+        <p>Here's why you'd actually use this in real life:</p>
+        
+        <h3>1. Secure Public WiFi</h3>
+        
+        <p>You're at a coffee shop, airport, hotel. Connect your phone/laptop to your WireGuard VPN first. Then do your banking, check your email, whatever. Your traffic is encrypted end-to-end. Nobody on that network can see anything.</p>
+        
+        <h3>2. Access Your Home Computers</h3>
+        
+        <p>You're traveling and need a file from your home server. Connect to your WireGuard VPN. Now you're on your home network. You can SSH into your Pi, access your NAS, whatever you could do if you were sitting at home.</p>
+        
+        <h3>3. Bypass Geographic Restrictions</h3>
+        
+        <p>Your VPS is in Germany. Connect to your WireGuard VPN. Now Netflix thinks you're in Germany. (Note: this may violate Netflix's terms of service. I'm not telling you to do this. Just saying it's possible.)</p>
+        
+        <h3>4. Tunnel Through Your VPS</h3>
+        
+        <p>You can use your VPS as the VPN server and route all your traffic through it. This is what commercial VPNs do—but you're the company now. You know your server isn't logging your traffic. You're the one in control.</p>
+
+        <h2 id="persistence">Persistent Configuration</h2>
+        
+        <p>WireGuard is designed to stay connected. Here's how to make it bulletproof:</p>
+        
+        <h3>On the server:</h3>
+        
+        <pre><code>sudo systemctl enable wg-quick@wg0</code></pre>
+        
+        <p>This makes WireGuard start automatically when the server boots.</p>
+        
+        <h3>On clients:</h3>
+        
+        <pre><code>sudo systemctl enable wg-quick@wg0</code></pre>
+        
+        <p>Same thing. The VPN will reconnect automatically if the connection drops.</p>
+        
+        <h3>PersistentKeepalive</h3>
+        
+        <p>Add <code>PersistentKeepalive = 25</code> to your client's [Peer] section. This sends a packet every 25 seconds to keep NAT/firewall mappings alive. Without this, some connections might drop after inactivity.</p>
+
+        <h2 id="troubleshooting">Troubleshooting</h2>
+        
+        <p>Things go wrong. Here's how to debug:</p>
+        
+        <h3>Check if WireGuard is running</h3>
+        
+        <pre><code>sudo wg</code></pre>
+        
+        <p>This shows all interfaces, peers, and transfer stats.</p>
+        
+        <h3>Check the logs</h3>
+        
+        <pre><code>journalctl -u wg-quick@wg0 -f</code></pre>
+        
+        <p>This shows what's happening in real-time. Look for error messages.</p>
+        
+        <h3>Can I reach the server?</h3>
+        
+        <p>If nothing works, first check basic connectivity:</p>
+        
+        <pre><code>ping 10.0.0.1</code></pre>
+        
+        <p>If this fails, the VPN isn't coming up properly. Check your config file for typos. Keys must be correct.</p>
+        
+        <h3>Is the port open?</h3>
+        
+        <pre><code>sudo ss -ulnp | grep 51820</code></pre>
+        
+        <p>This shows if WireGuard is listening on the right port. If nothing shows, it's not running.</p>
+        
+        <h3>Can the client reach the server?</h3>
+        
+        <p>From the client, test if the server's IP is reachable:</p>
+        
+        <pre><code>ping your-server-ip</code></pre>
+        
+        <p>If this fails but you can SSH to the server normally, there's a firewall issue. Check both the server's firewall and any router port forwarding.</p>
+
+        <h2>That's It</h2>
+        
+        <p>You now have your own VPN. It cost you nothing but time. There's no subscription. No company tracking you. Just an encrypted tunnel between your devices and your server.</p>
+        
+        <p>Add more clients by generating new keypairs and adding them to the server config. Your family, your friends—whoever you trust. This is what the internet should have been.</p>
+        
+        <p>WireGuard makes privacy accessible. It's not just for paranoids or geeks anymore. It's simple enough for anyone who can follow a tutorial. You just did.</p>
+        
+        <p>Go forth and encrypt.</p>
+        
+        <p><strong>The revolution will not be proprietary.</strong></p>
+    </article>
+
+    <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+        <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+        <div id="comments-list" style="margin-bottom: 32px;"></div>
+        <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+            <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+            <div style="display: grid; gap: 16px;">
+                <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                <button onclick="submitComment('blog-wireguard')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+            </div>
+        </div>
+    </section>
+    <script src="../comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-wireguard');
+        });
+    </script>
+</body>
+</html>

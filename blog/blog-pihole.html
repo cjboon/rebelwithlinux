@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-pihole.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Block Ads Everywhere with Pi-hole - REBEL WITH LINUX</title>
+    <meta name="description" content="The ad-blocking software that works at the network level. No browser extensions, no configuration - just clean internet for your entire home.">
+    <meta name="keywords" content="Pi-hole, ad blocking, network, privacy, DNS, self-hosted">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Block Ads Everywhere with Pi-hole">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-pihole.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-pihole.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: var(--black); border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: var(--white); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 40px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content h4 { font-size: 1.05rem; margin: 20px 0 8px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .blog-content a { color: var(--black); }
+        .blog-content .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px; margin: 20px 0; }
+        .blog-content .info { background: #e7f3ff; border-left: 4px solid #2196F3; padding: 16px; margin: 20px 0; }
+        .blog-content .success { background: #d4edda; border-left: 4px solid #28a745; padding: 16px; margin: 20px 0; }
+        .toc { background: var(--light-gray); padding: 20px; border-radius: 4px; margin: 20px 0; }
+        .toc ul { margin: 0; padding-left: 20px; }
+        .toc li { margin-bottom: 4px; }
+        .toc a { text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="blog-header">
+        <h1>Block Ads Everywhere with Pi-hole</h1>
+        <p>March 14, 2026 • Networking • 12 min read</p>
+    </div>
+    
+    <nav class="blog-nav">
+        <a href="../index.html">← Home</a>
+        <a href="../index.html#blog">All Posts</a>
+    </nav>
+
+    <article class="blog-content">
+        <p>You know what's exhausting about the modern internet? The ads. They're everywhere. Pop-ups, banner ads, video ads, sponsored posts, "recommended" content that's really just paid placements. Every website you visit is trying to sell you something, and they're willing to ruin your experience to do it.</p>
+        
+        <p>You've probably tried ad blockers. uBlock Origin in your browser works great for desktop. But what about your phone? Your smart TV? Your tablet? Your IoT devices that are constantly phoning home to advertise? Browser extensions only go so far.</p>
+        
+        <p>Enter Pi-hole. It's a DNS-level ad blocker. Instead of blocking ads in your browser, it blocks them at the network level. Every device on your network uses it. Every device gets ad-free. No browser extensions required. No configuration on each device. It's beautiful.</p>
+        
+        <p>Here's how it works: when your phone tries to load an ad from <code>ads.google.com</code>, Pi-hole says "nope, that doesn't exist." DNS is the phone book of the internet—it translates domain names to IP addresses. Pi-hole just refuses to look up the addresses of known ad servers.</p>
+
+        <h2 id="toc">What We'll Cover</h2>
+        <div class="toc">
+            <ul>
+                <li><a href="#what">What is Pi-hole?</a></li>
+                <li><a href="#why">Why Use It?</a></li>
+                <li><a href="#hardware">What Hardware Do You Need?</a></li>
+                <li><a href="#install">Installing Pi-hole</a></li>
+                <li><a href="#setup">Initial Setup</a></li>
+                <li><a href="#networksetup">Setting Up Your Network</a></li>
+                <li><a href="#blocklists">Blocklists and Filtering</a></li>
+                <li><a href="#whitelist">Whitelisting</a></li>
+                <li><a href="#remote">Remote Access</a></li>
+            </ul>
+        </div>
+
+        <h2 id="what">What is Pi-hole?</h2>
+        
+        <p>Pi-hole is open-source software that runs on a Linux machine—traditionally a Raspberry Pi, hence the name. It's a DNS server that blocks requests to known advertising and tracking domains.</p>
+        
+        <p>Think about how DNS works: when you type <code>youtube.com</code> into your browser, your computer asks a DNS server "what's the IP address for youtube.com?" The DNS server answers, and your browser loads the site.</p>
+        
+        <p>Pi-hole sits in the middle of this process. When your computer asks about <code>doubleclick.net</code> (Google's ad network), Pi-hole says "I don't know that one" (technically it returns 0.0.0.0). Your browser tries to connect to 0.0.0.0, fails, and the ad never loads. Simple as that.</p>
+
+        <h2 id="why">Why Use It?</h2>
+        
+        <ul>
+            <li><strong>Network-wide blocking</strong> – Every device. Phones, laptops, TVs, smart speakers, game consoles. If it's on your network, it gets blocked. No browser extensions needed.</li>
+            <li><strong>Blocks more than ads</strong> – It blocks trackers too. Those little scripts that follow you around the internet, building a profile of who you are? Pi-hole stops those at the DNS level.</li>
+            <li><strong>Privacy</strong> – No ad companies tracking you. No data being collected about your browsing habits. You're not the product.</li>
+            <li><strong>Faster browsing</strong> – Blocking all those ad requests actually makes pages load faster. Less stuff to download means quicker page loads.</li>
+            <li><strong>It's free</strong> – Open source, no subscription, no premium features. Just good software.</li>
+        </ul>
+        
+        <p>The best part is seeing the statistics. Pi-hole shows you how much garbage it's blocking. On my home network, we block somewhere between 30-50% of all DNS queries. That's half the requests that would have gone to ad and tracking servers. It's obscene how much stuff the average device tries to connect to.</p>
+
+        <h2 id="hardware">What Hardware Do You Need?</h2>
+        
+        <p>Pi-hole was designed for the Raspberry Pi, but it runs on anything Linux. Here are your options:</p>
+        
+        <h3>Raspberry Pi (Recommended)</h3>
+        <p>A Raspberry Pi 3, 4, or even a Zero will work. The Pi 4 is the best choice if you can get one—it has gigabit ethernet and enough RAM to handle a busy network. The Pi 3B+ is fine for smaller networks. The Zero works but can be slow.</p>
+        
+        <h3>Old Computer</h3>
+        <p>Have an old laptop or desktop gathering dust? Install Debian or Ubuntu on it and run Pi-hole. It'll use more electricity than a Pi, but it's plenty powerful.</p>
+        
+        <h3> VPS</h3>
+        <p>You can run Pi-hole on a VPS too. This lets you use it as a VPN—connect to your VPS with WireGuard, and your traffic gets ad-blocked even when you're on someone else's network. More on that in the WireGuard guide.</p>
+        
+        <h3>Docker</h3>
+        <p>If you already run Docker, Pi-hole has an official image. This is easiest if you're comfortable with Docker Compose. I'll show both the Docker way and the regular install way.</p>
+        
+        <div class="info">
+            <strong>Hardware recommendation:</strong> For most people, a Raspberry Pi 4 with a 32GB micro SD card is perfect. It's small, quiet, uses barely any electricity, and costs about $50 total. That one-time cost beats paying for ad blocker subscriptions forever.
+        </div>
+
+        <h2 id="install">Installing Pi-hole</h2>
+        
+        <p>I'll show you two ways: Docker (easier if you already run Docker) and the direct install (easier if you want a dedicated device).</p>
+        
+        <h3>Option A: Docker Install (Recommended if you have Docker)</h3>
+        
+        <pre><code>mkdir -p ~/docker/pihole && cd ~/docker/pihole
+cat > docker-compose.yml << 'EOF'
+version: '3'
+
+services:
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    restart: unless-stopped
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8080:80/tcp"
+    environment:
+      - TZ=America/Los_Angeles
+      - WEBPASSWORD=your-password-here
+    volumes:
+      - ./data:/etc/pihole
+      - ./dnsmasq.d:/etc/dnsmasq.d
+    cap_add:
+      - NET_ADMIN
+EOF</code></pre>
+        
+        <div class="warning">
+            <strong>Important:</strong> Change <code>your-password-here</code> to something secure. This is the admin password for Pi-hole's web interface.
+        </div>
+        
+        <pre><code>docker-compose up -d</code></pre>
+        
+        <p>That's it. Pi-hole is running. Skip to the setup section.</p>
+        
+        <h3>Option B: Direct Install (For Raspberry Pi or dedicated machine)</h3>
+        
+        <pre><code>curl -sSL https://install.pi-hole.net | bash</code></pre>
+        
+        <p>That's the official install script. It walks you through the setup. You'll answer questions about:</p>
+        
+        <ul>
+            <li><strong>Static IP</strong> – Give it a fixed IP on your network so you can always find it</li>
+            <li><strong>Upstream DNS</strong> – Where Pi-hole forwards non-blocked requests. I use Cloudflare (1.1.1.1) and Google (8.8.8.8) as fallbacks.</li>
+            <li><strong>Admin password</strong> – Set a password for the web interface</li>
+        </ul>
+        
+        <p>After install, the script will show you the admin URL and password. Write those down.</p>
+
+        <h2 id="setup">Initial Setup</h2>
+        
+        <p>Point your browser to the Pi-hole admin interface. If you're running Docker on your server, that's probably <code>http://localhost:8080</code>. If it's a standalone machine, it's <code>http://its-ip-address/admin</code>.</p>
+        
+        <p>Log in with the password you set. You'll see the dashboard. It's got charts and graphs and numbers. They're pretty satisfying. At the top, you'll see:</p>
+        
+        <ul>
+            <li><strong>Total queries</strong> – How many DNS queries have been made</li>
+            <li><strong>Queries blocked</strong> – How many were blocked</li>
+            <li><strong>Percent blocked</strong> – The ratio</li>
+            <li><strong>Domains on blocklist</strong> – How many domains are being filtered</li>
+        </ul>
+        
+        <p>Below that, you see pie charts of where queries go, what types of queries, and queries over time. It's like a window into how much garbage your devices are trying to connect to.</p>
+        
+        <div class="info">
+            <strong>First thing to do:</strong> Go to Settings > DNS and make sure your upstream DNS servers are set. I use:
+            <ul>
+                <li>Cloudflare: 1.1.1.1</li>
+                <li>Google: 8.8.8.8</li>
+            </ul>
+            These are fast and trustworthy.
+        </div>
+
+        <h2 id="networksetup">Setting Up Your Network</h2>
+        
+        <p>Here's the tricky part: you need to tell your network devices to use Pi-hole for DNS instead of whatever they're using by default.</p>
+        
+        <p>There are a few ways to do this:</p>
+        
+        <h3>Method 1: Router DHCP (Recommended)</h3>
+        
+        <p>This is the easiest method. You configure your router to give out Pi-hole's IP as the DNS server to every device on your network.</p>
+        
+        <p>Log into your router's admin interface. Look for:</p>
+        <ul>
+            <li>DHCP settings</li>
+            <li>Network settings</li>
+            <li>LAN settings</li>
+        </ul>
+        
+        <p>Find the DNS server field. Instead of letting the router give out the ISP's DNS, enter your Pi-hole's IP address.</p>
+        
+        <p>Save and restart your router. Now every device that connects to your network will automatically use Pi-hole for DNS.</p>
+        
+        <div class="warning">
+            <strong>Note:</strong> Some routers don't let you change the DNS server. In that case, try Method 2 or 3.
+        </div>
+        
+        <h3>Method 2: Configure Devices Manually</h3>
+        
+        <p>On each device, go to network settings and manually set DNS to your Pi-hole's IP address. This is tedious but works.</p>
+        
+        <h3>Method 3: Docker with Host Networking</h3>
+        
+        <p>If you ran Pi-hole in Docker, you need to be careful about DNS. Use host networking mode:</p>
+        
+        <pre><code>version: '3'
+
+services:
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      - TZ=America/Los_Angeles
+      - WEBPASSWORD=your-password-here
+    volumes:
+      - ./data:/etc/pihole
+      - ./dnsmasq.d:/etc/dnsmasq.d
+    cap_add:
+      - NET_ADMIN</code></pre>
+        
+        <p>This makes Pi-hole use the host's network directly, which plays better with most home networks.</p>
+        
+        <h3>Verify It's Working</h3>
+        
+        <p>Go to the Pi-hole query log (Query Log in the sidebar). You should see queries coming in from your devices. If you see nothing, DNS isn't working yet—check your router settings.</p>
+
+        <h2 id="blocklists">Blocklists and Filtering</h2>
+        
+        <p>Pi-hole comes with a default blocklist, but you'll want to add more. More blocklists = more blocked stuff.</p>
+        
+        <p>Go to Group Management > Blocklists. Add these URLs (these are the most popular, widely-used lists):</p>
+        
+        <pre><code># AdGuard Default
+https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+
+# AdGuard EasyList
+https://raw.githubusercontent.com/AdAwayAdaWayHostsFile/master/hosts.txt
+
+# Fanboy's Ultimate
+https://raw.githubusercontent.com/PolishFiltersTeam/KADhosts/master/KADhosts.txt
+
+# StevenBlack Hosts
+https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+
+# NoCoin (cryptomining)
+https://raw.githubusercontent.com/nickypangers/coinblockerlist/master/hosts</code></pre>
+        
+        <p>Click "Save" and then "Update." Pi-hole will download and merge these lists.</p>
+        
+        <div class="info">
+            <strong>Don't go crazy:</strong> More blocklists don't always mean better. Too many can cause issues. The 3-5 lists above are plenty for most people.
+        </div>
+        
+        <p>You can also add your own custom blocklist. Want to block <code>facebook.com</code> at the DNS level? Just add it to a custom list. Or create a regex filter for entire categories of domains.</p>
+
+        <h2 id="whitelist">Whitelisting</h2>
+        
+        <p>Sometimes a site you use breaks because Pi-hole is blocking something it shouldn't. You'll need to whitelist it.</p>
+        
+        <p>Go to Whitelist and add domains that are getting falsely blocked. Common ones:</p>
+        
+        <ul>
+            <li>Some banking sites are overly aggressive with security and get flagged</li>
+            <li>Some streaming services check for ads aggressively</li>
+            <li>Sometimes a site's CDN gets blocked</li>
+        </ul>
+        
+        <p>Finding what's blocked: go to the Query Log and search for the domain. If it shows "blocked," click it and you can whitelist it right there.</p>
+        
+        <div class="warning">
+            <strong>Be careful:</strong> If you whitelist something and ads still show up, it's probably not a DNS-level ad. Browser extensions might still be needed for those cases.
+        </div>
+
+        <h2 id="remote">Remote Access</h2>
+        
+        <p>Want to use your Pi-hole when you're away from home? There are a few options:</p>
+        
+        <h3>VPN (Recommended)</h3>
+        
+        <p>Set up WireGuard on your home network. Connect to it from outside. All your traffic goes through your home network, including through Pi-hole. It's like you're sitting at home. This is what I do.</p>
+        
+        <p>See the WireGuard guide for how to set that up.</p>
+        
+        <h3>Pi-hole Cloudflared</h3>
+        
+        <p>There's a project called cloudflared that lets you access your Pi-hole over the internet securely. It's more complex to set up, but it's an option if you don't want to run a full VPN.</p>
+
+        <h2>The Magic of Ad-Free Internet</h2>
+        
+        <p>The first few days with Pi-hole, you'll keep noticing things. Your smart TV doesn't show ads anymore. Your phone doesn't get those creepy ads that seem to know what you were just talking about. Websites load faster. Your data stays yours.</p>
+        
+        <p>It's one of those things you don't realize you needed until you have it. And once you have it, you can't go back. Visiting a friend's house and seeing ads everywhere feels weird now. It's like going back to regular TV after years of Netflix.</p>
+        
+        <p>Pi-hole won't fix everything. Browser fingerprinting still exists. Some trackers use clever methods. But blocking 30-50% of the garbage out there? That's a huge win. That's less data flying out of your home. That's less tracking. That's one more piece of your digital life that's actually yours.</p>
+        
+        <p>Welcome to the clean internet.</p>
+        
+        <p><strong>The revolution will not be proprietary.</strong></p>
+    </article>
+
+    <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+        <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+        <div id="comments-list" style="margin-bottom: 32px;"></div>
+        <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+            <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+            <div style="display: grid; gap: 16px;">
+                <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                <button onclick="submitComment('blog-pihole')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+            </div>
+        </div>
+    </section>
+    <script src="../comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-pihole');
+        });
+    </script>
+</body>
+</html>

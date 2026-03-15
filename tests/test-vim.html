@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-vim.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vim Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// VIM TEST</h1>
+            <p>Prove your Vim mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value" id="questionNum">1</div>
+                    <div class="stat-label">Question</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="streakNum">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="scoreNum">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="levelNum">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div id="questionsContainer"></div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "How do you enter insert mode in Vim?", a: ["i", "a", "o", "I"], correct: 0 },
+            { q: "What does 'i' command do in Vim?", a: ["Insert before cursor", "Insert after cursor", "Open line below", "Append to line"], correct: 0 },
+            { q: "What does 'a' command do in Vim?", a: ["Insert after cursor", "Insert before cursor", "Append to end of line", "Add new line"], correct: 0 },
+            { q: "How do you open a new line below current line?", a: ["o", "O", "i", "a"], correct: 0 },
+            { q: "How do you open a new line above current line?", a: ["O", "o", "i", "a"], correct: 0 },
+            { q: "What command deletes a line in normal mode?", a: ["dd", "d", "x", "dw"], correct: 0 },
+            { q: "What command yanks (copies) a line?", a: ["yy", "y", "c", "p"], correct: 0 },
+            { q: "What command pastes after cursor?", a: ["p", "P", "x", "u"], correct: 0 },
+            { q: "What command pastes before cursor?", a: ["P", "p", "x", "u"], correct: 0 },
+            { q: "What does 'x' command do?", a: ["Delete character under cursor", "Cut to end of line", "Delete word", "Exit Vim"], correct: 0 },
+            { q: "What does 'r' command do?", a: ["Replace single character", "Remove line", "Redo", "Repeat"], correct: 0 },
+            { q: "What is the command to move left in normal mode?", a: ["h", "j", "k", "l"], correct: 0 },
+            { q: "What is the command to move down in normal mode?", a: ["j", "k", "h", "l"], correct: 0 },
+            { q: "What is the command to move up in normal mode?", a: ["k", "j", "h", "l"], correct: 0 },
+            { q: "What is the command to move right in normal mode?", a: ["l", "h", "j", "k"], correct: 0 },
+            { q: "What does 'w' command do?", a: ["Move to next word start", "Move to word end", "Delete word", "Copy word"], correct: 0 },
+            { q: "What does 'b' command do?", a: ["Move to previous word start", "Move to next word", "Move back", "Begin line"], correct: 0 },
+            { q: "What command moves to the beginning of the file?", a: ["gg", "G", "1G", "H"], correct: 0 },
+            { q: "What command moves to the end of the file?", a: ["G", "gg", "L", "$"], correct: 0 },
+            { q: "How do you start a forward search?", a: ["/", "?", "n", "N"], correct: 0 },
+            { q: "How do you start a backward search?", a: ["?", "/", "n", "N"], correct: 0 },
+            { q: "What does 'n' command do?", a: ["Repeat last search same direction", "Reverse last search", "Next line", "New line"], correct: 0 },
+            { q: "What does 'N' command do?", a: ["Repeat last search opposite direction", "Next line", "New file", "Number"], correct: 0 },
+            { q: "What is the command to quit Vim without saving?", a: [":q!", ":q", ":wq", ":x"], correct: 0 },
+            { q: "What is the command to save and quit?", a: [":wq", ":q", ":q!", ":x!"], correct: 0 },
+            { q: "What is the command to save file?", a: [":w", ":q", ":wq", ":x"], correct: 0 },
+            { q: "How do you undo the last change?", a: ["u", "Ctrl+r", "U", "x"], correct: 0 },
+            { q: "How do you redo in Vim?", a: ["Ctrl+r", "u", "U", "r"], correct: 0 },
+            { q: "What is visual mode used for?", a: ["Selecting text", "Inserting text", "Deleting text", "Saving file"], correct: 0 },
+            { q: "How do you enter visual mode?", a: ["v", "V", "Ctrl+v", "visual"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "How do you delete from cursor to end of line?", a: ["D", "d$", "d0", "dd"], correct: 0 },
+            { q: "What does 'dw' command do?", a: ["Delete word", "Delete line", "Delete character", "Delete to end"], correct: 0 },
+            { q: "How do you delete from cursor to beginning of line?", a: ["d0", "d^", "dw", "D"], correct: 0 },
+            { q: "What does 'd^' command do?", a: ["Delete to first non-blank character", "Delete to beginning", "Delete word", "Delete line"], correct: 0 },
+            { q: "How do you change a word?", a: ["cw", "c", "dw", "xw"], correct: 0 },
+            { q: "What does 'cc' command do?", a: ["Change entire line", "Copy line", "Cut line", "Create line"], correct: 0 },
+            { q: "What is the substitute command pattern?", a: [":s/old/new", ":substitute/old/new", ":change/old/new", ":replace/old/new"], correct: 0 },
+            { q: "How do you substitute all occurrences in line?", a: [":s/old/new/g", ":s/old/new", ":s/old/new/gc", ":%s/old/new"], correct: 0 },
+            { q: "How do you substitute in entire file?", a: [":%s/old/new/g", ":s/old/new/g", ":substitute/old/new/g", ":replace/old/new"], correct: 0 },
+            { q: "What is a Vim buffer?", a: ["In-memory copy of a file", "Screen area", "Command line", "Search pattern"], correct: 0 },
+            { q: "How do you split window vertically?", a: [":vsplit", ":split", ":new", ":vnew"], correct: 0 },
+            { q: "How do you split window horizontally?", a: [":split", ":vsplit", ":new", ":horizontal"], correct: 0 },
+            { q: "How do you switch between windows?", a: ["Ctrl+w w", "Ctrl+w h", "Ctrl+w j", "Ctrl+w k"], correct: 0 },
+            { q: "How do you close a window?", a: [":q", ":close", ":quit", "Ctrl+w q"], correct: 0 },
+            { q: "What is a Vim register?", a: ["Storage for yanked/deleted text", "Memory location", "Buffer list", "Window storage"], correct: 0 },
+            { q: "How do you record a macro in register 'a'?", a: ["qa", "ma", "qa", "@a"], correct: 0 },
+            { q: "How do you stop recording a macro?", a: ["q", "esc", "stop", "end"], correct: 0 },
+            { q: "How do you play back a macro from register 'a'?", a: ["@a", "qa", "run a", "play a"], correct: 0 },
+            { q: "How do you repeat last macro?", a: ["@@", "@a", "repeat", "run"], correct: 0 },
+            { q: "What does 'yy' command do?", a: ["Yank current line", "Yank word", "Yank to end", "Yank character"], correct: 0 },
+            { q: "How do you yank a word?", a: ["yw", "yy", "y", "yw"], correct: 0 },
+            { q: "What does 'y$' command do?", a: ["Yank to end of line", "Yank whole line", "Yank word", "Yank to beginning"], correct: 0 },
+            { q: "How do you delete word under cursor?", a: ["dw", "de", "daw", "cw"], correct: 0 },
+            { q: "What does 'de' command do?", a: ["Delete to end of word", "Delete word", "Delete line", "Delete character"], correct: 0 },
+            { q: "What does 'daw' do?", a: ["Delete a word including whitespace", "Delete all words", "Delete around word", "Delete after word"], correct: 0 },
+            { q: "How do you move to the first non-blank character of line?", a: ["^", "0", "home", "beginning"], correct: 0 },
+            { q: "How do you move to end of line?", a: ["$", "end", "E", "e"], correct: 0 },
+            { q: "What does 'f' command do?", a: ["Find character forward", "Find word", "Find line", "Find file"], correct: 0 },
+            { q: "What does 'F' command do?", a: ["Find character backward", "Find forward", "Find word", "Find line"], correct: 0 },
+            { q: "What does 't' command do?", a: ["Move till character forward", "Move to character", "Type text", "Transpose"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "How do you delete inside brackets including brackets?", a: ["diB", "di)", "da)", "das"], correct: 0 },
+            { q: "What does 'ciw' do?", a: ["Change inner word", "Delete inner word", "Yank inner word", "Copy inner word"], correct: 0 },
+            { q: "How do you visually select inside quotes?", a: ["vi\"", "va\"", "vq", "v\""], correct: 0 },
+            { q: "What does 'va' do in visual mode?", a: ["Select including delimiters", "Select inside", "Select around", "Visual all"], correct: 0 },
+            { q: "How do you select a paragraph?", a: ["vip", "vap", "Vp", "ap"], correct: 0 },
+            { q: "What does 'dap' delete?", a: ["Delete a paragraph", "Delete all paragraphs", "Delete after paragraph", "Delete around paragraph"], correct: 0 },
+            { q: "How do you increment number under cursor?", a: ["Ctrl+a", "Ctrl+x", "ga", "g+"], correct: 0 },
+            { q: "How do you decrement number under cursor?", a: ["Ctrl+x", "Ctrl+a", "ga", "g-"], correct: 0 },
+            { q: "What is the command to show ASCII value?", a: ["ga", "ascii", "show", "code"], correct: 0 },
+            { q: "How do you join current line with next?", a: ["J", "j", "join", "gj"], correct: 0 },
+            { q: "What does 'gJ' do?", a: ["Join without spaces", "Join lines", "Go to line", "Global join"], correct: 0 },
+            { q: "How do you move to matching parenthesis?", a: ["%", "(", ")", "match"], correct: 0 },
+            { q: "What does 'Ctrl+o' do in normal mode?", a: ["Jump to previous location", "Open line", "Outdent", "Overwrite"], correct: 0 },
+            { q: "What does 'Ctrl+i' do in normal mode?", a: ["Jump to next location", "Indent", "Insert", "Import"], correct: 0 },
+            { q: "How do you change case of character?", a: ["~", "gu", "gU", "case"], correct: 0 },
+            { q: "What does 'guw' do?", a: ["Lowercase word", "Uppercase word", "Delete word", "Copy word"], correct: 0 },
+            { q: "What does 'gUw' do?", a: ["Uppercase word", "Lowercase word", "Delete word", "Copy word"], correct: 0 },
+            { q: "How do you mark a location with letter 'a'?", a: ["ma", "a", "mark a", "'a"], correct: 0 },
+            { q: "How do you jump to mark 'a'?", a: ["'a", "ma", "go a", "jump a"], correct: 0 },
+            { q: "How do you jump to exact position of mark 'a'?", a: ["`a", "'a", "gm a", "goto a"], correct: 0 },
+            { q: "What is the purpose of Vim plugins?", a: ["Extend functionality", "Speed up Vim", "Add colors", "Manage buffers"], correct: 0 },
+            { q: "What is the most popular plugin manager?", a: ["vim-plug", "Vundle", "Pathogen", "dein"], correct: 0 },
+            { q: "Where are plugins typically stored?", a: [".vim/pack", ".vim/plugin", ".vim/autoload", ".vim/bundle"], correct: 0 },
+            { q: "What is the purpose of 'netrw'?", a: ["File explorer", "Network wrapper", "File transfer", "Remote editing"], correct: 0 },
+            { q: "How do you open file explorer in Vim?", a: [":Explore", ":E", ":Lex", "both :E and :Lex"], correct: 0 },
+            { q: "What is Vim's leader key?", a: ["\\ (backslash)", ":", ";", "space"], correct: 0 },
+            { q: "How do you see all current mappings?", a: [":map", ":mapping", "showmap", "maps"], correct: 0 },
+            { q: "What does 'gf' command do?", a: ["Go to file under cursor", "Global find", "Go forward", "Go to function"], correct: 0 },
+            { q: "What does 'Ctrl+^' do in Vim?", a: ["Switch to alternate file", "Go up one level", "Go to definition", "Center screen"], correct: 0 },
+            { q: "How do you execute shell command from Vim?", a: [":!command", ":shell", "sh command", "!command"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            const q = currentQuestions[currentQuestionIndex];
+            
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            
+            qDiv.innerHTML = `
+                <div class="question-text">${q.q}</div>
+                <div class="answers-grid">${answersHtml}</div>
+            `;
+            
+            container.appendChild(qDiv);
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            const total = currentQuestions.length;
+            const progress = ((currentQuestionIndex) / total) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) {
+                    btn.classList.add('correct');
+                }
+            });
+            
+            totalAnswered++;
+            
+            if (index === q.correct) {
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+                consecutiveCorrect++;
+                score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30;
+                
+                if (currentLevel === 1 && consecutiveCorrect >= 7) {
+                    currentLevel = 2;
+                    difficulty = 'medium';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else if (currentLevel === 2 && consecutiveCorrect >= 7) {
+                    currentLevel = 3;
+                    difficulty = 'hard';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else {
+                    currentQuestionIndex++;
+                }
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 1200);
+            } else {
+                buttons[index].classList.add('incorrect');
+                streak = 0;
+                consecutiveCorrect = 0;
+                currentQuestionIndex++;
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 2000);
+                return;
+            }
+        }
+
+        function showResult() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            const resultScreen = document.getElementById('resultScreen');
+            resultScreen.classList.add('active');
+            
+            const pass = score >= 100;
+            document.getElementById('resultIcon').textContent = pass ? '✓' : '✗';
+            document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL';
+            document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score}`;
+            document.getElementById('resultDetails').innerHTML = `
+                Questions answered: ${totalAnswered}<br>
+                Best streak: ${maxStreak}<br>
+                Highest level reached: ${currentLevel}
+            `;
+            
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeToggle').checked = true;
+            }
+            initTest();
+        });
+    </script>
+
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p><a href="../site-map.html">All pages</a></p>
+    </footer>
+</body>
+</html>

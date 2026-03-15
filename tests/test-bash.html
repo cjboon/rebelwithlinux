@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-bash.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bash Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container {
+            padding: 32px 32px;
+            background: var(--white);
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 80vh;
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .test-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2rem;
+            margin-bottom: 4px;
+        }
+        
+        .test-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--light-gray);
+            border-radius: 4px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--charcoal);
+            transition: width 0.3s ease;
+        }
+        
+        .question-container {
+            display: none;
+        }
+        
+        .question-container.active {
+            display: block;
+        }
+        
+        .question-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.25rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .answers-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .answer-btn {
+            padding: 16px 20px;
+            border: 2px solid var(--charcoal);
+            background: transparent;
+            color: var(--charcoal);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .answer-btn:hover {
+            background: var(--light-gray);
+        }
+        
+        .answer-btn.correct {
+            background: #22c55e !important;
+            border-color: #22c55e !important;
+            color: white !important;
+        }
+        
+        .answer-btn.incorrect {
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+            color: white !important;
+        }
+        
+        .answer-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .result-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .result-screen.active {
+            display: block;
+        }
+        
+        .result-icon {
+            font-size: 5rem;
+            margin-bottom: 24px;
+        }
+        
+        .result-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        
+        .result-score {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.25rem;
+            color: var(--charcoal);
+            margin-bottom: 32px;
+        }
+        
+        .result-details {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+            margin-bottom: 32px;
+        }
+        
+        .retry-btn {
+            padding: 16px 32px;
+            background: var(--charcoal);
+            color: var(--white);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .retry-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 24px;
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: var(--white);
+            gap: 8px;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            white-space: nowrap;
+            color: var(--charcoal);
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .theme-toggle-label {
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+        
+        .theme-toggle-icon.sun {
+            display: none;
+        }
+        
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) {
+            display: none;
+        }
+        
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun {
+            display: inline;
+        }
+        
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) {
+            display: none;
+        }
+        
+        [data-theme="dark"] .theme-toggle-icon.sun {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">
+                REBEL WITH LINUX
+            </a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// BASH TEST</h1>
+            <p>Prove your Bash mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value" id="questionNum">1</div>
+                    <div class="stat-label">Question</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="streakNum">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="scoreNum">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="levelNum">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div id="questionsContainer"></div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What does 'echo' do in Bash?", a: ["Prints text to screen", "Edits files", "Exits shell", "Creates files"], correct: 0 },
+            { q: "How do you comment in Bash?", a: ["# comment", "// comment", "/* comment */", "-- comment"], correct: 0 },
+            { q: "What is a variable in Bash?", a: ["A container for data", "A command", "A function", "A loop"], correct: 0 },
+            { q: "How do you access a variable in Bash?", a: ["$varname", "@varname", "#varname", "%varname"], correct: 0 },
+            { q: "What does 'ls' command do?", a: ["Lists files", "Creates files", "Deletes files", "Moves files"], correct: 0 },
+            { q: "How do you make a script executable?", a: ["chmod +x script.sh", "exec script.sh", "run script.sh", "make script.sh"], correct: 0 },
+            { q: "What does 'cd' command do?", a: ["Changes directory", "Copies directory", "Creates directory", "Deletes directory"], correct: 0 },
+            { q: "How do you check if a file exists in Bash?", a: ["[ -f file ]", "exists file", "test file", "check file"], correct: 0 },
+            { q: "What is the shebang line?", a: ["#!/bin/bash", "#bash", "!/bin/bash", "##bash"], correct: 0 },
+            { q: "How do you create a for loop in Bash?", a: ["for i in list; do", "loop i in list", "for(i=0;i<n;i++)", "iterate i in list"], correct: 0 },
+            { q: "What does 'pwd' print?", a: ["Current directory", "Previous directory", "Print working directory", "Path working directory"], correct: 0 },
+            { q: "How do you concatenate strings in Bash?", a: ["$var1$var2", "$var1 + $var2", "concat($var1,$var2)", "$var1 . $var2"], correct: 0 },
+            { q: "What does 'read' do in Bash?", a: ["Reads input from user", "Reads files", "Reads directory", "Reads permissions"], correct: 0 },
+            { q: "How do you pass arguments to a script?", a: ["$1, $2, etc.", "@args", "arg[1], arg[2]", "args[0], args[1]"], correct: 0 },
+            { q: "What does 'exit 0' mean?", a: ["Successful exit", "Error exit", "Warning exit", "Unknown exit"], correct: 0 },
+            { q: "How do you use an if statement in Bash?", a: ["if [ condition ]; then", "if (condition)", "if condition then", "if condition fi"], correct: 0 },
+            { q: "What does 'wc -l' do?", a: ["Counts lines", "Counts words", "Counts characters", "Counts bytes"], correct: 0 },
+            { q: "How do you redirect output to a file?", a: ["> file", "< file", ">> file", "| file"], correct: 0 },
+            { q: "What does 'grep' do?", a: ["Searches for patterns", "Groups files", "Graphs data", "Gets file info"], correct: 0 },
+            { q: "How do you append to a file?", a: [">> file", "> file", "<< file", ">>> file"], correct: 0 },
+            { q: "What is a function in Bash?", a: ["Reusable code block", "A loop", "A variable", "A condition"], correct: 0 },
+            { q: "How do you call a function in Bash?", a: ["function_name", "call function_name", "run function_name", "exec function_name"], correct: 0 },
+            { q: "What does 'cat' do in Bash?", a: ["Displays file contents", "Creates files", "Copies files", "Deletes files"], correct: 0 },
+            { q: "How do you use a while loop?", a: ["while [ condition ]; do", "while (condition)", "loop while condition", "iterate while condition"], correct: 0 },
+            { q: "What does 'chmod' do?", a: ["Changes file permissions", "Changes file owner", "Changes file group", "Changes file name"], correct: 0 },
+            { q: "How do you use command substitution?", a: ["$(command)", "`command`", "$( command )", "[command]"], correct: 0 },
+            { q: "What does 'head' command do?", a: ["Shows first lines", "Shows last lines", "Shows all lines", "Shows middle lines"], correct: 0 },
+            { q: "How do you make a variable read-only?", a: ["readonly var", "const var", "static var", "final var"], correct: 0 },
+            { q: "What does 'tail' command do?", a: ["Shows last lines", "Shows first lines", "Shows all lines", "Shows middle lines"], correct: 0 },
+            { q: "How do you check string length in Bash?", a: ["${#variable}", "$length variable", "$size variable", "length($variable)"], correct: 0 },
+            { q: "What does 'sort' do?", a: ["Sorts lines", "Searches lines", "Deletes lines", "Adds lines"], correct: 0 },
+            { q: "How do you use case statement?", a: ["case var in ... esac", "switch var ... endswitch", "select var ... end", "match var ..."], correct: 0 },
+            { q: "What does 'uniq' do?", a: ["Removes duplicates", "Adds duplicates", "Finds duplicates", "Shows duplicates"], correct: 0 },
+            { q: "How do you export a variable?", a: ["export var", "export var=value", "exp var", "ex var"], correct: 0 },
+            { q: "What does 'cut' do?", a: ["Extracts columns", "Cuts files", "Deletes columns", "Adds columns"], correct: 0 },
+            { q: "How do you get substring in Bash?", a: ["${var:start:len}", "$substr(var,start,len)", "var[start:len]", "substring(var,start,len)"], correct: 0 },
+            { q: "What does 'sed' do?", a: ["Stream editor", "Send edit", "Secure delete", "System editor"], correct: 0 },
+            { q: "How do you use arrays in Bash?", a: ["arr=(1 2 3)", "arr = [1,2,3]", "array = {1,2,3}", "arr = new Array(1,2,3)"], correct: 0 },
+            { q: "What does 'awk' do?", a: ["Pattern scanning", "Adds words", "Aways key", "Assign work"], correct: 0 },
+            { q: "How do you find length of array?", a: ["${#arr[@]}", "$arr.length", "@arr.size", "arr.length()"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What does 'set -e' do in Bash?", a: ["Exit on error", "Set environment", "Enable echo", "Set error level"], correct: 0 },
+            { q: "How do you debug a Bash script?", a: ["bash -x script.sh", "bash -v script.sh", "bash -n script.sh", "debug script.sh"], correct: 0 },
+            { q: "What is the difference between '==' and '=' in [ ]?", a: ["Both work for strings", "== is numeric", "= is for strings", "No difference"], correct: 0 },
+            { q: "How do you redirect stderr?", a: ["2> file", "1> file", "> file 2>&1", "&> file"], correct: 0 },
+            { q: "What does 'trap' do in Bash?", a: ["Handles signals", "Creates traps", "Removes errors", "Sets errors"], correct: 0 },
+            { q: "How do you get exit status of last command?", a: ["$?", "$!", "$#", "$$"], correct: 0 },
+            { q: "What is a subshell?", a: ["Child shell process", "Parent shell", "Root shell", "Login shell"], correct: 0 },
+            { q: "How do you pipe in Bash?", a: ["|", ">", "<", ">>"], correct: 0 },
+            { q: "What does 'local' do in functions?", a: ["Creates local variable", "Creates global var", "Creates constant", "Creates array"], correct: 0 },
+            { q: "How do you use brace expansion?", a: ["{1..5}", "[1-5]", "(1..5)", "<1-5>"], correct: 0 },
+            { q: "What is PID of last background process?", a: ["$!", "$?", "$#", "$$"], correct: 0 },
+            { q: "How do you process arguments with getopts?", a: ["while getopts ':a:b:' opt", "getopts a:b opt", "for opt in getopts", "case getopts"], correct: 0 },
+            { q: "What does 'exec' do?", a: ["Replaces shell", "Executes command", "Runs in background", "Exits shell"], correct: 0 },
+            { q: "How do you do arithmetic in Bash?", a: ["$((a + b))", "$[a + b]", "$math(a + b)", "a + b"], correct: 0 },
+            { q: "What is a here document?", a: ["Inline script input", "Script file", "Script function", "Script comment"], correct: 0 },
+            { q: "How do you create a here document?", a: ["cat << EOF", "cat < EOF", "cat > EOF", "cat | EOF"], correct: 0 },
+            { q: "What does 'shift' do in scripts?", a: ["Shifts positional parameters", "Shifts variables", "Shifts arrays", "Shifts functions"], correct: 0 },
+            { q: "How do you check if variable is set?", a: ["${var:-default}", "${var:=default}", "${var:?error}", "${var:+value}"], correct: 0 },
+            { q: "What does 'wait' do?", a: ["Waits for background process", "Waits for input", "Waits for user", "Waits for file"], correct: 0 },
+            { q: "How do you use process substitution?", a: ["<(command)", "$(command)", "`command`", "[command]"], correct: 0 },
+            { q: "What is the difference between '||' and '&&'?", a: ["OR vs AND", "AND vs OR", "Same thing", "None"], correct: 0 },
+            { q: "How do you disable filename expansion?", a: ["set -f", "set -x", "set -v", "set -e"], correct: 0 },
+            { q: "What does 'xargs' do?", a: ["Builds commands from input", "Executes args", "Passes args", "Shows args"], correct: 0 },
+            { q: "How do you use 'read' with timeout?", a: ["read -t 5 var", "read -T 5 var", "read timeout=5 var", "read -q 5 var"], correct: 0 },
+            { q: "What is a coprocess in Bash?", a: ["Background process pair", "Copy process", "Parent process", "Child process"], correct: 0 },
+            { q: "How do you redirect to /dev/null?", a: ["> /dev/null 2>&1", "< /dev/null", "| /dev/null", ">> /dev/null"], correct: 0 },
+            { q: "What does 'type' command show?", a: ["Command type", "Command location", "Command help", "Command history"], correct: 0 },
+            { q: "How do you create a temporary file?", a: ["mktemp", "tempfile", "mkstemp", "tmpfile"], correct: 0 },
+            { q: "What is the 'shopt' command?", a: ["Shell options", "Shell prompt", "Shell path", "Shell profile"], correct: 0 },
+            { q: "How do you use 'select' in Bash?", a: ["select var in list; do", "for var in list; do", "while read var; do", "case var in"], correct: 0 },
+            { q: "What does 'ulimit' do?", a: ["Sets resource limits", "Shows limits", "Lists resources", "Removes limits"], correct: 0 },
+            { q: "How do you match patterns in case?", a: ["pattern)", "*pattern)", "?pattern)", "[pattern]"], correct: 0 },
+            { q: "What is shell expansion order?", a: [" brace -> tilde -> var -> cmd -> arith -> path", "var -> brace -> tilde -> cmd -> path", "cmd -> var -> brace -> tilde -> path", "tilde -> path -> var -> cmd -> brace"], correct: 0 },
+            { q: "How do you safely parse options?", a: ["getopts", "case", "if", "while"], correct: 0 },
+            { q: "What does 'return' do in a function?", a: ["Exits function with status", "Returns value", "Returns to caller", "Returns variable"], correct: 0 },
+            { q: "How do you make scripts POSIX compliant?", a: ["#!/bin/sh", "#!/bin/bash", "#!/usr/bin/env bash", "#!/bin/bash -e"], correct: 0 },
+            { q: "What does 'suspend' do?", a: ["Suspends shell", "Suspends process", "Suspends user", "Suspends job"], correct: 0 },
+            { q: "How do you run command in background?", a: ["command &", "command |", "command >", "command <"], correct: 0 },
+            { q: "What does 'jobs' show?", a: ["Background jobs", "Running jobs", "Stopped jobs", "All jobs"], correct: 0 },
+            { q: "How do you bring background job to foreground?", a: ["fg %1", "bg %1", "jobs %1", "run %1"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What does 'PS4' do in debugging?", a: ["Sets debug prompt", "Sets prompt", "Sets error", "Sets path"], correct: 0 },
+            { q: "How do you trace a script line by line?", a: ["set -x; commands; set +x", "debug on; commands; debug off", "trace on; commands; trace off", "bash -x script"], correct: 0 },
+            { q: "What is the difference between $@ and $*?", a: ["$@ splits, $* joins", "$* splits, $@ joins", "Same in double quotes", "Different outside quotes"], correct: 0 },
+            { q: "How do you implement a lock file?", a: ["[ -f lock ] && exit || touch lock", "lock file", "flock -n lock", "All of above"], correct: 0 },
+            { q: "What does 'set -u' do?", a: ["Error on undefined variable", "Set user", "Set UID", "Use variable"], correct: 0 },
+            { q: "How do you handle errors with ERR trap?", a: ["trap 'echo $?' ERR", "onerror echo", "catch error", "handle ERR"], correct: 0 },
+            { q: "What is a named pipe (FIFO)?", a: ["File for inter-process comm", "Pipe with name", "System pipe", "All of above"], correct: 0 },
+            { q: "How do you create a named pipe?", a: ["mkfifo mypipe", "mknod mypipe p", "pipe mypipe", "Both a and b"], correct: 0 },
+            { q: "What does 'command -v' do?", a: ["Shows command location", "Verifies command", "Validates command", "All of above"], correct: 0 },
+            { q: "How do you use associative arrays?", a: ["declare -A arr", "arr[key]=value", "Both a and b", "None"], correct: 0 },
+            { q: "What is 'BASH_SOURCE'?", a: ["Script file path", "Shell source", "Bash version", "Source file"], correct: 0 },
+            { q: "How do you get epoch time?", a: ["date +%s", "$(date +%s)", "Both a and b", "time()"], correct: 0 },
+            { q: "What does 'set -o pipefail' do?", a: ["Fails on pipe error", "Sets pipe", "Creates pipe", "Checks pipe"], correct: 0 },
+            { q: "How do you implement timeout in pure Bash?", a: ["timeout command", "while + sleep", "read -t", "All of above"], correct: 0 },
+            { q: "What is a process substitution advantage?", a: ["Can use where files expected", "Faster than files", "More secure", "None"], correct: 0 },
+            { q: "How does 'wait' with jobs work?", a: ["wait $!", "wait %1", "wait $(jobs -p)", "All of above"], correct: 0 },
+            { q: "What does 'readlink -f' do?", a: ["Canonical path", "Absolute path", "Real path", "All of above"], correct: 0 },
+            { q: "How do you safely eval user input?", a: ["Don't do it", "quote it", "validate it", "All of above"], correct: 0 },
+            { q: "What is the purpose of 'BASH_ENV'?", a: ["Script to source", "Environment file", "Config file", "None"], correct: 0 },
+            { q: "How do you implement progress bar in pure Bash?", a: ["printf with \\r", "echo -ne", "Both a and b", "tput"], correct: 0 },
+            { q: "What does 'compgen' do?", a: ["Completions generator", "Compare gens", "Component gen", "None"], correct: 0 },
+            { q: "How do you trap EXIT?", a: ["trap 'cleanup' EXIT", "trap EXIT 'cleanup'", "on exit cleanup", "exit cleanup"], correct: 0 },
+            { q: "What is the difference between source and .?", a: ["Same thing", "source is POSIX", ". is bash", "None"], correct: 0 },
+            { q: "How do you use nameref (declare -n)?", a: ["Reference to variable", "Name variable", "Both a and b", "None"], correct: 0 },
+            { q: "What does 'extdebug' option do?", a: ["Debug function calls", "Enable extglob", "Extended debug", "Extra debug"], correct: 0 },
+            { q: "How do you implement signal handling properly?", a: ["trap 'func' SIGTERM", "handle signal", "catch SIGTERM", "All of above"], correct: 0 },
+            { q: "What is 'POSIXLY_CORRECT'?", a: ["Forces POSIX mode", "Corrects POSIX", "Uses POSIX", "None"], correct: 0 },
+            { q: "How do you get random numbers securely?", a: ["/dev/urandom", "od", "openssl rand", "All secure"], correct: 0 },
+            { q: "What does 'BASH_FUNC_*' exported functions work?", a: ["Export function", "Import function", "Both a and b", "None"], correct: 0 },
+            { q: "How do you implement log rotation in Bash?", a: ["Move and date files", "Compress old logs", "Remove old logs", "All of above"], correct: 0 },
+            { q: "What is 'DEBUG' trap used for?", a: ["Run before each command", "Debug mode", "Error handling", "None"], correct: 0 },
+            { q: "How do you handle multiline variables?", a: ["Quote properly", "Use arrays", "Use here-docs", "All of above"], correct: 0 },
+            { q: "What does 'set -b' do?", a: ["Background job messages", "Set background", "Batch mode", "Begin mode"], correct: 0 },
+            { q: "How do you create a daemon in Bash?", a: ["nohup + disown", "fork", "exec", "All common"], correct: 0 },
+            { q: "What is the difference between 'local' and 'declare'?", a: ["declare can have options", "local is function-scoped", "Both valid", "None"], correct: 0 },
+            { q: "How do you use间接变量 (indirection)?", a: ["${!var}", "${var}", "${var##*}", "${var%%*}"], correct: 0 },
+            { q: "What does 'umask' default to?", a: ["022 typically", "000", "077", "Depends on system"], correct: 0 },
+            { q: "How do you implement config file parsing?", a: ["source config", "while read", "grep patterns", "All of above"], correct: 0 },
+            { q: "What is 'EXECIGNORE'?", a: ["Ignore patterns for glob", "Execute ignore", "Exclusion list", "None"], correct: 0 },
+            { q: "How do you make tab completion in script?", a: ["complete command", "compgen", "Both a and b", "Not possible"], correct: 0 },
+            { q: "What does 'set +m' do?", a: ["Disable job control", "Enable monitor", "Monitor mode", "Job mode"], correct: 0 },
+            { q: "How do you handle colors in terminal?", a: ["tput colors", "ANSI codes", "termcap", "All work"], correct: 0 },
+            { q: "What is difference between 'return' and 'exit'?", a: ["return=function, exit=script", "same thing", "return is error", "exit is success"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            const q = currentQuestions[currentQuestionIndex];
+            
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            
+            qDiv.innerHTML = `
+                <div class="question-text">${q.q}</div>
+                <div class="answers-grid">${answersHtml}</div>
+            `;
+            
+            container.appendChild(qDiv);
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            const total = currentQuestions.length;
+            const progress = ((currentQuestionIndex) / total) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) {
+                    btn.classList.add('correct');
+                }
+            });
+            
+            totalAnswered++;
+            
+            if (index === q.correct) {
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+                consecutiveCorrect++;
+                score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30;
+                
+                if (currentLevel === 1 && consecutiveCorrect >= 7) {
+                    currentLevel = 2;
+                    difficulty = 'medium';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else if (currentLevel === 2 && consecutiveCorrect >= 7) {
+                    currentLevel = 3;
+                    difficulty = 'hard';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else {
+                    currentQuestionIndex++;
+                }
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 1200);
+            } else {
+                buttons[index].classList.add('incorrect');
+                streak = 0;
+                consecutiveCorrect = 0;
+                currentQuestionIndex++;
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 2000);
+                return;
+            }
+        }
+
+        function showResult() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            const resultScreen = document.getElementById('resultScreen');
+            resultScreen.classList.add('active');
+            
+            const pass = score >= 100;
+            document.getElementById('resultIcon').textContent = pass ? '✓' : '✗';
+            document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL';
+            document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score}`;
+            document.getElementById('resultDetails').innerHTML = `
+                Questions answered: ${totalAnswered}<br>
+                Best streak: ${maxStreak}<br>
+                Highest level reached: ${currentLevel}
+            `;
+            
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        function handleThemeChange(isDark) {
+            const theme = isDark ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeToggle').checked = true;
+            }
+            initTest();
+        });
+    </script>
+</body>
+</html>

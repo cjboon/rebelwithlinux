@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-kubernetes.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// KUBERNETES TEST</h1>
+            <p>Prove your Kubernetes mastery</p>
+        </div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What is Kubernetes?", a: ["Container orchestration platform", "Virtual machine", "Programming language", "Database"], correct: 0 },
+            { q: "What does K8s stand for?", a: ["Kubernetes", "Kube Eight", "Kernel Eight", "Key Eight"], correct: 0 },
+            { q: "What is a Pod in Kubernetes?", a: ["Smallest deployable unit", "Network protocol", "Storage device", "CPU unit"], correct: 0 },
+            { q: "What is a Node in Kubernetes?", a: ["Worker machine in cluster", "Container image", "Network switch", "Storage array"], correct: 0 },
+            { q: "What is the Master Node?", a: ["Controls the cluster", "Runs workloads", "Stores data", "Monitors network"], correct: 0 },
+            { q: "What is kubectl?", a: ["Kubernetes command-line tool", "Container runtime", "Network plugin", "Storage driver"], correct: 0 },
+            { q: "What is a Deployment?", a: ["Manages ReplicaSets", "Creates nodes", "Configures network", "Allocates storage"], correct: 0 },
+            { q: "What does a ReplicaSet ensure?", a: ["Desired number of pods running", "Network connectivity", "Storage availability", "Node health"], correct: 0 },
+            { q: "What is a Service in Kubernetes?", a: ["Network abstraction for pods", "Storage volume", "CPU allocation", "Memory limit"], correct: 0 },
+            { q: "What is a Namespace?", a: ["Logical cluster partition", "Physical cluster", "Network segment", "Storage pool"], correct: 0 },
+            { q: "What is a ConfigMap?", a: ["Stores configuration data", "Stores secrets", "Stores volumes", "Stores images"], correct: 0 },
+            { q: "What is a Secret?", a: ["Stores sensitive data", "Stores config", "Stores logs", "Stores metrics"], correct: 0 },
+            { q: "What is a Volume?", a: ["Storage that persists data", "Memory allocation", "CPU allocation", "Network storage"], correct: 0 },
+            { q: "What is an Ingress?", a: ["HTTP/HTTPS routing", "Storage controller", "Network plugin", "Container runtime"], correct: 0 },
+            { q: "What is a StatefulSet?", a: ["Manages stateful applications", "Manages stateless apps", "Manages network", "Manages storage only"], correct: 0 },
+            { q: "What is a DaemonSet?", a: ["Runs on each node", "Runs once", "Runs on schedule", "Runs on demand"], correct: 0 },
+            { q: "What is a Job?", a: ["Runs to completion", "Runs continuously", "Runs on schedule", "Runs on trigger"], correct: 0 },
+            { q: "What is a CronJob?", a: ["Runs on schedule", "Runs continuously", "Runs once", "Runs on trigger"], correct: 0 },
+            { q: "What is a Label?", a: ["Key-value pair for identifying", "Password", "Network address", "Storage location"], correct: 0 },
+            { q: "What is a Selector?", a: ["Matches resources by labels", "Selects storage", "Selects network", "Selects nodes"], correct: 0 },
+            { q: "What is a ReplicaController?", a: ["Manages pod replicas", "Controls network", "Controls storage", "Controls nodes"], correct: 0 },
+            { q: "What is the default namespace?", a: ["default", "kube-system", "kube-public", "kube-node"], correct: 0 },
+            { q: "What is kubectl get pods?", a: ["Lists pods", "Creates pods", "Deletes pods", "Updates pods"], correct: 0 },
+            { q: "What is kubectl apply?", a: ["Creates/updates resources", "Deletes resources", "Lists resources", "Describes resources"], correct: 0 },
+            { q: "What is kubectl describe?", a: ["Shows resource details", "Deletes resource", "Creates resource", "Lists resource"], correct: 0 },
+            { q: "What is a Container?", a: ["Lightweight executable package", "Virtual machine", "Physical server", "Network device"], correct: 0 },
+            { q: "What is Docker?", a: ["Container runtime", "Programming language", "Operating system", "Database"], correct: 0 },
+            { q: "What is a Pod spec?", a: ["Defines pod configuration", "Network configuration", "Storage configuration", "Node configuration"], correct: 0 },
+            { q: "What is livenessProbe?", a: ["Checks if container is running", "Checks network", "Checks storage", "Checks memory"], correct: 0 },
+            { q: "What is readinessProbe?", a: ["Checks if container can serve traffic", "Checks network", "Checks storage", "Checks CPU"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the API Server?", a: ["REST API interface for cluster", "Container runtime", "Network plugin", "Storage driver"], correct: 0 },
+            { q: "What is etcd?", a: ["Distributed key-value store", "Container image", "Network plugin", "Monitoring tool"], correct: 0 },
+            { q: "What is the Scheduler?", a: ["Assigns pods to nodes", "Manages storage", "Controls network", "Monitors nodes"], correct: 0 },
+            { q: "What is the Controller Manager?", a: ["Runs controller loops", "Manages containers", "Controls network", "Allocates storage"], correct: 0 },
+            { q: "What is kube-proxy?", a: ["Network proxy on each node", "API proxy", "Load balancer", "Service mesh"], correct: 0 },
+            { q: "What is a CNI?", a: ["Container Network Interface", "Container Node Interface", "Cluster Network", "Container Network"], correct: 0 },
+            { q: "What is a PersistentVolume?", a: ["Cluster-wide storage resource", "Pod storage", "Node storage", "Container storage"], correct: 0 },
+            { q: "What is a PersistentVolumeClaim?", a: ["Request for storage", "Volume driver", "Storage class", "Volume plugin"], correct: 0 },
+            { q: "What is a StorageClass?", a: ["Dynamic volume provisioning", "Static volume", "Volume snapshot", "Volume clone"], correct: 0 },
+            { q: "What is RBAC?", a: ["Role-Based Access Control", "Resource-Based Access", "Remote Access", "Rule-Based Access"], correct: 0 },
+            { q: "What is a ClusterRole?", a: ["Cluster-wide permissions", "Namespace role", "User role", "Pod role"], correct: 0 },
+            { q: "What is a Role?", a: ["Namespace-scoped permissions", "Cluster-wide", "Node-scoped", "Pod-scoped"], correct: 0 },
+            { q: "What is a ServiceAccount?", a: ["Identity for pods", "User identity", "Node identity", "External identity"], correct: 0 },
+            { q: "What is a NetworkPolicy?", a: ["Controls network traffic", "Storage policy", "Access policy", "Quota policy"], correct: 0 },
+            { q: "What is Horizontal Pod Autoscaler?", a: ["Scales pods based on metrics", "Scales nodes", "Scales storage", "Scales network"], correct: 0 },
+            { q: "What is Vertical Pod Autoscaler?", a: ["Adjusts pod resource requests", "Scales pods", "Scales nodes", "Scales storage"], correct: 0 },
+            { q: "What is a ResourceQuota?", a: ["Limits resource usage in namespace", "Cluster quota", "Node quota", "Pod quota"], correct: 0 },
+            { q: "What is a LimitRange?", a: ["Sets default/limits for pods", "Range of resources", "Network limits", "Storage limits"], correct: 0 },
+            { q: "What is helm?", a: ["Package manager for Kubernetes", "Container runtime", "Monitoring tool", "Network plugin"], correct: 0 },
+            { q: "What is a Helm Chart?", a: ["Package of Kubernetes resources", "Container image", "Configuration file", "Template file"], correct: 0 },
+            { q: "What is Kustomize?", a: ["Kubernetes native configuration tool", "Package manager", "Monitoring tool", "Network tool"], correct: 0 },
+            { q: "What is kubectl port-forward?", a: ["Forwards local port to pod", "Opens cluster port", "Routes network", "Proxies traffic"], correct: 0 },
+            { q: "What is kubectl exec?", a: ["Execute command in container", "Exits container", "Exports container", "Executes pod"], correct: 0 },
+            { q: "What is kubectl logs?", a: ["Retrieves container logs", "Creates logs", "Deletes logs", "Updates logs"], correct: 0 },
+            { q: "What is a sidecar pattern?", a: ["Helper container in same pod", "Separate pod", "Node agent", "Network proxy"], correct: 0 },
+            { q: "What is an init container?", a: ["Runs before main container", "Runs after", "Runs on schedule", "Runs continuously"], correct: 0 },
+            { q: "What is pod disruption?", a: ["Voluntary or involuntary pod termination", "Network issue", "Storage issue", "CPU issue"], correct: 0 },
+            { q: "What is a PDB?", a: ["Pod Disruption Budget", "Pod Data Base", "Pod Default Budget", "Pod Dynamic Balance"], correct: 0 },
+            { q: "What is etcd backup?", a: ["Cluster state backup", "Pod backup", "Node backup", "Network backup"], correct: 0 },
+            { q: "What is kubeconfig?", a: ["Cluster access configuration", "Container config", "Storage config", "Network config"], correct: 0 },
+            { q: "What is a context in kubectl?", a: ["Cluster, user, namespace combo", "Time context", "Network context", "Storage context"], correct: 0 },
+            { q: "What is minikube?", a: ["Local Kubernetes cluster", "Production cluster", "Cloud cluster", "Hybrid cluster"], correct: 0 },
+            { q: "What is kind?", a: ["Kubernetes in Docker", "Kubernetes in VM", "Kubernetes in cloud", "Kubernetes on bare metal"], correct: 0 },
+            { q: "What is kubeadm?", a: ["Cluster bootstrapping tool", "Container tool", "Network tool", "Storage tool"], correct: 0 },
+            { q: "What is kubectl drain?", a: ["Safely evict pods from node", "Delete node", "Create node", "Update node"], correct: 0 },
+            { q: "What is kubectl cordon?", a: ["Marks node as unschedulable", "Removes node", "Adds node", "Updates node"], correct: 0 },
+            { q: "What is kubectl uncordon?", a: ["Marks node as schedulable", "Removes node", "Adds node", "Updates node"], correct: 0 },
+            { q: "What is cAdvisor?", a: ["Container resource usage collector", "Container advisor", "Container admin", "Container audit"], correct: 0 },
+            { q: "What is a static pod?", a: ["Pod managed by kubelet", "Pod in static namespace", "Pod with static IP", "Pod with static volume"], correct: 0 },
+            { q: "What is kube-scheduler?", a: ["Schedules pods to nodes", "Manages cluster", "Controls network", "Manages storage"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is the control plane?", a: ["Components that control cluster", "Data plane", "Worker nodes", "Storage layer"], correct: 0 },
+            { q: "What is a CRD?", a: ["Custom Resource Definition", "Container Resource Definition", "Cluster Resource Definition", "Core Resource Definition"], correct: 0 },
+            { q: "What is an Operator?", a: ["Custom controller for complex apps", "Simple script", "Monitoring tool", "Network plugin"], correct: 0 },
+            { q: "What is the difference between HPA and VPA?", a: ["HPA scales pods, VPA adjusts resources", "No difference", "VPA is deprecated", "HPA is deprecated"], correct: 0 },
+            { q: "What is a MutatingWebhook?", a: ["Modifies requests before processing", "Validates requests", "Logs requests", "Routes requests"], correct: 0 },
+            { q: "What is a ValidatingWebhook?", a: ["Validates requests", "Modifies requests", "Logs requests", "Routes requests"], correct: 0 },
+            { q: "What is etcd raft?", a: ["Consensus algorithm for etcd", "Storage format", "Network protocol", "Encryption method"], correct: 0 },
+            { q: "What is a Leader Election?", a: ["Ensures one replica is leader", "Elects storage", "Elects network", "Elects nodes"], correct: 0 },
+            { q: "What is the Kubernetes API aggregation layer?", a: ["Extends Kubernetes API", "Routes all requests", "Stores data", "Monitors cluster"], correct: 0 },
+            { q: "What is service mesh?", a: ["Infrastructure for service communication", "Network plugin", "Storage system", "Monitoring system"], correct: 0 },
+            { q: "What is Istio?", a: ["Service mesh implementation", "Container runtime", "Orchestrator", "Monitoring tool"], correct: 0 },
+            { q: "What is Envoy?", a: ["Sidecar proxy", "Container runtime", "Network plugin", "Storage driver"], correct: 0 },
+            { q: "What is Linkerd?", a: ["Service mesh", "Load balancer", "API gateway", "Service discovery"], correct: 0 },
+            { q: "What is a Pod preset?", a: ["Injects information into pods", "Creates pods", "Deletes pods", "Updates pods"], correct: 0 },
+            { q: "What is device plugins?", a: ["Provides hardware access to containers", "Plugin for devices", "Network plugin", "Storage plugin"], correct: 0 },
+            { q: "What is a CSI?", a: ["Container Storage Interface", "Container System Interface", "Container Service Interface", "Container Storage Initiative"], correct: 0 },
+            { q: "What is SIGs in Kubernetes?", a: ["Special Interest Groups", "System Information Groups", "Security Interest Groups", "Service Integration Groups"], correct: 0 },
+            { q: "What is the Kubernetes logo?", a: ["Helm with seven spokes", "Blue circle", "Red square", "Green triangle"], correct: 0 },
+            { q: "What is a Taint?", a: ["Marks node to repel pods", "Marks pod", "Marks namespace", "Marks cluster"], correct: 0 },
+            { q: "What is a Toleration?", a: ["Allows pod to tolerate taints", "Creates toleration", "Deletes toleration", "Updates toleration"], correct: 0 },
+            { q: "What is affinity in Kubernetes?", a: ["Controls pod placement", "Controls storage", "Controls network", "Controls resources"], correct: 0 },
+            { q: "What is node affinity?", a: ["Rules for pod placement on nodes", "Pod to pod affinity", "Network affinity", "Storage affinity"], correct: 0 },
+            { q: "What is pod affinity?", a: ["Co-locate pods based on labels", "Node affinity", "Network affinity", "Storage affinity"], correct: 0 },
+            { q: "What is anti-affinity?", a: ["Avoid co-locating pods", "Place pods together", "Network affinity", "Storage affinity"], correct: 0 },
+            { q: "What is priorityClass?", a: ["Defines pod scheduling priority", "Priority queue", "Priority scheduling", "Priority order"], correct: 0 },
+            { q: "What is preemption?", a: ["Higher priority pods evict lower", "Pod creation", "Pod deletion", "Pod update"], correct: 0 },
+            { q: "What is garbage collection in Kubernetes?", a: ["Cleans up unused resources", "Memory management", "Storage management", "Network management"], correct: 0 },
+            { q: "What is finalizers?", a: ["Logic that runs before deletion", "Final cleanup", "Final check", "Final action"], correct: 0 },
+            { q: "What is custom metrics?", a: ["User-defined metrics for HPA", "Standard metrics", "System metrics", "Network metrics"], correct: 0 },
+            { q: "What is the metrics-server?", a: ["Collects resource metrics", "Server metrics", "Application metrics", "Network metrics"], correct: 0 },
+            { q: "What is Prometheus?", a: ["Time-series monitoring system", "Logging system", "Network system", "Storage system"], correct: 0 },
+            { q: "What is Grafana?", a: ["Visualization and monitoring", "Logging", "Network", "Storage"], correct: 0 },
+            { q: "What is Alertmanager?", a: ["Handles Prometheus alerts", "Manages logs", "Manages network", "Manages storage"], correct: 0 },
+            { q: "What is a PGO?", a: ["PGO - Postgres Operator", "Pod Group Operator", "Pod General Operator", "Pod Global Operator"], correct: 0 },
+            { q: "What is a CNI plugin?", a: ["Container network interface plugin", "Container storage", "Container monitoring", "Container security"], correct: 0 },
+            { q: "What is Calico?", a: ["CNI and network policy engine", "Storage system", "Monitoring system", "Authentication"], correct: 0 },
+            { q: "What is Flannel?", a: ["CNI overlay network", "Storage plugin", "Monitoring plugin", "Security plugin"], correct: 0 },
+            { q: "What is Cilium?", a: ["eBPF-based networking", "Overlay network", "Storage network", "Security network"], correct: 0 },
+            { q: "What is eBPF?", a: ["Extended Berkeley Packet Filter", "Basic Packet Filter", "Enhanced Packet Filter", "External Packet Filter"], correct: 0 },
+            { q: "What is a cluster autoscaler?", a: ["Scales nodes based on workload", "Scales pods", "Scales storage", "Scales network"], correct: 0 },
+            { q: "What is multi-cluster Kubernetes?", a: ["Multiple Kubernetes clusters", "Single cluster", "Virtual cluster", "Container cluster"], correct: 0 },
+            { q: "What is federation?", a: ["Manages multiple clusters", "Single cluster", "Backup system", "Monitoring system"], correct: 0 },
+            { q: "What is kubeflow?", a: ["Machine learning on Kubernetes", "Data flow", "Network flow", "Control flow"], correct: 0 },
+            { q: "What is Argo CD?", a: ["GitOps continuous delivery", "Continuous integration", "Continuous deployment", "Continuous monitoring"], correct: 0 },
+            { q: "What is Flux?", a: ["GitOps tool for Kubernetes", "Code flow", "Data flow", "Network flow"], correct: 0 },
+            { q: "What is a Pod security policy?", a: ["Security context for pods", "Network policy", "Storage policy", "Access policy"], correct: 0 },
+            { q: "What is OPA?", a: ["Open Policy Agent", "Open Authentication", "Open Authorization", "Open Audit"], correct: 0 },
+            { q: "What is Gatekeeper?", a: ["OPA Kubernetes integration", "Network gatekeeper", "Storage gatekeeper", "System gatekeeper"], correct: 0 },
+            { q: "What is Kyverno?", a: ["Kubernetes-native policy engine", "Network engine", "Storage engine", "Security engine"], correct: 0 },
+            { q: "What is a VolumeSnapshot?", a: ["Captures point-in-time state", "Volume backup", "Volume clone", "Volume replica"], correct: 0 },
+            { q: "What is VolumeCloning?", a: ["Creates new volume from existing", "Volume snapshot", "Volume backup", "Volume replica"], correct: 0 },
+            { q: "What is the Kubernetes scheduler filter phase?", a: ["Filters nodes that can't run pod", "Filters pods", "Filters storage", "Filters network"], correct: 0 },
+            { q: "What is the Kubernetes scheduler ranking phase?", a: ["Ranks nodes by fitness", "Filters nodes", "Selects node", "Creates pod"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+        function initTest() { difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0; currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0; document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block'; renderQuestion(); }
+        function renderQuestion() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const q = currentQuestions[currentQuestionIndex]; const qDiv = document.createElement('div'); qDiv.className = 'question-container active'; let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join(''); qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`; container.appendChild(qDiv); updateUI(); }
+        function updateUI() { const total = currentQuestions.length; const progress = ((currentQuestionIndex) / total) * 100; document.getElementById('progressFill').style.width = progress + '%'; document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; }
+        function selectAnswer(index) { const q = currentQuestions[currentQuestionIndex]; const buttons = document.querySelectorAll('.answer-btn'); buttons.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); }); totalAnswered++; if (index === q.correct) { streak++; if (streak > maxStreak) maxStreak = streak; consecutiveCorrect++; score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30; if (currentLevel === 1 && consecutiveCorrect >= 7) { currentLevel = 2; difficulty = 'medium'; consecutiveCorrect = 0; currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else if (currentLevel === 2 && consecutiveCorrect >= 7) { currentLevel = 3; difficulty = 'hard'; consecutiveCorrect = 0; currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else { currentQuestionIndex++; } setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 1200); } else { buttons[index].classList.add('incorrect'); streak = 0; consecutiveCorrect = 0; currentQuestionIndex++; setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 2000); return; } }
+        function showResult() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const resultScreen = document.getElementById('resultScreen'); resultScreen.classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '✓' : '✗'; document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score}`; document.getElementById('resultDetails').innerHTML = `Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`; document.getElementById('progressFill').style.width = '100%'; }
+        function restartTest() { initTest(); }
+        document.addEventListener('DOMContentLoaded', function() { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('themeToggle').checked = true; } initTest(); });
+    </script>
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+    <footer><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-css.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+    </nav>
+    <div class="test-container">
+        <div class="test-header"><h1>// CSS TEST</h1><p>Prove your CSS mastery</p></div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const easyQuestions = [
+            { q: "What does CSS stand for?", a: ["Cascading Style Sheets", "Computer Style Sheets", "Creative Style Sheets", "Colorful Style Sheets"], correct: 0 },
+            { q: "Which property changes text color?", a: ["color", "text-color", "font-color", "foreground"], correct: 0 },
+            { q: "How do you select an element with id 'header'?", a: ["#header", ".header", "header", "*header"], correct: 0 },
+            { q: "How do you select elements with class 'btn'?", a: [".btn", "#btn", "btn", "*btn"], correct: 0 },
+            { q: "Which property changes background color?", a: ["background-color", "bgcolor", "color", "background"], correct: 0 },
+            { q: "How do you make text bold?", a: ["font-weight: bold", "text-style: bold", "font: bold", "text: bold"], correct: 0 },
+            { q: "Which property adds space inside element?", a: ["padding", "margin", "border", "spacing"], correct: 0 },
+            { q: "Which property adds space outside element?", a: ["margin", "padding", "border", "gap"], correct: 0 },
+            { q: "How do you center text?", a: ["text-align: center", "align: center", "center: text", "text-center"], correct: 0 },
+            { q: "Which property changes font size?", a: ["font-size", "text-size", "size", "font-style"], correct: 0 },
+            { q: "How do you make text italic?", a: ["font-style: italic", "font: italic", "text-style: italic", "italic: true"], correct: 0 },
+            { q: "Which property changes the font family?", a: ["font-family", "font-type", "text-font", "family"], correct: 0 },
+            { q: "How do you create a flex container?", a: ["display: flex", "flex: container", "container: flex", "flexbox: true"], correct: 0 },
+            { q: "Which property arranges items horizontally?", a: ["justify-content", "align-items", "flex-direction", "flex-wrap"], correct: 0 },
+            { q: "Which property arranges items vertically?", a: ["align-items", "justify-content", "vertical-align", "flex-direction"], correct: 0 },
+            { q: "How do you set fixed width?", a: ["width: 100px", "size: 100", "fixed-width: 100", "set-width: 100"], correct: 0 },
+            { q: "Which property creates rounded corners?", a: ["border-radius", "corner-radius", "border-round", "radius"], correct: 0 },
+            { q: "How do you add a border?", a: ["border: 1px solid black", "outline: 1px", "stroke: 1px", "line: 1px"], correct: 0 },
+            { q: "Which property makes element hidden?", a: ["display: none", "visibility: hidden", "Both a and b", "opacity: 0"], correct: 0 },
+            { q: "How do you make element semi-transparent?", a: ["opacity: 0.5", "transparent: 0.5", "visibility: 0.5", "alpha: 0.5"], correct: 0 },
+            { q: "Which selector targets all paragraphs?", a: ["p", ".p", "#p", "*p"], correct: 0 },
+            { q: "How do you comment in CSS?", a: ["/* comment */", "// comment", "<!-- comment -->", "# comment"], correct: 0 },
+            { q: "Which property changes link color?", a: ["color", "link-color", "a-color", "href-color"], correct: 0 },
+            { q: "How do you remove underline from link?", a: ["text-decoration: none", "decoration: none", "underline: none", "link-style: none"], correct: 0 },
+            { q: "Which property changes cursor?", a: ["cursor", "pointer", "mouse", "icon"], correct: 0 }
+        ];
+        const mediumQuestions = [
+            { q: "What is specificity in CSS?", a: ["Priority of selectors", "Speed of rendering", "File size", "Browser support"], correct: 0 },
+            { q: "Which has higher specificity: #header or .header?", a: ["#header", ".header", "Same", "Depends on usage"], correct: 0 },
+            { q: "What does 'box-sizing: border-box' do?", a: ["Includes padding in width", "Adds border to width", "Removes padding", "Changes height"], correct: 0 },
+            { q: "What is the default position value?", a: ["static", "relative", "absolute", "fixed"], correct: 0 },
+            { q: "Which position is relative to viewport?", a: ["fixed", "absolute", "relative", "sticky"], correct: 0 },
+            { q: "What does 'z-index' control?", a: ["Stacking order", "Element size", "Opacity", "Visibility"], correct: 0 },
+            { q: "How do you use CSS grid?", a: ["display: grid", "grid: container", "display: grid-container", "grid-template: true"], correct: 0 },
+            { q: "What does 'grid-template-columns: 1fr 1fr' create?", a: ["Two equal columns", "Two rows", "One column", "Three columns"], correct: 0 },
+            { q: "What is a media query used for?", a: ["Responsive design", "Animation", "Validation", "Optimization"], correct: 0 },
+            { q: "What does '@media (max-width: 768px)' target?", a: ["Screens under 768px", "Screens over 768px", "Print only", "Mobile only"], correct: 0 },
+            { q: "How do you create a pseudo-class?", a: [":hover", "::hover", "--hover", ".hover"], correct: 0 },
+            { q: "What does ':first-child' select?", a: ["First child element", "First paragraph", "First div", "Child elements"], correct: 0 },
+            { q: "How do you create a pseudo-element?", a: ["::before", ":before", "*-before", ".before"], correct: 0 },
+            { q: "What is the difference between :hover and ::before?", a: ["State vs element", "Same thing", "Before vs after", "Class vs ID"], correct: 0 },
+            { q: "How do you use CSS variables?", a: ["--variable-name", "$variable", "@variable", "*variable"], correct: 0 }
+        ];
+        const hardQuestions = [
+            { q: "What does 'transform: translateX(10px)' do?", a: ["Move right 10px", "Scale 10px", "Rotate 10px", "Skew 10px"], correct: 0 },
+            { q: "What does 'transition: all 0.3s' create?", a: ["Smooth animation", "Instant change", "Delayed change", "No change"], correct: 0 },
+            { q: "What is a CSS preprocessor?", a: ["Tool that extends CSS", "Browser feature", "Animation library", "Validation tool"], correct: 0 },
+            { q: "What does '@keyframes' define?", a: ["Animation steps", "Key frames", "Frame rate", "Time frames"], correct: 0 },
+            { q: "How do you apply animation?", a: ["animation-name", "animate", "keyframe", "transition"], correct: 0 },
+            { q: "What does 'will-change' optimize?", a: ["Performance", "Size", "Color", "Layout"], correct: 0 },
+            { q: "What is 'contain' property used for?", a: ["Element isolation", "Layout containment", "Style containment", "All of above"], correct: 0 },
+            { q: "What does 'backdrop-filter: blur(5px)' do?", a: ["Blurs background", "Blurs text", "Adds shadow", "Creates gradient"], correct: 0 },
+            { q: "What is CSS Container Queries?", a: ["Style based on parent", "Media query", "Element query", "Viewport query"], correct: 0 },
+            { q: "How do you create custom property?", a: ["--custom-name: value", "@property", "var(--custom)", "define()"], correct: 0 },
+            { q: "What does 'clip-path' do?", a: ["Clips element shape", "Crops image", "Masks content", "All of above"], correct: 0 },
+            { q: "What is the purpose of 'paint-order'?", a: ["SVG stroke order", "Text z-order", "Layer order", "Draw order"], correct: 0 },
+            { q: "What does 'object-fit: cover' do?", a: ["Fills container preserving ratio", "Scales to fit", "Centers content", "Stretches image"], correct: 0 },
+            { q: "What is 'margin collapse'?", a: ["Vertical margins combine", "Horizontal margins combine", "Margins reset", "Margins multiply"], correct: 0 },
+            { q: "What does 'place-items: center' do?", a: ["Center both axes", "Center horizontal", "Center vertical", "Place in center"], correct: 0 }
+        ];
+        let currentQuestions=[],currentQuestionIndex=0,score=0,streak=0,maxStreak=0,difficulty='easy',currentLevel=1,consecutiveCorrect=0,totalAnswered=0;
+        function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+        function shuffleAnswers(q){let a=[...q.a],c=a[q.correct],s=shuffle(a);return{...q,a:s,correct:s.indexOf(c)}}
+        function initTest(){difficulty='easy';currentLevel=1;consecutiveCorrect=0;currentQuestions=shuffle([...easyQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0;score=0;streak=0;maxStreak=0;totalAnswered=0;document.getElementById('resultScreen').classList.remove('active');document.getElementById('quiz').style.display='block';renderQuestion()}
+        function renderQuestion(){let c=document.getElementById('questionsContainer');c.innerHTML='';let q=currentQuestions[currentQuestionIndex],d=document.createElement('div');d.className='question-container active';d.innerHTML=`<div class="question-text">${q.q}</div><div class="answers-grid">${q.a.map((a,i)=>`<button class="answer-btn" onclick="selectAnswer(${i})">${a}</button>`).join('')}</div>`;c.appendChild(d);updateUI()}
+        function updateUI(){let t=currentQuestions.length,p=(currentQuestionIndex/t)*100;document.getElementById('progressFill').style.width=p+'%';document.getElementById('questionNum').textContent=currentQuestionIndex+1;document.getElementById('streakNum').textContent=streak;document.getElementById('scoreNum').textContent=score;document.getElementById('levelNum').textContent=currentLevel}
+        function selectAnswer(i){let q=currentQuestions[currentQuestionIndex],b=document.querySelectorAll('.answer-btn');b.forEach((btn,j)=>{btn.disabled=true;if(j===q.correct)btn.classList.add('correct')});totalAnswered++;if(i===q.correct){streak++;if(streak>maxStreak)maxStreak=streak;consecutiveCorrect++;score+=difficulty==='easy'?10:difficulty==='medium'?20:30;if(currentLevel===1&&consecutiveCorrect>=7){currentLevel=2;difficulty='medium';consecutiveCorrect=0;currentQuestions=shuffle([...mediumQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0}else if(currentLevel===2&&consecutiveCorrect>=7){currentLevel=3;difficulty='hard';consecutiveCorrect=0;currentQuestions=shuffle([...hardQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0}else currentQuestionIndex++;setTimeout(()=>{currentQuestionIndex<currentQuestions.length?renderQuestion():showResult()},1200)}else{b[i].classList.add('incorrect');streak=0;consecutiveCorrect=0;currentQuestionIndex++;setTimeout(()=>{currentQuestionIndex<currentQuestions.length?renderQuestion():showResult()},2000);return}}
+        function showResult(){document.getElementById('questionsContainer').innerHTML='';let p=score>=100;document.getElementById('resultScreen').classList.add('active');document.getElementById('resultIcon').textContent=p?'✓':'✗';document.getElementById('resultText').textContent=p?'PASS':'FAIL';document.getElementById('resultText').className='result-text '+(p?'pass':'fail');document.getElementById('resultScore').textContent=`Score: ${score}`;document.getElementById('resultDetails').innerHTML=`Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`;document.getElementById('progressFill').style.width='100%'}
+        function restartTest(){initTest()}
+        function handleThemeChange(isDark){let t=isDark?'dark':'light';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t)}
+        document.addEventListener('DOMContentLoaded',function(){let s=localStorage.getItem('theme');if(s==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('themeToggle').checked=true}initTest()});
+    </script>
+</body>
+</html>

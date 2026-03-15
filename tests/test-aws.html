@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-aws.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// AWS TEST</h1>
+            <p>Prove your AWS mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value" id="questionNum">1</div>
+                    <div class="stat-label">Question</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="streakNum">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="scoreNum">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="levelNum">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div id="questionsContainer"></div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What does EC2 stand for?", a: ["Elastic Compute Cloud", "Elastic Computer Cloud", "Extended Compute Cloud", "Elastic Cloud Compute"], correct: 0 },
+            { q: "What is S3 in AWS?", a: ["Simple Storage Service", "Simple Server Storage", "Secure Storage Service", "Standard Storage Service"], correct: 0 },
+            { q: "What does RDS stand for?", a: ["Relational Database Service", "Remote Database Service", "Reliable Database Service", "Redundant Database Service"], correct: 0 },
+            { q: "What is Lambda?", a: ["Serverless compute service", "Database service", "Storage service", "Networking service"], correct: 0 },
+            { q: "What does VPC stand for?", a: ["Virtual Private Cloud", "Virtual Public Cloud", "Virtual Private Connection", "Virtual Protected Cloud"], correct: 0 },
+            { q: "What does IAM stand for?", a: ["Identity and Access Management", "Internet Access Management", "Identity Access Monitor", "Internal Access Management"], correct: 0 },
+            { q: "What does ELB stand for?", a: ["Elastic Load Balancer", "External Load Balancer", "Enhanced Load Balancer", "Elastic Load Balancing"], correct: 0 },
+            { q: "What is CloudFront?", a: ["Content Delivery Network", "Cloud Storage", "Cloud Computing", "Cloud Firewall"], correct: 0 },
+            { q: "What is Route53?", a: ["DNS web service", "Route management", "Network service", "Storage service"], correct: 0 },
+            { q: "What does EKS stand for?", a: ["Elastic Kubernetes Service", "Elastic Kernel Service", "Extended Kubernetes Service", "Enterprise Kubernetes Service"], correct: 0 },
+            { q: "What does ECS stand for?", a: ["Elastic Container Service", "Elastic Cloud Service", "Extended Container Service", "Enterprise Container Service"], correct: 0 },
+            { q: "What is DynamoDB?", a: ["NoSQL database service", "Relational database", "Data warehouse", "Cache service"], correct: 0 },
+            { q: "What does SNS stand for?", a: ["Simple Notification Service", "Simple Network Service", "Secure Notification Service", "Standard Notification Service"], correct: 0 },
+            { q: "What does SQS stand for?", a: ["Simple Queue Service", "Simple Query Service", "Secure Queue Service", "Standard Queue Service"], correct: 0 },
+            { q: "What is API Gateway?", a: ["API management service", "API storage", "API firewall", "API network"], correct: 0 },
+            { q: "What is the default region in AWS?", a: ["us-east-1", "us-west-1", "eu-west-1", "ap-northeast-1"], correct: 0 },
+            { q: "What is an EC2 instance type?", a: ["Hardware configuration template", "Operating system", "Network type", "Storage type"], correct: 0 },
+            { q: "What is an AMI?", a: ["Amazon Machine Image", "Amazon Management Interface", "Amazon Memory Instance", "Amazon Monitor Instance"], correct: 0 },
+            { q: "What does EBS stand for?", a: ["Elastic Block Store", "Elastic Backup Store", "External Block Store", "Enhanced Block Store"], correct: 0 },
+            { q: "What is a security group?", a: ["Virtual firewall for EC2", "User group", "Permission set", "Network rule"], correct: 0 },
+            { q: "What does IAM role provide?", a: ["Temporary AWS credentials", "Permanent access", "Password authentication", "SSH keys"], correct: 0 },
+            { q: "What is an S3 bucket?", a: ["Container for objects", "Storage tier", "Backup location", "Archive"], correct: 0 },
+            { q: "What is object storage in S3?", a: ["Data stored as objects", "File system", "Block storage", "Database"], correct: 0 },
+            { q: "What is a VPC subnet?", a: ["Subdivision of VPC network", "Firewall rule", "Security group", "Route table"], correct: 0 },
+            { q: "What is a NAT gateway?", a: ["Allows private subnet internet access", "Blocks traffic", "Routes internal", "Monitors traffic"], correct: 0 },
+            { q: "What is CloudWatch?", a: ["Monitoring and observability", "Storage service", "Database service", "Compute service"], correct: 0 },
+            { q: "What is an SNS topic?", a: ["Channel for publishing messages", "Message queue", "Email service", "Notification rule"], correct: 0 },
+            { q: "What is SQS used for?", a: ["Message queuing", "Data storage", "File transfer", "Email sending"], correct: 0 },
+            { q: "What is a Lambda function?", a: ["Serverless code execution", "Virtual machine", "Container", "Server"], correct: 0 },
+            { q: "What is Terraform?", a: ["Infrastructure as Code tool", "AWS service", "Container service", "Monitoring tool"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the difference between ALB and NLB?", a: ["ALB is layer 7, NLB is layer 4", "NLB is faster", "ALB is older", "No difference"], correct: 0 },
+            { q: "What is Auto Scaling Group?", a: ["Automatically adjusts instance count", "Manual scaling", "Fixed scaling", "Scheduled scaling"], correct: 0 },
+            { q: "What is a launch template?", a: ["EC2 instance configuration", "Startup script", "AMI backup", "Security template"], correct: 0 },
+            { q: "What is RDS Multi-AZ?", a: ["Database replication across availability zones", "Single zone deployment", "Backup only", "Standby only"], correct: 0 },
+            { q: "What is RDS read replica?", a: ["Read-only database copy", "Backup copy", "Primary copy", "Standby copy"], correct: 0 },
+            { q: "What is S3 versioning?", a: ["Preserves object versions", "Object encryption", "Object compression", "Object deletion"], correct: 0 },
+            { q: "What is S3 lifecycle policy?", a: ["Automates object transitions", "Object locking", "Object replication", "Object backup"], correct: 0 },
+            { q: "What is S3 replication?", a: ["Copies objects across buckets", "Version control", "Encryption", "Compression"], correct: 0 },
+            { q: "What is CloudFront origin?", a: ["Source of content for distribution", "Edge location", "Cache server", "Distribution endpoint"], correct: 0 },
+            { q: "What is a Route53 health check?", a: ["Monitors endpoint health", "DNS check", "Server check", "Network check"], correct: 0 },
+            { q: "What is EKS node group?", a: ["EC2 instances for Kubernetes", "Kubernetes cluster", "Pod definition", "Service endpoint"], correct: 0 },
+            { q: "What is ECS task definition?", a: ["Container configuration blueprint", "Task scheduler", "Service definition", "Cluster config"], correct: 0 },
+            { q: "What is DynamoDB partition key?", a: ["Primary key for data distribution", "Sort key", "Index key", "Secondary key"], correct: 0 },
+            { q: "What is a VPC peering connection?", a: ["Route traffic between VPCs", "VPN connection", "Direct connect", "Transit gateway"], correct: 0 },
+            { q: "What is an Internet Gateway?", a: ["Enables internet access for VPC", "Blocks internet", "Routes internal", "Monitors traffic"], correct: 0 },
+            { q: "What is IAM policy?", a: ["Defines permissions", "User account", "Group definition", "Role assignment"], correct: 0 },
+            { q: "What is IAM user?", a: ["Individual AWS access identity", "Group", "Role", "Service account"], correct: 0 },
+            { q: "What is IAM group?", a: ["Collection of IAM users", "Single user", "Role", "Policy"], correct: 0 },
+            { q: "What is IAM role?", a: ["Temporary permissions identity", "Permanent user", "Group", "Policy"], correct: 0 },
+            { q: "What is AWS Organizations?", a: ["Account management service", "User management", "Billing service", "Support service"], correct: 0 },
+            { q: "What is a CloudWatch alarm?", a: ["Triggers actions based on metrics", "System alert", "Log alert", "Event alert"], correct: 0 },
+            { q: "What is CloudWatch Logs?", a: ["Monitoring and storing logs", "Log backup", "Log analysis", "Log storage"], correct: 0 },
+            { q: "What is AWS X-Ray?", a: ["Distributed tracing service", "Error monitoring", "Performance monitoring", "Log analysis"], correct: 0 },
+            { q: "What is AWS CloudTrail?", a: ["API call logging", "User activity", "Resource tracking", "Cost tracking"], correct: 0 },
+            { q: "What is AWS Config?", a: ["Resource configuration tracking", "Configuration backup", "Config storage", "Config validation"], correct: 0 },
+            { q: "What is AWS Secrets Manager?", a: ["Secure credential storage", "Secret sharing", "Secret backup", "Secret rotation"], correct: 0 },
+            { q: "What is AWS Parameter Store?", a: ["Parameter and secret storage", "Parameter backup", "Config storage", "Secret encryption"], correct: 0 },
+            { q: "What is a NAT instance?", a: ["EC2 instance for NAT", "NAT gateway", "NAT service", "NAT storage"], correct: 0 },
+            { q: "What is VPC Flow Logs?", a: ["Captures network traffic logs", "Flow monitoring", "Traffic analysis", "Network logging"], correct: 0 },
+            { q: "What is AWS Direct Connect?", a: ["Dedicated network connection", "VPN connection", "Internet connection", "VPC connection"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is Terraform AWS provider?", a: ["Manages AWS resources", "AWS plugin", "AWS API client", "AWS SDK"], correct: 0 },
+            { q: "What is a Terraform resource?", a: ["Infrastructure component", "Provider config", "Variable", "Module"], correct: 0 },
+            { q: "What is a Terraform data source?", a: ["Queries existing AWS resources", "Resource definition", "Variable input", "Output definition"], correct: 0 },
+            { q: "What does 'terraform plan' do?", a: ["Shows planned changes", "Applies changes", "Destroys resources", "Formats code"], correct: 0 },
+            { q: "What does 'terraform apply' do?", a: ["Creates/updates infrastructure", "Shows plan", "Destroys resources", "Validates config"], correct: 0 },
+            { q: "What is Terraform state?", a: ["Maps real resources to config", "Resource backup", "Plan history", "Variable values"], correct: 0 },
+            { q: "What is Terraform backend?", a: ["Storage for state", "Resource provider", "Module source", "Variable input"], correct: 0 },
+            { q: "What is an EKS pod?", a: ["Smallest deployable unit", "Node group", "Cluster", "Service"], correct: 0 },
+            { q: "What is an EKS service?", a: ["Exposes pods to network", "Pod definition", "Node config", "Cluster config"], correct: 0 },
+            { q: "What is Kubernetes ingress?", a: ["HTTP/HTTPS routing", "Internal network", "External access", "Service mesh"], correct: 0 },
+            { q: "What is EKS Fargate?", a: ["Serverless compute for containers", "Container service", "Node type", "Storage type"], correct: 0 },
+            { q: "What is AWS App Mesh?", a: ["Service mesh implementation", "Application deployment", "App monitoring", "App configuration"], correct: 0 },
+            { q: "What is AWS CodePipeline?", a: ["CI/CD service", "Code storage", "Code testing", "Code building"], correct: 0 },
+            { q: "What is AWS CodeBuild?", a: ["Build and test code", "Code deployment", "Code storage", "Code review"], correct: 0 },
+            { q: "What is AWS CodeDeploy?", a: ["Automates deployment", "Code building", "Code testing", "Code storage"], correct: 0 },
+            { q: "What is AWS SAM?", a: ["Serverless application model", "Standard architecture", "Security model", "Storage model"], correct: 0 },
+            { q: "What is AWS Step Functions?", a: ["Orchestrates serverless workflows", "Workflow engine", "State machine", "Task runner"], correct: 0 },
+            { q: "What is Amazon EventBridge?", a: ["Serverless event bus", "Event logging", "Event storage", "Event monitoring"], correct: 0 },
+            { q: "What is AWS Glue?", a: ["ETL service", "Data pipeline", "Data warehouse", "Data lake"], correct: 0 },
+            { q: "What is Amazon Redshift?", a: ["Data warehouse service", "Database service", "Cache service", "Storage service"], correct: 0 },
+            { q: "What is AWS Athena?", a: ["Query service for S3 data", "Database service", "ETL service", "Analytics service"], correct: 0 },
+            { q: "What is Amazon Kinesis?", a: ["Real-time data streaming", "Data storage", "Data processing", "Data analysis"], correct: 0 },
+            { q: "What is AWS Lake Formation?", a: ["Data lake setup service", "Data storage", "Data backup", "Data migration"], correct: 0 },
+            { q: "What is Amazon Cognito?", a: ["User identity and access", "Authentication", "Authorization", "User management"], correct: 0 },
+            { q: "What is AWS WAF?", a: ["Web application firewall", "Network firewall", "Database firewall", "API firewall"], correct: 0 },
+            { q: "What is AWS Shield?", a: ["DDoS protection", "Network protection", "Application protection", "Data protection"], correct: 0 },
+            { q: "What is AWS GuardDuty?", a: ["Threat detection service", "Firewall service", "Encryption service", "Backup service"], correct: 0 },
+            { q: "What is AWS Security Hub?", a: ["Security posture management", "Security logging", "Security monitoring", "Security compliance"], correct: 0 },
+            { q: "What is AWS Inspector?", a: ["Security assessment service", "Security monitoring", "Security compliance", "Security audit"], correct: 0 },
+            { q: "What is AWS Control Tower?", a: ["Governs multi-account environment", "Account management", "User management", "Access control"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            const q = currentQuestions[currentQuestionIndex];
+            
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            
+            qDiv.innerHTML = `
+                <div class="question-text">${q.q}</div>
+                <div class="answers-grid">${answersHtml}</div>
+            `;
+            
+            container.appendChild(qDiv);
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            const total = currentQuestions.length;
+            const progress = ((currentQuestionIndex) / total) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) {
+                    btn.classList.add('correct');
+                }
+            });
+            
+            totalAnswered++;
+            
+            if (index === q.correct) {
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+                consecutiveCorrect++;
+                score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30;
+                
+                if (currentLevel === 1 && consecutiveCorrect >= 7) {
+                    currentLevel = 2;
+                    difficulty = 'medium';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else if (currentLevel === 2 && consecutiveCorrect >= 7) {
+                    currentLevel = 3;
+                    difficulty = 'hard';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else {
+                    currentQuestionIndex++;
+                }
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 1200);
+            } else {
+                buttons[index].classList.add('incorrect');
+                streak = 0;
+                consecutiveCorrect = 0;
+                currentQuestionIndex++;
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 2000);
+                return;
+            }
+        }
+
+        function showResult() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            const resultScreen = document.getElementById('resultScreen');
+            resultScreen.classList.add('active');
+            
+            const pass = score >= 100;
+            document.getElementById('resultIcon').textContent = pass ? '✓' : '✗';
+            document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL';
+            document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score}`;
+            document.getElementById('resultDetails').innerHTML = `
+                Questions answered: ${totalAnswered}<br>
+                Best streak: ${maxStreak}<br>
+                Highest level reached: ${currentLevel}
+            `;
+            
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeToggle').checked = true;
+            }
+            initTest();
+        });
+    </script>
+
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p><a href="../site-map.html">All pages</a></p>
+    </footer>
+</body>
+</html>

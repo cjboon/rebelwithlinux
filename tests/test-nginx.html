@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-nginx.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nginx Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// NGINX TEST</h1>
+            <p>Prove your Nginx mastery</p>
+        </div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What is Nginx?", a: ["Web server and reverse proxy", "Programming language", "Database", "Operating system"], correct: 0 },
+            { q: "What does Nginx stand for?", a: ["Engine X", "Next Generation", "Network Exchange", "Next Server"], correct: 0 },
+            { q: "What is the default Nginx config location?", a: ["/etc/nginx/nginx.conf", "/etc/nginx/conf/default", "/etc/nginx/sites-enabled", "/etc/nginx/nginx.cfg"], correct: 0 },
+            { q: "What command tests Nginx config?", a: ["nginx -t", "nginx test", "nginx check", "nginx validate"], correct: 0 },
+            { q: "What command reloads Nginx?", a: ["nginx -s reload", "nginx reload", "nginx -r", "nginx -l"], correct: 0 },
+            { q: "What command stops Nginx?", a: ["nginx -s stop", "nginx stop", "nginx -k stop", "nginx quit"], correct: 0 },
+            { q: "What port does Nginx listen on by default?", a: ["80", "443", "8080", "22"], correct: 0 },
+            { q: "What is a server block in Nginx?", a: ["Virtual host configuration", "Server process", "Module", "Directive"], correct: 0 },
+            { q: "What is the location directive?", a: ["Matches URL patterns", "Defines location", "Creates location", "Deletes location"], correct: 0 },
+            { q: "What does root directive do?", a: ["Sets document root", "Sets root user", "Sets root access", "Sets root path"], correct: 0 },
+            { q: "What is index directive?", a: ["Sets default files", "Indexes server", "Creates index", "Deletes index"], correct: 0 },
+            { q: "What does listen directive do?", a: ["Defines port and IP", "Listens for connections", "Listens for logs", "Listens for requests"], correct: 0 },
+            { q: "What is server_name directive?", a: ["Defines domain names", "Sets server name", "Creates server name", "Deletes server name"], correct: 0 },
+            { q: "What is a reverse proxy?", a: ["Forwards requests to backends", "Proxies client", "Blocks requests", "Caches responses"], correct: 0 },
+            { q: "What directive enables proxy_pass?", a: ["proxy_pass", "proxy", "forward", "pass"], correct: 0 },
+            { q: "What is upstream in Nginx?", a: ["Defines backend servers", "Upstream traffic", "Upstream network", "Upstream module"], correct: 0 },
+            { q: "What is load balancing?", a: ["Distributes traffic to backends", "Blocks traffic", "Routes traffic", "Caches traffic"], correct: 0 },
+            { q: "What is a 404 error?", a: ["Page not found", "Server error", "Access denied", "Redirect"], correct: 0 },
+            { q: "What is a 502 error?", a: ["Bad Gateway", "Access denied", "Not found", "Server error"], correct: 0 },
+            { q: "What is a 301 redirect?", a: ["Permanent redirect", "Temporary redirect", "Access denied", "Server error"], correct: 0 },
+            { q: "What is a 302 redirect?", a: ["Temporary redirect", "Permanent redirect", "Access denied", "Server error"], correct: 0 },
+            { q: "What directive does return do?", a: ["Returns response code", "Returns data", "Returns file", "Returns location"], correct: 0 },
+            { q: "What is rewrite directive?", a: ["Modifies URL", "Rewrites code", "Rewrites config", "Rewrites logs"], correct: 0 },
+            { q: "What does try_files do?", a: ["Checks file existence", "Tries files", "Finds files", "Deletes files"], correct: 0 },
+            { q: "What is gzip compression?", a: ["Compresses responses", "Encrypts responses", "Caches responses", "Blocks responses"], correct: 0 },
+            { q: "What directive enables gzip?", a: ["gzip on", "gzip", "compress on", "compress gzip"], correct: 0 },
+            { q: "What is a worker process?", a: ["Handles connections", "Manages config", "Manages logs", "Manages modules"], correct: 0 },
+            { q: "What is worker_connections?", a: ["Max connections per worker", "Worker count", "Worker timeout", "Worker limit"], correct: 0 },
+            { q: "What is keepalive connections?", a: ["Persistent connections", "Live connections", "Open connections", "Close connections"], correct: 0 },
+            { q: "What is Nginx Plus?", a: ["Commercial version", "Free version", "Open source", "Beta version"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the difference between Nginx and Apache?", a: ["Event-driven vs process-based", "Same architecture", "Nginx is newer", "Apache is faster"], correct: 0 },
+            { q: "What is a sticky session?", a: ["Routes to same backend", "Blocks sessions", "Expires sessions", "Deletes sessions"], correct: 0 },
+            { q: "What isip_hash in upstream?", a: ["Routes by client IP", "Hashes IP", "Blocks IP", "Maps IP"], correct: 0 },
+            { q: "What is least_conn directive?", a: ["Routes to least busy server", "Least connections", "Minimum connections", "Blocks connections"], correct: 0 },
+            { q: "What is proxy_set_header?", a: ["Sets headers for backend", "Sets client header", "Sets server header", "Deletes header"], correct: 0 },
+            { q: "What does X-Real-IP capture?", a: ["Client's real IP address", "Server IP", "Proxy IP", "Backend IP"], correct: 0 },
+            { q: "What does X-Forwarded-For contain?", a: ["Original client IP", "Server IP", "Proxy name", "Backend name"], correct: 0 },
+            { q: "What is buffer in proxy?", a: ["Stores response temporarily", "Buffers requests", "Buffers logs", "Buffers connections"], correct: 0 },
+            { q: "What is proxy_cache?", a: ["Caches backend responses", "Caches requests", "Caches files", "Caches sessions"], correct: 0 },
+            { q: "What is fastcgi_cache?", a: ["Caches FastCGI responses", "Caches fastcgi", "Caches files", "Caches data"], correct: 0 },
+            { q: "What is uwsgi_cache?", a: ["Caches uWSGI responses", "Caches uwsgi", "Caches data", "Caches files"], correct: 0 },
+            { q: "What is scgi_cache?", a: ["Caches SCGI responses", "Caches scgi", "Caches data", "Caches files"], correct: 0 },
+            { q: "What is the proxy_cache_path?", a: ["Defines cache storage location", "Cache path", "File path", "Log path"], correct: 0 },
+            { q: "What is max-age in caching?", a: ["Cache expiration time", "Maximum age", "Minimum age", "Average age"], correct: 0 },
+            { q: "What does proxy_cache_valid do?", a: ["Sets cache duration", "Validates cache", "Clears cache", "Checks cache"], correct: 0 },
+            { q: "What is a cache hit?", a: ["Served from cache", "Cache created", "Cache expired", "Cache deleted"], correct: 0 },
+            { q: "What is a cache miss?", a: ["Not in cache, fetched from backend", "Cache found", "Cache valid", "Cache old"], correct: 0 },
+            { q: "What is SSI in Nginx?", a: ["Server Side Includes", "Server Side Include", "Server Information", "Server Integration"], correct: 0 },
+            { q: "What is ngx_http_ssl_module?", a: ["SSL/TLS termination", "HTTP module", "Logging module", "Proxy module"], correct: 0 },
+            { q: "What is OCSP stapling?", a: ["Speeds up SSL verification", "Staples certificate", "Blocks certificate", "Verifies certificate"], correct: 0 },
+            { q: "What is SPDY?", a: ["HTTP/2 predecessor", "Protocol", "Module", "Server"], correct: 0 },
+            { q: "What is HTTP/2?", a: ["Newer HTTP protocol", "Old protocol", "HTTP version 1", "HTTP alternative"], correct: 0 },
+            { q: "What is multiplexing in HTTP/2?", a: ["Multiple requests over one connection", "Single request", "No connection", "Blocking"], correct: 0 },
+            { q: "What is server_push in HTTP/2?", a: ["Sends resources proactively", "Pushes server", "Pushes data", "Pushes connections"], correct: 0 },
+            { q: "What is a stream in Nginx?", a: ["TCP/UDP proxy", "HTTP stream", "Data stream", "Log stream"], correct: 0 },
+            { q: "What is stream module?", a: ["TCP/UDP proxy module", "HTTP module", "Mail module", "Log module"], correct: 0 },
+            { q: "What is mail module?", a: ["Proxy for mail protocols", "Email server", "Mail client", "Mail storage"], correct: 0 },
+            { q: "What is Lua in Nginx?", a: ["Scripting capability", "Module", "Language", "Extension"], correct: 0 },
+            { q: "What is OpenResty?", a: ["Nginx with Lua", "Nginx version", "Nginx fork", "Nginx module"], correct: 0 },
+            { q: "What is JWT authentication?", a: ["Token-based auth", "Password auth", "Certificate auth", "Basic auth"], correct: 0 },
+            { q: "What is rate limiting?", a: ["Controls request rate", "Limits bandwidth", "Limits connections", "Limits users"], correct: 0 },
+            { q: "What is limit_req_zone?", a: ["Defines rate limit zone", "Limits requests", "Limits zones", "Defines zones"], correct: 0 },
+            { q: "What is limit_conn_zone?", a: ["Defines connection limit zone", "Limits connections", "Limits zones", "Defines zones"], correct: 0 },
+            { q: "What is ngx_http_geo_module?", a: ["Creates variables based on IP", "Geographic module", "Location module", "Data module"], correct: 0 },
+            { q: "What is map directive?", a: ["Creates new variables", "Maps data", "Maps files", "Maps requests"], correct: 0 },
+            { q: "What is split_clients?", a: ["Splits traffic percentage", "Splits clients", "Splits data", "Splits files"], correct: 0 },
+            { q: "What is a/b testing?", a: ["Tests two versions", "One version", "No testing", "User testing"], correct: 0 },
+            { q: "What is WebSocket proxying?", a: ["Proxies WebSocket connections", "Web server", "Web socket", "Web proxy"], correct: 0 },
+            { q: "What directive enables WebSocket?", a: ["proxy_http_version 1.1; Upgrade; Connection", "websocket on", "upgrade on", "connection upgrade"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is the worker_rlimit_nofile?", a: ["Max file descriptors per worker", "Worker limit", "File limit", "Connection limit"], correct: 0 },
+            { q: "What is multi_accept in Nginx?", a: ["Accepts multiple connections", "Multiple accept", "Accepts one", "Rejects multiple"], correct: 0 },
+            { q: "What is use epoll?", a: ["Linux-specific event model", "Event model", "Connection model", "Network model"], correct: 0 },
+            { q: "What is accept_mutex?", a: ["Prevents thundering herd", "Accepts mutex", "Mutex lock", "Accepts lock"], correct: 0 },
+            { q: "What is sendfile in Nginx?", a: ["Optimizes file serving", "Sends file", "Files only", "Sends data"], correct: 0 },
+            { q: "What is tcp_nopush?", a: ["Optimizes packet sending", "TCP no push", "No push", "Push TCP"], correct: 0 },
+            { q: "What is tcp_nodelay?", a: ["Disables Nagle's algorithm", "No delay", "TCP delay", "Delay TCP"], correct: 0 },
+            { q: "What is aio in Nginx?", a: ["Asynchronous I/O", "Async I/O", "IO operation", "IO mode"], correct: 0 },
+            { q: "What is directio in Nginx?", a: ["Direct I/O to disk", "Direct IO", "IO operation", "Disk IO"], correct: 0 },
+            { q: "What is open_file_cache?", a: ["Caches open file descriptors", "File cache", "Cache open", "Cache files"], correct: 0 },
+            { q: "What is open_file_cache_valid?", a: ["Cache validation time", "Validates cache", "Cache time", "Validates files"], correct: 0 },
+            { q: "What is open_file_cache_min_uses?", a: ["Min uses before caching", "Minimum uses", "Caching uses", "File uses"], correct: 0 },
+            { q: "What is ngx_http_proxy_module?", a: ["Proxy functionality", "Proxy module", "HTTP module", "Network module"], correct: 0 },
+            { q: "What is proxy_buffering?", a: ["Buffers response from backend", "Buffer proxy", "Proxy buffer", "Buffering"], correct: 0 },
+            { q: "What is proxy_buffer_size?", a: ["Size of buffer for headers", "Buffer size", "Header buffer", "Proxy size"], correct: 0 },
+            { q: "What is proxy_buffers?", a: ["Number of buffers", "Proxy buffers", "Number of proxies", "Buffer number"], correct: 0 },
+            { q: "What is proxy_busy_buffers_size?", a: ["Max size of busy buffers", "Busy buffer size", "Buffer busy", "Busy proxy"], correct: 0 },
+            { q: "What is proxy_temp_path?", a: ["Directory for temp files", "Temp path", "Proxy temp", "Path temp"], correct: 0 },
+            { q: "What is proxy_connect_timeout?", a: ["Timeout connecting to backend", "Connect timeout", "Proxy timeout", "Timeout"], correct: 0 },
+            { q: "What is proxy_send_timeout?", a: ["Timeout sending to backend", "Send timeout", "Proxy timeout", "Timeout"], correct: 0 },
+            { q: "What is proxy_read_timeout?", a: ["Timeout reading from backend", "Read timeout", "Proxy timeout", "Timeout"], correct: 0 },
+            { q: "What is proxy_next_upstream?", a: ["Try next upstream on error", "Next upstream", "Proxy next", "Upstream next"], correct: 0 },
+            { q: "What is retry on 502?", a: ["Retry on bad gateway", "Retry error", "No retry", "Block retry"], correct: 0 },
+            { q: "What is error_page handling?", a: ["Custom error pages", "Error page", "Page error", "Error handling"], correct: 0 },
+            { q: "What is recursive_error_pages?", a: ["Allows error_page to chain", "Recursive error", "Error pages", "Pages error"], correct: 0 },
+            { q: "What is log_format in Nginx?", a: ["Defines log output format", "Log format", "Format log", "Logs format"], correct: 0 },
+            { q: "What is access_log?", a: ["Logs client requests", "Access log", "Log access", "Client log"], correct: 0 },
+            { q: "What is error_log?", a: ["Logs server errors", "Error log", "Log error", "Server log"], correct: 0 },
+            { q: "What is log_not_found?", a: ["Logs 404 errors", "Log not found", "Not found log", "404 log"], correct: 0 },
+            { q: "What is Nginx Unit?", a: ["Application server", "Server unit", "Application unit", "Unit server"], correct: 0 },
+            { q: "What is Nginx Controller?", a: ["Management platform", "Controller", "Platform controller", "Nginx platform"], correct: 0 },
+            { q: "What is Amplify?", a: ["Monitoring and analytics", "Amplify tool", "Analytics amplify", "Monitoring amplify"], correct: 0 },
+            { q: "What is container registry?", a: ["Stores container images", "Registry container", "Container store", "Image store"], correct: 0 },
+            { q: "What is dynamic modules?", a: ["Loadable at runtime", "Modules dynamic", "Dynamic loading", "Runtime modules"], correct: 0 },
+            { q: "What is --with-http_ssl_module?", a: ["Enables SSL module", "SSL module", "HTTP SSL", "Module SSL"], correct: 0 },
+            { q: "What is --with-http_v2_module?", a: ["Enables HTTP/2", "HTTP module", "V2 module", "HTTP2 module"], correct: 0 },
+            { q: "What is nginx.conf structure?", a: ["directives, contexts, blocks", "Structure config", "Config structure", "Structure"], correct: 0 },
+            { q: "What is main context?", a: ["Top-level configuration", "Main config", "Top level", "Root context"], correct: 0 },
+            { q: "What is http context?", a: ["HTTP-specific configuration", "HTTP config", "Protocol context", "Network context"], correct: 0 },
+            { q: "What is server context?", a: ["Virtual host configuration", "Server config", "Host context", "Virtual context"], correct: 0 },
+            { q: "What is location context?", a: ["URL-matching configuration", "Location config", "URL context", "Path context"], correct: 0 },
+            { q: "What is if in location?", a: ["Conditional within location", "If condition", "Condition location", "Location if"], correct: 0 },
+            { q: "What is regex location?", a: ["Pattern matching location", "Regex location", "Pattern location", "Match location"], correct: 0 },
+            { q: "What is ~ in location?", a: ["Regex matching", "Regex", "Pattern", "Match"], correct: 0 },
+            { q: "What is ^~ in location?", a: ["Preferential prefix match", "Prefix match", "Priority prefix", "Prefix priority"], correct: 0 },
+            { q: "What is = in location?", a: ["Exact match", "Equal match", "Match equal", "Exact"], correct: 0 },
+            { q: "What is @ named location?", a: ["Named location for internal use", "Named location", "Internal location", "Named"], correct: 0 },
+            { q: "What is proxy_redirect?", a: ["Modifies response headers", "Redirect proxy", "Proxy redirect", "Redirects proxy"], correct: 0 },
+            { q: "What is grpc_pass?", a: ["Proxies gRPC requests", "gRPC pass", "Pass grpc", "gRPC proxy"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+        function initTest() { difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0; currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0; document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block'; renderQuestion(); }
+        function renderQuestion() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const q = currentQuestions[currentQuestionIndex]; const qDiv = document.createElement('div'); qDiv.className = 'question-container active'; let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join(''); qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`; container.appendChild(qDiv); updateUI(); }
+        function updateUI() { const total = currentQuestions.length; const progress = ((currentQuestionIndex) / total) * 100; document.getElementById('progressFill').style.width = progress + '%'; document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; }
+        function selectAnswer(index) { const q = currentQuestions[currentQuestionIndex]; const buttons = document.querySelectorAll('.answer-btn'); buttons.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); }); totalAnswered++; if (index === q.correct) { streak++; if (streak > maxStreak) maxStreak = streak; consecutiveCorrect++; score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30; if (currentLevel === 1 && consecutiveCorrect >= 7) { currentLevel = 2; difficulty = 'medium'; consecutiveCorrect = 0; currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else if (currentLevel === 2 && consecutiveCorrect >= 7) { currentLevel = 3; difficulty = 'hard'; consecutiveCorrect = 0; currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else { currentQuestionIndex++; } setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 1200); } else { buttons[index].classList.add('incorrect'); streak = 0; consecutiveCorrect = 0; currentQuestionIndex++; setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 2000); return; } }
+        function showResult() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const resultScreen = document.getElementById('resultScreen'); resultScreen.classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '✓' : '✗'; document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score}`; document.getElementById('resultDetails').innerHTML = `Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`; document.getElementById('progressFill').style.width = '100%'; }
+        function restartTest() { initTest(); }
+        document.addEventListener('DOMContentLoaded', function() { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('themeToggle').checked = true; } initTest(); });
+    </script>
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+    <footer><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>

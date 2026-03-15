@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-apache.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// APACHE TEST</h1>
+            <p>Prove your Apache mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value" id="questionNum">1</div>
+                    <div class="stat-label">Question</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="streakNum">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="scoreNum">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="levelNum">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div id="questionsContainer"></div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What is the default port for HTTP traffic?", a: ["80", "443", "8080", "3000"], correct: 0 },
+            { q: "What is the default port for HTTPS traffic?", a: ["443", "80", "22", "21"], correct: 0 },
+            { q: "What command starts Apache on RHEL/CentOS?", a: ["systemctl start httpd", "systemctl start apache", "systemctl start apache2", "service start httpd"], correct: 0 },
+            { q: "What command starts Apache on Debian/Ubuntu?", a: ["systemctl start apache2", "systemctl start httpd", "systemctl start apache", "service start apache"], correct: 0 },
+            { q: "What is the main Apache configuration file on RHEL?", a: ["/etc/httpd/conf/httpd.conf", "/etc/apache2/apache2.conf", "/etc/httpd.conf", "/etc/apache.conf"], correct: 0 },
+            { q: "What is the main Apache configuration file on Debian?", a: ["/etc/apache2/apache2.conf", "/etc/httpd/conf/httpd.conf", "/etc/apache.conf", "/etc/apache2.conf"], correct: 0 },
+            { q: "What directive sets the document root in Apache?", a: ["DocumentRoot", "Document_Root", "RootDirectory", "ServerRoot"], correct: 0 },
+            { q: "What directive controls which directories Apache can serve?", a: ["<Directory>", "<Files>", "<Location>", "<VirtualHost>"], correct: 0 },
+            { q: "What module provides URL rewriting?", a: ["mod_rewrite", "mod_alias", "mod_proxy", "mod_ssl"], correct: 0 },
+            { q: "What module provides SSL/TLS support?", a: ["mod_ssl", "mod_rewrite", "mod_proxy", "mod_headers"], correct: 0 },
+            { q: "What file is used for per-directory access control?", a: [".htaccess", ".htpasswd", ".htconfig", ".apache"], correct: 0 },
+            { q: "What is the Apache error log location on Debian?", a: ["/var/log/apache2/error.log", "/var/log/httpd/error.log", "/var/log/apache/error.log", "/var/log/errors.log"], correct: 0 },
+            { q: "What is the Apache access log location on RHEL?", a: ["/var/log/httpd/access_log", "/var/log/apache2/access.log", "/var/log/apache/access.log", "/var/log/access.log"], correct: 0 },
+            { q: "What directive controls the administrator email?", a: ["ServerAdmin", "AdminEmail", "AdminContact", "ContactEmail"], correct: 0 },
+            { q: "What directive sets the server name?", a: ["ServerName", "Server_Host", "HostName", "ServerAlias"], correct: 0 },
+            { q: "What command tests Apache configuration syntax?", a: ["apachectl configtest", "apache2ctl test", "httpd -t", "apache -check"], correct: 0 },
+            { q: "What status code indicates 'Not Found'?", a: ["404", "500", "403", "301"], correct: 0 },
+            { q: "What status code indicates 'Forbidden'?", a: ["403", "404", "500", "302"], correct: 0 },
+            { q: "What status code indicates 'Internal Server Error'?", a: ["500", "404", "403", "200"], correct: 0 },
+            { q: "What status code indicates 'Redirect Permanent'?", a: ["301", "302", "304", "307"], correct: 0 },
+            { q: "What directive enables .htaccess files?", a: ["AllowOverride All", "AllowOverride None", "AllowAccess All", "Override Enabled"], correct: 0 },
+            { q: "What module handles compression?", a: ["mod_deflate", "mod_gzip", "mod_compress", "mod_zip"], correct: 0 },
+            { q: "What directive sets the default index file?", a: ["DirectoryIndex", "IndexFile", "DefaultIndex", "DirectoryDefault"], correct: 0 },
+            { q: "What directive controls the listening ports?", a: ["Listen", "Port", "Bind", "Address"], correct: 0 },
+            { q: "What is the Apache service name on RHEL?", a: ["httpd", "apache", "apache2", "http"], correct: 0 },
+            { q: "What is the Apache service name on Debian/Ubuntu?", a: ["apache2", "httpd", "apache", "http"], correct: 0 },
+            { q: "What directive creates a virtual host?", a: ["<VirtualHost>", "<Virtual>", "<Host>", "<Server>"], correct: 0 },
+            { q: "What module provides user authentication?", a: ["mod_auth_basic", "mod_authn_file", "mod_authz", "mod_auth"], correct: 0 },
+            { q: "What directive sets the server's hostname and port?", a: ["ServerName", "ServerAlias", "ServerAddr", "ServerHost"], correct: 0 },
+            { q: "What directive defines the timeout for requests?", a: ["Timeout", "RequestTimeout", "TimeLimit", "LimitTime"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What does 'Require all denied' do?", a: ["Denies access from all", "Requires authentication", "Requires SSL", "Logs all access"], correct: 0 },
+            { q: "What does 'Require all granted' do?", a: ["Allows access from all", "Requires password", "Requires SSL", "Blocks all"], correct: 0 },
+            { q: "What is a VirtualHost in Apache?", a: ["Container for hosting multiple sites", "Virtual machine", "Proxy configuration", "SSL certificate"], correct: 0 },
+            { q: "What is .htaccess used for?", a: ["Per-directory configuration", "Global settings", "Server logs", "User management"], correct: 0 },
+            { q: "What does mod_rewrite do?", a: ["URL rewriting and redirection", "File compression", "SSL encryption", "User authentication"], correct: 0 },
+            { q: "What is the purpose of mod_ssl?", a: ["Provides SSL/TLS encryption", "URL rewriting", "Directory listing", "Caching"], correct: 0 },
+            { q: "What is the difference between 'Require ip' and 'Require host'?", a: ["IP restricts by address, host by hostname", "They are the same", "IP is slower", "Host is deprecated"], correct: 0 },
+            { q: "What does 'Options Indexes' allow?", a: ["Directory listing", "CGI execution", "SSL", "SSI"], correct: 0 },
+            { q: "What is the purpose of 'MaxClients' directive?", a: ["Maximum concurrent connections", "Maximum file size", "Maximum requests", "Maximum bandwidth"], correct: 0 },
+            { q: "What does 'AllowOverride None' mean?", a: ["Disables .htaccess processing", "Enables all overrides", "Requires authentication", "Enables SSL"], correct: 0 },
+            { q: "What is the purpose of 'KeepAlive' directive?", a: ["Allows persistent connections", "Keeps server alive", "Maintains logs", "Caches data"], correct: 0 },
+            { q: "What is the default KeepAliveTimeout?", a: ["5 seconds", "30 seconds", "60 seconds", "1 second"], correct: 0 },
+            { q: "What does 'Redirect permanent' do?", a: ["Returns 301 for permanent redirect", "Temporary redirect", "Blocks access", "Shows error"], correct: 0 },
+            { q: "What is the purpose of 'LoadModule' directive?", a: ["Loads Apache modules", "Loads configuration", "Loads virtual hosts", "Loads logs"], correct: 0 },
+            { q: "What is MPM in Apache?", a: ["Multi-Processing Module", "Main Process Manager", "Memory Pool Manager", "Module Priority Manager"], correct: 0 },
+            { q: "What are the common MPMs in Apache?", a: ["prefork, worker, event", "apache, nginx, lighttpd", "php, perl, python", "ssl, tls, http"], correct: 0 },
+            { q: "What MPM is required for mod_php?", a: ["prefork", "worker", "event", "any"], correct: 0 },
+            { q: "What does 'SSLEngine on' do?", a: ["Enables SSL for the virtual host", "Disables SSL", "Logs SSL", "Tests SSL"], correct: 0 },
+            { q: "What directive specifies SSL certificate file?", a: ["SSLCertificateFile", "SSLFile", "CertFile", "SSLCert"], correct: 0 },
+            { q: "What directive specifies SSL private key file?", a: ["SSLCertificateKeyFile", "SSLKey", "KeyFile", "SSLPrivate"], correct: 0 },
+            { q: "What is .htpasswd used for?", a: ["Storing encrypted passwords", "Configuration", "Certificates", "Logs"], correct: 0 },
+            { q: "What command creates .htpasswd user?", a: ["htpasswd -c", "htpasswd -n", "passwd apache", "apache-passwd"], correct: 0 },
+            { q: "What does 'SetEnvIf' do?", a: ["Sets environment variables based on conditions", "Configures environment", "Sets path", "Sets variables"], correct: 0 },
+            { q: "What is the purpose of 'ErrorLog' directive?", a: ["Specifies error log location", "Logs errors only", "Logs to syslog", "Disables logging"], correct: 0 },
+            { q: "What does 'LogLevel' control?", a: ["Verbosity of logging", "Log size", "Log format", "Log rotation"], correct: 0 },
+            { q: "What is 'mod_proxy' used for?", a: ["Reverse proxy and forwarding", "URL rewriting", "SSL", "Caching"], correct: 0 },
+            { q: "What directive enables proxying?", a: ["ProxyRequests", "ProxyPass", "ProxyEnable", "ProxyOn"], correct: 0 },
+            { q: "What is the purpose of 'ProxyPass'?", a: ["Defines proxy destination", "Passes passwords", "Proxies cookies", "Enables proxy"], correct: 0 },
+            { q: "What does 'SSLProtocol all -SSLv3' do?", a: ["Enables all except SSLv3", "Enables only SSLv3", "Disables all SSL", "Enables TLS only"], correct: 0 },
+            { q: "What is 'mod_headers' used for?", a: ["Manipulate HTTP request/response headers", "Header files", "HTML headers", "SSL headers"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is the purpose of a LoadBalancer in Apache?", a: ["Distributes traffic across servers", "Loads balance", "Caches content", "Manages SSL"], correct: 0 },
+            { q: "What is FCGI (FastCGI)?", a: ["Protocol for running CGI scripts efficiently", "File CGI", "Fast CGI wrapper", "CGI format"], correct: 0 },
+            { q: "What module enables FCGI support?", a: ["mod_fcgid", "mod_cgi", "mod_fastcgi", "mod_perl"], correct: 0 },
+            { q: "What is the difference between CGI and FastCGI?", a: ["FastCGI persists processes, CGI does not", "FastCGI is slower", "CGI is more secure", "No difference"], correct: 0 },
+            { q: "What is the purpose of 'mod_security'?", a: ["Web application firewall", "Security certificates", "Security logs", "User security"], correct: 0 },
+            { q: "What does 'SecRuleEngine On' do?", a: ["Enables ModSecurity rules", "Disables rules", "Tests rules", "Logs rules"], correct: 0 },
+            { q: "What is 'mod_evasive' used for?", a: ["DDoS and brute-force protection", "SSL evasion", "Header evasion", "IP evasion"], correct: 0 },
+            { q: "What directive controls request body size limit?", a: ["LimitRequestBody", "RequestLimit", "BodyLimit", "MaxRequestSize"], correct: 0 },
+            { q: "What is 'mod_remoteip' used for?", a: ["Replaces client IP with proxy header", "Remote IP access", "IP blocking", "IP logging"], correct: 0 },
+            { q: "What is the purpose of 'RateLimiting' in Apache?", a: ["Limits request rate per IP", "Limits bandwidth", "Limits connections", "Limits users"], correct: 0 },
+            { q: "What module provides rate limiting?", a: ["mod_ratelimit", "mod_limit", "mod_bandwidth", "mod_throttle"], correct: 0 },
+            { q: "What is 'mod_cache' used for?", a: ["Caching content", "Cache management", "File caching", "Memory caching"], correct: 0 },
+            { q: "What is the difference between 'mod_disk_cache' and 'mod_mem_cache'?", a: ["Disk vs memory caching", "Same thing", "Disk is faster", "Memory is deprecated"], correct: 0 },
+            { q: "What does 'EnableSendfile' do?", a: ["Uses kernel sendfile for serving files", "Sends files", "Enables file serving", "File transfer"], correct: 0 },
+            { q: "What is 'mod_http2' used for?", a: ["HTTP/2 protocol support", "HTTP requests", "HTTP headers", "HTTP compression"], correct: 0 },
+            { q: "What are the benefits of HTTP/2 over HTTP/1.1?", a: ["Multiplexing, header compression, server push", "Faster only", "Compression only", "No benefits"], correct: 0 },
+            { q: "What is the purpose of 'ServerTokens' directive?", a: ["Controls server banner information", "Server tokens", "Token authentication", "API tokens"], correct: 0 },
+            { q: "What does 'ServerTokens Prod' return?", a: ["Server: Apache", "Server: Apache/2.4.x", "Full server info", "No information"], correct: 0 },
+            { q: "What is the purpose of 'TraceEnable Off'?", a: ["Disables HTTP TRACE method", "Enables tracing", "Enables debug", "Logs requests"], correct: 0 },
+            { q: "What security header prevents XSS?", a: ["X-XSS-Protection", "X-Frame-Options", "X-Content-Type", "Strict-Transport-Security"], correct: 0 },
+            { q: "What security header controls iframe embedding?", a: ["X-Frame-Options", "X-XSS-Protection", "X-Content-Type", "CORS"], correct: 0 },
+            { q: "What is HSTS?", a: ["HTTP Strict Transport Security", "High Security", "Host Security", "HTTP Security"], correct: 0 },
+            { q: "What directive implements OCSP stapling?", a: ["SSLUseStapling", "SSLStapling", "StaplingEnable", "OCSP Staple"], correct: 0 },
+            { q: "What is the purpose of 'GracefulShutdownTimeout'?", a: ["Time to finish requests during shutdown", "Timeout for grace", "Shutdown delay", "Stop timeout"], correct: 0 },
+            { q: "What does 'Mutex posixsem' do?", a: ["Configures mutex for inter-process locking", "Enables mutex", "Mutex file", "Process mutex"], correct: 0 },
+            { q: "What is the purpose of 'mod_lua'?", a: ["Allows writing Apache modules in Lua", "Lua scripting", "Lua pages", "Lua hooks"], correct: 0 },
+            { q: "What is 'mod_socache' used for?", a: ["Session caching", "Social caching", "Socket cache", "SSL cache"], correct: 0 },
+            { q: "What is the difference between 'LogFormat' and 'CustomLog'?", a: ["LogFormat defines format, CustomLog defines log file", "They are the same", "CustomLog is deprecated", "LogFormat is old"], correct: 0 },
+            { q: "What does '%h' in LogFormat represent?", a: ["Client IP address", "Hostname", "HTTP method", "Response time"], correct: 0 },
+            { q: "What does '%s' in LogFormat represent?", a: ["Response status code", "Server name", "Request size", "Response size"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            const q = currentQuestions[currentQuestionIndex];
+            
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            
+            qDiv.innerHTML = `
+                <div class="question-text">${q.q}</div>
+                <div class="answers-grid">${answersHtml}</div>
+            `;
+            
+            container.appendChild(qDiv);
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            const total = currentQuestions.length;
+            const progress = ((currentQuestionIndex) / total) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) {
+                    btn.classList.add('correct');
+                }
+            });
+            
+            totalAnswered++;
+            
+            if (index === q.correct) {
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+                consecutiveCorrect++;
+                score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30;
+                
+                if (currentLevel === 1 && consecutiveCorrect >= 7) {
+                    currentLevel = 2;
+                    difficulty = 'medium';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else if (currentLevel === 2 && consecutiveCorrect >= 7) {
+                    currentLevel = 3;
+                    difficulty = 'hard';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else {
+                    currentQuestionIndex++;
+                }
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 1200);
+            } else {
+                buttons[index].classList.add('incorrect');
+                streak = 0;
+                consecutiveCorrect = 0;
+                currentQuestionIndex++;
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 2000);
+                return;
+            }
+        }
+
+        function showResult() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            const resultScreen = document.getElementById('resultScreen');
+            resultScreen.classList.add('active');
+            
+            const pass = score >= 100;
+            document.getElementById('resultIcon').textContent = pass ? '✓' : '✗';
+            document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL';
+            document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score}`;
+            document.getElementById('resultDetails').innerHTML = `
+                Questions answered: ${totalAnswered}<br>
+                Best streak: ${maxStreak}<br>
+                Highest level reached: ${currentLevel}
+            `;
+            
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeToggle').checked = true;
+            }
+            initTest();
+        });
+    </script>
+
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p><a href="../site-map.html">All pages</a></p>
+    </footer>
+</body>
+</html>

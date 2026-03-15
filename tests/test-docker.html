@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-docker.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+    </nav>
+    <div class="test-container">
+        <div class="test-header"><h1>// DOCKER TEST</h1><p>Prove your Docker mastery</p></div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const easyQuestions = [
+            { q: "What is Docker?", a: ["Container platform", "Virtual machine", "Programming language", "Operating system"], correct: 0 },
+            { q: "What is a Docker image?", a: ["Template for containers", "Running container", "Dockerfile", "Volume"], correct: 0 },
+            { q: "What is a Docker container?", a: ["Running instance of image", "Image template", "Dockerfile", "Volume"], correct: 0 },
+            { q: "What does 'docker run' do?", a: ["Creates and starts container", "Builds image", "Stops container", "Removes container"], correct: 0 },
+            { q: "What does 'docker ps' show?", a: ["Running containers", "All images", "Volumes", "Networks"], correct: 0 },
+            { q: "How do you list all containers?", a: ["docker ps -a", "docker list", "docker containers", "docker show"], correct: 0 },
+            { q: "What does 'docker stop' do?", a: ["Stops running container", "Removes container", "Pauses container", "Kills container"], correct: 0 },
+            { q: "What does 'docker rm' do?", a: ["Removes container", "Stops container", "Pauses container", "Starts container"], correct: 0 },
+            { q: "What is a Dockerfile?", a: ["Build instructions", "Running container", "Docker config", "Image"], correct: 0 },
+            { q: "What does 'docker build' do?", a: ["Creates image from Dockerfile", "Runs container", "Starts container", "Builds volume"], correct: 0 },
+            { q: "What is 'docker pull'?", a: ["Downloads image", "Uploads image", "Builds image", "Removes image"], correct: 0 },
+            { q: "What does 'docker images' list?", a: ["Local images", "Containers", "Volumes", "Networks"], correct: 0 },
+            { q: "What is Docker Hub?", a: ["Image registry", "Container runtime", "Orchestrator", "Network"], correct: 0 },
+            { q: "What does '-p' flag do in docker run?", a: ["Port mapping", "Volume mapping", "Environment", "Name"], correct: 0 },
+            { q: "What does '-d' flag do?", a: ["Run in detached mode", "Debug mode", "Delete mode", "Direct mode"], correct: 0 },
+            { q: "What is a Docker volume?", a: ["Persistent data storage", "Container memory", "Image layer", "Network"], correct: 0 },
+            { q: "What does 'docker exec' do?", a: ["Run command in container", "Exit container", "Export container", "Execute build"], correct: 0 },
+            { q: "What is 'docker-compose'?", a: ["Multi-container tool", "Single container", "Image builder", "Container runtime"], correct: 0 },
+            { q: "What does 'docker-compose up' do?", a: ["Starts all services", "Builds images", "Stops services", "Removes services"], correct: 0 },
+            { q: "What is a Docker network?", a: ["Container communication", "Image storage", "Volume type", "Build context"], correct: 0 },
+            { q: "What does '--link' do?", a: ["Connect containers", "Link volumes", "Link networks", "Link images"], correct: 0 },
+            { q: "What is 'docker logs'?", a: ["Shows container output", "Lists containers", "Shows images", "Creates container"], correct: 0 },
+            { q: "What does '-e' flag set?", a: ["Environment variable", "Entry point", "Exposed port", "Executable"], correct: 0 },
+            { q: "What is 'docker inspect'?", a: ["Detailed container info", "Image info", "Network info", "Volume info"], correct: 0 },
+            { q: "What does '--name' do?", a: ["Names container", "Names image", "Names volume", "Names network"], correct: 0 },
+            { q: "What is Docker daemon?", a: ["Background service", "Container process", "Image builder", "Network driver"], correct: 0 }
+        ];
+        const mediumQuestions = [
+            { q: "What is difference between CMD and ENTRYPOINT?", a: ["CMD default, ENTRYPOINT required", "Same thing", "ENTRYPOINT is deprecated", "CMD is required"], correct: 0 },
+            { q: "What is Docker layer?", a: ["Image filesystem layer", "Container layer", "Network layer", "Storage layer"], correct: 0 },
+            { q: "What is layer caching?", a: ["Reuse unchanged layers", "Cache volumes", "Cache networks", "Cache builds"], correct: 0 },
+            { q: "What does 'docker volume create' do?", a: ["Creates named volume", "Creates container", "Creates image", "Creates network"], correct: 0 },
+            { q: "What is multi-stage build?", a: ["Reduce image size", "Build faster", "Multiple images", "Multiple stages"], correct: 0 },
+            { q: "What is .dockerignore?", a: ["Exclude files from build", "Ignore errors", "Ignore network", "Ignore volumes"], correct: 0 },
+            { q: "What does '--volumes-from' do?", a: ["Share volumes between containers", "Share network", "Share CPU", "Share memory"], correct: 0 },
+            { q: "What is bridge network?", a: ["Default container network", "Host network", "Overlay network", "Macvlan network"], correct: 0 },
+            { q: "What does 'docker network create' do?", a: ["Creates custom network", "Creates bridge", "Creates overlay", "Creates volume"], correct: 0 },
+            { q: "What is healthcheck?", a: ["Container health monitoring", "Network health", "Volume health", "Image health"], correct: 0 },
+            { q: "What does 'docker stats' show?", a: ["Resource usage", "Container logs", "Network stats", "Volume stats"], correct: 0 },
+            { q: "What is 'docker system prune'?", a: ["Cleanup unused data", "Remove containers", "Remove images", "Remove volumes"], correct: 0 },
+            { q: "What is swarm mode?", a: ["Container orchestration", "Single node", "Build system", "Network driver"], correct: 0 },
+            { q: "What is 'docker commit'?", a: ["Create image from container", "Commit changes", "Save container", "Export container"], correct: 0 },
+            { q: "What is 'docker save'?", a: ["Export image to tar", "Save container", "Save volume", "Save network"], correct: 0 }
+        ];
+        const hardQuestions = [
+            { q: "What is 'docker buildkit'?", a: ["Faster builds", "Build system", "Build cache", "Build service"], correct: 0 },
+            { q: "What is 'docker --squash'?", a: ["Reduce image layers", "Squash containers", "Compress image", "Optimize build"], correct: 0 },
+            { q: "What is 'docker init'?", a: ["Scaffold Dockerfile", "Initialize swarm", "Create network", "Setup volume"], correct: 0 },
+            { q: "What is 'docker context'?", a: ["Manage multiple envs", "Switch docker hosts", "Both a and b", "Network context"], correct: 0 },
+            { q: "What is 'docker buildx'?", a: ["Extended build features", "Build matrix", "Build extensions", "Build tools"], correct: 0 },
+            { q: "What does 'docker manifest' do?", a: ["Multi-arch images", "List images", "Image metadata", "Image layers"], correct: 0 },
+            { q: "What is 'docker secrets'?", a: ["Sensitive data management", "Encrypt data", "Store secrets", "Both a and c"], correct: 0 },
+            { q: "What is 'docker config'?", a: ["Non-sensitive configuration", "Configure docker", "Config files", "Docker settings"], correct: 0 },
+            { q: "What is 'docker service'?", a: ["Swarm workload", "Container service", "Background service", "System service"], correct: 0 },
+            { q: "What is 'docker stack'?", a: ["Swarm deployment", "Container stack", "Image stack", "Volume stack"], correct: 0 },
+            { q: "What is 'docker trust'?", a: ["Image signing", "Container trust", "Network trust", "Volume trust"], correct: 0 },
+            { q: "What is 'docker scout'?", a: ["Image analysis", "Container scanning", "Security analysis", "All of above"], correct: 0 },
+            { q: "What is 'docker build cache'?", a: ["Layer caching", "Build caching", "Image caching", "Container caching"], correct: 0 },
+            { q: "What is 'docker' buildkit cache?", a: ["Build cache backend", "Cache storage", "Cache manager", "Cache driver"], correct: 0 },
+            { q: "What is rootless mode?", a: ["Run without root", "Root access", "Root user", "Root container"], correct: 0 }
+        ];
+        let currentQuestions=[],currentQuestionIndex=0,score=0,streak=0,maxStreak=0,difficulty='easy',currentLevel=1,consecutiveCorrect=0,totalAnswered=0;
+        function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+        function shuffleAnswers(q){let a=[...q.a],c=a[q.correct],s=shuffle(a);return{...q,a:s,correct:s.indexOf(c)}}
+        function initTest(){difficulty='easy';currentLevel=1;consecutiveCorrect=0;currentQuestions=shuffle([...easyQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0;score=0;streak=0;maxStreak=0;totalAnswered=0;document.getElementById('resultScreen').classList.remove('active');document.getElementById('quiz').style.display='block';renderQuestion()}
+        function renderQuestion(){let c=document.getElementById('questionsContainer');c.innerHTML='';let q=currentQuestions[currentQuestionIndex],d=document.createElement('div');d.className='question-container active';d.innerHTML=`<div class="question-text">${q.q}</div><div class="answers-grid">${q.a.map((a,i)=>`<button class="answer-btn" onclick="selectAnswer(${i})">${a}</button>`).join('')}</div>`;c.appendChild(d);updateUI()}
+        function updateUI(){let t=currentQuestions.length,p=(currentQuestionIndex/t)*100;document.getElementById('progressFill').style.width=p+'%';document.getElementById('questionNum').textContent=currentQuestionIndex+1;document.getElementById('streakNum').textContent=streak;document.getElementById('scoreNum').textContent=score;document.getElementById('levelNum').textContent=currentLevel}
+        function selectAnswer(i){let q=currentQuestions[currentQuestionIndex],b=document.querySelectorAll('.answer-btn');b.forEach((btn,j)=>{btn.disabled=true;if(j===q.correct)btn.classList.add('correct')});totalAnswered++;if(i===q.correct){streak++;if(streak>maxStreak)maxStreak=streak;consecutiveCorrect++;score+=difficulty==='easy'?10:difficulty==='medium'?20:30;if(currentLevel===1&&consecutiveCorrect>=7){currentLevel=2;difficulty='medium';consecutiveCorrect=0;currentQuestions=shuffle([...mediumQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0}else if(currentLevel===2&&consecutiveCorrect>=7){currentLevel=3;difficulty='hard';consecutiveCorrect=0;currentQuestions=shuffle([...hardQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0}else currentQuestionIndex++;setTimeout(()=>{currentQuestionIndex<currentQuestions.length?renderQuestion():showResult()},1200)}else{b[i].classList.add('incorrect');streak=0;consecutiveCorrect=0;currentQuestionIndex++;setTimeout(()=>{currentQuestionIndex<currentQuestions.length?renderQuestion():showResult()},2000);return}}
+        function showResult(){document.getElementById('questionsContainer').innerHTML='';let p=score>=100;document.getElementById('resultScreen').classList.add('active');document.getElementById('resultIcon').textContent=p?'✓':'✗';document.getElementById('resultText').textContent=p?'PASS':'FAIL';document.getElementById('resultText').className='result-text '+(p?'pass':'fail');document.getElementById('resultScore').textContent=`Score: ${score}`;document.getElementById('resultDetails').innerHTML=`Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`;document.getElementById('progressFill').style.width='100%'}
+        function restartTest(){initTest()}
+        function handleThemeChange(isDark){let t=isDark?'dark':'light';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t)}
+        document.addEventListener('DOMContentLoaded',function(){let s=localStorage.getItem('theme');if(s==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('themeToggle').checked=true}initTest()});
+    </script>
+</body>
+</html>

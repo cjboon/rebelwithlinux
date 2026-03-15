@@ -185,6 +185,35 @@ body {
     line-height: 1.6;
 }
 
+/* CRT Scanline Effect */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.03),
+        rgba(0, 0, 0, 0.03) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 99999;
+}
+
+[data-theme="dark"] body::after {
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+}
+
 /* =============================================================================
    BLOCK 6: HEADING STYLES
    =============================================================================
@@ -214,14 +243,18 @@ nav {
     top: 0;
     left: 0;
     right: 0;
-    background: var(--white);
-    color: var(--black);
+    background: var(--white) !important;
+    color: var(--black) !important;
     padding: 12px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 1000;
-    border-bottom: none;
+    z-index: 10000;
+}
+
+[data-theme="dark"] nav {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
 }
 
 .nav-left {
@@ -327,14 +360,22 @@ nav {
     top: 60px;
     left: 0;
     right: 0;
-    background: #ffffff !important;
-    color: #000000 !important;
+    background: var(--white) !important;
+    color: var(--black) !important;
     border: 1px solid #ccc;
     flex-direction: column;
     padding: 20px;
     gap: 0;
     transform: translateY(-100%);
     opacity: 0;
+    z-index: 10000;
+}
+
+[data-theme="dark"] .nav-links {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+    border-color: #444;
+}
     visibility: hidden;
     transition: all 0.3s ease;
     border-bottom: none;
@@ -422,10 +463,15 @@ nav {
     padding: 16px 0;
     border-bottom: 1px solid #eee;
     font-size: 1rem;
-    color: #000000 !important;
+    color: var(--black) !important;
     text-decoration: none;
     font-family: 'IBM Plex Mono', monospace;
     display: block;
+}
+
+[data-theme="dark"] .nav-links a {
+    color: #ffffff !important;
+    border-bottom-color: #444;
 }
 
 .nav-links .nav-close {
@@ -468,7 +514,8 @@ nav {
 #show-more-references,
 #show-more-blog,
 #show-more-about,
-#show-more-contact {
+#show-more-contact,
+#show-more-tests {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -490,30 +537,11 @@ nav {
     transition: all 0.3s ease;
 }
 
-#manifesto:has(#show-more-manifesto:checked) .manifesto {
-    display: block;
-}
-
 .manifesto {
     padding: 32px 32px;
     max-width: 1030px;
     margin: 0 auto 32px;
     background: var(--white);
-    opacity: 0;
-    visibility: hidden;
-    max-height: 0;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-#manifesto:has(#show-more-manifesto:checked) .manifesto {
-    opacity: 1;
-    visibility: visible;
-    max-height: 2000px;
-}
-
-#manifesto:has(#show-more-manifesto:checked) .section-header {
-    margin-bottom: 16px;
 }
 
 #manifesto .section-header {
@@ -530,21 +558,6 @@ nav {
     padding-top: 0;
     margin-bottom: 0;
     min-height: 24px;
-}
-
-#about .about-content {
-    transition: all 0.3s ease;
-    opacity: 0;
-    visibility: hidden;
-    max-height: 0;
-    overflow: hidden;
-    margin-top: 32px;
-}
-
-#about:has(#show-more-about:checked) .about-content {
-    opacity: 1;
-    visibility: visible;
-    max-height: 2000px;
 }
 
 .about-section .section-header {
@@ -591,38 +604,36 @@ nav {
     display: block;
 }
 
-/* Hide contact section by default */
-#contact .contact-hidden {
-    display: none !important;
-}
-
-/* Show contact section when checked */
-#contact:has(#show-more-contact:checked) .contact-hidden {
-    display: flex !important;
-}
-
 /* Show cards when checkbox is checked */
-#guides:has(#show-more-guides:checked) .lesson-card {
+#guides:has(#section-guides:checked) .lesson-card {
     display: block;
 }
 
-#projects:has(#show-more-projects:checked) .project-card {
+#projects:has(#section-projects:checked) .project-card {
     display: block;
 }
 
-#resources:has(#show-more-resources:checked) .resource-card {
+#resources:has(#section-resources:checked) .resource-card {
     display: block;
 }
 
-#scripts:has(#show-more-scripts:checked) .resource-card {
+#scripts:has(#section-scripts:checked) .resource-card {
     display: block;
 }
 
-#games:has(#show-more-games:checked) .lesson-card {
+#games:has(#section-games:checked) .lesson-card {
     display: block;
 }
 
-#distros:has(#show-more-distros:checked) .lesson-card {
+#tests:has(#section-tests:checked) .lesson-card {
+    display: block;
+}
+
+#tests .lesson-card {
+    display: none;
+}
+
+#distros:has(#section-distros:checked) .lesson-card {
     display: block;
 }
 
@@ -630,15 +641,15 @@ nav {
     display: none;
 }
 
-#games:has(#show-more-games:checked) .browser-games-header {
+#games:has(#section-games:checked) .browser-games-header {
     display: block;
 }
 
-#references:has(#show-more-references:checked) .lesson-card {
+#references:has(#section-references:checked) .lesson-card {
     display: block;
 }
 
-#blog:has(#show-more-blog:checked) .lesson-card {
+#blog:has(#section-blog:checked) .lesson-card {
     display: block;
 }
 
@@ -646,40 +657,37 @@ nav {
     transition: opacity 0.3s ease;
 }
 
-#about:has(#show-more-about:checked) .about-hidden {
-    display: block;
-}
-
 /* Hide show more button when expanded - DISABLED to show arrow instead */
-#guides:has(#show-more-guides:checked) .show-more-btn,
-#projects:has(#show-more-projects:checked) .show-more-btn,
-#resources:has(#show-more-resources:checked) .show-more-btn,
-#scripts:has(#show-more-scripts:checked) .show-more-btn,
-#contact:has(#show-more-contact:checked) .show-more-btn,
-#games:has(#show-more-games:checked) .show-more-btn,
+#guides:has(#section-guides:checked) .show-more-btn,
+#projects:has(#section-projects:checked) .show-more-btn,
+#resources:has(#section-resources:checked) .show-more-btn,
+#scripts:has(#section-scripts:checked) .show-more-btn,
+#contact:has(#section-contact:checked) .show-more-btn,
+#games:has(#section-games:checked) .show-more-btn,
 #browser-games:has(#show-more-browser-games:checked) .show-more-btn,
-#distros:has(#show-more-distros:checked) .show-more-btn,
-#references:has(#show-more-references:checked) .show-more-btn,
-#blog:has(#show-more-blog:checked) .show-more-btn,
-#about:has(#show-more-about:checked) .show-more-btn,
-#manifesto:has(#show-more-manifesto:checked) .show-more-btn,
-#contact:has(#show-more-contact:checked) .show-more-btn {
+#distros:has(#section-distros:checked) .show-more-btn,
+#references:has(#section-references:checked) .show-more-btn,
+#blog:has(#section-blog:checked) .show-more-btn,
+#about:has(#section-about:checked) .show-more-btn,
+#manifesto:has(#section-manifesto:checked) .show-more-btn,
+#contact:has(#section-contact:checked) .show-more-btn {
     /* display: none; - removed to show arrow instead */
 }
 
 /* Arrow rotation when expanded - point left when closed, down when open */
-#guides:has(#show-more-guides:checked) .show-more-btn::after,
-#projects:has(#show-more-projects:checked) .show-more-btn::after,
-#resources:has(#show-more-resources:checked) .show-more-btn::after,
-#scripts:has(#show-more-scripts:checked) .show-more-btn::after,
-#contact:has(#show-more-contact:checked) .show-more-btn::after,
-#games:has(#show-more-games:checked) .show-more-btn::after,
-#distros:has(#show-more-distros:checked) .show-more-btn::after,
-#references:has(#show-more-references:checked) .show-more-btn::after,
-#blog:has(#show-more-blog:checked) .show-more-btn::after,
-#about:has(#show-more-about:checked) .show-more-btn::after,
-#manifesto:has(#show-more-manifesto:checked) .show-more-btn::after,
-#contact:has(#show-more-contact:checked) .show-more-btn::after {
+#guides:has(#section-guides:checked) .show-more-btn::after,
+#projects:has(#section-projects:checked) .show-more-btn::after,
+#resources:has(#section-resources:checked) .show-more-btn::after,
+#scripts:has(#section-scripts:checked) .show-more-btn::after,
+#contact:has(#section-contact:checked) .show-more-btn::after,
+#games:has(#section-games:checked) .show-more-btn::after,
+#distros:has(#section-distros:checked) .show-more-btn::after,
+#references:has(#section-references:checked) .show-more-btn::after,
+#blog:has(#section-blog:checked) .show-more-btn::after,
+#about:has(#section-about:checked) .show-more-btn::after,
+#manifesto:has(#section-manifesto:checked) .show-more-btn::after,
+#tests:has(#section-tests:checked) .show-more-btn::after,
+#contact:has(#section-contact:checked) .show-more-btn::after {
     transform: rotate(90deg);
 }
 
@@ -804,6 +812,70 @@ nav {
     font-size: 1.25rem;
     margin-bottom: 32px;
     color: var(--charcoal);
+}
+
+/* Manifesto header styling (moved from hero) */
+#manifesto .section-header h1 {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    line-height: 1.1;
+    margin-bottom: 24px;
+    color: var(--black);
+    font-weight: bold;
+}
+
+#manifesto .section-header .tagline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.25rem;
+    margin-bottom: 32px;
+    color: var(--charcoal);
+}
+
+.section-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 70px 16px 16px;
+    background: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+}
+
+/* Hide the radio buttons - they're just for state management */
+input[type="radio"][name="section"] {
+    display: none;
+}
+
+.section-links label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--charcoal);
+    padding: 6px 12px;
+    border: 1px solid var(--charcoal);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.section-links label:hover {
+    background: var(--charcoal);
+    color: var(--white);
+}
+
+[data-theme="dark"] .section-links label {
+    color: var(--black);
+    background: var(--white);
+    border-color: var(--black);
+}
+
+[data-theme="dark"] .section-links label:hover {
+    background: var(--black);
+    color: var(--white);
+}
+
+.section-links a:hover {
+    background: var(--charcoal);
+    color: var(--white);
 }
 
 /* =============================================================================
@@ -2370,20 +2442,23 @@ footer .copyleft {
 
 .guides-progress-section,
 .projects-progress-section,
-.games-progress-section {
+.games-progress-section,
+.tests-progress-section {
     margin-bottom: 48px;
 }
 
 .guides-progress-section h2,
 .projects-progress-section h2,
-.games-progress-section h2 {
+.games-progress-section h2,
+.tests-progress-section h2 {
     font-size: 1.5rem;
     margin-bottom: 24px;
 }
 
 .guides-list,
 .projects-list,
-.games-list {
+.games-list,
+.tests-list {
     background: var(--white);
     border: none;
 }
@@ -2538,4 +2613,247 @@ footer .copyleft {
     box-shadow: none !important;
     border: 1px solid #e0e0e0 !important;
     outline: none !important;
+}
+
+/* ALL SECTIONS HIDDEN BY DEFAULT */
+#manifesto, #distros, #games, #guides, #projects, #resources, #references, #scripts, #blog, #about, #contact, #tests, #stats, #rebels, #site-footer { display: none !important; }
+
+/* SHOW ONLY THE CHECKED SECTION */
+body:has(#section-manifesto:checked) #manifesto,
+body:has(#section-distros:checked) #distros,
+body:has(#section-games:checked) #games,
+body:has(#section-guides:checked) #guides,
+body:has(#section-projects:checked) #projects,
+body:has(#section-resources:checked) #resources,
+body:has(#section-references:checked) #references,
+body:has(#section-scripts:checked) #scripts,
+body:has(#section-blog:checked) #blog,
+body:has(#section-about:checked) #about,
+body:has(#section-contact:checked) #contact,
+body:has(#section-tests:checked) #tests,
+body:has(#section-stats:checked) #stats,
+body:has(#section-rebels:checked) #rebels { 
+    display: block !important;
+    padding-top: 70px;
+}
+
+/* Show section content when section is visible */
+.manifesto, .section-header, .lesson-card, .project-card, .resource-card, .about-content, .contact-hidden, .about-preview { display: block !important; }
+
+#manifesto,
+#distros,
+#games,
+#guides,
+#projects,
+#resources,
+#references,
+#scripts,
+#blog,
+#about,
+#contact,
+#tests,
+#stats,
+#rebels {
+    display: none;
+}
+
+/* Show specific section when its radio is checked */
+/* Just show the entire section when selected */
+body:has(#section-manifesto:checked) #manifesto,
+body:has(#section-distros:checked) #distros,
+body:has(#section-games:checked) #games,
+body:has(#section-guides:checked) #guides,
+body:has(#section-projects:checked) #projects,
+body:has(#section-resources:checked) #resources,
+body:has(#section-references:checked) #references,
+body:has(#section-scripts:checked) #scripts,
+body:has(#section-blog:checked) #blog,
+body:has(#section-about:checked) #about,
+body:has(#section-contact:checked) #contact,
+body:has(#section-tests:checked) #tests,
+body:has(#section-stats:checked) #stats,
+body:has(#section-rebels:checked) #rebels {
+    display: block;
+}
+
+/* Hide the original show-more buttons */
+.show-more-btn {
+    display: none !important;
+}
+
+/* Show footer when footer button is checked */
+body:has(#section-footer:checked) #site-footer {
+    display: block !important;
+    padding-top: 70px;
+}
+
+/* Show the label in section-links as the toggle instead */
+.section-header .show-more-checkbox {
+    display: none;
+}
+
+.section-links::-webkit-scrollbar {
+    display: none;
+}
+
+.section-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    padding: 6px 12px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.section-links a:hover {
+    background: #333;
+    border-color: #555;
+}
+
+/* =============================================================================
+   MOBILE RESPONSIVE STYLES
+   ============================================================================= */
+
+/* Base mobile adjustments */
+@media (max-width: 768px) {
+    /* Hero section */
+    .hero h1 {
+        font-size: 2.5rem !important;
+        line-height: 1.1 !important;
+        letter-spacing: -2px !important;
+    }
+    
+    .hero .tagline {
+        font-size: 0.9rem !important;
+    }
+    
+    /* Navigation */
+    .nav-title {
+        font-size: 0.9rem !important;
+    }
+    
+    .section-links {
+        padding: 60px 12px 10px;
+        gap: 8px;
+    }
+    
+    .section-links a {
+        font-size: 0.65rem;
+        padding: 5px 8px;
+    }
+    
+    /* Section headers */
+    .section-title-wrap h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    /* Grid layouts - single column on mobile */
+    .blog-grid,
+    .lessons-grid,
+    .projects-grid,
+    .resources-grid {
+        grid-template-columns: 1fr !important;
+        padding: 0 16px !important;
+    }
+    
+    /* Cards */
+    .lesson-card,
+    .project-card,
+    .resource-card {
+        min-height: auto !important;
+        padding: 16px !important;
+    }
+    
+    /* Reduce padding everywhere */
+    section {
+        padding: 32px 16px !important;
+    }
+    
+    /* Manifesto */
+    .manifesto {
+        padding: 24px 16px !important;
+    }
+    
+    .manifesto p {
+        font-size: 0.9rem !important;
+        line-height: 1.6 !important;
+    }
+    
+    /* Games section */
+    #games .games-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Guides */
+    #guides {
+        padding: 32px 16px !important;
+    }
+    
+    /* Projects */
+    .projects-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Resources */
+    .resources-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Footer */
+    footer {
+        padding: 32px 16px !important;
+    }
+    
+    footer .footer-content {
+        flex-direction: column !important;
+        gap: 24px !important;
+    }
+    
+    /* Forms */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    textarea {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+    
+    /* Buttons */
+    button,
+    .btn {
+        padding: 12px 20px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    /* Tables */
+    table {
+        font-size: 0.8rem !important;
+        display: block;
+        overflow-x: auto;
+    }
+    
+    /* Code blocks */
+    pre {
+        font-size: 0.75rem !important;
+        padding: 12px !important;
+        overflow-x: auto;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 2rem !important;
+    }
+    
+    .section-links a {
+        font-size: 0.6rem;
+        padding: 4px 6px;
+    }
+    
+    .blog-grid {
+        grid-template-columns: 1fr !important;
+    }
 }

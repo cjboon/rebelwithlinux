@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-prometheus.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Prometheus: The Backbone of Modern Monitoring - REBEL WITH LINUX</title>
+    <meta name="description" content="Learn Prometheus, the open-source monitoring system that became the foundation of cloud-native observability.">
+    <meta name="keywords" content="Prometheus, monitoring, observability, DevOps, metrics, Grafana, time series">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Prometheus: The Backbone of Modern Monitoring">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-prometheus.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-prometheus.html">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+
+    <style>
+        .blog-header {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 32px 60px;
+            text-align: center;
+        }
+        .blog-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .blog-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--gray);
+        }
+        .blog-nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 16px;
+            border-bottom: 2px solid var(--black);
+            background: var(--white);
+        }
+        .blog-nav a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--black);
+            text-decoration: none;
+        }
+        .blog-nav a:hover {
+            text-decoration: underline;
+        }
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+        .blog-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 16px;
+        }
+        .blog-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+        .blog-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        .blog-content p {
+            margin-bottom: 24px;
+        }
+        .blog-content h2 {
+            font-size: 1.5rem;
+            margin: 40px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--black);
+        }
+        .blog-content h3 {
+            font-size: 1.2rem;
+            margin: 32px 0 12px;
+        }
+        .blog-content ul, .blog-content ol {
+            margin-bottom: 24px;
+            padding-left: 24px;
+        }
+        .blog-content li {
+            margin-bottom: 8px;
+        }
+        .blog-content blockquote {
+            border-left: 4px solid var(--black);
+            padding-left: 20px;
+            margin: 24px 0;
+            font-style: italic;
+            color: var(--gray);
+        }
+        .blog-content code {
+            background: var(--beige);
+            padding: 2px 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95rem;
+        }
+        .blog-content pre {
+            background: var(--black);
+            color: var(--ivory);
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            border: 3px solid var(--black);
+        }
+        .blog-content pre code {
+            background: transparent;
+            padding: 0;
+            color: var(--ivory);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: var(--black);
+            text-decoration: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        footer {
+            padding: 48px 32px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="blog-header">
+        <h1>// THE REBEL BLOG</h1>
+        <p>Thoughts on free software, privacy, and taking back control</p>
+    </header>
+
+    <nav class="blog-nav">
+        <a href="../index.html#blog">← Back to Blog</a>
+    </nav>
+
+    <main class="blog-container" id="main-content">
+        <article>
+            <div class="blog-meta">
+                <span>2026-03-14</span> • <span>10 min read</span> • <span>DevOps</span>
+            </div>
+            <h1 class="blog-title">Prometheus: The Backbone of Modern Monitoring</h1>
+
+            <div class="blog-content">
+                <p>Your application is in production. Users are clicking, data is flowing, and everything seems fine—until it isn't. A service starts responding slowly. A server runs out of memory. A database connection pool saturates. How do you know? More importantly, how do you know <em>before</em> your users start complaining?</p>
+
+                <p>This is where Prometheus comes in. Originally built at SoundCloud and now a top-level Cloud Native Computing Foundation project, Prometheus has become the standard for cloud-native monitoring. It's the tool that answers the question: "What's happening in my system right now?"</p>
+
+                <h2>What Is Prometheus?</h2>
+
+                <p>Prometheus is an open-source systems monitoring and alerting toolkit. It collects metrics from configured targets, stores them locally, and exposes them for querying via a powerful PromQL (Prometheus Query Language).</p>
+
+                <p>Unlike traditional monitoring systems that push data to a central server, Prometheus follows a <strong>pull model</strong>. It reaches out to your applications and scrapes their metrics endpoints at regular intervals. This approach has several advantages:</p>
+
+                <ul>
+                    <li><strong>Decentralized</strong> — No single point of failure</li>
+                    <li><strong>Simple</strong> — Applications just need to expose metrics</li>
+                    <li><strong> Scalable</strong> — Add targets without reconfiguring the server</li>
+                    <li><strong>Reliable</strong> — Works during network outages</li>
+                </ul>
+
+                <h2>Core Concepts</h2>
+
+                <h3>Metrics</h3>
+
+                <p>Metrics are the heart of Prometheus. A metric is a numeric measurement that changes over time. Prometheus supports four types:</p>
+
+                <ul>
+                    <li><strong>Counter</strong> — A monotonically increasing value (e.g., total requests, total errors)</li>
+                    <li><strong>Gauge</strong> — A value that can go up or down (e.g., memory usage, CPU temperature)</li>
+                    <li><strong>Histogram</strong> — A distribution of values (e.g., request latencies)</li>
+                    <li><strong>Summary</strong> — Similar to histogram, but with pre-computed quantiles</li>
+                </ul>
+
+                <h3>Labels</h3>
+
+                <p>Labels add dimensions to your metrics. Instead of having one "http_requests_total" metric, you can have multiple with different labels:</p>
+
+                <pre><code>http_requests_total{method="GET", status="200", endpoint="/api/users"}
+http_requests_total{method="POST", status="201", endpoint="/api/users"}
+http_requests_total{method="GET", status="404", endpoint="/api/nonexistent"}</code></pre>
+
+                <p>This lets you slice and dice your data however you need.</p>
+
+                <h3>Exporters</h3>
+
+                <p>An exporter is a tool that exposes existing metrics in Prometheus format. There's an exporter for almost everything:</p>
+
+                <ul>
+                    <li><strong>node_exporter</strong> — System-level metrics (CPU, memory, disk, network)</li>
+                    <li><strong>blackbox_exporter</strong> — HTTP, HTTPS, DNS, TCP, ICMP probes</li>
+                    <li><strong>postgres_exporter</strong> — PostgreSQL database metrics</li>
+                    <li><strong>redis_exporter</strong> — Redis metrics</li>
+                    <li><strong>cadvisor</strong> — Docker container metrics</li>
+                </ul>
+
+                <h3>PromQL</h3>
+
+                <p>PromQL is Prometheus's query language. It's incredibly powerful for time series analysis:</p>
+
+                <pre><code># CPU usage across all nodes
+100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+
+# Requests per second
+rate(http_requests_total[5m])
+
+# 95th percentile latency
+histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))</code></pre>
+
+                <h2>Setting Up Prometheus</h2>
+
+                <pre><code># Download Prometheus
+wget https://github.com/prometheus/prometheus/releases/latest/download/prometheus-*.linux-amd64.tar.gz
+tar xvfz prometheus-*.linux-amd64.tar.gz
+
+# Create config
+cat > prometheus.yml << 'EOF'
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+  
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
+EOF
+
+# Start Prometheus
+./prometheus --config.file=prometheus.yml</code></pre>
+
+                <p>Now visit http://localhost:9090 to access the Prometheus UI.</p>
+
+                <h2>Alerting with Alertmanager</h2>
+
+                <p>Prometheus isn't just for viewing metrics—it can also alert you when things go wrong. The Alertmanager handles alert routing, grouping, and notification:</p>
+
+                <pre><code># alerts.yml
+groups:
+  - name: example
+    rules:
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"</code></pre>
+
+                <h2>Visualization with Grafana</h2>
+
+                <p>While Prometheus has a built-in UI, Grafana is the standard for visualization. They integrate seamlessly:</p>
+
+                <ol>
+                    <li>Install Grafana</li>
+                    <li>Add Prometheus as a data source</li>
+                    <li>Build dashboards with PromQL queries</li>
+                </ol>
+
+                <p>Grafana also has pre-built dashboards for most exporters, so you can get started in minutes.</p>
+
+                <h2>The Ecosystem</h2>
+
+                <p>Prometheus doesn't exist in isolation. It fits into a larger observability ecosystem:</p>
+
+                <ul>
+                    <li><strong>Thanos</strong> — Adds long-term storage, global querying, and high availability</li>
+                    <li><strong>Cortex</strong> — Multi-tenant Prometheus as a service</li>
+                    <li><strong>VictoriaMetrics</strong> — Cost-effective alternative with better compression</li>
+                    <li><strong>OpenTelemetry</strong> — Standard for collecting traces and metrics</li>
+                </ul>
+
+                <h2>Instrumenting Your Applications</h2>
+
+                <p>Most languages have client libraries for Prometheus. Here's a simple Python example:</p>
+
+                <pre><code>from prometheus_client import Counter, Gauge, generate_latest
+
+# Count requests
+requests_total = Counter('app_requests_total', 'Total requests')
+
+# Track in-progress requests
+in_progress = Gauge('app_in_progress', 'Requests in progress')
+
+# Measure request latency
+request_duration = Histogram('app_request_duration_seconds', 'Request duration')
+
+@app.route("/api/users")
+def get_users():
+    in_progress.inc()
+    try:
+        return fetch_users()
+    finally:
+        in_progress.dec()
+        requests_total.inc()</code></pre>
+
+                <h2>Why Prometheus Matters</h2>
+
+                <p>Prometheus succeeded because it embraced simplicity while delivering power. It doesn't try to do everything—it does one thing extremely well: collect and query time series metrics.</p>
+
+                <p>In a world where systems are increasingly distributed, ephemeral, and complex, having solid observability isn't optional. Prometheus gives you the visibility you need to debug issues, optimize performance, and sleep soundly at night.</p>
+
+                <blockquote>If you can't measure it, you can't improve it. — Peter Drucker</blockquote>
+
+                <h2>Getting Started</h2>
+
+                <ol>
+                    <li><strong>Install Prometheus</strong> — Start with a single instance</li>
+                    <li><strong>Add node_exporter</strong> — Monitor your first server</li>
+                    <li><strong>Learn PromQL</strong> — Practice querying in the UI</li>
+                    <li><strong>Set up alerting</strong> — Add Alertmanager</li>
+                    <li><strong>Add Grafana</strong> — Build beautiful dashboards</li>
+                    <li><strong>Instrument your code</strong> — Expose application metrics</li>
+                </ol>
+
+                <p>The learning curve is gentle, and the payoff is immediate. Once you have Prometheus running, you'll wonder how you ever managed without it.</p>
+            </div>
+        </article>
+
+        <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+            <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+            <div id="comments-list" style="margin-bottom: 32px;"></div>
+            <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+                <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+                <div style="display: grid; gap: 16px;">
+                    <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                    <button onclick="submitComment('blog-prometheus')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                    <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                    <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        
+    </footer>
+    <script>
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    
+    <script src="../nav.js" defer></script>
+    <script src="../comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-prometheus');
+        });
+    </script>
+</body>
+</html>

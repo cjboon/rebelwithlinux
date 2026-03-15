@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-php.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// PHP TEST</h1>
+            <p>Prove your PHP mastery</p>
+        </div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What does PHP stand for?", a: ["PHP: Hypertext Preprocessor", "Personal Home Page", "Preprocessor Hypertext", "Private Home Page"], correct: 0 },
+            { q: "How do you start a PHP block?", a: ["<?php", "<?", "<php", "<?php?>"], correct: 0 },
+            { q: "Which symbol is used for variables in PHP?", a: ["$", "@", "%", "#"], correct: 0 },
+            { q: "How do you concatenate strings in PHP?", a: [".", "+", ",", "&"], correct: 0 },
+            { q: "Which function outputs text in PHP?", a: ["echo", "print", "output", "write"], correct: 0 },
+            { q: "How do you write a single-line comment in PHP?", a: ["//", "<!--", "#", "**"], correct: 0 },
+            { q: "Which superglobal contains form data?", a: ["$_POST", "$_GET", "$_SERVER", "$_SESSION"], correct: 0 },
+            { q: "How do you check if two values are equal?", a: ["==", "===", "=" , "eq"], correct: 0 },
+            { q: "Which function is used to get the length of a string?", a: ["strlen()", "length()", "strlength()", "size()"], correct: 0 },
+            { q: "How do you create an array in PHP?", a: ["$arr = array()", "$arr = []", "$arr = new Array()", "Both A and B"], correct: 3 },
+            { q: "Which keyword defines a constant?", a: ["const", "define", "constant", "let"], correct: 0 },
+            { q: "How do you include an external file?", a: ["include", "require", "import", "Both A and B"], correct: 2 },
+            { q: "What does isset() check?", a: ["If variable is set", "If variable is empty", "If variable is null", "If variable exists"], correct: 0 },
+            { q: "Which loop iterates through an array?", a: ["foreach", "for", "while", "do-while"], correct: 0 },
+            { q: "How do you create a function in PHP?", a: ["function name()", "def name()", "func name()", "void name()"], correct: 0 },
+            { q: "What does empty() check?", a: ["If variable is empty", "If variable is set", "If variable is null", "If variable is defined"], correct: 0 },
+            { q: "Which function redirects to another page?", a: ["header()", "redirect()", "location()", "goto()"], correct: 0 },
+            { q: "How do you get the current timestamp?", a: ["time()", "date()", "now()", "timestamp()"], correct: 0 },
+            { q: "What is the correct way to create a class?", a: ["class MyClass {}", "Class MyClass {}", "new class MyClass", "define MyClass"], correct: 0 },
+            { q: "How do you access static methods?", a: ["ClassName::method()", "ClassName->method()", "$class->method()", "ClassName.method()"], correct: 0 },
+            { q: "Which operator checks type as well as value?", a: ["===", "==", "=", "!="], correct: 0 },
+            { q: "What does $_GET contain?", a: ["URL parameters", "Form data", "Cookies", "Server info"], correct: 0 },
+            { q: "How do you start a session?", a: ["session_start()", "start_session()", "session_begin()", "init_session()"], correct: 0 },
+            { q: "What does count() return?", a: ["Number of elements", "Array size", "Both A and B", "None"], correct: 2 },
+            { q: "How do you get the current file name?", a: ["$_SERVER['PHP_SELF']", "$_SERVER['FILE']", "$_SERVER['NAME']", "$_SERVER['SELF']"], correct: 0 },
+            { q: "Which function escapes special characters?", a: ["htmlspecialchars()", "escape()", "strip_tags()", "clean()"], correct: 0 },
+            { q: "What does explode() do?", a: ["Splits string into array", "Joins array to string", "Removes spaces", "Encrypts string"], correct: 0 },
+            { q: "What does implode() do?", a: ["Joins array to string", "Splits string", "Removes characters", "Encrypts string"], correct: 0 },
+            { q: "How do you get input from user?", a: ["$_POST or $_GET", "readline()", "input()", "fgets()"], correct: 0 },
+            { q: "What is the file extension for PHP files?", a: [".php", ".html", ".phtml", ".php3"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the difference between == and ===?", a: ["=== checks type too", "== checks type too", "No difference", "=== is faster"], correct: 0 },
+            { q: "What does PDO stand for?", a: ["PHP Data Objects", "PHP Database Objects", "PHP Data Oriented", "PHP Direct Objects"], correct: 0 },
+            { q: "How do you prevent SQL injection?", a: ["Prepared statements", "addslashes()", "htmlspecialchars()", "strip_tags()"], correct: 0 },
+            { q: "What is Composer?", a: ["Dependency manager", "Framework", "Server", "Template engine"], correct: 0 },
+            { q: "What is autoloading?", a: ["Auto-loads classes", "Auto-starts sessions", "Auto-connects DB", "Auto-routes URLs"], correct: 0 },
+            { q: "What is a trait in PHP?", a: ["Code reuse mechanism", "Class type", "Interface type", "Data type"], correct: 0 },
+            { q: "What does namespace do?", a: ["Organizes code", "Creates scope", "Both A and B", "None"], correct: 2 },
+            { q: "What is PSR?", a: ["PHP Standards Recommendation", "PHP System Requirements", "PHP Server Response", "PHP Syntax Rules"], correct: 0 },
+            { q: "What is a closure?", a: ["Anonymous function", "Class method", "Static function", "Magic method"], correct: 0 },
+            { q: "What does use keyword do in namespaces?", a: ["Imports namespace", "Declares namespace", "Creates namespace", "Deletes namespace"], correct: 0 },
+            { q: "What is the purpose of __construct()?", a: ["Class constructor", "Class destructor", "Magic method", "Static method"], correct: 0 },
+            { q: "What does __get() magic method do?", a: ["Handles inaccessible properties", "Sets properties", "Deletes properties", "Checks properties"], correct: 0 },
+            { q: "What is dependency injection?", a: ["Passing dependencies", "Including files", "Creating objects", "Extending classes"], correct: 0 },
+            { q: "What is a service container?", a: ["DI container", "Database container", "Cache container", "Session container"], correct: 0 },
+            { q: "What does bin/console do in Symfony?", a: ["CLI commands", "Web server", "Database tool", "Cache clear"], correct: 0 },
+            { q: "What is Laravel's Eloquent?", a: ["ORM", "Template engine", "Router", "Middleware"], correct: 0 },
+            { q: "What is Middleware?", a: ["Request/response filter", "Database layer", "Cache layer", "Routing layer"], correct: 0 },
+            { q: "What is a facade?", a: ["Static proxy", "Database class", "Controller", "Model"], correct: 0 },
+            { q: "What does yield do?", a: ["Generates values", "Returns value", "Ends function", "Pauses function"], correct: 0 },
+            { q: "What is a generator?", a: ["Function that yields", "Class generator", "Code generator", "File generator"], correct: 0 },
+            { q: "What is the purpose of final keyword?", a: ["Prevents inheritance", "Prevents override", "Both A and B", "None"], correct: 2 },
+            { q: "What is static binding?", a: ["Compile-time binding", "Runtime binding", "Dynamic binding", "Late binding"], correct: 0 },
+            { q: "What is late static binding?", a: ["Resolves at runtime", "Resolves at compile", "No binding", "Early binding"], correct: 0 },
+            { q: "What is the purpose of abstract keyword?", a: ["Cannot instantiate", "Must implement methods", "Both A and B", "None"], correct: 2 },
+            { q: "What is an interface?", a: ["Contract for classes", "Type of class", "Type of trait", "Type of method"], correct: 0 },
+            { q: "What does trait conflict resolution use?", a: ["insteadof", "use", "extends", "implements"], correct: 0 },
+            { q: "What is polymorphism?", a: ["Multiple forms", "Single form", "No form", "One form"], correct: 0 },
+            { q: "What is method overriding?", a: ["Redefining method in child", "Overloading method", "Creating method", "Deleting method"], correct: 0 },
+            { q: "What is the purpose of protected?", a: ["Access in class and children", "Access everywhere", "Access in class only", "No access"], correct: 0 },
+            { q: "What is type hinting?", a: ["Specifies parameter types", "Creates types", "Defines types", "Checks types"], correct: 0 },
+            { q: "What does return type declaration do?", a: ["Specifies return type", "Creates return type", "Defines return type", "Checks return type"], correct: 0 },
+            { q: "What is strict typing?", a: ["Enforces types strictly", "Allows types", "Ignores types", "Converts types"], correct: 0 },
+            { q: "What is garbage collection?", a: ["Memory management", "Cache management", "Session management", "File management"], correct: 0 },
+            { q: "What does unset() do?", a: ["Removes variable", "Sets variable to null", "Destroys variable", "Both A and C"], correct: 3 },
+            { q: "What is serialization?", a: ["Converts to string", "Converts to array", "Converts to object", "Converts to int"], correct: 0 },
+            { q: "What does json_encode() return?", a: ["JSON string", "Array", "Object", "Boolean"], correct: 0 },
+            { q: "What is the purpose of final methods?", a: ["Cannot be overridden", "Must be overridden", "Can be overridden", "None"], correct: 0 },
+            { q: "What is method chaining?", a: ["Return $this", "Return value", "End execution", "Start loop"], correct: 0 },
+            { q: "What is a fluent interface?", a: ["Method chaining", "Object creation", "Query building", "Both A and C"], correct: 2 },
+            { q: "What does spl_autoload_register() do?", a: ["Registers autoloader", "Creates autoloader", "Loads autoloader", "Shows autoloader"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is the singleton pattern?", a: ["One instance only", "Many instances", "No instance", "Factory pattern"], correct: 0 },
+            { q: "What is the factory pattern?", a: ["Creates objects", "Destroys objects", "Modifies objects", "Stores objects"], correct: 0 },
+            { q: "What is dependency injection container?", a: ["Manages dependencies", "Stores objects", "Creates objects", "Destroys objects"], correct: 0 },
+            { q: "What is PSR-4 autoloading?", a: ["Maps namespaces to paths", "Loads all files", "Loads classes only", "Loads interfaces"], correct: 0 },
+            { q: "What is event-driven architecture?", a: ["Based on events", "Based on requests", "Based on responses", "Based on data"], correct: 0 },
+            { q: "What is the observer pattern?", a: ["Event subscription", "Data storage", "Object creation", "Code execution"], correct: 0 },
+            { q: "What is a strategy pattern?", a: ["Interchangeable algorithms", "Data strategy", "Storage strategy", "Execution strategy"], correct: 0 },
+            { q: "What is the decorator pattern?", a: ["Adds behavior dynamically", "Creates objects", "Destroys objects", "Stores objects"], correct: 0 },
+            { q: "What is refactoring?", a: ["Improving code structure", "Breaking code", "Writing tests", "Deploying code"], correct: 0 },
+            { q: "What is technical debt?", a: ["Cost of poor choices", "Money owed", "Time spent", "Code written"], correct: 0 },
+            { q: "What is the repository pattern?", a: ["Abstracts data access", "Stores data", "Retrieves data", "Manages data"], correct: 0 },
+            { q: "What is the builder pattern?", a: ["Builds complex objects", "Destroys objects", "Stores objects", "Copies objects"], correct: 0 },
+            { q: "What is hexagonal architecture?", a: ["Ports and adapters", "Layered architecture", "MVC architecture", "Service-oriented"], correct: 0 },
+            { q: "What is domain-driven design?", a: ["Focuses on domain logic", "Focuses on data", "Focuses on UI", "Focuses on tests"], correct: 0 },
+            { q: "What is CQRS?", a: ["Command Query Responsibility Segregation", "Code Query Responsibility", "Command Query Response", "Code Query Response"], correct: 0 },
+            { q: "What is event sourcing?", a: ["Stores state changes", "Stores current state", "Stores queries", "Stores commands"], correct: 0 },
+            { q: "What is microservices?", a: ["Small independent services", "Small functions", "Monolithic code", "Serverless functions"], correct: 0 },
+            { q: "What is API gateway?", a: ["Single entry point", "API documentation", "API testing", "API security"], correct: 0 },
+            { q: "What is service mesh?", a: ["Service communication layer", "Load balancer", "API gateway", "Service discovery"], correct: 0 },
+            { q: "What is circuit breaker?", a: ["Prevents cascading failures", "Breaks loops", "Creates circuits", "Tests connections"], correct: 0 },
+            { q: "What is horizontal scaling?", a: ["Adding more machines", "Adding more power", "Adding more code", "Adding more data"], correct: 0 },
+            { q: "What is vertical scaling?", a: ["Adding more power", "Adding more machines", "Adding more code", "Adding more data"], correct: 0 },
+            { q: "What is load balancing?", a: ["Distributes load", "Balances data", "Balances code", "Balances storage"], correct: 0 },
+            { q: "What is caching?", a: ["Stores for fast access", "Stores permanently", "Stores temporarily", "Stores securely"], correct: 0 },
+            { q: "What is Redis?", a: ["In-memory data store", "Relational database", "File storage", "Cache only"], correct: 0 },
+            { q: "What is Memcached?", a: ["Distributed memory caching", "Database", "File system", "Message queue"], correct: 0 },
+            { q: "What is message queue?", a: ["Stores messages", "Processes requests", "Routes messages", "Creates messages"], correct: 0 },
+            { q: "What is RabbitMQ?", a: ["Message broker", "Database", "Cache", "Load balancer"], correct: 0 },
+            { q: "What is WebSocket?", a: ["Full-duplex communication", "One-way communication", "Batch processing", "File transfer"], correct: 0 },
+            { q: "What is REST?", a: ["API architectural style", "Database type", "Programming language", "Protocol"], correct: 0 },
+            { q: "What is GraphQL?", a: ["Query language for APIs", "Database", "Framework", "Template engine"], correct: 0 },
+            { q: "What is JWT?", a: ["JSON Web Token", "Java Web Token", "JavaScript Web", "JSON Write Token"], correct: 0 },
+            { q: "What is OAuth?", a: ["Authorization framework", "Authentication", "Encryption", "Protocol"], correct: 0 },
+            { q: "What is OpenID Connect?", a: ["Identity layer on OAuth", "Database", "Framework", "Protocol"], correct: 0 },
+            { q: "What is two-factor authentication?", a: ["Two verification methods", "Two passwords", "Two users", "Two servers"], correct: 0 },
+            { q: "What is XSS?", a: ["Cross-site scripting", "Cross-site request", "Server-side scripting", "SQL injection"], correct: 0 },
+            { q: "What is CSRF?", a: ["Cross-site request forgery", "Cross-site scripting", "Server request", "Client request"], correct: 0 },
+            { q: "What is the purpose of hash_hmac()?", a: ["Creates keyed hash", "Creates hash", "Verifies hash", "Encrypts data"], correct: 0 },
+            { q: "What is password_hash()?", a: ["Hashes password", "Verifies password", "Encrypts password", "Stores password"], correct: 0 },
+            { q: "What is the purpose of password_verify()?", a: ["Verifies password", "Hashes password", "Encrypts password", "Stores password"], correct: 0 },
+            { q: "What is BCrypt?", a: ["Password hashing function", "Encryption", "Encoding", "Compression"], correct: 0 },
+            { q: "What is static analysis?", a: ["Analyzes code without running", "Runs code", "Tests code", "Deploys code"], correct: 0 },
+            { q: "What is PHPStan?", a: ["Static analysis tool", "Testing framework", "Debugging tool", "Deployment tool"], correct: 0 },
+            { q: "What is Psalm?", a: ["Static analysis tool", "Testing framework", "Debugging tool", "Deployment tool"], correct: 0 },
+            { q: "What is Rector?", a: ["Automated upgrades", "Testing tool", "Debugging tool", "Deployment tool"], correct: 0 },
+            { q: "What is CI/CD?", a: ["Continuous Integration/Deployment", "Continuous Input", "Code Integration", "Container Integration"], correct: 0 },
+            { q: "What is Docker?", a: ["Container platform", "Virtual machine", "Server", "Database"], correct: 0 },
+            { q: "What is Kubernetes?", a: ["Container orchestration", "Container", "VM manager", "Server"], correct: 0 },
+            { q: "What is Composer lock file?", a: ["Locks dependency versions", "Locks PHP version", "Locks file access", "Locks server"], correct: 0 },
+            { q: "What is the purpose of Composer script?", a: ["Runs custom commands", "Scripts PHP", "Manages files", "Deploys code"], correct: 0 },
+            { q: "What is雁阵 pattern in PHP?", a: ["Array mapping", "Data structure", "Loop pattern", "Error handling"], correct: 0 },
+            { q: "What is array_map()?", a: ["Applies function to arrays", "Creates array", "Filters array", "Sorts array"], correct: 0 },
+            { q: "What is array_filter()?", a: ["Filters array by condition", "Maps array", "Sorts array", "Merges array"], correct: 0 },
+            { q: "What is array_reduce()?", a: ["Reduces to single value", "Filters array", "Maps array", "Sorts array"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+        function initTest() { difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0; currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0; document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block'; renderQuestion(); }
+        function renderQuestion() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const q = currentQuestions[currentQuestionIndex]; const qDiv = document.createElement('div'); qDiv.className = 'question-container active'; let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join(''); qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`; container.appendChild(qDiv); updateUI(); }
+        function updateUI() { const total = currentQuestions.length; const progress = ((currentQuestionIndex) / total) * 100; document.getElementById('progressFill').style.width = progress + '%'; document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; }
+        function selectAnswer(index) { const q = currentQuestions[currentQuestionIndex]; const buttons = document.querySelectorAll('.answer-btn'); buttons.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); }); totalAnswered++; if (index === q.correct) { streak++; if (streak > maxStreak) maxStreak = streak; consecutiveCorrect++; score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30; if (currentLevel === 1 && consecutiveCorrect >= 7) { currentLevel = 2; difficulty = 'medium'; consecutiveCorrect = 0; currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else if (currentLevel === 2 && consecutiveCorrect >= 7) { currentLevel = 3; difficulty = 'hard'; consecutiveCorrect = 0; currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else { currentQuestionIndex++; } setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 1200); } else { buttons[index].classList.add('incorrect'); streak = 0; consecutiveCorrect = 0; currentQuestionIndex++; setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 2000); return; } }
+        function showResult() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const resultScreen = document.getElementById('resultScreen'); resultScreen.classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '✓' : '✗'; document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score}`; document.getElementById('resultDetails').innerHTML = `Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`; document.getElementById('progressFill').style.width = '100%'; }
+        function restartTest() { initTest(); }
+        document.addEventListener('DOMContentLoaded', function() { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('themeToggle').checked = true; } initTest(); });
+    </script>
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+    <footer><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-ansible.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ansible Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// ANSIBLE TEST</h1>
+            <p>Prove your Ansible mastery</p>
+        </div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What is Ansible?", a: ["Configuration management tool", "Container platform", "Monitoring tool", "Version control"], correct: 0 },
+            { q: "What is Ansible agentless?", a: ["No agent needed on remote", "Needs agent", "Needs SSH only", "Needs password"], correct: 0 },
+            { q: "What language is Ansible written in?", a: ["Python", "Ruby", "Go", "Java"], correct: 0 },
+            { q: "What is a Playbook in Ansible?", a: ["YAML file defining tasks", "Script file", "Config file", "Inventory file"], correct: 0 },
+            { q: "What is an Inventory file?", a: ["List of managed hosts", "Task list", "Variable file", "Module list"], correct: 0 },
+            { q: "What command runs a playbook?", a: ["ansible-playbook", "ansible-run", "ansible-execute", "ansible-start"], correct: 0 },
+            { q: "What is a Module in Ansible?", a: ["Unit of work to execute", "Host list", "Variable file", "Task file"], correct: 0 },
+            { q: "What is a Task in Ansible?", a: ["Single unit of action", "Playbook", "Module", "Role"], correct: 0 },
+            { q: "What is a Play in Ansible?", a: ["Mapping of hosts to tasks", "Single task", "Module", "Role"], correct: 0 },
+            { q: "What is idempotency?", a: ["Running multiple times safely", "Running once", "Running quickly", "Running safely"], correct: 0 },
+            { q: "What is the default inventory file?", a: ["/etc/ansible/hosts", "/etc/ansible/inventory", "/etc/hosts", "/etc/ansible/nodes"], correct: 0 },
+            { q: "What does ansible --version show?", a: ["Ansible version", "Host list", "Module list", "Playbook list"], correct: 0 },
+            { q: "What is ansible all?", a: ["Targets all hosts", "Lists all", "Shows all", "Tests all"], correct: 0 },
+            { q: "What is a Facts in Ansible?", a: ["System information gathered", "Variables", "Tasks", "Playbooks"], correct: 0 },
+            { q: "What command gathers facts?", a: ["setup module", "gather module", "facts module", "info module"], correct: 0 },
+            { q: "What is a Variable in Ansible?", a: ["Stores dynamic values", "Task list", "Host list", "Module list"], correct: 0 },
+            { q: "How do you define a variable in playbook?", a: ["vars:", "variable:", "var:", "define:"], correct: 0 },
+            { q: "What is Jinja2 in Ansible?", a: ["Template engine", "Language", "Module type", "File type"], correct: 0 },
+            { q: "What is the template extension?", a: [".j2", ".template", ".tpl", ".jinja"], correct: 0 },
+            { q: "What is with_items?", a: ["Loop over list", "Item counter", "Item selector", "Item filter"], correct: 0 },
+            { q: "What is a Handler in Ansible?", a: ["Task triggered by notify", "Regular task", "Module", "Variable"], correct: 0 },
+            { q: "What does notify do?", a: ["Triggers handler", "Notifies user", "Sends notification", "Logs message"], correct: 0 },
+            { q: "What is a Role in Ansible?", a: ["Reusable task structure", "User role", "Host role", "Play role"], correct: 0 },
+            { q: "What directory contains role tasks?", a: ["tasks/", "role/", "play/", "main/"], correct: 0 },
+            { q: "What directory contains role variables?", a: ["vars/", "variables/", "var/", "data/"], correct: 0 },
+            { q: "What is ansible.cfg?", a: ["Ansible configuration file", "Ansible client", "Ansible server", "Ansible host"], correct: 0 },
+            { q: "What is a Vault in Ansible?", a: ["Encrypts sensitive data", "Storage system", "Module type", "Variable type"], correct: 0 },
+            { q: "What command encrypts a file?", a: ["ansible-vault encrypt", "ansible encrypt", "vault encrypt", "encrypt vault"], correct: 0 },
+            { q: "What is check mode in Ansible?", a: ["Dry run without changes", "Checks syntax", "Checks hosts", "Checks modules"], correct: 0 },
+            { q: "What flag enables check mode?", a: ["--check", "--dry-run", "--test", "--preview"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the difference between shell and command?", a: ["shell executes in shell, command doesn't", "No difference", "shell is deprecated", "command is deprecated"], correct: 0 },
+            { q: "What is delegate_to in Ansible?", a: ["Executes on different host", "Transfers ownership", "Delegates task", "Changes host"], correct: 0 },
+            { q: "What is run_once in Ansible?", a: ["Executes on first host only", "Runs once", "Runs multiple", "Runs first"], correct: 0 },
+            { q: "What does become do?", a: ["Privilege escalation", "Becomes another user", "Runs in background", "Runs as service"], correct: 0 },
+            { q: "What is ansible_become_user?", a: ["User to become", "Current user", "Admin user", "System user"], correct: 0 },
+            { q: "What is serial in Ansible?", a: ["Controls number of hosts", "Series of tasks", "Sequence", "Order"], correct: 0 },
+            { q: "What is strategy in Ansible?", a: ["Execution strategy", "Host strategy", "Task strategy", "Play strategy"], correct: 0 },
+            { q: "What is free strategy?", a: ["No host ordering", "Free execution", "Free tasks", "Free plays"], correct: 0 },
+            { q: "What is linear strategy?", a: ["Sequential host execution", "Parallel execution", "Free execution", "Random execution"], correct: 0 },
+            { q: "What is debug module?", a: ["Prints debug messages", "Debugs playbooks", "Debugs hosts", "Debugs modules"], correct: 0 },
+            { q: "What is fail module?", a: ["Fails with message", "Fails host", "Fails task", "Fails play"], correct: 0 },
+            { q: "What is assert module?", a: ["Asserts condition", "Tests condition", "Checks condition", "Verifies condition"], correct: 0 },
+            { q: "What is register in Ansible?", a: ["Stores task output", "Registers host", "Registers task", "Registers variable"], correct: 0 },
+            { q: "What does changed_when do?", a: ["Controls changed status", "Changes task", "Changes host", "Changes play"], correct: 0 },
+            { q: "What is until in loops?", a: ["Retry until condition", "Until done", "Until complete", "Until success"], correct: 0 },
+            { q: "What is retries in loops?", a: ["Number of retry attempts", "Retry count", "Retry task", "Retry play"], correct: 0 },
+            { q: "What is delay in loops?", a: ["Delay between retries", "Delay time", "Delay task", "Delay play"], correct: 0 },
+            { q: "What is with_dict?", a: ["Loop over dictionary", "Loop over list", "Loop over items", "Loop over values"], correct: 0 },
+            { q: "What is with_fileglob?", a: ["Loop over file patterns", "Get files", "Find files", "List files"], correct: 0 },
+            { q: "What is lookups in Ansible?", a: ["Fetch data from external sources", "Look up variables", "Look up hosts", "Look up tasks"], correct: 0 },
+            { q: "What is password lookup?", a: ["Generate encrypted passwords", "Find passwords", "Store passwords", "Check passwords"], correct: 0 },
+            { q: "What is env lookup?", a: ["Read environment variables", "Environment setup", "Environment file", "Environment path"], correct: 0 },
+            { q: "What is set_fact?", a: ["Sets variable", "Gets fact", "Collects fact", "Gathers fact"], correct: 0 },
+            { q: "What is include_tasks?", a: ["Dynamic task inclusion", "Includes file", "Includes playbook", "Includes role"], correct: 0 },
+            { q: "What is import_tasks?", a: ["Static task inclusion", "Imports file", "Imports playbook", "Imports role"], correct: 0 },
+            { q: "What is include_playbook?", a: ["Includes playbook", "Imports playbook", "Dynamic playbook", "Static playbook"], correct: 0 },
+            { q: "What is tags in Ansible?", a: ["Labels for selective execution", "Tags resources", "Tags hosts", "Tags tasks"], correct: 0 },
+            { q: "What flag runs tagged tasks?", a: ["--tags", "--tagged", "--run-tags", "--execute-tags"], correct: 0 },
+            { q: "What flag skips tagged tasks?", a: ["--skip-tags", "--skip-tagged", "--no-tags", "--ignore-tags"], correct: 0 },
+            { q: "What is ansible-pull?", a: ["Pulls playbook from repo", "Pulls modules", "Pulls roles", "Pulls facts"], correct: 0 },
+            { q: "What is ansible-console?", a: ["Interactive Ansible console", "Console module", "Console play", "Console host"], correct: 0 },
+            { q: "What is wanteds in filter?", a: ["Filters list", "Gets wanted", "Selects wanted", "Finds wanted"], correct: 0 },
+            { q: "What is reject filter?", a: ["Rejects by condition", "Rejects hosts", "Rejects tasks", "Rejects plays"], correct: 0 },
+            { q: "What is json_query filter?", a: ["Query JSON data", "Queries JSON", "Gets JSON", "Finds JSON"], correct: 0 },
+            { q: "What is ansible-doc?", a: ["Shows module documentation", "Documents Ansible", "Creates docs", "Manages docs"], correct: 0 },
+            { q: "What is ansible-vault create?", a: ["Creates encrypted file", "Creates vault", "Opens vault", "Uses vault"], correct: 0 },
+            { q: "What is ansible-vault edit?", a: ["Edits encrypted file", "Edits vault", "Opens vault", "Uses vault"], correct: 0 },
+            { q: "What is ansible-vault decrypt?", a: ["Decrypts vault file", "Decrypts data", "Removes encryption", "Opens vault"], correct: 0 },
+            { q: "What is block in Ansible?", a: ["Groups tasks", "Blocks tasks", "Creates blocks", "Manages blocks"], correct: 0 },
+            { q: "What is rescue in Ansible?", a: ["Runs on block failure", "Rescues host", "Rescues task", "Rescues play"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is the difference between include and import?", a: ["include is dynamic, import is static", "No difference", "include is deprecated", "import is deprecated"], correct: 0 },
+            { q: "What is strategy plugin?", a: ["Custom execution strategy", "Host strategy", "Task strategy", "Play strategy"], correct: 0 },
+            { q: "What is mitogen strategy?", a: ["Faster Python execution", "Strategy plugin", "Custom strategy", "Parallel strategy"], correct: 0 },
+            { q: "What is ansible-test?", a: ["Testing framework for Ansible", "Tests playbooks", "Tests hosts", "Tests modules"], correct: 0 },
+            { q: "What is molecule?", a: ["Ansible role testing framework", "Molecule module", "Molecule tool", "Molecule plugin"], correct: 0 },
+            { q: "What is inspec?", a: ["Compliance testing tool", "Testing framework", "Test module", "Test plugin"], correct: 0 },
+            { q: "What is ansible-lint?", a: ["Lints Ansible playbooks", "Lints code", "Lints syntax", "Lints hosts"], correct: 0 },
+            { q: "What is AWX?", a: ["Ansible Tower upstream", "Ansible interface", "Ansible UI", "Ansible dashboard"], correct: 0 },
+            { q: "What is Ansible Tower?", a: ["Enterprise automation platform", "Ansible tool", "Ansible UI", "Ansible platform"], correct: 0 },
+            { q: "What is a Workflow in Tower?", a: ["Orchestrates job templates", "Work template", "Job flow", "Template flow"], correct: 0 },
+            { q: "What is a Job Template in Tower?", a: ["Defines Ansible job", "Template job", "Job definition", "Ansible job"], correct: 0 },
+            { q: "What is survey in Tower?", a: ["Dynamic variables for job", "Survey host", "Survey task", "Survey play"], correct: 0 },
+            { q: "What is RBAC in Tower?", a: ["Role-based access control", "Role control", "Base control", "Access control"], correct: 0 },
+            { q: "What is a Project in Tower?", a: ["Collection of playbooks", "Ansible project", "Playbook project", "Job project"], correct: 0 },
+            { q: "What is a Credential in Tower?", a: ["Authentication information", "Credential type", "Credential store", "Credential manager"], correct: 0 },
+            { q: "What is a Inventory Source in Tower?", a: ["Source of inventory", "Inventory type", "Inventory host", "Inventory group"], correct: 0 },
+            { q: "What is smart inventory in Tower?", a: ["Dynamic inventory based on hosts", "Static inventory", "Manual inventory", "File inventory"], correct: 0 },
+            { q: "What is a Container Group in Tower?", a: ["Runs jobs in containers", "Container job", "Container template", "Container runtime"], correct: 0 },
+            { q: "What is execution environment?", a: ["Containerized Ansible runtime", "Environment variable", "Runtime environment", "Ansible environment"], correct: 0 },
+            { q: "What is ansible-builder?", a: ["Builds execution environments", "Builds images", "Builds containers", "Builds environments"], correct: 0 },
+            { q: "What is a collection?", a: ["Distribution format for Ansible content", "Collection of hosts", "Collection of tasks", "Collection of plays"], correct: 0 },
+            { q: "What is ansible-galaxy?", a: ["Ansible content repository", "Galaxy tool", "Galaxy collection", "Galaxy role"], correct: 0 },
+            { q: "What is requirements.yml?", a: ["Defines collection dependencies", "Requirements file", "Collection file", "Dependency file"], correct: 0 },
+            { q: "What is FQCN?", a: ["Fully Qualified Collection Name", "Full Name", "Qualified Name", "Complete Name"], correct: 0 },
+            { q: "What is a custom module?", a: ["User-defined module", "Custom task", "Custom plugin", "Custom lookup"], correct: 0 },
+            { q: "What is a module_utils?", a: ["Shared Python code for modules", "Module utility", "Utility module", "Shared module"], correct: 0 },
+            { q: "What is ansible-filter plugin?", a: ["Custom Jinja2 filters", "Filter plugin", "Filter module", "Jinja2 plugin"], correct: 0 },
+            { q: "What is ansible-lookup plugin?", a: ["Custom data lookups", "Lookup plugin", "Data plugin", "External plugin"], correct: 0 },
+            { q: "What is ansible-inventory?", a: ["Shows inventory information", "Inventory tool", "Inventory display", "Inventory list"], correct: 0 },
+            { q: "What is ansible-config?", a: ["Manages Ansible configuration", "Config tool", "Config display", "Config list"], correct: 0 },
+            { q: "What is accelerate mode?", a: ["PySSH accelerated connection", "Fast mode", "Quick mode", "Speed mode"], correct: 0 },
+            { q: "What is pipelining in Ansible?", a: ["Reduces SSH operations", "Pipeline mode", "Pipe mode", "Quick mode"], correct: 0 },
+            { q: "What is fact caching?", a: ["Caches gathered facts", "Cache facts", "Store facts", "Facts storage"], correct: 0 },
+            { q: "What is fact caching JSON?", a: ["JSON file fact cache", "JSON cache", "Cache JSON", "Facts JSON"], correct: 0 },
+            { q: "What is ansible-vault password file?", a: ["File containing vault password", "Vault file", "Password file", "Credential file"], correct: 0 },
+            { q: "What is group_vars?", a: ["Variables for host groups", "Group variables", "Variables group", "Vars group"], correct: 0 },
+            { q: "What is host_vars?", a: ["Variables for specific hosts", "Host variables", "Variables host", "Vars host"], correct: 0 },
+            { q: "What is precedence in Ansible?", a: ["Order of variable override", "Variable order", "Priority order", "Override order"], correct: 0 },
+            { q: "What is environment variables precedence?", a: ["High precedence", "Low precedence", "No precedence", "Default precedence"], correct: 0 },
+            { q: "What is ansible all -m ping?", a: ["Tests connectivity to hosts", "Pings hosts", "Shows hosts", "Lists hosts"], correct: 0 },
+            { q: "What is async in Ansible?", a: ["Runs task asynchronously", "Sync task", "Wait task", "Background task"], correct: 0 },
+            { q: "What is poll in Ansible?", a: ["Async status check interval", "Polls host", "Polls task", "Polls result"], correct: 0 },
+            { q: "What is a callback plugin?", a: ["Custom output handlers", "Callback module", "Output plugin", "Result plugin"], correct: 0 },
+            { q: "What is a cache plugin?", a: ["Fact caching backend", "Cache backend", "Fact backend", "Data backend"], correct: 0 },
+            { q: "What is a connection plugin?", a: ["Defines how to connect", "Connection type", "Connect plugin", "Link plugin"], correct: 0 },
+            { q: "What is netconf plugin?", a: ["Network device management", "Network plugin", "Device plugin", "Config plugin"], correct: 0 },
+            { q: "What is ansible-vault rekey?", a: ["Changes vault password", "Updates vault", "Changes password", "Modifies password"], correct: 0 },
+            { q: "What is ansible-inventory --graph?", a: ["Shows inventory as graph", "Shows graph", "Displays graph", "Graphs inventory"], correct: 0 },
+            { q: "What is no_log in Ansible?", a: ["Suppresses task output", "No logging", "No output", "Hides output"], correct: 0 },
+            { q: "What is any_errors_fatal?", a: ["Any failure stops play", "Error handling", "Fatal errors", "Error fate"], correct: 0 },
+            { q: "What is max_fail_percentage?", a: ["Stops after X% failures", "Fail percentage", "Failure rate", "Error rate"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+        function initTest() { difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0; currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0; document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block'; renderQuestion(); }
+        function renderQuestion() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const q = currentQuestions[currentQuestionIndex]; const qDiv = document.createElement('div'); qDiv.className = 'question-container active'; let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join(''); qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`; container.appendChild(qDiv); updateUI(); }
+        function updateUI() { const total = currentQuestions.length; const progress = ((currentQuestionIndex) / total) * 100; document.getElementById('progressFill').style.width = progress + '%'; document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; }
+        function selectAnswer(index) { const q = currentQuestions[currentQuestionIndex]; const buttons = document.querySelectorAll('.answer-btn'); buttons.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); }); totalAnswered++; if (index === q.correct) { streak++; if (streak > maxStreak) maxStreak = streak; consecutiveCorrect++; score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30; if (currentLevel === 1 && consecutiveCorrect >= 7) { currentLevel = 2; difficulty = 'medium'; consecutiveCorrect = 0; currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else if (currentLevel === 2 && consecutiveCorrect >= 7) { currentLevel = 3; difficulty = 'hard'; consecutiveCorrect = 0; currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else { currentQuestionIndex++; } setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 1200); } else { buttons[index].classList.add('incorrect'); streak = 0; consecutiveCorrect = 0; currentQuestionIndex++; setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 2000); return; } }
+        function showResult() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const resultScreen = document.getElementById('resultScreen'); resultScreen.classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '✓' : '✗'; document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score}`; document.getElementById('resultDetails').innerHTML = `Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`; document.getElementById('progressFill').style.width = '100%'; }
+        function restartTest() { initTest(); }
+        document.addEventListener('DOMContentLoaded', function() { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('themeToggle').checked = true; } initTest(); });
+    </script>
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+    <footer><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>

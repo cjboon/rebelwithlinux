@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-vault.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Vault: Secrets Management for the Modern Stack - REBEL WITH LINUX</title>
+    <meta name="description" content="Learn HashiCorp Vault, the industry-standard tool for secrets management, encryption as a service, and secure data storage.">
+    <meta name="keywords" content="Vault, HashiCorp, secrets management, encryption, DevOps, security, credentials">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Vault: Secrets Management for the Modern Stack">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-vault.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-vault.html">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dynamic') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+
+    <style>
+        .blog-header {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 32px 60px;
+            text-align: center;
+        }
+        .blog-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .blog-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--gray);
+        }
+        .blog-nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 16px;
+            border-bottom: 2px solid var(--black);
+            background: var(--white);
+        }
+        .blog-nav a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--black);
+            text-decoration: none;
+        }
+        .blog-nav a:hover {
+            text-decoration: underline;
+        }
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+        .blog-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 16px;
+        }
+        .blog-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+        .blog-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        .blog-content p {
+            margin-bottom: 24px;
+        }
+        .blog-content h2 {
+            font-size: 1.5rem;
+            margin: 40px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--black);
+        }
+        .blog-content h3 {
+            font-size: 1.2rem;
+            margin: 32px 0 12px;
+        }
+        .blog-content ul, .blog-content ol {
+            margin-bottom: 24px;
+            padding-left: 24px;
+        }
+        .blog-content li {
+            margin-bottom: 8px;
+        }
+        .blog-content blockquote {
+            border-left: 4px solid var(--black);
+            padding-left: 20px;
+            margin: 24px 0;
+            font-style: italic;
+            color: var(--gray);
+        }
+        .blog-content code {
+            background: var(--beige);
+            padding: 2px 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95rem;
+        }
+        .blog-content pre {
+            background: var(--black);
+            color: var(--ivory);
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            border: 3px solid var(--black);
+        }
+        .blog-content pre code {
+            background: transparent;
+            padding: 0;
+            color: var(--ivory);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: var(--black);
+            text-decoration: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        footer {
+            padding: 48px 32px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="blog-header">
+        <h1>// THE REBEL BLOG</h1>
+        <p>Thoughts on free software, privacy, and taking back control</p>
+    </header>
+
+    <nav class="blog-nav">
+        <a href="../index.html#blog">← Back to Blog</a>
+    </nav>
+
+    <main class="blog-container" id="main-content">
+        <article>
+            <div class="blog-meta">
+                <span>2026-03-14</span> • <span>10 min read</span> • <span>DevOps</span>
+            </div>
+            <h1 class="blog-title">Vault: Secrets Management for the Modern Stack</h1>
+
+            <div class="blog-content">
+                <p>Database passwords in config files. API keys in environment variables. AWS credentials in source code. We've all done it—we needed to move fast, and security took a backseat. But in a world where data breaches make headlines daily, this approach is untenable.</p>
+
+                <p>Enter HashiCorp Vault—the tool that has become the industry standard for secrets management. Whether you need to store API keys, encrypt database credentials, or manage access to sensitive infrastructure, Vault has you covered.</p>
+
+                <h2>What Is Vault?</h2>
+
+                <p>Vault is a tool for securely storing and accessing secrets. Developed by HashiCorp (the same company behind Terraform, Consul, and Nomad), Vault provides a unified interface to manage secrets while enforcing strict access controls and maintaining detailed audit logs.</p>
+
+                <p>But Vault isn't just a key-value store. It handles:</p>
+
+                <ul>
+                    <li><strong>Secrets storage</strong> — API keys, passwords, certificates</li>
+                    <li><strong>Encryption as a service</strong> — Encrypt data without storing it</li>
+                    <li><strong>Dynamic secrets</strong> — Generate short-lived credentials on demand</li>
+                    <li><strong>Access management</strong> — Fine-grained policies and authentication</li>
+                    <li><strong>Audit logging</strong> — Comprehensive access trails</li>
+                </ul>
+
+                <h2>Core Concepts</h2>
+
+                <h3>Secrets Engines</h3>
+
+                <p>Vault organizes secrets into "mounts" called secrets engines. Each engine handles a specific type of secret:</p>
+
+                <ul>
+                    <li><strong>KV</strong> — Simple key-value storage (v1 and v2)</li>
+                    <li><strong>Database</strong> — Dynamic database credentials</li>
+                    <li><strong>AWS</strong> — Dynamic AWS credentials</li>
+                    <li><strong>PKI</strong> — Certificate management</li>
+                    <li><strong>Transit</strong> — Encryption as a service</li>
+                    <li><strong>SSH</strong> — One-time SSH passwords</li>
+                </ul>
+
+                <h3>Authentication Methods</h3>
+
+                <p>Vault supports multiple ways to authenticate:</p>
+
+                <ul>
+                    <li><strong>Token</strong> — The default method</li>
+                    <li><strong>AppRole</strong> — Machine authentication</li>
+                    <li><strong>Kubernetes</strong> — Authenticate from within K8s</li>
+                    <li><strong>AWS IAM</strong> — Cloud identity</li>
+                    <li><strong>LDAP/Active Directory</strong> — Enterprise identity</li>
+                    <li><strong>OIDC</strong> — OAuth/OIDC providers</li>
+                </ul>
+
+                <h3>Policies</h3>
+
+                <p>Vault policies define what paths a user or service can access:</p>
+
+                <pre><code># Read-only access to database credentials
+path "database/creds/readonly" {
+  capabilities = ["read"]
+}
+
+# Full access to KV secrets
+path "kv/data/myapp/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}</code></pre>
+
+                <h2>Getting Started</h2>
+
+                <pre><code># Download and extract Vault
+wget https://releases.hashicorp.com/vault/1.15.0/vault_1.15.0_linux_amd64.zip
+unzip vault_1.15.0_linux_amd64.zip
+sudo mv vault /usr/local/bin/
+
+# Start Vault in dev mode (for testing)
+vault server -dev
+
+# Export VAULT_ADDR and VAULT_TOKEN
+export VAULT_ADDR='http://127.0.0.1:8200'
+export VAULT_TOKEN='your-token-here'
+
+# Check status
+vault status</code></pre>
+
+                <h3>Writing Secrets</h3>
+
+                <pre><code># Enable KV secrets engine
+vault secrets enable -path=secret kv
+
+# Write a secret
+vault kv put secret/myapp api_key=abc123 password=secretpass
+
+# Read a secret
+vault kv get secret/myapp
+
+# Delete a secret
+vault kv delete secret/myapp</code></pre>
+
+                <h3>Dynamic Secrets</h3>
+
+                <p>One of Vault's most powerful features is dynamic secrets—credentials generated on-demand that automatically expire:</p>
+
+                <pre><code># Enable AWS secrets engine
+vault secrets enable aws
+
+# Configure AWS credentials
+vault write aws/config/root \
+    access_key=AKIAIOSFODNN7EXAMPLE \
+    secret_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY \
+    region=us-east-1
+
+# Generate temporary AWS credentials
+vault read aws/creds/my-role
+
+# Result:
+# Key                Value
+# ---                -----
+# access_key         ASIA...
+# secret_key         ...
+# expiration         2024-01-15T15:30:00Z</code></pre>
+
+                <p>These credentials will automatically expire after the TTL. No need to rotate them manually.</p>
+
+                <h3>Encryption as a Service</h3>
+
+                <p>Need to encrypt data but don't want to manage keys? Use the transit secrets engine:</p>
+
+                <pre><code># Enable transit secrets engine
+vault secrets enable transit
+
+# Create an encryption key
+vault write -f transit/keys/my-key
+
+# Encrypt data
+vault transit encrypt transit/plaintext $(echo "sensitive data" | base64)
+
+# Decrypt data
+vault transit decrypt transit/ciphertext vault:v1:abc123...</code></pre>
+
+                <h2>Integrations</h2>
+
+                <p>Vault integrates with practically everything:</p>
+
+                <ul>
+                    <li><strong>Kubernetes</strong> — Vault Agent Injector for automatic secret injection</li>
+                    <li><strong>Terraform</strong> — Provider for managing Vault resources</li>
+                    <li><strong>Databases</strong> — MySQL, PostgreSQL, MongoDB, and more</li>
+                    <li><strong>Clouds</strong> — AWS, GCP, Azure</li>
+                    <li><strong>Applications</strong> — SDKs for every language</li>
+                </ul>
+
+                <h3>Kubernetes Integration</h3>
+
+                <p>The Vault Agent Injector automatically injects secrets into pods:</p>
+
+                <pre><code># Annotate a deployment to receive secrets
+annotations:
+    vault.hashicorp.com/agent-inject: "true"
+    vault.hashicorp.com/role: "myapp"
+    vault.hashicorp.com/agent-inject-secret-config: "secret/data/myapp"</code></pre>
+
+                <p>Secrets appear in <code>/vault/secrets/config</code> inside the container—never exposed in environment variables or config files.</p>
+
+                <h2>Production Considerations</h2>
+
+                <p>Running Vault in production requires planning:</p>
+
+                <h3>High Availability</h3>
+
+                <p>For production, use HA mode with Consul, etcd, or Raft storage:</p>
+
+                <pre><code># Raft storage (simpler, no external dependency)
+vault operator init
+
+# Unseal with key shares (requires 3 of 5 by default)
+vault operator unseal</code></pre>
+
+                <h3>Audit Logging</h3>
+
+                <p>Enable audit devices to track all access:</p>
+
+                <pre><code># Enable file audit log
+vault audit enable file file_path=/var/log/vault/audit.log</code></pre>
+
+                <h3>Namespaces</h3>
+
+                <p>For multi-tenant environments, use namespaces to isolate secrets:</p>
+
+                <pre><code># Create namespace
+vault namespace create dev
+
+# Switch to namespace
+export VAULT_NAMESPACE=dev</code></pre>
+
+                <h2>Why Vault Matters</h2>
+
+                <p>In an era where credential theft is among the most common attack vectors, Vault addresses a critical need:</p>
+
+                <ul>
+                    <li><strong>No more hardcoded secrets</strong> — Everything retrieved dynamically</li>
+                    <li><strong>Automatic rotation</strong> — Dynamic secrets expire and rotate automatically</li>
+                    <li><strong>Fine-grained access</strong> — Policies ensure least privilege</li>
+                    <li><strong>Complete audit trail</strong> — Know who accessed what, when</li>
+                    <li><strong>Encryption without complexity</strong> — Encrypt data without managing keys</li>
+                </ul>
+
+                <blockquote>Secrets are like Easter eggs—the more places you hide them, the harder they are to manage.</blockquote>
+
+                <h2>Getting Started</h2>
+
+                <ol>
+                    <li><strong>Try the dev server</strong> — <code>vault server -dev</code> to learn the basics</li>
+                    <li><strong>Explore the KV engine</strong> — Store and retrieve simple secrets</li>
+                    <li><strong>Set up dynamic credentials</strong> — Try database or AWS secrets</li>
+                    <li><strong>Write policies</strong> — Practice access control</li>
+                    <li><strong>Add audit logging</strong> — See what's being accessed</li>
+                    <li><strong>Integrate an app</strong> — Use the SDK in your code</li>
+                </ol>
+
+                <p>Whether you're running a small project or managing enterprise infrastructure, Vault scales with you. Start simple, add complexity as needed, and sleep better knowing your secrets are secure.</p>
+            </div>
+        </article>
+
+        <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+            <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+            <div id="comments-list" style="margin-bottom: 32px;"></div>
+            <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+                <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+                <div style="display: grid; gap: 16px;">
+                    <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                    <button onclick="submitComment('blog-vault')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                    <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                    <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        
+    </footer>
+    <script>
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    
+    <script src="../nav.js" defer></script>
+    <script src="../comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-vault');
+        });
+    </script>
+</body>
+</html>

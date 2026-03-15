@@ -489,9 +489,25 @@ EOF
                 ls -1 /etc/apache2/sites-enabled/ 2>/dev/null | grep -v "^000-default" | grep -v "^default-ssl" || true
                 read -p "Enter site domain (e.g., example.com): " TOR_DOMAIN
                 if [ -d "/var/www/$TOR_DOMAIN" ]; then
-                    cat > /etc/apache2/sites-available/hidden_service.conf << EOF
+                    print_info "Will configure onion site for $TOR_DOMAIN"
+                else
+                    print_error "Site /var/www/$TOR_DOMAIN does not exist"
+                    print_info "Hidden service will use default Apache document root"
+                fi
+            else
+                TOR_DOMAIN="html"
+                print_info "Hidden service will use default Apache document root (/var/www/html)"
+            fi
+            
+            if [ -f /var/lib/tor/hidden_service/hostname ]; then
+                ONION_ADDRESS=$(cat /var/lib/tor/hidden_service/hostname)
+                print_success "Hidden service created!"
+                print_info "Your .onion address: $ONION_ADDRESS"
+                
+                cat > /etc/apache2/sites-available/${ONION_ADDRESS}.conf << EOF
 <VirtualHost *:80>
-    ServerName localhost
+    ServerName $ONION_ADDRESS
+    ServerAlias www.$ONION_ADDRESS
     DocumentRoot /var/www/$TOR_DOMAIN
 
     ServerSignature Off
@@ -513,23 +529,15 @@ EOF
         Header always set Referrer-Policy "no-referrer"
         Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
     </IfModule>
+
+    ErrorLog \${APACHE_LOG_DIR}/${ONION_ADDRESS}_error.log
+    CustomLog \${APACHE_LOG_DIR}/${ONION_ADDRESS}_access.log combined
 </VirtualHost>
 EOF
-                    a2ensite hidden_service.conf
-                    systemctl reload apache2
-                    print_success "Hidden service now serves from /var/www/$TOR_DOMAIN"
-                else
-                    print_error "Site /var/www/$TOR_DOMAIN does not exist"
-                    print_info "Hidden service will use default Apache document root"
-                fi
-            else
-                print_info "Hidden service will use default Apache document root (/var/www/html)"
-            fi
-            
-            if [ -f /var/lib/tor/hidden_service/hostname ]; then
-                print_success "Hidden service created!"
-                print_info "Your .onion address:"
-                cat /var/lib/tor/hidden_service/hostname
+                a2ensite ${ONION_ADDRESS}.conf
+                
+                systemctl reload apache2
+                print_success "Onion site configured with proper ServerName"
             fi
         fi
     else

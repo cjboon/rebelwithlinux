@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-monitoring.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// MONITORING TEST</h1>
+            <p>Prove your monitoring mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value" id="questionNum">1</div>
+                    <div class="stat-label">Question</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="streakNum">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="scoreNum">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="levelNum">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div id="questionsContainer"></div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What is Prometheus?", a: ["Time-series monitoring system", "Log analysis", "Dashboard tool", "Alert system"], correct: 0 },
+            { q: "What is Grafana?", a: ["Visualization and dashboard tool", "Monitoring system", "Log collector", "Alert manager"], correct: 0 },
+            { q: "What is the ELK stack?", a: ["Elasticsearch, Logstash, Kibana", "Email, Logs, Keys", "Events, Links, Knowledge", "Enterprise, Linux, Kubernetes"], correct: 0 },
+            { q: "What does a log do?", a: ["Records system events", "Monitors performance", "Stores metrics", "Creates alerts"], correct: 0 },
+            { q: "What are metrics?", a: ["Quantitative measurements of system behavior", "System logs", "Alert rules", "Dashboard widgets"], correct: 0 },
+            { q: "What are alerts?", a: ["Notifications when thresholds are exceeded", "System logs", "Performance data", "Dashboard views"], correct: 0 },
+            { q: "What is Nagios?", a: ["Infrastructure monitoring tool", "Log management", "Dashboard tool", "Alert system"], correct: 0 },
+            { q: "What is Zabbix?", a: ["Enterprise monitoring solution", "Log analyzer", "Dashboard tool", "Alert system"], correct: 0 },
+            { q: "What is Datadog?", a: ["Cloud monitoring platform", "On-premise monitoring", "Log tool", "Dashboard only"], correct: 0 },
+            { q: "What is New Relic?", a: ["Application performance monitoring", "Network monitoring", "Log management", "Security monitoring"], correct: 0 },
+            { q: "What is observability?", a: ["Ability to understand system behavior", "System monitoring", "Log collection", "Alert handling"], correct: 0 },
+            { q: "What does SLI stand for?", a: ["Service Level Indicator", "System Level Index", "Service Log Indicator", "System Limit Index"], correct: 0 },
+            { q: "What does SLO stand for?", a: ["Service Level Objective", "System Level Objective", "Service Limit Objective", "System Limit Operation"], correct: 0 },
+            { q: "What does SLA stand for?", a: ["Service Level Agreement", "System Level Agreement", "Service Limit Agreement", "System Limit Agreement"], correct: 0 },
+            { q: "What is a dashboard?", a: ["Visual display of metrics and data", "Monitoring agent", "Alert rule", "Log file"], correct: 0 },
+            { q: "What are alerting rules?", a: ["Define when to trigger alerts", "Display metrics", "Store logs", "Process data"], correct: 0 },
+            { q: "What is a metric collector?", a: ["Gathers metrics from systems", "Stores logs", "Displays dashboards", "Sends alerts"], correct: 0 },
+            { q: "What is time-series data?", a: ["Data indexed by time", "Static data", "User data", "Log files"], correct: 0 },
+            { q: "What is CPU monitoring?", a: ["Tracking processor usage", "Network monitoring", "Disk monitoring", "Memory monitoring"], correct: 0 },
+            { q: "What is memory monitoring?", a: ["Tracking RAM usage", "CPU monitoring", "Network monitoring", "Disk monitoring"], correct: 0 },
+            { q: "What is disk monitoring?", a: ["Tracking storage usage", "CPU monitoring", "Network monitoring", "Memory monitoring"], correct: 0 },
+            { q: "What is network monitoring?", a: ["Tracking network traffic", "Disk monitoring", "CPU monitoring", "Memory monitoring"], correct: 0 },
+            { q: "What is application monitoring?", a: ["Tracking application performance", "System monitoring", "Network monitoring", "Security monitoring"], correct: 0 },
+            { q: "What is uptime monitoring?", a: ["Checking if services are running", "Performance monitoring", "Security monitoring", "Log monitoring"], correct: 0 },
+            { q: "What is a health check?", a: ["Endpoint that reports service status", "Alert rule", "Dashboard", "Metric collector"], correct: 0 },
+            { q: "What is a metric threshold?", a: ["Value that triggers alert", "Dashboard widget", "Log entry", "Collection interval"], correct: 0 },
+            { q: "What is a metric name?", a: ["Identifier for a metric", "Threshold value", "Alert message", "Dashboard panel"], correct: 0 },
+            { q: "What is a label in Prometheus?", a: ["Key-value pair for metric classification", "Alert rule", "Dashboard widget", "Metric threshold"], correct: 0 },
+            { q: "What is a query in monitoring?", a: ["Request for specific metrics", "Alert message", "Dashboard view", "Collection schedule"], correct: 0 },
+            { q: "What is metric aggregation?", a: ["Combining multiple metric values", "Metric collection", "Metric storage", "Metric visualization"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the difference between push and pull metrics?", a: ["Pull: system requests, Push: system sends", "Pull is faster", "Push is older", "No difference"], correct: 0 },
+            { q: "What is PromQL?", a: ["Prometheus query language", "Prometheus programming", "Prometheus protocol", "Prometheus processing"], correct: 0 },
+            { q: "What is a Prometheus exporter?", a: ["Exposes metrics for collection", "Imports data", "Stores data", "Displays data"], correct: 0 },
+            { q: "What is node_exporter?", a: ["Exposes system-level metrics", "Application metrics", "Network metrics", "Custom metrics"], correct: 0 },
+            { q: "What is the Alertmanager in Prometheus?", a: ["Handles alert routing and notification", "Stores alerts", "Creates alerts", "Displays alerts"], correct: 0 },
+            { q: "What is a recording rule in Prometheus?", a: ["Pre-computes complex queries", "Alert rule", "Metric storage", "Data collection"], correct: 0 },
+            { q: "What is Grafana Loki?", a: ["Log aggregation system", "Metric system", "Alert system", "Dashboard system"], correct: 0 },
+            { q: "What is Elasticsearch?", a: ["Search and analytics engine", "Log collector", "Dashboard tool", "Alert manager"], correct: 0 },
+            { q: "What is Logstash?", a: ["Log processing pipeline", "Log storage", "Log visualization", "Log collection"], correct: 0 },
+            { q: "What is Kibana?", a: ["Visualization and exploration tool", "Log collector", "Log processor", "Log storage"], correct: 0 },
+            { q: "What is the difference between logs and metrics?", a: ["Logs: events, metrics: measurements", "Same thing", "Logs are faster", "No difference"], correct: 0 },
+            { q: "What is centralized logging?", a: ["Aggregating logs from multiple sources", "Single log file", "Local logging", "Console logging"], correct: 0 },
+            { q: "What is log rotation?", a: ["Managing log file sizes and archiving", "Log deletion", "Log compression", "Log analysis"], correct: 0 },
+            { q: "What is structured logging?", a: ["Logs in machine-readable format", "Plain text logs", "Binary logs", "Console output"], correct: 0 },
+            { q: "What is a log level?", a: ["Severity of log message", "Log size", "Log format", "Log location"], correct: 0 },
+            { q: "What are ERROR, WARN, INFO, DEBUG log levels?", a: ["Severity from highest to lowest", "Random order", "Same severity", "Not used"], correct: 0 },
+            { q: "What is syslog?", a: ["Standard log messaging protocol", "Log format", "Log storage", "Log viewer"], correct: 0 },
+            { q: "What is journald?", a: ["Systemd log manager", "Log format", "Log protocol", "Log viewer"], correct: 0 },
+            { q: "What is the difference between availability and reliability?", a: ["Up vs consistently working", "Same thing", "Reliability is faster", "No difference"], correct: 0 },
+            { q: "What is error budget?", a: ["Allowed downtime in SLO", "Budget for tools", "Performance budget", "Cost budget"], correct: 0 },
+            { q: "What is Toil in SRE?", a: ["Manual, repetitive, automateable work", "Workload", "Training", "Meeting"], correct: 0 },
+            { q: "What is a service catalog?", a: ["List of available services", "Service log", "Service dashboard", "Service metrics"], correct: 0 },
+            { q: "What is runbook?", a: ["Documented operational procedures", "Run log", "Run metric", "Run alert"], correct: 0 },
+            { q: "What is incident management?", a: ["Process of responding to issues", "Log management", "Metric management", "Alert management"], correct: 0 },
+            { q: "What is MTTR?", a: ["Mean Time To Recovery", "Mean Time To Respond", "Mean Time To Repair", "Mean Time To Resolve"], correct: 0 },
+            { q: "What is MTBF?", a: ["Mean Time Between Failures", "Mean Time Before Failure", "Mean Time Between Fixes", "Mean Time Before Fix"], correct: 0 },
+            { q: "What is post-mortem?", a: ["Analysis after incident", "Before incident", "During incident", "Warning"], correct: 0 },
+            { q: "What iscanary deployment?", a: ["Rolling out to subset of users", "Full deployment", "Rollback", "Test deployment"], correct: 0 },
+            { q: "What is blue-green deployment?", a: ["Two identical environments switch", "Single deployment", "Canary type", "Rollback type"], correct: 0 },
+            { q: "What is feature flag?", a: ["Toggle feature on/off without deployment", "Feature test", "Feature log", "Feature metric"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is Prometheus federation?", a: ["Hierarchical Prometheus servers", "Single server", "Data storage", "Alert system"], correct: 0 },
+            { q: "What is Thanos?", a: ["Prometheus HA and long-term storage", "Monitoring tool", "Log tool", "Dashboard"], correct: 0 },
+            { q: "What is Cortex?", a: ["Prometheus as a service", "Monitoring tool", "Log analyzer", "Dashboard"], correct: 0 },
+            { q: "What is VictoriaMetrics?", a: ["Prometheus-compatible time series DB", "Dashboard", "Log system", "Alert manager"], correct: 0 },
+            { q: "What is InfluxDB?", a: ["Time-series database", "Relational DB", "NoSQL DB", "Graph DB"], correct: 0 },
+            { q: "What is Telegraf?", a: ["Metric collection agent", "Dashboard tool", "Alert system", "Log tool"], correct: 0 },
+            { q: "What is Kapacitor?", a: ["InfluxDB processing engine", "Dashboard", "Collection agent", "Alert system"], correct: 0 },
+            { q: "What is the TICK stack?", a: ["Telegraf, InfluxDB, Chronograf, Kapacitor", "Time-series stack", "Monitoring stack", "Log stack"], correct: 0 },
+            { q: "What is OpenTelemetry?", a: ["Standard for metrics, logs, traces", "Monitoring tool", "Log tool", "Tracing tool"], correct: 0 },
+            { q: "What is distributed tracing?", a: ["Tracking requests across services", "Single service tracking", "Metric collection", "Log aggregation"], correct: 0 },
+            { q: "What is Jaeger?", a: ["Distributed tracing system", "Monitoring", "Logging", "Dashboard"], correct: 0 },
+            { q: "What is Zipkin?", a: ["Distributed tracing tool", "Monitoring", "Logging", "Dashboard"], correct: 0 },
+            { q: "What is a span in tracing?", a: ["Single operation in trace", "Full trace", "Metric", "Log"], correct: 0 },
+            { q: "What is a trace ID?", a: ["Unique ID for request across services", "Span ID", "Metric name", "Log ID"], correct: 0 },
+            { q: "What is APM?", a: ["Application Performance Monitoring", "Alert Processing", "API Monitoring", "Agent Management"], correct: 0 },
+            { q: "What is synthetic monitoring?", a: ["Automated testing of endpoints", "Real user monitoring", "Passive monitoring", "Log monitoring"], correct: 0 },
+            { q: "What is RUM?", a: ["Real User Monitoring", "Remote User Monitoring", "Random User Monitoring", "Recorded User Monitoring"], correct: 0 },
+            { q: "What is golden signals monitoring?", a: ["Latency, traffic, errors, saturation", "All metrics", "Single metric", "Log metrics"], correct: 0 },
+            { q: "What is USE method?", a: ["Utilization, Saturation, Errors", "User, System, Error", "Unified System Error", "Usage Statistics Error"], correct: 0 },
+            { q: "What is RED method?", a: ["Rate, Errors, Duration", "Reliability, Errors, Data", "Response, Error, Duration", "Request, Error, Data"], correct: 0 },
+            { q: "What is service mesh?", a: ["Infrastructure for service communication", "Network mesh", "Load balancing", "API gateway"], correct: 0 },
+            { q: "What is Linkerd?", a: ["Service mesh implementation", "API gateway", "Load balancer", "Service discovery"], correct: 0 },
+            { q: "What is Istio?", a: ["Service mesh with traffic management", "API gateway", "Load balancer", "Service discovery"], correct: 0 },
+            { q: "What is OpenMetrics?", a: ["Metric exposition format", "Metric collection", "Metric storage", "Metric display"], correct: 0 },
+            { q: "What is a histogram in Prometheus?", a: ["Distribution of values", "Single value", "Counter", "Gauge"], correct: 0 },
+            { q: "What is a summary in Prometheus?", a: ["Quantiles and count", "Single value", "Histogram", "Counter"], correct: 0 },
+            { q: "What is histogram_quantile in PromQL?", a: ["Calculates quantiles from histogram", "Calculates average", "Counts values", "Sums values"], correct: 0 },
+            { q: "What is long-term storage for Prometheus?", a: ["Storing metrics beyond retention", "Short-term storage", "Memory only", "Disk cache"], correct: 0 },
+            { q: "What is continuous profiling?", a: ["Ongoing CPU/memory analysis", "One-time profiling", "Log analysis", "Metric collection"], correct: 0 },
+            { q: "What is Parca?", a: ["Continuous profiling tool", "Monitoring tool", "Log tool", "Tracing tool"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            const q = currentQuestions[currentQuestionIndex];
+            
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            
+            qDiv.innerHTML = `
+                <div class="question-text">${q.q}</div>
+                <div class="answers-grid">${answersHtml}</div>
+            `;
+            
+            container.appendChild(qDiv);
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            const total = currentQuestions.length;
+            const progress = ((currentQuestionIndex) / total) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) {
+                    btn.classList.add('correct');
+                }
+            });
+            
+            totalAnswered++;
+            
+            if (index === q.correct) {
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+                consecutiveCorrect++;
+                score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30;
+                
+                if (currentLevel === 1 && consecutiveCorrect >= 7) {
+                    currentLevel = 2;
+                    difficulty = 'medium';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else if (currentLevel === 2 && consecutiveCorrect >= 7) {
+                    currentLevel = 3;
+                    difficulty = 'hard';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else {
+                    currentQuestionIndex++;
+                }
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 1200);
+            } else {
+                buttons[index].classList.add('incorrect');
+                streak = 0;
+                consecutiveCorrect = 0;
+                currentQuestionIndex++;
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 2000);
+                return;
+            }
+        }
+
+        function showResult() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            const resultScreen = document.getElementById('resultScreen');
+            resultScreen.classList.add('active');
+            
+            const pass = score >= 100;
+            document.getElementById('resultIcon').textContent = pass ? '✓' : '✗';
+            document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL';
+            document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score}`;
+            document.getElementById('resultDetails').innerHTML = `
+                Questions answered: ${totalAnswered}<br>
+                Best streak: ${maxStreak}<br>
+                Highest level reached: ${currentLevel}
+            `;
+            
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeToggle').checked = true;
+            }
+            initTest();
+        });
+    </script>
+
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p><a href="../site-map.html">All pages</a></p>
+    </footer>
+</body>
+</html>

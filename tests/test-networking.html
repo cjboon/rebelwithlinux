@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-networking.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Networking Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// NETWORKING TEST</h1>
+            <p>Prove your Networking mastery</p>
+        </div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What does IP stand for?", a: ["Internet Protocol", "Internal Protocol", "International Protocol", "Interconnect Protocol"], correct: 0 },
+            { q: "What is an IP address?", a: ["Unique identifier for a device", "Email address", "Website name", "Phone number"], correct: 0 },
+            { q: "What is TCP?", a: ["Transmission Control Protocol", "Transfer Control Protocol", "Transport Connection Protocol", "Transmit Control Protocol"], correct: 0 },
+            { q: "What is UDP?", a: ["User Datagram Protocol", "User Data Protocol", "Universal Data Protocol", "Unified Data Protocol"], correct: 0 },
+            { q: "What is DNS?", a: ["Domain Name System", "Dynamic Network System", "Data Network Service", "Direct Name System"], correct: 0 },
+            { q: "What port does HTTP use?", a: ["80", "443", "22", "21"], correct: 0 },
+            { q: "What port does HTTPS use?", a: ["443", "80", "22", "25"], correct: 0 },
+            { q: "What port does SSH use?", a: ["22", "21", "23", "25"], correct: 0 },
+            { q: "What does LAN stand for?", a: ["Local Area Network", "Large Area Network", "Long Area Network", "Link Area Network"], correct: 0 },
+            { q: "What does WAN stand for?", a: ["Wide Area Network", "World Area Network", "Wireless Area Network", "Wired Area Network"], correct: 0 },
+            { q: "What is a router?", a: ["Device that forwards data", "Device that stores data", "Device that deletes data", "Device that creates data"], correct: 0 },
+            { q: "What is a switch?", a: ["Device that connects devices", "Device that routes", "Device that protects", "Device that stores"], correct: 0 },
+            { q: "What is a firewall?", a: ["Security device that filters traffic", "Network speed device", "Storage device", "Computing device"], correct: 0 },
+            { q: "What does ping command do?", a: ["Tests network connectivity", "Measures speed", "Finds IP", "Routes traffic"], correct: 0 },
+            { q: "What is localhost IP?", a: ["127.0.0.1", "192.168.1.1", "10.0.0.1", "8.8.8.8"], correct: 0 },
+            { q: "What is a subnet mask?", a: ["Defines network portion", "Identifies device", "Encrypts data", "Routes packets"], correct: 0 },
+            { q: "What does DHCP do?", a: ["Assigns IP addresses automatically", "Translates domain names", "Routes traffic", "Filters data"], correct: 0 },
+            { q: "What is MAC address?", a: ["Hardware address", "IP address", "Domain name", "Email address"], correct: 0 },
+            { q: "What layer is IP on?", a: ["Network Layer", "Transport Layer", "Application Layer", "Data Link Layer"], correct: 0 },
+            { q: "What layer is TCP on?", a: ["Transport Layer", "Network Layer", "Application Layer", "Physical Layer"], correct: 0 },
+            { q: "What is a gateway?", a: ["Entry/exit point to network", "Network storage", "Network security", "Network switch"], correct: 0 },
+            { q: "What does tracert/traceroute do?", a: ["Shows packet route", "Tests speed", "Scans ports", "Blocks traffic"], correct: 0 },
+            { q: "What is NAT?", a: ["Network Address Translation", "Network Access Transfer", "New Address Type", "Network Admin Tool"], correct: 0 },
+            { q: "What is a VPN?", a: ["Virtual Private Network", "Very Private Network", "Visual Private Network", "Virtual Public Network"], correct: 0 },
+            { q: "What does SSL do?", a: ["Encrypts data", "Routes data", "Stores data", "Deletes data"], correct: 0 },
+            { q: "What is FTP?", a: ["File Transfer Protocol", "Fast Transfer Protocol", "File Transit Protocol", "Forward Transfer Protocol"], correct: 0 },
+            { q: "What port does FTP use?", a: ["21", "22", "20", "25"], correct: 0 },
+            { q: "What is SMTP?", a: ["Simple Mail Transfer Protocol", "Secure Mail Transfer Protocol", "Simple Message Transfer Protocol", "Secure Message Transit Protocol"], correct: 0 },
+            { q: "What port does SMTP use?", a: ["25", "110", "143", "587"], correct: 0 },
+            { q: "What does ARP do?", a: ["Maps IP to MAC address", "Routes packets", "Translates domain", "Assigns IP"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the difference between TCP and UDP?", a: ["TCP is reliable, UDP is fast", "No difference", "TCP is faster", "UDP is reliable"], correct: 0 },
+            { q: "What is a Class C network?", a: ["192-223 range, /24", "1-126 range", "128-191 range", "224-255 range"], correct: 0 },
+            { q: "What is CIDR notation?", a: ["IP address with prefix length", "IP address without mask", "Classful notation", "Old notation"], correct: 0 },
+            { q: "What is VLAN?", a: ["Virtual Local Area Network", "Very Large Area Network", "Virtual LAN", "Virtual Link Area Network"], correct: 0 },
+            { q: "What is OSPF?", a: ["Open Shortest Path First", "Open System Protocol", "Operational Security Protocol", "Open Service Protocol"], correct: 0 },
+            { q: "What is BGP?", a: ["Border Gateway Protocol", "Basic Gateway Protocol", "Broad Gateway Protocol", "Business Gateway Protocol"], correct: 0 },
+            { q: "What is load balancing?", a: ["Distributes traffic across servers", "Blocks traffic", "Routes to single server", "Monitors traffic"], correct: 0 },
+            { q: "What is a reverse proxy?", a: ["Server that forwards to backend", "Proxy for client", "Security device", "Load balancer only"], correct: 0 },
+            { q: "What is a forward proxy?", a: ["Client proxy to internet", "Server proxy", "Security device", "Load balancer"], correct: 0 },
+            { q: "What is SSL/TLS termination?", a: ["Decrypts at load balancer", "Encrypts at client", "No encryption", "Blocks encryption"], correct: 0 },
+            { q: "What is ARP spoofing?", a: ["ARP cache poisoning attack", "Normal ARP operation", "ARP backup", "ARP routing"], correct: 0 },
+            { q: "What is a man-in-the-middle attack?", a: ["Intercepts communication", "Denies service", "Crashes server", "Steals passwords only"], correct: 0 },
+            { q: "What is port forwarding?", a: ["Routes external to internal", "Blocks ports", "Opens all ports", "Monitors ports"], correct: 0 },
+            { q: "What is QoS?", a: ["Quality of Service", "Quantity of Service", "Quality of Signal", "Quick of Service"], correct: 0 },
+            { q: "What is bandwidth?", a: ["Data transfer capacity", "Network speed", "Latency", "Packet size"], correct: 0 },
+            { q: "What is latency?", a: ["Delay in data transfer", "Transfer speed", "Bandwidth", "Packet loss"], correct: 0 },
+            { q: "What is jitter?", a: ["Variation in latency", "Connection speed", "Packet size", "Network name"], correct: 0 },
+            { q: "What is packet loss?", a: ["Data not reaching destination", "Slow transfer", "Fast transfer", "Secure transfer"], correct: 0 },
+            { q: "What is MTU?", a: ["Maximum Transmission Unit", "Maximum Transfer Unit", "Media Transfer Unit", "Multiple Transfer Unit"], correct: 0 },
+            { q: "What is a broadcast address?", a: ["Address for all hosts", "Single host address", "Router address", "Network address"], correct: 0 },
+            { q: "What is network address translation?", a: ["Maps private to public IP", "Creates IP addresses", "Deletes IP addresses", "Blocks IP addresses"], correct: 0 },
+            { q: "What is a DMZ?", a: ["Demilitarized zone", "Direct zone", "Data zone", "Domain zone"], correct: 0 },
+            { q: "What is IDS?", a: ["Intrusion Detection System", "Internet Defense System", "Internal Defense System", "Integrated Defense System"], correct: 0 },
+            { q: "What is IPS?", a: ["Intrusion Prevention System", "Internet Protocol Security", "Internal Protocol", "Integrated Protection System"], correct: 0 },
+            { q: "What is a honeypot?", a: ["Decoy system to attract attackers", "Real production system", "Backup system", "Monitoring system"], correct: 0 },
+            { q: "What is port scanning?", a: ["Scanning for open ports", "Scanning for files", "Scanning for users", "Scanning for networks"], correct: 0 },
+            { q: "What is DNS cache poisoning?", a: ["Corrupts DNS records", "Normal DNS query", "DNS backup", "DNS update"], correct: 0 },
+            { q: "What is DNSSEC?", a: ["DNS Security Extensions", "DNS Service", "DNS Server", "DNS Simple"], correct: 0 },
+            { q: "What is anycast?", a: ["One address, multiple locations", "Multiple addresses", "Single location", "No address"], correct: 0 },
+            { q: "What is multicast?", a: ["One sender, multiple receivers", "One sender, one receiver", "Multiple senders", "No sender"], correct: 0 },
+            { q: "What is unicast?", a: ["One sender, one receiver", "One sender, multiple", "Multiple senders", "No communication"], correct: 0 },
+            { q: "What is VXLAN?", a: ["Virtual Extensible LAN", "Very Extra LAN", "Virtual Ethernet LAN", "Virtual External LAN"], correct: 0 },
+            { q: "What is GRE?", a: ["Generic Routing Encapsulation", "General Routing Encapsulation", "Global Routing Encapsulation", "Gateway Routing Encapsulation"], correct: 0 },
+            { q: "What is IPsec?", a: ["IP Security Protocol", "Internet Protocol Security", "Internal Protocol Security", "Internet Protection Security"], correct: 0 },
+            { q: "What is a subnet?", a: ["Logical subdivision of network", "Physical network", "Wireless network", "Storage network"], correct: 0 },
+            { q: "What is supernetting?", a: ["Combining smaller networks", "Splitting network", "Securing network", "Monitoring network"], correct: 0 },
+            { q: "What is VLAN tagging?", a: ["Identifies VLAN membership", "Creates VLAN", "Deletes VLAN", "Monitors VLAN"], correct: 0 },
+            { q: "What is STP?", a: ["Spanning Tree Protocol", "Spanning Protocol", "Standard Transfer Protocol", "Secure Transfer Protocol"], correct: 0 },
+            { q: "What is RSTP?", a: ["Rapid Spanning Tree Protocol", "Rapid Secure Protocol", "Remote Spanning Tree", "Reliable Spanning Tree"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is TCP three-way handshake?", a: ["SYN, SYN-ACK, ACK", "SYN, ACK, FIN", "START, ACK, END", "CONNECT, DATA, CLOSE"], correct: 0 },
+            { q: "What is SYN flood attack?", a: ["Denies service by SYN flood", "Normal handshake", "Data transfer", "Connection close"], correct: 0 },
+            { q: "What is a TCP state machine?", a: ["States of TCP connection", "Network topology", "Protocol types", "Address scheme"], correct: 0 },
+            { q: "What is TCP window size?", a: ["Amount of data before ACK", "Packet size", "Connection limit", "Timeout value"], correct: 0 },
+            { q: "What is slow start?", a: ["Gradually increases congestion window", "Slow connection", "Delayed ACK", "Reduced window"], correct: 0 },
+            { q: "What is congestion avoidance?", a: ["Reduces packet loss", "Increases speed", "Blocks traffic", "Prioritizes traffic"], correct: 0 },
+            { q: "What is TTL?", a: ["Time To Live - limits packet lifetime", "Transfer Time", "Total Time", "Traffic Type Label"], correct: 0 },
+            { q: "What is fragmentation?", a: ["Splitting large packets", "Combining packets", "Compressing packets", "Encrypting packets"], correct: 0 },
+            { q: "What is Path MTU Discovery?", a: ["Finds optimal packet size", "Finds IP address", "Finds route", "Finds path"], correct: 0 },
+            { q: "What is a routing table?", a: ["Maps network paths", "Maps users", "Maps files", "Maps applications"], correct: 0 },
+            { q: "What is static routing?", a: ["Manual route configuration", "Automatic routing", "Dynamic routing", "Random routing"], correct: 0 },
+            { q: "What is dynamic routing?", a: ["Automatic route updates", "Manual routes", "Fixed routes", "No routes"], correct: 0 },
+            { q: "What is distance-vector routing?", a: ["Uses hop count", "Uses bandwidth", "Uses delay", "Uses security"], correct: 0 },
+            { q: "What is link-state routing?", a: ["Knows entire network topology", "Knows only distance", "Knows only neighbors", "Knows nothing"], correct: 0 },
+            { q: "What is MPLS?", a: ["Multi-Protocol Label Switching", "Multi-Protocol Link State", "Multiple Path Label Switch", "Managed Packet Label System"], correct: 0 },
+            { q: "What is a label in MPLS?", a: ["Short fixed-length identifier", "IP address", "MAC address", "Port number"], correct: 0 },
+            { q: "What is segment routing?", a: ["Source routing approach", "Network segmentation", "Port routing", "IP routing"], correct: 0 },
+            { q: "What is network slicing?", a: ["Virtual network partitioning", "Network cutting", "Network blocking", "Network monitoring"], correct: 0 },
+            { q: "What is 5G network slicing?", a: ["Virtual networks for services", "Fifth generation", "Network speed", "Network protocol"], correct: 0 },
+            { q: "What is SD-WAN?", a: ["Software-Defined Wide Area Network", "Secure WAN", "Static WAN", "Shared WAN"], correct: 0 },
+            { q: "What is network function virtualization?", a: ["Replaces hardware with software", "Virtual hardware", "Network visualization", "Hardware virtualization"], correct: 0 },
+            { q: "What is a vRouter?", a: ["Virtual router", "Physical router", "Cloud router", "Edge router"], correct: 0 },
+            { q: "What is network automation?", a: ["Automating network tasks", "Manual network", "Network monitoring", "Network security"], correct: 0 },
+            { q: "What is Ansible for networking?", a: ["Network automation tool", "Network monitoring", "Network security", "Network testing"], correct: 0 },
+            { q: "What is NAPALM?", a: ["Network Automation and Programmability", "Network Access Protocol", "Network Application Layer", "Network Address Protocol"], correct: 0 },
+            { q: "What is a network TAP?", a: ["Traffic access point for monitoring", "Network tap", "Network test point", "Network access"], correct: 0 },
+            { q: "What is port mirroring?", a: ["Copies traffic to monitoring port", "Blocks ports", "Opens ports", "Routes ports"], correct: 0 },
+            { q: "What is NetFlow?", a: ["Network traffic analysis", "Network flow", "Network filtering", "Network firewall"], correct: 0 },
+            { q: "What is sFlow?", a: ["Statistical packet sampling", "Secure flow", "Simple flow", "Standard flow"], correct: 0 },
+            { q: "What is IPFIX?", a: ["IP Flow Information Export", "IP Filter Information", "IP Flow Index", "IP Fast Information"], correct: 0 },
+            { q: "What is packet sniffing?", a: ["Capturing network packets", "Blocking packets", "Routing packets", "Filtering packets"], correct: 0 },
+            { q: "What is Wireshark?", a: ["Network protocol analyzer", "Network scanner", "Network sniffer only", "Network tool"], correct: 0 },
+            { q: "What is tcpdump?", a: ["Command-line packet analyzer", "TCP dumper", "Packet dumper", "Network dumper"], correct: 0 },
+            { q: "What is nmap?", a: ["Network scanning tool", "Network mapper only", "Network monitor", "Network manager"], correct: 0 },
+            { q: "What is network segmentation?", a: ["Dividing network into segments", "Connecting segments", "Monitoring segments", "Securing segments"], correct: 0 },
+            { q: "What is a zero-trust model?", a: ["Never trust, always verify", "Trust all", "No trust", "Trust network"], correct: 0 },
+            { q: "What is microsegmentation?", a: ["Fine-grained network segmentation", "Macro segmentation", "No segmentation", "Physical segmentation"], correct: 0 },
+            { q: "What is east-west traffic?", a: ["Lateral traffic between servers", "Traffic to internet", "Traffic to user", "Traffic to storage"], correct: 0 },
+            { q: "What is north-south traffic?", a: ["Traffic in/out of network", "Lateral traffic", "Server traffic", "Storage traffic"], correct: 0 },
+            { q: "What is SASE?", a: ["Secure Access Service Edge", "Simple Access Service", "Secure Application Service", "Standard Access Service"], correct: 0 },
+            { q: "What is SSE?", a: ["Security Service Edge", "Secure Service Edge", "Standard Service Edge", "Software Service Edge"], correct: 0 },
+            { q: "What is a network proxy?", a: ["Intermediate server", "End server", "Backup server", "Database server"], correct: 0 },
+            { q: "What is TLS 1.3?", a: ["Latest TLS protocol version", "Old TLS", "First TLS", "TLS replacement"], correct: 0 },
+            { q: "What is mutual TLS?", a: ["Both sides authenticate", "One side auth", "No auth", "Basic auth"], correct: 0 },
+            { q: "What is OCSP?", a: ["Online Certificate Status Protocol", "Certificate check", "Certificate request", "Certificate validation"], correct: 0 },
+            { q: "What is CRL?", a: ["Certificate Revocation List", "Certificate Request List", "Certificate Right List", "Certificate Resource List"], correct: 0 },
+            { q: "What is HSTS?", a: ["HTTP Strict Transport Security", "HTTP Secure Transfer", "HTTP Standard Transfer", "HTTP Simple Transfer"], correct: 0 },
+            { q: "What is CSP?", a: ["Content Security Policy", "Computer Security Policy", "Cloud Security Policy", "Connection Security Policy"], correct: 0 },
+            { q: "What is CORS?", a: ["Cross-Origin Resource Sharing", "Cross-Origin Request", "Cross-Origin Reference", "Cross-Origin Response"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+        function initTest() { difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0; currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0; document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block'; renderQuestion(); }
+        function renderQuestion() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const q = currentQuestions[currentQuestionIndex]; const qDiv = document.createElement('div'); qDiv.className = 'question-container active'; let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join(''); qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`; container.appendChild(qDiv); updateUI(); }
+        function updateUI() { const total = currentQuestions.length; const progress = ((currentQuestionIndex) / total) * 100; document.getElementById('progressFill').style.width = progress + '%'; document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; }
+        function selectAnswer(index) { const q = currentQuestions[currentQuestionIndex]; const buttons = document.querySelectorAll('.answer-btn'); buttons.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); }); totalAnswered++; if (index === q.correct) { streak++; if (streak > maxStreak) maxStreak = streak; consecutiveCorrect++; score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30; if (currentLevel === 1 && consecutiveCorrect >= 7) { currentLevel = 2; difficulty = 'medium'; consecutiveCorrect = 0; currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else if (currentLevel === 2 && consecutiveCorrect >= 7) { currentLevel = 3; difficulty = 'hard'; consecutiveCorrect = 0; currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else { currentQuestionIndex++; } setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 1200); } else { buttons[index].classList.add('incorrect'); streak = 0; consecutiveCorrect = 0; currentQuestionIndex++; setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 2000); return; } }
+        function showResult() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const resultScreen = document.getElementById('resultScreen'); resultScreen.classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '✓' : '✗'; document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score}`; document.getElementById('resultDetails').innerHTML = `Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`; document.getElementById('progressFill').style.width = '100%'; }
+        function restartTest() { initTest(); }
+        document.addEventListener('DOMContentLoaded', function() { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('themeToggle').checked = true; } initTest(); });
+    </script>
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+    <footer><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>

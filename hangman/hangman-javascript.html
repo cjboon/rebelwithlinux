@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/hangman/hangman-javascript.html" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hangman: JavaScript - Rebel with Linux</title>
@@ -40,8 +41,9 @@
         .game-container {
             display: flex;
             gap: 40px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             justify-content: center;
+            align-items: flex-start;
             max-width: 900px;
         }
         
@@ -49,6 +51,15 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .definition-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1;
+            min-width: 280px;
         }
         
         canvas {
@@ -229,16 +240,18 @@
         }
 
         /* Mobile optimizations */
-        @media (max-width: 600px) {
+        @media (max-width: 500px) {
             body {
                 padding: 10px;
+                padding-bottom: 100px;
                 font-size: 14px;
             }
             h1 { font-size: 1.4rem; }
             .subtitle { font-size: 0.9rem; margin-bottom: 10px; }
             .game-container {
+                flex-wrap: wrap;
                 flex-direction: column;
-                gap: 20px;
+                align-items: center;
             }
             canvas {
                 width: 150px;
@@ -272,8 +285,14 @@
                 font-size: 1rem;
             }
             .message {
-                padding: 10px;
-                font-size: 0.9rem;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 15px;
+                font-size: 1rem;
+                z-index: 100;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             }
         }
         
@@ -455,6 +474,7 @@
             score = Math.max(0, score);
             messageBox.style.display = 'none';
             messageBox.className = 'message';
+            messageBox.innerHTML = '';
             guessInput.value = '';
             isDead = false;
             deathTime = 0;
@@ -660,6 +680,16 @@
             
             checkGameState();
         }
+
+        function showMessage(type, text) {
+            messageBox.className = 'message ' + type;
+            messageBox.innerHTML = `<div>${text}</div><button id="playAgainBtn" tabindex="-1" onclick="newGame()">Play Again</button>`;
+            messageBox.style.display = 'block';
+            
+            if (window.innerWidth > 500) {
+                document.getElementById('playAgainBtn').focus();
+            }
+        }
         
         function checkGameState() {
             const allGuessed = currentWord.split('').every(l => l === ' ' || guessedLetters.includes(l));
@@ -678,18 +708,14 @@
                     }
                 }
                 
-                messageBox.className = 'message success';
-                messageBox.textContent = 'You won! +' + (10 + bonus) + ' points';
-                messageBox.style.display = 'block';
+                showMessage('success', 'You won! +' + (10 + bonus) + ' points');
             }
             
             if (wrongCount >= maxWrong && !isDead) {
                 isDead = true;
                 streak = 0;
                 
-                messageBox.className = 'message dead';
-                messageBox.textContent = 'Game Over! The word was: ' + currentWord;
-                messageBox.style.display = 'block';
+                showMessage('dead', 'Game Over! The word was: ' + currentWord);
                 
                 const slots = document.querySelectorAll('.letter-slot');
                 slots.forEach(slot => {
@@ -707,7 +733,7 @@
             if (e.key === 'Enter') {
                 const guess = guessInput.value.toLowerCase().trim();
                 
-                if (guess.length === 1 && /[a-z]/.test(guess)) {
+                if (guess.length === 1 && /[a-z0-9_\- ]/.test(guess)) {
                     if (!guessedLetters.includes(guess)) {
                         guessedLetters.push(guess);
                         if (!currentWord.includes(guess)) {
@@ -739,7 +765,7 @@
         document.addEventListener('keydown', (e) => {
             if (!guessInput.matches(':focus')) {
                 const key = e.key.toLowerCase();
-                if (key.length === 1 && /[a-z]/.test(key)) {
+                if (key.length === 1 && /[a-z0-9_\- ]/.test(key)) {
                     guessInput.focus();
                 }
             }
@@ -750,7 +776,7 @@
             const value = e.target.value.toLowerCase();
             if (value.length > 0) {
                 const lastChar = value[value.length - 1];
-                if (/[a-z0-9_-]/.test(lastChar)) {
+                if (/[a-z0-9_\- ]/.test(lastChar)) {
                     // Check if already guessed
                     if (!guessedLetters.includes(lastChar)) {
                         guessedLetters.push(lastChar);

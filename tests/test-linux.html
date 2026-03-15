@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-linux.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container {
+            padding: 32px 32px;
+            background: var(--white);
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 80vh;
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .test-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2rem;
+            margin-bottom: 4px;
+        }
+        
+        .test-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--light-gray);
+            border-radius: 4px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--charcoal);
+            transition: width 0.3s ease;
+        }
+        
+        .question-container {
+            display: none;
+        }
+        
+        .question-container.active {
+            display: block;
+        }
+        
+        .question-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.25rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .answers-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .answer-btn {
+            padding: 16px 20px;
+            border: 2px solid var(--charcoal);
+            background: transparent;
+            color: var(--charcoal);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .answer-btn:hover {
+            background: var(--light-gray);
+        }
+        
+        .answer-btn.correct {
+            background: #22c55e !important;
+            border-color: #22c55e !important;
+            color: white !important;
+        }
+        
+        .answer-btn.incorrect {
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+            color: white !important;
+        }
+        
+        .answer-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .result-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .result-screen.active {
+            display: block;
+        }
+        
+        .result-icon {
+            font-size: 5rem;
+            margin-bottom: 24px;
+        }
+        
+        .result-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        
+        .result-score {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.25rem;
+            color: var(--charcoal);
+            margin-bottom: 32px;
+        }
+        
+        .result-details {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+            margin-bottom: 32px;
+        }
+        
+        .retry-btn {
+            padding: 16px 32px;
+            background: var(--charcoal);
+            color: var(--white);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .retry-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 24px;
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: var(--white);
+            gap: 8px;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            white-space: nowrap;
+            color: var(--charcoal);
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .theme-toggle-label {
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+        
+        .theme-toggle-icon.sun {
+            display: none;
+        }
+        
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) {
+            display: none;
+        }
+        
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun {
+            display: inline;
+        }
+        
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) {
+            display: none;
+        }
+        
+        [data-theme="dark"] .theme-toggle-icon.sun {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">
+                REBEL WITH LINUX
+            </a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// LINUX TEST</h1>
+            <p>Prove your Linux mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value" id="questionNum">1</div>
+                    <div class="stat-label">Question</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="streakNum">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="scoreNum">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="levelNum">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div id="questionsContainer"></div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What command is used to list files in a directory?", a: ["ls", "list", "dir", "show"], correct: 0 },
+            { q: "What does the 'cd' command stand for?", a: ["Change Directory", "Create Directory", "Copy Directory", "Close Directory"], correct: 0 },
+            { q: "Which command creates a new directory?", a: ["mkdir", "newdir", "createdir", "mkd"], correct: 0 },
+            { q: "What command displays the current working directory?", a: ["pwd", "cwd", "path", "where"], correct: 0 },
+            { q: "Which command is used to copy files?", a: ["cp", "copy", "cpx", "cut"], correct: 0 },
+            { q: "What command moves or renames files?", a: ["mv", "move", "ren", "name"], correct: 0 },
+            { q: "Which command removes files?", a: ["rm", "del", "remove", "erase"], correct: 0 },
+            { q: "What does the 'cat' command do?", a: ["Displays file contents", "Creates a file", "Copies a file", "Deletes a file"], correct: 0 },
+            { q: "Which command shows the manual for a command?", a: ["man", "help", "info", "doc"], correct: 0 },
+            { q: "What does 'ls -l' do?", a: ["List with details", "List all hidden", "List large files", "List last modified"], correct: 0 },
+            { q: "Which command creates an empty file?", a: ["touch", "create", "new", "make"], correct: 0 },
+            { q: "What does 'rm -r' do?", a: ["Removes directories recursively", "Removes read-only files", "Removes root files", "Removes recent files"], correct: 0 },
+            { q: "Which command shows the first few lines of a file?", a: ["head", "tail", "top", "start"], correct: 0 },
+            { q: "What does 'chmod +x' do?", a: ["Makes file executable", "Changes ownership", "Changes group", "Copies permissions"], correct: 0 },
+            { q: "Which command changes file ownership?", a: ["chown", "chmod", "chgrp", "chatt"], correct: 0 },
+            { q: "What does 'grep' do?", a: ["Searches for patterns", "Groups files", "Graphs data", "Gets file info"], correct: 0 },
+            { q: "Which command counts lines in a file?", a: ["wc -l", "count", "lines", "cl"], correct: 0 },
+            { q: "What does 'ps' command show?", a: ["Running processes", "Disk space", "Network connections", "File permissions"], correct: 0 },
+            { q: "Which command kills a process by name?", a: ["killall", "kill", "stop", "end"], correct: 0 },
+            { q: "What does 'df' command show?", a: ["Disk space usage", "Directory files", "Data files", "Deleted files"], correct: 0 },
+            { q: "Which command shows memory usage?", a: ["free", "mem", "ram", "usage"], correct: 0 },
+            { q: "What does 'top' command display?", a: ["System processes", "Top files", "Network ports", "Disk IO"], correct: 0 },
+            { q: "Which command finds files by name?", a: ["find", "search", "locate", "whereis"], correct: 0 },
+            { q: "What does 'tar' command do?", a: ["Archives files", "Deletes files", "Transfers files", "Tracks files"], correct: 0 },
+            { q: "Which command compresses files?", a: ["gzip", "zip", "compress", "squeeze"], correct: 0 },
+            { q: "What does 'sudo' do?", a: ["Runs as root", "Shows user", "Lists users", "Creates user"], correct: 0 },
+            { q: "Which command adds a new user?", a: ["useradd", "adduser", "newuser", "mkuser"], correct: 0 },
+            { q: "What does 'passwd' command do?", a: ["Changes user password", "Shows password status", "Lists passwords", "Generates passwords"], correct: 0 },
+            { q: "Which command shows network interfaces?", a: ["ip addr", "netstat", "ifconfig", "route"], correct: 0 },
+            { q: "What does 'ping' command do?", a: ["Tests network connectivity", "Shows IP address", "Traces route", "Maps network"], correct: 0 },
+            { q: "Which command SSH into another machine?", a: ["ssh", "telnet", "ftp", "scp"], correct: 0 },
+            { q: "What does 'scp' do?", a: ["Secure copy between hosts", "Shows clipboard", "Copies screen", "Secures port"], correct: 0 },
+            { q: "Which command restarts the system?", a: ["reboot", "restart", "shutdown -r", "init 6"], correct: 0 },
+            { q: "What does 'shutdown' command do?", a: ["Shuts down the system", "Shows down status", "Lists downloads", "Closes programs"], correct: 0 },
+            { q: "Which command shows current date/time?", a: ["date", "time", "now", "clock"], correct: 0 },
+            { q: "What does 'cal' command display?", a: ["Calendar", "Call log", "CPU usage", "Call history"], correct: 0 },
+            { q: "Which command shows running services?", a: ["systemctl list-units", "services", "list services", "ps -a"], correct: 0 },
+            { q: "What does 'ln -s' create?", a: ["Symbolic link", "Hard link", "Copy", "Shortcut"], correct: 0 },
+            { q: "Which command displays file in reverse?", a: ["tac", "rev", "reverse", "flip"], correct: 0 },
+            { q: "What does 'history' command show?", a: ["Previously executed commands", "File history", "Directory history", "User history"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What file contains the list of users on the system?", a: ["/etc/passwd", "/etc/users", "/etc/shadow", "/var/users"], correct: 0 },
+            { q: "Which file stores hashed user passwords?", a: ["/etc/shadow", "/etc/passwd", "/etc/group", "/etc/login"], correct: 0 },
+            { q: "What does 'chmod 755' set?", a: ["rwxr-xr-x", "rwx------", "rwxrwxrwx", "r-xr-xr-x"], correct: 0 },
+            { q: "What is the inode number?", a: ["Unique file identifier", "File size", "File permissions", "File timestamp"], correct: 0 },
+            { q: "Which signal does 'kill -9' send?", a: ["SIGKILL", "SIGTERM", "SIGSTOP", "SIGINT"], correct: 0 },
+            { q: "What does 'grep -r' do?", a: ["Search recursively", "Show regular matches", "Count matches", "Highlight matches"], correct: 0 },
+            { q: "What is a daemon?", a: ["Background process", "User process", "System error", "Network service"], correct: 0 },
+            { q: "What does 'df -h' show?", a: ["Human-readable sizes", "Full paths", "Hidden files", "File types"], correct: 0 },
+            { q: "Which command monitors file changes in real-time?", a: ["tail -f", "watch", "monitor", "follow"], correct: 0 },
+            { q: "What is the difference between soft and hard links?", a: ["Soft can cross filesystems", "Hard cannot be directories", "Soft can link to directories", "Hard is always absolute"], correct: 0 },
+            { q: "What does 'awk' do?", a: ["Pattern scanning and processing", "Archive management", "File encryption", "Network analysis"], correct: 0 },
+            { q: "What is systemd?", a: ["System and service manager", "Storage device manager", "Security daemon", "Service timer"], correct: 0 },
+            { q: "What does 'journalctl' do?", a: ["Queries systemd logs", "Creates journals", "Manages disk space", "Monitors processes"], correct: 0 },
+            { q: "What is the purpose of '/etc/fstab'?", a: ["Defines disk mounts", "Stores passwords", "Lists fstab users", "Configures firewall"], correct: 0 },
+            { q: "What does 'netstat -tulpn' show?", a: ["Listening ports and programs", "Network traffic", "TCP connections", "User logins"], correct: 0 },
+            { q: "What is a PID?", a: ["Process ID number", "Program ID", "Port ID", "Permission ID"], correct: 0 },
+            { q: "What does 'cron' do?", a: ["Schedules tasks", "Runs continuously", "Monitors services", "Creates logs"], correct: 0 },
+            { q: "What is the purpose of '/etc/crontab'?", a: ["System cron schedule", "User crontab", "Cron logs", "Cron configuration"], correct: 0 },
+            { q: "What does 'nice' command do?", a: ["Sets process priority", "Shows nice messages", "Lists processes", "Creates user"], correct: 0 },
+            { q: "What is a zombie process?", a: ["Terminated but not reaped", "High priority process", "Stopped process", "Hidden process"], correct: 0 },
+            { q: "What does 'strace' do?", a: ["Traces system calls", "Shows processes", "Monitors network", "Tests speed"], correct: 0 },
+            { q: "What is '/proc' filesystem?", a: ["Virtual filesystem with kernel info", "User process files", "Program files", "Protected files"], correct: 0 },
+            { q: "What does 'lsblk' display?", a: ["Block devices", "List blocks", "System limits", "Disk statistics"], correct: 0 },
+            { q: "What is LVM?", a: ["Logical Volume Manager", "Logical Virtual Machine", "Linear Volume Mode", "Legacy Virtual Manager"], correct: 0 },
+            { q: "What does 'vgcreate' do?", a: ["Creates volume group", "Creates virtual group", "Creates user group", "Creates process group"], correct: 0 },
+            { q: "What is the difference between 'grep' and 'egrep'?", a: ["egrep supports extended regex", "grep is faster", "egrep excludes matches", "grep edits files"], correct: 0 },
+            { q: "What does 'sed' do?", a: ["Stream editor", "Send edit", "Secure delete", "System editor"], correct: 0 },
+            { q: "What is a shebang?", a: ["Script interpreter directive", "Comment header", "Variable definition", "Function declaration"], correct: 0 },
+            { q: "What does 'export' do in bash?", a: ["Sets environment variable", "Exports files", "Opens terminal", "Removes variable"], correct: 0 },
+            { q: "What is 'umask'?", a: ["Default file permission mask", "User mask", "Unique mask", "Unmount mask"], correct: 0 },
+            { q: "What does '>&' do in bash?", a: ["Redirects file descriptors", "Creates pipe", "Ends command", "Runs in background"], correct: 0 },
+            { q: "What is '/etc/apt/sources.list'?", a: ["Package repository sources", "System sources", "User sources", "Security sources"], correct: 0 },
+            { q: "What does 'apt-get update' do?", a: ["Refreshes package lists", "Upgrades packages", "Installs updates", "Removes old packages"], correct: 0 },
+            { q: "What is a PPA?", a: ["Personal Package Archive", "Public Package Archive", "Primary Package Archive", "Private Package Archive"], correct: 0 },
+            { q: "What does 'dpkg -i' do?", a: ["Installs a .deb package", "Removes package", "Updates package", "Lists package"], correct: 0 },
+            { q: "What is a Docker container?", a: ["Lightweight executable package", "Virtual machine", "Storage container", "Network container"], correct: 0 },
+            { q: "What does 'docker ps' show?", a: ["Running containers", "All containers", "Stopped containers", "Container images"], correct: 0 },
+            { q: "What is the purpose of 'iptables'?", a: ["Packet filtering", "IP testing", "Address translation", "Port management"], correct: 0 },
+            { q: "What does 'ufw' stand for?", a: ["Uncomplicated Firewall", "User Firewall", "Ultimate Firewall", "Unified Firewall"], correct: 0 },
+            { q: "What is SELinux?", a: ["Security-Enhanced Linux", "Simple Linux", "Standard Linux", "System Linux"], correct: 0 },
+            { q: "What does 'getenforce' show?", a: ["SELinux enforcement status", "File permissions", "User access", "Network status"], correct: 0 },
+            { q: "What is a chroot?", a: ["Changes root directory", "Creates root user", "Removes root", "Shows root"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What does 'echo $?' return?", a: ["Exit status of last command", "Current shell PID", "User ID", "Process ID"], correct: 0 },
+            { q: "What is the difference between exec and system() in C?", a: ["exec replaces process, system() forks", "exec is faster", "system() is safer", "No difference"], correct: 0 },
+            { q: "What does 'set -e' do in bash?", a: ["Exit on command failure", "Enable echo", "Set environment", "Export variables"], correct: 0 },
+            { q: "What is a race condition?", a: ["Timing-dependent behavior", "File conflict", "Memory leak", "Deadlock"], correct: 0 },
+            { q: "What does 'strace -c' do?", a: ["Counts system calls", "Traces child processes", "Shows calls continuously", "Creates trace file"], correct: 0 },
+            { q: "What is the purpose of '/etc/sysctl.conf'?", a: ["Kernel parameters", "System configuration", "User limits", "Network config"], correct: 0 },
+            { q: "What does 'sysctl -p' do?", a: ["Loads sysctl settings", "Shows parameters", "Tests configuration", "Prints values"], correct: 0 },
+            { q: "What is a kernel panic?", a: ["Critical kernel error", "Memory overflow", "Process deadlock", "Disk failure"], correct: 0 },
+            { q: "What does 'dmesg' display?", a: ["Kernel ring buffer", "Disk messages", "Daemon logs", "User messages"], correct: 0 },
+            { q: "What is the difference between hardware and software interrupts?", a: ["Hardware from devices, software from CPU", "Hardware is faster", "Software is more reliable", "No difference"], correct: 0 },
+            { q: "What does 'sar' command do?", a: ["System activity reporter", "Shows archive", "Security audit", "Service analysis"], correct: 0 },
+            { q: "What is 'perf' in Linux?", a: ["Performance monitoring tool", "Personal error", "Process file", "Port error"], correct: 0 },
+            { q: "What does 'blktrace' do?", a: ["Traces block I/O", "Blocks traffic", "Traces users", "Tests blocks"], correct: 0 },
+            { q: "What is 'tcpdump'?", a: ["Network packet analyzer", "TCP configuration", "Port dumper", "Connection tester"], correct: 0 },
+            { q: "What does 'wireshark' analyze?", a: ["Network protocols", "Disk usage", "Memory", "Processes"], correct: 0 },
+            { q: "What is 'iptables -t nat'?", a: ["Network address translation", "Packet filtering", "Packet logging", "Connection tracking"], correct: 0 },
+            { q: "What does 'conntrack' track?", a: ["Network connections", "Files", "Users", "Processes"], correct: 0 },
+            { q: "What is a virtual IP (VIP)?", a: ["Floating IP for HA", "Virtual machine IP", "VPN IP", "Internal IP"], correct: 0 },
+            { q: "What does 'keepalived' provide?", a: ["High availability", "File sharing", "User management", "Backup service"], correct: 0 },
+            { q: "What is 'pacemaker'?", a: ["Cluster resource manager", "Package manager", "Service monitor", "Backup system"], correct: 0 },
+            { q: "What is 'corosync'?", a: ["Cluster communication", "Core sync", "Cron sync", "Config sync"], correct: 0 },
+            { q: "What does 'drbd' do?", a: ["Distributed replicated storage", "Disk backup", "Data restore", "Dynamic raid"], correct: 0 },
+            { q: "What is GlusterFS?", a: ["Distributed file system", "Gluster storage", "User file system", "Network file system"], correct: 0 },
+            { q: "What is Ceph?", a: ["Distributed storage platform", "Central storage", "Cloud storage", "Cache storage"], correct: 0 },
+            { q: "What is 'etcd'?", a: ["Distributed key-value store", "Edit configuration", "External disk", "Encrypted disk"], correct: 0 },
+            { q: "What does 'consul' provide?", a: ["Service discovery", "Configuration", "Monitoring", "Backup"], correct: 0 },
+            { q: "What is a CNI in Kubernetes?", a: ["Container Network Interface", "Container Node Interface", "Cluster Network", "Container Network"], correct: 0 },
+            { q: "What is 'kube-proxy'?", a: ["Kubernetes network proxy", "Proxy server", "API proxy", "Reverse proxy"], correct: 0 },
+            { q: "What does 'kubectl' do?", a: ["Kubernetes CLI", "Kube container", "Kube control", "Kube cluster"], correct: 0 },
+            { q: "What is an Ingress in Kubernetes?", a: ["HTTP/HTTPS routing", "Internal network", "External access", "Service mesh"], correct: 0 },
+            { q: "What is 'Prometheus'?", a: ["Time-series monitoring", "Process monitor", "System metrics", "Alert manager"], correct: 0 },
+            { q: "What does 'Grafana' provide?", a: ["Visualization dashboard", "File system", "Network graph", "Data storage"], correct: 0 },
+            { q: "What is 'Alertmanager'?", a: ["Handles alerts", "Manages alerts", "Creates alerts", "Tests alerts"], correct: 0 },
+            { q: "What is 'Helm' in Kubernetes?", a: ["Package manager", "Container runtime", "Orchestrator", "Monitor"], correct: 0 },
+            { q: "What is a ConfigMap in Kubernetes?", a: ["Configuration data", "Configuration map", "Config volume", "Config pod"], correct: 0 },
+            { q: "What is a PersistentVolume (PV)?", a: ["Cluster-wide storage", "Pod volume", "Container volume", "Node volume"], correct: 0 },
+            { q: "What is 'RBAC' in Kubernetes?", a: ["Role-Based Access Control", "Resource-Based Access", "Remote Access", "Rule-Based Access"], correct: 0 },
+            { q: "What is 'etcd' backup important?", a: ["Cluster state recovery", "Data backup", "Config backup", "Secret backup"], correct: 0 },
+            { q: "What is 'kube-scheduler'?", a: ["Assigns pods to nodes", "Schedules jobs", "Manages scheduler", "Configures scheduler"], correct: 0 },
+            { q: "What does 'kube-controller-manager' run?", a: ["Controller loops", "Pod controllers", "Service controllers", "Node controllers"], correct: 0 },
+            { q: "What is the API server in Kubernetes?", a: ["REST API interface", "Server API", "App server", "User server"], correct: 0 },
+            { q: "What is 'cAdvisor'?", a: ["Container resource usage", "Container admin", "Container advisor", "Container audit"], correct: 0 },
+            { q: "What does 'kubectl apply' do?", a: ["Creates/updates resources", "Applies policy", "Applies config", "Applies manifest"], correct: 0 },
+            { q: "What is a DaemonSet?", a: ["Runs on each node", "Runs once", "Runs on master", "Runs on demand"], correct: 0 },
+            { q: "What is a StatefulSet?", a: ["Manages stateful apps", "Manages stateless", "Manages storage", "Manages services"], correct: 0 },
+            { q: "What is 'HPA'?", a: ["Horizontal Pod Autoscaler", "High Performance", "Host Port Access", "HTTP Proxy"], correct: 0 },
+            { q: "What does 'kubectl exec' do?", a: ["Execute command in container", "Exit container", "Export container", "Execute pod"], correct: 0 },
+            { q: "What is 'kubectl port-forward'?", a: ["Forward local port to pod", "Export ports", "Map ports", "Open ports"], correct: 0 },
+            { q: "What is Terraform?", a: ["Infrastructure as Code", "Terminate infra", "Test formation", "Transfer form"], correct: 0 },
+            { q: "What is a Terraform provider?", a: ["Manages API interactions", "Provides resources", "Supplies config", "Offers services"], correct: 0 },
+            { q: "What does 'terraform plan' do?", a: ["Shows planned changes", "Creates plan", "Executes plan", "Deletes plan"], correct: 0 },
+            { q: "What is 'ansible-vault'?", a: ["Encrypts sensitive data", "Creates vault", "Manages vault", "Opens vault"], correct: 0 },
+            { q: "What does 'ansible-playbook' run?", a: ["Ansible playbook", "Ansible plan", "Ansible script", "Ansible config"], correct: 0 },
+            { q: "What is a CI/CD pipeline?", a: ["Continuous Integration/Deployment", "Continuous Input", "Code Integration", "Container Integration"], correct: 0 },
+            { q: "What does 'docker build' do?", a: ["Creates image from Dockerfile", "Builds container", "Builds volume", "Builds network"], correct: 0 },
+            { q: "What is a multi-stage Dockerfile?", a: ["Builds with multiple steps", "Multiple containers", "Multiple images", "Multiple volumes"], correct: 0 },
+            { q: "What does 'docker-compose' do?", a: ["Defines multi-container apps", "Composes images", "Composes volumes", "Composes networks"], correct: 0 },
+            { q: "What is a Kubernetes Secret?", a: ["Sensitive data storage", "Secret pod", "Hidden data", "Encrypted data"], correct: 0 },
+            { q: "What is WireGuard?", a: ["Modern VPN solution", "Wire guard", "Guard wire", "Network guard"], correct: 0 },
+            { q: "What does 'fail2ban' do?", a: ["Blocks malicious IPs", "Bans processes", "Tests ban", "Creates ban"], correct: 0 },
+            { q: "What is 'auditd'?", a: ["Linux audit daemon", "Audio daemon", "Auto daemon", "Alert daemon"], correct: 0 },
+            { q: "What does 'aureport' show?", a: ["Audit reports", "Audio reports", "Auto reports", "Alert reports"], correct: 0 },
+            { q: "What is 'tripwire'?", a: ["File integrity monitor", "Trip wire", "Data monitor", "System monitor"], correct: 0 },
+            { q: "What is 'lynis'?", a: ["Security auditing tool", "Linux system", "System scanner", "Security scanner"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            const q = currentQuestions[currentQuestionIndex];
+            
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            
+            qDiv.innerHTML = `
+                <div class="question-text">${q.q}</div>
+                <div class="answers-grid">${answersHtml}</div>
+            `;
+            
+            container.appendChild(qDiv);
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            const total = currentQuestions.length;
+            const progress = ((currentQuestionIndex) / total) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) {
+                    btn.classList.add('correct');
+                }
+            });
+            
+            totalAnswered++;
+            
+            if (index === q.correct) {
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+                consecutiveCorrect++;
+                score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30;
+                
+                if (currentLevel === 1 && consecutiveCorrect >= 7) {
+                    currentLevel = 2;
+                    difficulty = 'medium';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else if (currentLevel === 2 && consecutiveCorrect >= 7) {
+                    currentLevel = 3;
+                    difficulty = 'hard';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else {
+                    currentQuestionIndex++;
+                }
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 1200);
+            } else {
+                buttons[index].classList.add('incorrect');
+                streak = 0;
+                consecutiveCorrect = 0;
+                currentQuestionIndex++;
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 2000);
+                return;
+            }
+        }
+
+        function showResult() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            const resultScreen = document.getElementById('resultScreen');
+            resultScreen.classList.add('active');
+            
+            const pass = score >= 100;
+            document.getElementById('resultIcon').textContent = pass ? '✓' : '✗';
+            document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL';
+            document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score}`;
+            document.getElementById('resultDetails').innerHTML = `
+                Questions answered: ${totalAnswered}<br>
+                Best streak: ${maxStreak}<br>
+                Highest level reached: ${currentLevel}
+            `;
+            
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeToggle').checked = true;
+            }
+            initTest();
+        });
+    </script>
+
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p><a href="../site-map.html">All pages</a></p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-browser-hardening.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Browser Hardening: Take Back Your Privacy - REBEL WITH LINUX</title>
+    <meta name="description" content="Your browser knows more about you than your closest friends. Let's fix that. A practical guide to hardening Firefox and protecting your privacy.">
+    <meta name="keywords" content="browser privacy, Firefox hardening, privacy browser, tracker blocking, browser fingerprinting, uBlock Origin">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Browser Hardening: Take Back Your Privacy">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-browser-hardening.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-browser-hardening.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: var(--black); border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: var(--white); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 40px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content h4 { font-size: 1.05rem; margin: 20px 0 8px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .blog-content a { color: var(--black); text-decoration: underline; }
+        .blog-content a:hover { color: var(--gray); }
+        .warning-box { background: #fff3cd; border: 2px solid #ffc107; padding: 16px; margin: 24px 0; border-radius: 4px; }
+        .tip-box { background: #d4edda; border: 2px solid #28a745; padding: 16px; margin: 24px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <header class="blog-header">
+        <h1>Browser Hardening</h1>
+        <p>Take back your privacy, one setting at a time</p>
+    </header>
+
+    <nav class="blog-nav">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#blog">Blog</a>
+        <a href="../projects.html">Projects</a>
+    </nav>
+
+    <article class="blog-content">
+        <p>Your browser knows things about you that would make a private investigator jealous. Every site you visit, every click, every scroll — it's all tracked, catalogued, and monetized. The big browser companies talk a big game about privacy, but at the end of the day, they're in the advertising business. Your data is their product.</p>
+        
+        <p>But here's the thing: you don't have to play their game. You can take control. Browser hardening isn't about being paranoid — it's about being intentional. It's about deciding what you share and with whom.</p>
+        
+        <p>Let's make your browser work for you.</p>
+        
+        <h2>Choose Your Weapon</h2>
+        
+        <p>Not all browsers are created equal when it comes to privacy. Here's the honest breakdown:</p>
+        
+        <h3>Firefox</h3>
+        <p>Your best option for a mainstream browser that respects privacy. It's free, open source, and Mozilla (the non-profit behind it) actually fights for user rights. With the right configuration, Firefox is a privacy powerhouse. This guide focuses on Firefox.</p>
+        
+        <h3>Brave</h3>
+        <p>A Chromium-based browser with built-in ad blocking and privacy features. It's come a long way, though some privacy purists worry about its ties to the advertising industry. Good option if you need Chrome extension compatibility.</p>
+        
+        <h3>LibreWolf</h3>
+        <p>A Firefox fork designed from the ground up for privacy. It strips out all the telemetry, includes privacy extensions by default, and locks down settings aggressively. Great if you want the Firefox experience without the configuration work.</p>
+        
+        <h3>The Untouchables</h3>
+        <p>Tor Browser is in a category of its own. It routes your traffic through the Tor network, making traffic analysis practically impossible. But it comes with tradeoffs — sites may break, and it's noticeably slower. Use it when you truly need anonymity, not for everyday browsing.</p>
+        
+        <div class="tip-box">
+            <strong>Pro tip:</strong> I use Firefox for daily browsing with hardening, and Tor Browser for sensitive tasks. Having more than one browser isn't paranoia — it's good OPSEC.
+        </div>
+        
+        <h2>Essential Extensions</h2>
+        
+        <p>Extensions are like power tools — incredibly useful in the right hands, dangerous when misused. Be selective. Every extension you add is code running in your browser that can see everything you do.</p>
+        
+        <h3>uBlock Origin (Required)</h3>
+        <p>This isn't optional. uBlock Origin blocks ads, trackers, and malware domains at the network level. It's more effective than any ad blocker extension and uses way less memory.</p>
+        
+        <p>Install it, then go to the dashboard and enable these lists:</p>
+        <ul>
+            <li><strong>uBlock filters</strong> — the default blocking rules</li>
+            <li><strong>EasyList</strong> — standard ad blocking</li>
+            <li><strong>EasyPrivacy</strong> — blocks tracking scripts</li>
+            <li><strong>Peter Lowe's Blocklist</strong> — blocks advertising servers</li>
+            <li><strong>AdGuard DNS filter</strong> — additional blocking</li>
+        </ul>
+        
+        <p>In settings, also enable "I am an advanced user" and add these to "Dynamic filtering":</p>
+        <pre><code>no-large-media: * true
+no-scripting: * true</code></pre>
+        
+        <p>The first rule blocks large media elements that track you. The second disables JavaScript globally — but that's aggressive. Let's be more surgical.</p>
+        
+        <h3>Privacy Badger (or uMatrix)</h3>
+        <p>Privacy Badger learns what's tracking you and blocks it automatically. It's from the EFF (Electronic Frontier Foundation), so it's trustworthy. It won't break sites as aggressively as uBlock's strict mode.</p>
+        
+        <p>For the more adventurous, uMatrix gives you pixel-level control over what each site can load. But it requires more setup and maintenance.</p>
+        
+        <h3>ClearURLs</h3>
+        <p>Ever notice those tracking codes in URLs? <code>?utm_source=twitter&amp;ref=whatever</code>. ClearURLs removes all that garbage automatically, keeping your browsing history cleaner.</p>
+        
+        <h3>Skip Redirect</h3>
+        <p>Many sites don't link to pages directly — they link through tracking redirects first. Skip Redirect bypasses these intermediaries, getting you straight to the destination.</p>
+        
+        <h3>Don't Install</h3>
+        <p>As a rule of thumb, avoid:</p>
+        <ul>
+            <li>Password managers that aren't dedicated, established tools (Bitwarden, 1Password)</li>
+            <li>VPN extensions (most are just proxy services with poor security)</li>
+            <li>Free "VPN" services — if it's free, you're the product</li>
+            <li>Extensions you don't actively use</li>
+        </ul>
+        
+        <h2>Firefox Privacy Settings</h2>
+        
+        <p>Now let's dive into Firefox's internal settings. Type <code>about:config</code> in your address bar and hit Enter. You'll see a warning — click "Accept the Risk and Continue". Now you're in the engine room.</p>
+        
+        <h3>Search Settings</h3>
+        <ul>
+            <li><strong>browser.search.suggest.enabled</strong> = false — stops sending your search queries to providers</li>
+            <li><strong>browser.urlbar.suggest.searches</strong> = false — same deal</li>
+            <li><strong>keyword.enabled</strong> = false — prevents accidentally searching from the address bar</li>
+        </ul>
+        
+        <h3>Telemetry (Kill It)</h3>
+        <ul>
+            <li><strong>toolkit.telemetry.enabled</strong> = false</li>
+            <li><strong>toolkit.telemetry.archive.enabled</strong> = false</li>
+            <li><strong>datareporting.healthreport.enabled</strong> = false</li>
+            <li><strong>datareporting.healthreport.uploadEnabled</strong> = false</li>
+            <li><strong>browser.newtabpage.activity-stream.feeds.telemetry</strong> = false</li>
+            <li><strong>browser.newtabpage.activity-stream.telemetry</strong> = false</li>
+        </ul>
+        
+        <h3>Network and Connections</h3>
+        <ul>
+            <li><strong>network.cookie.cookieBehavior</strong> = 1 — block third-party cookies</li>
+            <li><strong>network.cookie.cookieThreshold</strong> = 1 — reject all cookies except for the current site</li>
+            <li><strong>network.cookie.lifetimePolicy</strong> = 2 — cookies expire at end of session</li>
+            <li><strong>network.http.referer.XOriginPolicy</strong> = 2 — only send referrer to exact domain</li>
+            <li><strong>network.http.referer.trimmingPolicy</strong> = 2 — strip referrer to just the origin</li>
+        </ul>
+        
+        <h3>Fingerprinting Protection</h3>
+        <p>Browser fingerprinting is scary — websites can identify you without cookies, just by measuring your browser's unique characteristics. Firefox has built-in fingerprinting protection:</p>
+        <ul>
+            <li><strong>privacy.resistFingerprinting</strong> = true — this is the big one</li>
+            <li><strong>webgl.disabled</strong> = true — WebGL can fingerprint your graphics card</li>
+            <li><strong>media.peerconnection.enabled</strong> = false — WebRTC can leak your IP</li>
+        </ul>
+        
+        <h3>Miscellaneous Hardening</h3>
+        <ul>
+            <li><strong>geo.enabled</strong> = false — don't share your location</li>
+            <li><strong>geo.provider.network.url</strong> = "" — disable geolocation API</li>
+            <li><strong>media.navigator.enabled</strong> = false — block camera/mic access when possible</li>
+            <li><strong>security.insecure_connection_icon.enabled</strong> = true — show warning for HTTP</li>
+            <li><strong>extensions.pocket.enabled</strong> = false — Pocket is owned by Mozilla now and tracks</li>
+        </ul>
+        
+        <div class="warning-box">
+            <strong>Warning:</strong> Some of these settings will break functionality on certain sites. If something doesn't work, you can always temporarily flip the setting back. Consider using Firefox's Container extensions (like Multi-Account Containers) to isolate problematic sites.
+        </div>
+        
+        <h2>Firefox Preferences (GUI Settings)</h2>
+        
+        <p>Let's also check the regular settings. Go to Firefox Preferences (or Options):</p>
+        
+        <h3>Privacy & Security</h3>
+        <ul>
+            <li><strong>Enhanced Tracking Protection</strong> = Strict</li>
+            <li><strong>Cookies</strong> = Delete cookies and site data when Firefox is closed</li>
+            <li><strong>History</strong> = Use custom settings for history → check "Clear history when Firefox closes"</li>
+            <li><strong>Address Bar</strong> = Uncheck everything except Search Suggestions (if you want those)</li>
+        </ul>
+        
+        <h3>Search</h3>
+        <ul>
+            <li><strong>Default Search Engine</strong> = DuckDuckGo, Startpage, or Brave Search</li>
+            <li><strong>Uncheck</strong> "Show search suggestions"</li>
+            <li><strong>Uncheck</strong> "Provide search suggestions"</li>
+            <li><strong>Uncheck</strong> "Show trending suggestions"</li>
+        </ul>
+        
+        <h3>Sync</h3>
+        <p>If you use Firefox Sync, be aware that Mozilla stores your data encrypted, but they hold the keys. For maximum security, consider not using sync, or using a different method to sync bookmarks (like a self-hosted service).</p>
+        
+        <h2>Search Engine Matters</h3>
+        
+        <p>Your search engine sees everything you type. That's a lot of data. Choose wisely:</p>
+        
+        <ul>
+            <li><strong>DuckDuckGo</strong> — Doesn't log your searches, blocks trackers. Good default.</li>
+            <li><strong>Startpage</strong> — Google's results without Google tracking you. Uses anonymous view.</li>
+            <li><strong>Brave Search</strong> — Independent index, no tracking, decent results.</li>
+            <li><strong>SearXNG</strong> — Self-host your own meta-search engine. Ultimate privacy.</li>
+        </ul>
+        
+        <p>I use DuckDuckGo most of the time, but run my own SearXNG instance for sensitive searches.</p>
+        
+        <h2>Good Browser Habits</h2>
+        
+        <p>Settings and extensions only get you so far. The biggest security weakness is usually between the keyboard and the chair.</p>
+        
+        <h3>Use Separate Browser Profiles</h3>
+        <p>Firefox lets you create multiple profiles. I have one for general browsing, one for work, one for anything sensitive. Each has different settings, extensions, and cookies. They don't share data. Go to <code>about:profiles</code> to manage them.</p>
+        
+        <h3>Use Containers</h3>
+        <p>Firefox Multi-Account Containers extension lets you isolate sites. Have a "Shopping" container, a "Social" container, a "Banking" container. Cookies don't leak between them. It's like having multiple browsers in one.</p>
+        
+        <h3>Regularly Clear Data</h3>
+        <p>Make it a habit to clear your browsing data regularly. Firefox has a keyboard shortcut: Ctrl+Shift+Delete. Set it to clear everything (cache, cookies, history, form data) for "All Time".</p>
+        
+        <h3>Check Before You Click</h3>
+        <p>That link in an email? Hover over it first. Does it go where it claims? Watch for typos in domain names (paypaI.com instead of paypal.com). When in doubt, navigate manually to the site instead of clicking.</p>
+        
+        <h3>Keep It Updated</h3>
+        <p>Browser updates aren't just about new features — they're often security patches. Enable automatic updates. Don't stick with old versions because "they work fine."</p>
+        
+        <h2>The Fingerprinting Problem</h2>
+        
+        <p>Even with all these settings, websites can still fingerprint you. They measure:</p>
+        <ul>
+            <li>Your screen resolution and window size</li>
+            <li>Your installed fonts</li>
+            <li>Your browser extensions</li>
+            <li>Your hardware (CPU, GPU)</li>
+            <li>How your browser renders certain elements</li>
+            <li>Your timezone</li>
+            <li>Your language settings</li>
+        </ul>
+        
+        <p>When you combine all these data points, you become uniquely identifiable. That's why privacy.resistFingerprinting is so important — it normalizes these values.</p>
+        
+        <p>To test your fingerprinting resistance, visit:</p>
+        <ul>
+            <li><strong>amiunique.org</strong> — See how unique your browser is</li>
+            <li><strong>coveryourtracks.info</strong> — EFF's Panopticlick successor</li>
+            <li><strong>browserleaks.com</strong> — Comprehensive leak testing</li>
+        </ul>
+        
+        <p>With all hardening enabled, you should see yourself as "unique" but with some protections in place. Being completely invisible is nearly impossible without Tor Browser, but making yourself "just another user" is achievable.</p>
+        
+        <h2>Mobile Firefox</h2>
+        
+        <p>Don't forget your phone. Mobile browsers have different capabilities, but you can still harden them:</p>
+        
+        <ul>
+            <li>Enhanced Tracking Protection = Strict</li>
+            <li>Block cookies = All third-party (or all)</li>
+            <li>Don't allow Firefox to access location</li>
+            <li>Use Firefox Focus for one-off browsing sessions</li>
+            <li>Disable WebRTC if possible (may require extensions or about:config)</li>
+        </ul>
+        
+        <p>On iOS, you're somewhat limited by Apple's restrictions, but Firefox on iOS does have content blocking support now.</p>
+        
+        <h2>What's Missing</h2>
+        
+        <p>This guide covers the practical stuff. There's always more:</p>
+        
+        <ul>
+            <li><strong>Tor Browser</strong> — For maximum anonymity (separate guide)</li>
+            <li><strong>Linux</strong> — Using a privacy-respecting OS under your browser</li>
+            <li><strong>VPN/Proxy</strong> — Hide your IP (but choose carefully)</li>
+            <li><strong>DNS over HTTPS</strong> — Encrypt your DNS queries</li>
+        </ul>
+        
+        <p>But even implementing half of what we've covered here puts you ahead of 90% of internet users. You don't need perfect privacy — you just need to be harder to track than the next person.</p>
+        
+        <h2>Take Back Your Browser</h2>
+        
+        <p>The internet wasn't built to track you. It was built to share information. Somewhere along the way, advertising got involved, tracking became ubiquitous, and we all got used to being monitored.</p>
+        
+        <p>But it doesn't have to be that way.</p>
+        
+        <p>Every setting you change, every tracker you block, every extension you add — that's a small victory. It's you saying: "I decide what I share."</p>
+        
+        <p>Start with one change today. Install uBlock Origin. Change your search engine. Just start.</p>
+        
+        <p>Your browser is your window to the internet. Make it a window you control.</p>
+        
+        <p><strong>The revolution will not be proprietary.</strong></p>
+    </article>
+
+    <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+        <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+        <div id="comments-list" style="margin-bottom: 32px;"></div>
+        <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+            <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+            <div style="display: grid; gap: 16px;">
+                <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                <button onclick="submitComment('blog-browser-hardening')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+            </div>
+        </div>
+    </section>
+    <script src="../comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-browser-hardening');
+        });
+    </script>
+</body>
+</html>

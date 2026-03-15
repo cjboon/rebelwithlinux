@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-cicd.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CI/CD Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// CI/CD TEST</h1>
+            <p>Prove your CI/CD mastery</p>
+        </div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What does CI/CD stand for?", a: ["Continuous Integration/Continuous Deployment", "Continuous Integration/Continuous Delivery", "Code Integration/Code Deployment", "Continuous Implementation/Continuous Deployment"], correct: 0 },
+            { q: "What is Continuous Integration?", a: ["Frequently merging code changes", "Deploying code", "Testing code", "Building code"], correct: 0 },
+            { q: "What is Continuous Deployment?", a: ["Automatically deploying to production", "Deploying manually", "Testing deployment", "Planning deployment"], correct: 0 },
+            { q: "What is a CI/CD pipeline?", a: ["Automated process for code delivery", "Code editor", "Version control", "Code repository"], correct: 0 },
+            { q: "What is a build server?", a: ["Server that compiles code", "Web server", "Database server", "File server"], correct: 0 },
+            { q: "What is version control?", a: ["System that tracks code changes", "Code editor", "Server", "Deployment tool"], correct: 0 },
+            { q: "What is Git?", a: ["Distributed version control system", "Programming language", "Server software", "Code editor"], correct: 0 },
+            { q: "What is a commit?", a: ["Saves changes to repository", "Deletes code", "Deploys code", "Tests code"], correct: 0 },
+            { q: "What is a branch?", a: ["Parallel line of development", "Main code", "Test code", "Production code"], correct: 0 },
+            { q: "What is a merge?", a: ["Combines branches", "Deletes branch", "Creates branch", "Tests branch"], correct: 0 },
+            { q: "What is a pull request?", a: ["Request to merge changes", "Request to delete", "Request to deploy", "Request to test"], correct: 0 },
+            { q: "What is a code review?", a: ["Examines code before merge", "Compiles code", "Runs tests", "Deploys code"], correct: 0 },
+            { q: "What is a build artifact?", a: ["Output of build process", "Source code", "Test results", "Deployment plan"], correct: 0 },
+            { q: "What is automated testing?", a: ["Tests run without manual intervention", "Manual testing", "Code review", "Deployment"], correct: 0 },
+            { q: "What is unit testing?", a: ["Tests individual components", "Tests entire system", "Tests integration", "Tests UI"], correct: 0 },
+            { q: "What is integration testing?", a: ["Tests component interactions", "Tests single component", "Tests UI", "Tests performance"], correct: 0 },
+            { q: "What is a test runner?", a: ["Executes tests automatically", "Runs manually", "Deploys tests", "Creates tests"], correct: 0 },
+            { q: "What is a webhook?", a: ["HTTP callback for events", "Web hook", "Server hook", "Git hook"], correct: 0 },
+            { q: "What is Docker?", a: ["Container platform", "Build tool", "Testing framework", "Version control"], correct: 0 },
+            { q: "What is a container?", a: ["Lightweight executable package", "Virtual machine", "Server", "Database"], correct: 0 },
+            { q: "What is a Dockerfile?", a: ["Defines container image", "Container runtime", "Container registry", "Container network"], correct: 0 },
+            { q: "What is a Docker image?", a: ["Template for containers", "Running container", "Container registry", "Container network"], correct: 0 },
+            { q: "What is Docker Compose?", a: ["Defines multi-container apps", "Builds images", "Runs containers", "Manages registry"], correct: 0 },
+            { q: "What is a container registry?", a: ["Stores container images", "Runs containers", "Builds containers", "Networks containers"], correct: 0 },
+            { q: "What is a staging environment?", a: ["Pre-production testing", "Production", "Development", "Backup"], correct: 0 },
+            { q: "What is a production environment?", a: ["Live environment", "Testing", "Development", "Staging"], correct: 0 },
+            { q: "What is a deployment?", a: ["Publishing to environment", "Building code", "Testing code", "Reviewing code"], correct: 0 },
+            { q: "What is rollback?", a: ["Revert to previous version", "Deploy forward", "Delete version", "Skip version"], correct: 0 },
+            { q: "What is blue-green deployment?", a: ["Two identical environments", "Single environment", "Test deployment", "Development deployment"], correct: 0 },
+            { q: "What is canary deployment?", a: ["Gradual rollout to users", "Full rollout", "No rollout", "Instant rollout"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is Continuous Delivery?", a: ["Code ready to deploy automatically", "Manual deployment", "No deployment", "Continuous deployment"], correct: 0 },
+            { q: "What is the difference between CI and CD?", a: ["CI builds/tests, CD deploys", "No difference", "CI is deprecated", "CD is deprecated"], correct: 0 },
+            { q: "What is GitLab CI?", a: ["GitLab's CI/CD platform", "Git hosting", "Code review", "Project management"], correct: 0 },
+            { q: "What is GitHub Actions?", a: ["GitHub's CI/CD platform", "Git hosting", "Code review", "Package management"], correct: 0 },
+            { q: "What is Jenkins?", a: ["Open-source automation server", "Code editor", "Version control", "Container platform"], correct: 0 },
+            { q: "What is a Jenkinsfile?", a: ["Defines CI/CD pipeline", "Jenkins config", "Jenkins plugin", "Jenkins job"], correct: 0 },
+            { q: "What is a Jenkins pipeline?", a: ["Defines build/test/deploy process", "Jenkins job", "Jenkins build", "Jenkins plugin"], correct: 0 },
+            { q: "What is CircleCI?", a: ["Cloud CI/CD platform", "Code hosting", "Container platform", "Monitoring platform"], correct: 0 },
+            { q: "What is Travis CI?", a: ["Hosted CI service", "Build server", "Test framework", "Deployment tool"], correct: 0 },
+            { q: "What is a YAML file?", a: ["Human-readable data format", "Programming language", "Code format", "Script format"], correct: 0 },
+            { q: "What is Docker Hub?", a: ["Public container registry", "Private registry", "Build service", "Container runtime"], correct: 0 },
+            { q: "What is a multi-stage Dockerfile?", a: ["Builds with multiple steps", "Single stage", "No stage", "Manual stage"], correct: 0 },
+            { q: "What is container orchestration?", a: ["Manages containerized apps", "Builds containers", "Runs containers", "Stores containers"], correct: 0 },
+            { q: "What is Kubernetes?", a: ["Container orchestration platform", "Build tool", "CI tool", "Testing framework"], correct: 0 },
+            { q: "What is Helm?", a: ["Kubernetes package manager", "Package manager", "Container runtime", "Orchestrator"], correct: 0 },
+            { q: "What is a Helm chart?", a: ["Kubernetes application package", "Package file", "Config file", "Template file"], correct: 0 },
+            { q: "What is Argo CD?", a: ["GitOps continuous delivery", "Git tool", "CD tool", "Deployment tool"], correct: 0 },
+            { q: "What is GitOps?", a: ["Git-based deployment workflow", "Git hosting", "Git workflow", "Git CI"], correct: 0 },
+            { q: "What is Flux?", a: ["GitOps tool for Kubernetes", "Git tool", "CI tool", "CD tool"], correct: 0 },
+            { q: "What is a secret in CI/CD?", a: ["Sensitive credential", "Public data", "Config file", "Build variable"], correct: 0 },
+            { q: "What is environment variable?", a: ["System-level variable", "Code variable", "Build variable", "Test variable"], correct: 0 },
+            { q: "What is artifact storage?", a: ["Stores build outputs", "Stores source", "Stores tests", "Stores config"], correct: 0 },
+            { q: "What is S3 artifact storage?", a: ["AWS storage for artifacts", "Storage service", "Build service", "Deploy service"], correct: 0 },
+            { q: "What is code coverage?", a: ["Percentage of code tested", "Code quality", "Test count", "Build status"], correct: 0 },
+            { q: "What is static code analysis?", a: ["Analyzes code without running", "Runs code", "Tests code", "Deploys code"], correct: 0 },
+            { q: "What is SonarQube?", a: ["Code quality analysis tool", "Testing tool", "Build tool", "Deploy tool"], correct: 0 },
+            { q: "What is linting?", a: ["Code style checking", "Code running", "Code testing", "Code deploying"], correct: 0 },
+            { q: "What is a linter?", a: ["Code analysis tool", "Test runner", "Build tool", "Deploy tool"], correct: 0 },
+            { q: "What is code formatting?", a: ["Standardizes code style", "Compresses code", "Encrypts code", "Validates code"], correct: 0 },
+            { q: "What is Prettier?", a: ["Code formatter", "Code linter", "Code tester", "Code builder"], correct: 0 },
+            { q: "What is ESLint?", a: ["JavaScript linter", "JavaScript runner", "JavaScript builder", "JavaScript deployer"], correct: 0 },
+            { q: "What is dependency management?", a: ["Manages external libraries", "Manages tests", "Manages builds", "Manages deploys"], correct: 0 },
+            { q: "What is npm?", a: ["Node package manager", "Package manager", "Build tool", "Test tool"], correct: 0 },
+            { q: "What is yarn?", a: ["JavaScript package manager", "Build tool", "Test tool", "Deploy tool"], correct: 0 },
+            { q: "What is a lock file?", a: ["Locks dependency versions", "Locks files", "Locks builds", "Locks deploys"], correct: 0 },
+            { q: "What is semantic versioning?", a: ["Version number format", "Version control", "Version testing", "Version deployment"], correct: 0 },
+            { q: "What is a pre-commit hook?", a: ["Runs before commit", "Runs after commit", "Runs on push", "Runs on merge"], correct: 0 },
+            { q: "What is a CI trigger?", a: ["Event that starts pipeline", "Manual trigger", "Scheduled trigger", "API trigger"], correct: 0 },
+            { q: "What is a scheduled pipeline?", a: ["Runs at specific times", "Manual run", "Triggered run", "On-demand run"], correct: 0 },
+            { q: "What is matrix build?", a: ["Multiple configuration builds", "Single build", "Parallel build", "Sequential build"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is a distributed build?", a: ["Build across multiple machines", "Single machine build", "Local build", "Manual build"], correct: 0 },
+            { q: "What is build caching?", a: ["Reuses previous build outputs", "Caches tests", "Caches code", "Caches config"], correct: 0 },
+            { q: "What is incremental build?", a: ["Builds only changed parts", "Full rebuild", "No build", "Test build"], correct: 0 },
+            { q: "What is monorepo?", a: ["Single repository for multiple projects", "Multiple repos", "Single project", "No repo"], correct: 0 },
+            { q: "What is a workspace in CI?", a: ["Directory for build files", "User directory", "Temp directory", "Log directory"], correct: 0 },
+            { q: "What is parallel testing?", a: ["Tests run simultaneously", "Tests run sequentially", "Tests run once", "Tests run manual"], correct: 0 },
+            { q: "What is test isolation?", a: ["Tests don't affect each other", "Tests run separately", "Tests run in order", "Tests run randomly"], correct: 0 },
+            { q: "What is a flaky test?", a: ["Non-deterministic test result", "Fast test", "Slow test", "Failing test"], correct: 0 },
+            { q: "What is test automation framework?", a: ["Structure for automated tests", "Test runner", "Test data", "Test report"], correct: 0 },
+            { q: "What is Selenium?", a: ["Browser automation tool", "Testing tool", "Build tool", "Deploy tool"], correct: 0 },
+            { q: "What is Cypress?", a: ["JavaScript E2E testing", "Testing tool", "Build tool", "CI tool"], correct: 0 },
+            { q: "What is JUnit?", a: ["Java testing framework", "Build tool", "CI tool", "Deploy tool"], correct: 0 },
+            { q: "What is PyTest?", a: ["Python testing framework", "Build tool", "CI tool", "Deploy tool"], correct: 0 },
+            { q: "What is a smoke test?", a: ["Quick validation test", "Full test", "Integration test", "Unit test"], correct: 0 },
+            { q: "What is a regression test?", a: ["Ensures existing features work", "New feature test", "Quick test", "Smoke test"], correct: 0 },
+            { q: "What is load testing?", a: ["Tests system under load", "Tests functionality", "Tests security", "Tests UI"], correct: 0 },
+            { q: "What is JMeter?", a: ["Load testing tool", "Build tool", "CI tool", "Deploy tool"], correct: 0 },
+            { q: "What is performance testing?", a: ["Tests system performance", "Tests functionality", "Tests security", "Tests UI"], correct: 0 },
+            { q: "What is Grafana?", a: ["Visualization and monitoring", "Testing tool", "Build tool", "Deploy tool"], correct: 0 },
+            { q: "What is Prometheus?", a: ["Time-series monitoring", "Testing tool", "Build tool", "Deploy tool"], correct: 0 },
+            { q: "What is Chaos Engineering?", a: "["Testing system resilience", "Testing functionality", "Testing security", "Testing UI"], correct: 0 },
+            { q: "What is Chaos Monkey?", a: ["Netflix's chaos tool", "Test runner", "Build tool", "Deploy tool"], correct: 0 },
+            { q: "What is a service mesh?", a: ["Service communication layer", "Network layer", "Storage layer", "Security layer"], correct: 0 },
+            { q: "What is Istio?", a: ["Service mesh implementation", "Build tool", "CI tool", "Deploy tool"], correct: 0 },
+            { q: "What is observability?", a: ["System insight capability", "Test capability", "Build capability", "Deploy capability"], correct: 0 },
+            { q: "What is distributed tracing?", a: ["Tracks requests across services", "Tests services", "Builds services", "Deploys services"], correct: 0 },
+            { q: "What is Jaeger?", a: ["Distributed tracing tool", "Testing tool", "Build tool", "Deploy tool"], correct: 0 },
+            { q: "What is log aggregation?", a: ["Centralizes log collection", "Log testing", "Log building", "Log deployment"], correct: 0 },
+            { q: "What is ELK stack?", a: ["Elasticsearch, Logstash, Kibana", "Log tool", "Build tool", "Deploy tool"], correct: 0 },
+            { q: "What is feature flag?", a: ["Controls feature availability", "Feature test", "Feature build", "Feature deploy"], correct: 0 },
+            { q: "What is LaunchDarkly?", a: ["Feature flag service", "Build service", "Test service", "Deploy service"], correct: 0 },
+            { q: "What is A/B testing?", a: ["Compares two versions", "Single version", "Test version", "No testing"], correct: 0 },
+            { q: "What is Infrastructure as Code?", a: ["Manages infrastructure programmatically", "Manual infrastructure", "Infrastructure testing", "Infrastructure deployment"], correct: 0 },
+            { q: "What is Terraform?", a: ["Infrastructure as Code tool", "Build tool", "Test tool", "Deploy tool"], correct: 0 },
+            { q: "What is Ansible?", a: ["Configuration management tool", "Build tool", "Test tool", "Deploy tool"], correct: 0 },
+            { q: "What is blue-green deployment?", a: ["Two environments switch", "Single environment", "Test deployment", "No deployment"], correct: 0 },
+            { q: "What is canary release?", a: ["Gradual percentage rollout", "Full rollout", "No rollout", "Instant rollout"], correct: 0 },
+            { q: "What is rolling deployment?", a: ["Sequential pod updates", "Parallel updates", "No updates", "Manual updates"], correct: 0 },
+            { q: "What is immutable infrastructure?", a: ["Never modified, replaced instead", "Mutable infrastructure", "Test infrastructure", "Dev infrastructure"], correct: 0 },
+            { q: "What is a golden image?", a: ["Pre-built VM/container image", "Standard image", "Test image", "Dev image"], correct: 0 },
+            { q: "What is Packer?", a: ["Image building tool", "Test tool", "Deploy tool", "Config tool"], correct: 0 },
+            { q: "What is Vagrant?", a: ["Development environment tool", "Test tool", "Deploy tool", "Build tool"], correct: 0 },
+            { q: "What is a build agent?", a: ["Runs build tasks", "Build manager", "Build creator", "Build user"], correct: 0 },
+            { q: "What is a self-hosted runner?", a: ["Runs on your infrastructure", "Cloud runner", "Hosted runner", "External runner"], correct: 0 },
+            { q: "What is container scanning?", a: ["Checks for vulnerabilities", "Builds containers", "Runs containers", "Stores containers"], correct: 0 },
+            { q: "What is Trivy?", a: ["Container vulnerability scanner", "Container builder", "Container runner", "Container store"], correct: 0 },
+            { q: "What is Snyk?", a: ["Security vulnerability scanner", "Build tool", "Deploy tool", "Test tool"], correct: 0 },
+            { q: "What is dependency scanning?", a: ["Checks for vulnerable dependencies", "Builds dependencies", "Uses dependencies", "Manages dependencies"], correct: 0 },
+            { q: "What is SAST?", a: ["Static Application Security Testing", "Security test", "App test", "Build test"], correct: 0 },
+            { q: "What is DAST?", a: ["Dynamic Application Security Testing", "Static test", "Code test", "Build test"], correct: 0 },
+            { q: "What is RASP?", a: ["Runtime Application Self-Protection", "Test protection", "Build protection", "Deploy protection"], correct: 0 },
+            { q: "What is DevSecOps?", a: ["Security in DevOps", "DevOps", "SecOps", "DevSec"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+        function initTest() { difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0; currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0; document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block'; renderQuestion(); }
+        function renderQuestion() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const q = currentQuestions[currentQuestionIndex]; const qDiv = document.createElement('div'); qDiv.className = 'question-container active'; let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join(''); qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`; container.appendChild(qDiv); updateUI(); }
+        function updateUI() { const total = currentQuestions.length; const progress = ((currentQuestionIndex) / total) * 100; document.getElementById('progressFill').style.width = progress + '%'; document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; }
+        function selectAnswer(index) { const q = currentQuestions[currentQuestionIndex]; const buttons = document.querySelectorAll('.answer-btn'); buttons.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); }); totalAnswered++; if (index === q.correct) { streak++; if (streak > maxStreak) maxStreak = streak; consecutiveCorrect++; score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30; if (currentLevel === 1 && consecutiveCorrect >= 7) { currentLevel = 2; difficulty = 'medium'; consecutiveCorrect = 0; currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else if (currentLevel === 2 && consecutiveCorrect >= 7) { currentLevel = 3; difficulty = 'hard'; consecutiveCorrect = 0; currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else { currentQuestionIndex++; } setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 1200); } else { buttons[index].classList.add('incorrect'); streak = 0; consecutiveCorrect = 0; currentQuestionIndex++; setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 2000); return; } }
+        function showResult() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const resultScreen = document.getElementById('resultScreen'); resultScreen.classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '✓' : '✗'; document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score}`; document.getElementById('resultDetails').innerHTML = `Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`; document.getElementById('progressFill').style.width = '100%'; }
+        function restartTest() { initTest(); }
+        document.addEventListener('DOMContentLoaded', function() { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('themeToggle').checked = true; } initTest(); });
+    </script>
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+    <footer><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>

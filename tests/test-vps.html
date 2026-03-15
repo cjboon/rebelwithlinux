@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-vps.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPS Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// VPS TEST</h1>
+            <p>Prove your VPS mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value" id="questionNum">1</div>
+                    <div class="stat-label">Question</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="streakNum">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="scoreNum">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="levelNum">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div id="questionsContainer"></div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What does SSH stand for?", a: ["Secure Shell", "Simple Shell", "Secure HTTP", "System Shell"], correct: 0 },
+            { q: "What is the default SSH port?", a: ["22", "21", "23", "25"], correct: 0 },
+            { q: "What command connects to a remote server via SSH?", a: ["ssh user@hostname", "connect user@hostname", "remote user@hostname", "telnet user@hostname"], correct: 0 },
+            { q: "What is a VPS?", a: ["Virtual Private Server", "Virtual Public Server", "Very Private Server", "Virtual Process Server"], correct: 0 },
+            { q: "What command updates packages on Debian/Ubuntu?", a: ["apt update", "yum update", "dnf update", "pacman -Syu"], correct: 0 },
+            { q: "What command installs packages on RHEL/CentOS?", a: ["yum install", "apt install", "dnf install", "pacman -S"], correct: 0 },
+            { q: "What is the purpose of a firewall?", a: ["Blocks unauthorized network access", "Speeds up network", "Manages files", "Stores logs"], correct: 0 },
+            { q: "What does UFW stand for?", a: ["Uncomplicated Firewall", "User Firewall", "Universal Firewall", "Unified Firewall"], correct: 0 },
+            { q: "What command enables UFW firewall?", a: ["ufw enable", "ufw start", "ufw on", "ufw active"], correct: 0 },
+            { q: "What command allows SSH through UFW?", a: ["ufw allow ssh", "ufw open ssh", "ufw permit ssh", "ufw allow 22"], correct: 0 },
+            { q: "What is DNS?", a: ["Domain Name System", "Dynamic Network Service", "Data Network System", "Domain Network Server"], correct: 0 },
+            { q: "What file contains DNS server entries?", a: ["/etc/resolv.conf", "/etc/hosts", "/etc/dns", "/etc/network"], correct: 0 },
+            { q: "What command restarts a service in systemd?", a: ["systemctl restart", "service restart", "restart service", "system restart"], correct: 0 },
+            { q: "What command enables a service to start on boot?", a: ["systemctl enable", "systemctl start", "systemctl on", "systemctl boot"], correct: 0 },
+            { q: "What is a LAMP stack?", a: ["Linux, Apache, MySQL, PHP", "Linux, Apache, Mongo, Python", "Linux, Nginx, MySQL, PHP", "Linux, Apache, MariaDB, Perl"], correct: 0 },
+            { q: "What is a LEMP stack?", a: ["Linux, Nginx, MySQL, PHP", "Linux, Apache, MySQL, PHP", "Linux, Nginx, MongoDB, Python", "Linux, LiteSpeed, MySQL, PHP"], correct: 0 },
+            { q: "What does SSL/TLS provide?", a: ["Encryption for data in transit", "Data storage", "User authentication", "File compression"], correct: 0 },
+            { q: "What command generates an SSH key?", a: ["ssh-keygen", "ssh-gen", "keygen", "generate-key"], correct: 0 },
+            { q: "What is the SSH public key file?", a: ["~/.ssh/id_rsa.pub", "~/.ssh/id_rsa", "~/.ssh/key", "~/.ssh/pub"], correct: 0 },
+            { q: "What command copies SSH key to server?", a: ["ssh-copy-id", "ssh-copy", "scp-key", "copy-ssh"], correct: 0 },
+            { q: "What does 'sudo' do?", a: ["Executes command as root", "Shows user info", "Lists users", "Creates user"], correct: 0 },
+            { q: "What command creates a new user?", a: ["useradd", "adduser", "newuser", "mkuser"], correct: 0 },
+            { q: "What command changes user password?", a: ["passwd", "password", "chpasswd", "setpass"], correct: 0 },
+            { q: "What is Fail2Ban?", a: ["Intrusion prevention tool", "Backup tool", "Monitoring tool", "Firewall only"], correct: 0 },
+            { q: "What command checks disk usage?", a: ["df -h", "du", "fdisk -l", "lsblk"], correct: 0 },
+            { q: "What command checks memory usage?", a: ["free -h", "mem", "ram", "top"], correct: 0 },
+            { q: "What command shows running processes?", a: ["ps aux", "top", "htop", "proc"], correct: 0 },
+            { q: "What is the purpose of monitoring?", a: ["Track system performance", "Block attackers", "Manage files", "Configure network"], correct: 0 },
+            { q: "What command checks open ports?", a: ["netstat -tulpn", "nmap", "ss -tulpn", "iptables -L"], correct: 0 },
+            { q: "What is a backup?", a: ["Copy of data for recovery", "Security update", "Network config", "System log"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is SSH hardening?", a: ["Securing SSH configuration", "Hardening hardware", "SSH installation", "SSH testing"], correct: 0 },
+            { q: "What directive in sshd_config disables root login?", a: ["PermitRootLogin no", "RootLogin no", "DenyRoot yes", "DisableRoot true"], correct: 0 },
+            { q: "What directive disables password authentication in SSH?", a: ["PasswordAuthentication no", "DisablePassword yes", "AuthPassword no", "PassAuth false"], correct: 0 },
+            { q: "What is the purpose of SSH keys over passwords?", a: ["More secure, key-based auth", "Faster connection", "Easier to remember", "No difference"], correct: 0 },
+            { q: "What does iptables -L list?", a: ["All firewall rules", "Open ports", "Network interfaces", "Active connections"], correct: 0 },
+            { q: "What iptables rule blocks incoming traffic?", a: ["iptables -P INPUT DROP", "iptables -A INPUT -j DROP", "iptables -F", "iptables -X"], correct: 0 },
+            { q: "What is a proper UFW default policy?", a: ["DENY incoming, ALLOW outgoing", "ALLOW all", "DENY all", "BLOCK only"], correct: 0 },
+            { q: "What command allows specific port in UFW?", a: ["ufw allow 80/tcp", "ufw open 80", "ufw permit 80", "ufw allow http"], correct: 0 },
+            { q: "What is a DNS A record?", a: ["Maps domain to IP address", "Mail server record", "Name server record", "CNAME record"], correct: 0 },
+            { q: "What is a DNS CNAME record?", a: ["Alias to another domain", "Mail exchange", "Name server", "Pointer record"], correct: 0 },
+            { q: "What is Let's Encrypt?", a: ["Free SSL certificate authority", "DNS provider", "Web server", "Firewall"], correct: 0 },
+            { q: "What tool automates Let's Encrypt certificates?", a: ["certbot", "letsencrypt", "acme", "ssl-cert"], correct: 0 },
+            { q: "What command obtains SSL certificate with certbot?", a: ["certbot certonly --webroot", "certbot install", "certbot get", "certbot create"], correct: 0 },
+            { q: "What is server hardening?", a: ["Security configuration to reduce vulnerabilities", "Hardware upgrade", "Software update", "Network expansion"], correct: 0 },
+            { q: "What is the purpose of disabling unused services?", a: ["Reduce attack surface", "Save memory", "Improve speed", "Enable features"], correct: 0 },
+            { q: "What command lists enabled services?", a: ["systemctl list-unit-files --enabled", "systemctl list-services", "ls /etc/init.d", "service --list"], correct: 0 },
+            { q: "What is the purpose of a backup strategy?", a: ["Ensure data can be recovered", "Save disk space", "Speed up server", "Reduce costs"], correct: 0 },
+            { q: "What is rsync?", a: ["Fast incremental file transfer", "Remote shell", "Reverse proxy", "Rate limiter"], correct: 0 },
+            { q: "What command uses rsync over SSH?", a: ["rsync -avz -e ssh", "rsync -s", "ssh rsync", "rsync --ssh"], correct: 0 },
+            { q: "What is automated backup scheduling?", a: ["cron jobs for regular backups", "Manual backup", "Real-time backup", "On-demand backup"], correct: 0 },
+            { q: "What is performance tuning?", a: ["Optimizing server for better performance", "Security hardening", "Backup configuration", "Network setup"], correct: 0 },
+            { q: "What is the purpose of SWAP?", a: ["Extends available memory", "Increases disk space", "Speeds up CPU", "Manages network"], correct: 0 },
+            { q: "What command adjusts kernel parameters?", a: ["sysctl -w", "kernelctl", "paramset", "tune-kernel"], correct: 0 },
+            { q: "What is the purpose of TCP wrappers?", a: ["Host-based access control", "TCP optimization", "Connection logging", "Packet filtering"], correct: 0 },
+            { q: "What file controls TCP wrappers?", a: ["/etc/hosts.allow and /etc/hosts.deny", "/etc/tcpwrappers", "/etc/tcp.conf", "/etc/access.conf"], correct: 0 },
+            { q: "What is a cron job?", a: ["Scheduled task execution", "Cron daemon", "Backup tool", "Monitor service"], correct: 0 },
+            { q: "What is the crontab file?", a: ["Schedule configuration for cron", "System log", "Cron daemon config", "User database"], correct: 0 },
+            { q: "What does '* * * * *' mean in crontab?", a: ["Run every minute", "Run once", "Run hourly", "Run daily"], correct: 0 },
+            { q: "What is server provisioning?", a: ["Setting up and configuring a server", "Creating backups", "Monitoring", "Security scanning"], correct: 0 },
+            { q: "What tool automates server provisioning?", a: ["Ansible, Terraform, Puppet", "Cron", "Rsync", "UFW"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is two-factor authentication (2FA)?", a: ["Authentication using two different factors", "Two passwords", "Two servers", "Two-factor login"], correct: 0 },
+            { q: "What is the difference between authentication and authorization?", a: ["Auth verifies identity, authz defines permissions", "They are the same", "Authz is stronger", "No difference"], correct: 0 },
+            { q: "What is SELinux?", a: ["Security-Enhanced Linux", "Simple Linux", "Standard Linux", "System Linux"], correct: 0 },
+            { q: "What are the SELinux modes?", a: ["Enforcing, Permissive, Disabled", "On, Off, Auto", "High, Medium, Low", "Active, Inactive, Blocked"], correct: 0 },
+            { q: "What does 'getenforce' show?", a: ["Current SELinux mode", "File permissions", "User access", "Network status"], correct: 0 },
+            { q: "What is AppArmor?", a: ["Linux security module for access control", "Application armor", "Server protection", "Firewall type"], correct: 0 },
+            { q: "What is the difference between UFW and iptables?", a: ["UFW is frontend to iptables", "UFW is newer", "iptables is deprecated", "No difference"], correct: 0 },
+            { q: "What is a stateful firewall?", a: ["Tracks connection state", "Blocks all", "Logs everything", "Only filters packets"], correct: 0 },
+            { q: "What does iptables -m state --state ESTABLISHED do?", a: ["Allows return traffic for established connections", "Blocks established", "Logs connections", "Creates state"], correct: 0 },
+            { q: "What is port knocking?", a: ["Sequence of connection attempts to open ports", "Port scanning", "Port blocking", "Port forwarding"], correct: 0 },
+            { q: "What is an intrusion detection system (IDS)?", a: ["Monitors for malicious activity", "Blocks attackers", "Logs access", "Manages ports"], correct: 0 },
+            { q: "What is the difference between IDS and IPS?", a: ["IDS detects, IPS prevents", "Same thing", "IDS is faster", "No difference"], correct: 0 },
+            { q: "What is log monitoring?", a: ["Analyzing system logs for issues", "Creating logs", "Deleting logs", "Storing logs"], correct: 0 },
+            { q: "What is a SIEM?", a: ["Security Information and Event Management", "Security Internet", "Server Monitoring", "System Log"], correct: 0 },
+            { q: "What is the purpose of rate limiting?", a: ["Prevents brute-force and DoS", "Speeds up access", "Blocks all", "Logs requests"], correct: 0 },
+            { q: "What is a honeypot?", a: ["Decoy system to attract attackers", "Honey storage", "Security tool", "Monitoring system"], correct: 0 },
+            { q: "What is network segmentation?", a: ["Dividing network into isolated segments", "Segmenting disk", "Dividing files", "CPU cores"], correct: 0 },
+            { q: "What is the principle of least privilege?", a: ["Give minimum necessary permissions", "All privileges", "Admin only", "No restrictions"], correct: 0 },
+            { q: "What is a security audit?", a: ["Systematic security evaluation", "Server backup", "Network test", "Performance check"], correct: 0 },
+            { q: "What is vulnerability scanning?", a: ["Identifying security weaknesses", "Scanning for viruses", "Network scan", "Port scan"], correct: 0 },
+            { q: "What is the purpose of system updates?", a: ["Patch security vulnerabilities", "Add features", "Change appearance", "Increase speed"], correct: 0 },
+            { q: "What is automated patching?", a: ["Automatic security updates", "Manual updates", "Optional updates", "Feature updates"], correct: 0 },
+            { q: "What is container security?", a: ["Securing containerized applications", "Container storage", "Container networking", "Container backup"], correct: 0 },
+            { q: "What is Docker security best practice?", a: ["Don't run containers as root", "Run as root", "Disable all logs", "Use latest images"], correct: 0 },
+            { q: "What is the purpose of kernel tuning?", a: ["Optimize system performance", "Security hardening", "Network setup", "Backup management"], correct: 0 },
+            { q: "What does net.core.somaxconn control?", a: ["Maximum concurrent connections", "Socket memory", "Network timeout", "Connection limit"], correct: 0 },
+            { q: "What is the purpose of tcp_tw_reuse?", a: ["Reuse time-wait sockets", "Time wait sockets", "TCP timing", "Connection reuse"], correct: 0 },
+            { q: "What is CDN?", a: ["Content Delivery Network", "Content Data Network", "Central Domain", "Cloud Delivery"], correct: 0 },
+            { q: "What is the purpose of CDN?", a: ["Deliver content from edge locations", "Store data", "Secure connections", "Balance load"], correct: 0 },
+            { q: "What is load balancing?", a: ["Distributing traffic across multiple servers", "Balancing disk", "CPU balance", "Memory distribution"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            const q = currentQuestions[currentQuestionIndex];
+            
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            
+            qDiv.innerHTML = `
+                <div class="question-text">${q.q}</div>
+                <div class="answers-grid">${answersHtml}</div>
+            `;
+            
+            container.appendChild(qDiv);
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            const total = currentQuestions.length;
+            const progress = ((currentQuestionIndex) / total) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) {
+                    btn.classList.add('correct');
+                }
+            });
+            
+            totalAnswered++;
+            
+            if (index === q.correct) {
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+                consecutiveCorrect++;
+                score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30;
+                
+                if (currentLevel === 1 && consecutiveCorrect >= 7) {
+                    currentLevel = 2;
+                    difficulty = 'medium';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else if (currentLevel === 2 && consecutiveCorrect >= 7) {
+                    currentLevel = 3;
+                    difficulty = 'hard';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else {
+                    currentQuestionIndex++;
+                }
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 1200);
+            } else {
+                buttons[index].classList.add('incorrect');
+                streak = 0;
+                consecutiveCorrect = 0;
+                currentQuestionIndex++;
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 2000);
+                return;
+            }
+        }
+
+        function showResult() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            const resultScreen = document.getElementById('resultScreen');
+            resultScreen.classList.add('active');
+            
+            const pass = score >= 100;
+            document.getElementById('resultIcon').textContent = pass ? '✓' : '✗';
+            document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL';
+            document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score}`;
+            document.getElementById('resultDetails').innerHTML = `
+                Questions answered: ${totalAnswered}<br>
+                Best streak: ${maxStreak}<br>
+                Highest level reached: ${currentLevel}
+            `;
+            
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeToggle').checked = true;
+            }
+            initTest();
+        });
+    </script>
+
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p><a href="../site-map.html">All pages</a></p>
+    </footer>
+</body>
+</html>

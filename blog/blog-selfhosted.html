@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-selfhosted.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>The Self-Hosted Services Guide - REBEL WITH LINUX</title>
+    <meta name="description" content="Stop trusting Big Tech with your data. A practical guide to self-hosting essential services: password managers, calendars, file storage, and more.">
+    <meta name="keywords" content="self-hosted, privacy, FOSS, open source, Bitwarden, Nextcloud, AdGuard, homelab">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="The Self-Hosted Services Guide">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-selfhosted.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-selfhosted.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: var(--black); border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: var(--white); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 40px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content h4 { font-size: 1.05rem; margin: 20px 0 8px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .blog-content a { color: var(--black); }
+        .blog-content .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px; margin: 20px 0; }
+        .blog-content .info { background: #e7f3ff; border-left: 4px solid #2196F3; padding: 16px; margin: 20px 0; }
+        .blog-content .success { background: #d4edda; border-left: 4px solid #28a745; padding: 16px; margin: 20px 0; }
+        .toc { background: var(--light-gray); padding: 20px; border-radius: 4px; margin: 20px 0; }
+        .toc ul { margin: 0; padding-left: 20px; }
+        .toc li { margin-bottom: 4px; }
+        .toc a { text-decoration: none; }
+        .service-card { border: 2px solid var(--black); padding: 20px; margin: 20px 0; border-radius: 4px; }
+        .service-card h3 { margin-top: 0; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="blog-header">
+        <h1>The Self-Hosted Services Guide</h1>
+        <p>March 14, 2026 • Self-Hosting • 20 min read</p>
+    </div>
+    
+    <nav class="blog-nav">
+        <a href="../index.html">← Home</a>
+        <a href="../index.html#blog">All Posts</a>
+    </nav>
+
+    <article class="blog-content">
+        <p>You use Google for email. Dropbox for files. 1Password for passwords. Maybe iCloud for your photos and contacts. Every service you use is someone else's computer—and that means someone else has your data.</p>
+        
+        <p>I'm not here to tell you to go cold turkey. I still use some cloud services. But I've spent years gradually bringing more of my digital life onto my own hardware. It's not about being a paranoid extremist. It's about control. About owning the things that are yours. About not being the product.</p>
+        
+        <p>This guide covers the services I self-host that actually make my life better. Not tech-for-tech's-sake projects—these are tools I use every day. Passwords, files, bookmarks, reading lists, network-level ad blocking. The stuff that matters.</p>
+
+        <h2 id="toc">What We'll Cover</h2>
+        <div class="toc">
+            <ul>
+                <li><a href="#why">Why Self-Host?</a></li>
+                <li><a href="#what">What You Need Before You Start</a></li>
+                <li><a href="#bitwarden">1. Bitwarden – Password Manager</a></li>
+                <li><a href="#nextcloud">2. Nextcloud – Files, Calendar, Contacts</a></li>
+                <li><a href="#wallabag">3. Wallabag – Read Later</a></li>
+                <li><a href="#linkding">4. Linkding – Bookmarks</a></li>
+                <li><a href="#adguard">5. AdGuard Home – Network-Wide Ad Blocking</a></li>
+                <li><a href="#tips">Tips for Running These at Home</a></li>
+            </ul>
+        </div>
+
+        <h2 id="why">Why Self-Host?</h2>
+        
+        <p>Here's the thing: self-hosting isn't for everyone. It takes time. It takes maintenance. You'll deal with upgrades that break things. You'll troubleshoot at 2 AM when something stops working. It's not all glamour.</p>
+        
+        <p>But here's what you get back:</p>
+        
+        <ul>
+            <li><strong>Control</strong> – Your data lives where you say. Not in some company's data center.</li>
+            <li><strong>Privacy</strong> – You're not the product. There's no ads, no tracking, no selling your data.</li>
+            <li><strong>Learning</strong> – You learn how this stuff actually works. That's valuable knowledge.</li>
+            <li><strong>Cost</strong> – Most of these are free. You just need hardware you probably already have.</li>
+        </ul>
+        
+        <div class="info">
+            <strong>Prerequisite:</strong> You'll need a home server. It can be a Raspberry Pi, an old laptop, a cheap VPS, or a dedicated mini PC. Check out the <a href="blog-homelab.html">Homelab Guide</a> for hardware suggestions. For this guide, I'll assume you have Docker installed (see the <a href="blog-docker.html">Docker Guide</a> if you don't).
+        </div>
+
+        <h2 id="what">What You Need Before You Start</h2>
+        
+        <p>Before we dive in, make sure you have:</p>
+        
+        <ul>
+            <li><strong>Docker and Docker Compose installed</strong> – We'll use Docker for everything because it makes installation and updates trivial.</li>
+            <li><strong>A domain name</strong> – You'll need this for accessing services from outside your network. You can get one for cheap, or use a free dynamic DNS service.</li>
+            <li><strong>Some time</strong> – Plan on an evening to get everything set up.</li>
+        </ul>
+        
+        <p>I'm going to show you docker-compose.yml files for each service. Create a folder for each service, drop in the compose file, and run <code>docker-compose up -d</code>. That's it.</p>
+
+        <h2 id="bitwarden">1. Bitwarden – Password Manager</h2>
+        
+        <div class="service-card">
+            <h3>What it is</h3>
+            <p>Bitwarden is an open-source password manager. It's like 1Password or LastPass, but you host it yourself. You get a password vault, secure notes, credit card storage, and the whole thing is end-to-end encrypted.</p>
+            
+            <h3>Why I use it</h3>
+            <p>I used to use 1Password. Then I realized I was paying $35/year to store my passwords in someone else's cloud. Bitwarden does the same thing—better, in my opinion—and I host it on my own server. The browser extensions work great. The mobile apps are solid. The $10/year for premium is optional (I still pay it for the extra features, but the free tier is genuinely usable).</p>
+        </div>
+        
+        <p>There are two ways to run Bitwarden: the official image (which is heavy and requires their proprietary Rust server), or Vaultwarden, which is a lighter alternative written in Rust that implements the Bitwarden API. Use Vaultwarden. It's what everyone runs.</p>
+        
+        <pre><code>mkdir -p ~/docker/vaultwarden && cd ~/docker/vaultwarden
+cat > docker-compose.yml << 'EOF'
+version: '3'
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: always
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./data:/data
+    environment:
+      - WEBSOCKET_ENABLED=true
+      - SIGNUPS_ALLOWED=true
+      - ADMIN_TOKEN=your-admin-token-here
+EOF</code></pre>
+        
+        <div class="warning">
+            <strong>Important:</strong> Change <code>your-admin-token-here</code> to something random and long. This gives you access to the admin panel at /admin. Keep this secret!
+        </div>
+        
+        <p>Start it up:</p>
+        
+        <pre><code>docker-compose up -d</code></pre>
+        
+        <p>Set up a reverse proxy (nginx or Caddy) in front of this to handle HTTPS. I'll cover that in another guide, but for now, know that you need SSL. You're handling passwords here—don't send them over plain HTTP.</p>
+        
+        <div class="info">
+            <strong>First-time setup:</strong> Visit your Bitwarden instance in a browser. Create your account. That's it. The encryption key is derived from your master password—you're the only one who can read your passwords. Even if someone got access to your server, they'd need your master password to decrypt anything.
+        </div>
+
+        <h2 id="nextcloud">2. Nextcloud – Files, Calendar, Contacts</h2>
+        
+        <div class="service-card">
+            <h3>What it is</h3>
+            <p>Nextcloud is essentially a self-hosted Google Drive. It handles file storage, sync, calendar, contacts, tasks, notes, and about a hundred other apps. It's huge. It can do too much, honestly.</p>
+            
+            <h3>Why I use it</h3>
+            <p>I use it for file sync and calendar primarily. My wife and I share a folder with family photos. We sync our calendars. It's nice having our own Google Photos/Google Calendar without being on Google.</p>
+        </div>
+        
+        <p>Nextcloud is heavier than the other services here. It needs at least 1GB RAM to run comfortably. But it's powerful.</p>
+        
+        <pre><code>mkdir -p ~/docker/nextcloud && cd ~/docker/nextcloud
+cat > docker-compose.yml << 'EOF'
+version: '3'
+
+services:
+  nextcloud:
+    image: nextcloud:latest
+    container_name: nextcloud
+    restart: always
+    ports:
+      - "127.0.0.1:8081:80"
+    volumes:
+      - ./data:/var/www/html
+      - ./apps:/var/www/html/custom_apps
+    environment:
+      - PHP_MEMORY_LIMIT=512M
+      - NEXTCLOUD_TRUSTED_DOMAINS=your-domain.com
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    container_name: nextcloud-db
+    restart: always
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=strong-password-here
+EOF</code></pre>
+        
+        <p>Start it:</p>
+        
+        <pre><code>docker-compose up -d</code></pre>
+        
+        <p>Give it a minute—the first-time setup takes a bit. Then visit the port you mapped (8081 in this case) and you'll see the Nextcloud setup wizard. Point it to the database (use <code>db</code> as the hostname), create your admin account, and you're off.</p>
+        
+        <div class="info">
+            <strong>Important:</strong> Nextcloud has an Android app and iOS app for syncing files. Install them and point them to your server. That's where the magic happens—you get Dropbox-like sync without Dropbox.
+        </div>
+        
+        <p>Once you're logged in, head to the app store (click your avatar → Apps) and install:</p>
+        <ul>
+            <li><strong>Calendar</strong> – For calendar sync</li>
+            <li><strong>Contacts</strong> – For contacts sync</li>
+            <li><strong>Tasks</strong> – If you want task management</li>
+        </ul>
+
+        <h2 id="wallabag">3. Wallabag – Read Later</h2>
+        
+        <div class="service-card">
+            <h3>What it is</h3>
+            <p>Wallabag is a "read it later" service. You save articles to it, and it strips away the clutter—ads, popups, tracking—and gives you just the content. It's like Pocket, but self-hosted.</p>
+            
+            <h3>Why I use it</h3>
+            <p>I read a lot of articles. I don't read them all at once. I save them to Wallabag, and when I have time—on a flight, before bed—I open Wallabag and read without distractions. No ads trying to sell me things. No Medium paywalls. Just the article.</p>
+        </div>
+        
+        <p>Wallabag is straightforward:</p>
+        
+        <pre><code>mkdir -p ~/docker/wallabag && cd ~/docker/wallabag
+cat > docker-compose.yml << 'EOF'
+version: '3'
+
+services:
+  wallabag:
+    image: wallabag/wallabag:latest
+    container_name: wallabag
+    restart: always
+    ports:
+      - "127.0.0.1:8082:80"
+    volumes:
+      - ./data:/var/www/wallabag/data
+    environment:
+      - SYMFONY__ENV__DATABASE_DRIVER=pdo_sqlite
+      - SYMFONY__ENV__DATABASE_PATH=/var/www/wallabag/data/wallabag.db
+      - SYMFONY__ENV__DOMAIN_NAME=https://your-domain.com
+EOF</code></pre>
+        
+        <p>Start it and go to port 8082. Create your admin account. That's it for the basics.</p>
+        
+        <div class="info">
+            <strong>The browser extension:</strong> Install the Wallabag browser extension for Firefox or Chrome. When you're on any page, click the extension icon to save it to your Wallabag. Super useful for articles you want to read but don't have time for now.
+        </div>
+
+        <h2 id="linkding">4. Linkding – Bookmarks</h2>
+        
+        <div class="service-card">
+            <h3>What it is</h3>
+            <p>Linkding is a simple bookmark manager. That's it. That's the whole thing. You save URLs, tag them, search them. No bloat, no features you don't need.</p>
+            
+            <h3>Why I use it</h3>
+            <p>Browser bookmarks never worked for me. I never remember to look at them. Linkding gives me a place to dump links I want to remember, tag them with topics, and search when I need them. It's especially great because I can access my bookmarks from any browser, on any device—not locked into Chrome's ecosystem.</p>
+        </div>
+        
+        <p>This one is lightweight and uses SQLite:</p>
+        
+        <pre><code>mkdir -p ~/docker/linkding && cd ~/docker/linkding
+cat > docker-compose.yml << 'EOF'
+version: '3'
+
+services:
+  linkding:
+    image: sissbruecker/linkding:latest
+    container_name: linkding
+    restart: always
+    ports:
+      - "127.0.0.1:8083:3000"
+    volumes:
+      - ./data:/linkding/data
+    environment:
+      - LD_SETTINGS_SECRET=super-secret-random-string
+EOF</code></pre>
+        
+        <p>Start it:</p>
+        
+        <pre><code>docker-compose up -d</code></pre>
+        
+        <p>First login is username <code>admin</code> and password <code>admin</code>. Change that immediately in settings. You also set the <code>LD_SETTINGS_SECRET</code>—this is used for加密 settings, so make it random.</p>
+        
+        <div class="info">
+            <strong>The bookmarklet:</strong> Linkding has a bookmarklet you can add to your browser. Drag it to your bookmarks bar, and whenever you're on a page you want to save, click it. Quickest way to bookmark.
+        </div>
+
+        <h2 id="adguard">5. AdGuard Home – Network-Wide Ad Blocking</h2>
+        
+        <div class="service-card">
+            <h3>What it is</h3>
+            <p>AdGuard Home is a DNS-level ad and tracker blocker. You configure your devices to use your AdGuard server as their DNS, and it blocks ads system-wide. Every device. Every app. No browser extensions needed.</p>
+            
+            <h3>Why I use it</h3>
+            <p>My TV's smart apps were bombarding me with ads. My phone was tracking everything I did. My router couldn't stop it. AdGuard sits between my network and the internet and just... blocks the garbage. No ads on YouTube apps. No tracking in games. It's incredible.</p>
+        </div>
+        
+        <p>AdGuard is different—it needs to run on your network directly, not just in Docker, because it needs to be your DNS server. There are two ways to do this:</p>
+        
+        <h4>Option A: Run directly on the host (recommended)</h4>
+        
+        <pre><code># The easy way - one command
+docker run -d \
+  --name adguardhome \
+  --restart always \
+  -v ./data:/opt/adguardhome/conf \
+  -v ./work:/opt/adguardhome/work \
+  -p 53:53/tcp \
+  -p 53:53/udp \
+  -p 3000:3000/tcp \
+  adguard/adguardhome</code></pre>
+        
+        <h4>Option B: Use the official install script</h4>
+        
+        <pre><code>curl -sSL https://raw.githubusercontent.com/AdGuardTeam/AdGuardHome/master/scripts/install.sh | sh -s -- -v</code></pre>
+        
+        <p>Either way, visit port 3000 for the setup wizard. It walks you through:</p>
+        <ul>
+            <li>Setting up the admin interface</li>
+            <li>Configuring DNS upstream servers (I use Cloudflare and Google as fallbacks)</li>
+            <li>Enabling blocklists (they provide good defaults)</li>
+        </ul>
+        
+        <div class="warning">
+            <strong>Network setup:</strong> For AdGuard to work, you need to change your router's DHCP settings to hand out AdGuard's IP as the DNS server. Every device on your network will then use it automatically. Check your router's documentation for how to do this.
+        </div>
+        
+        <div class="info">
+            <strong>Blocklists:</strong> AdGuard comes with a few enabled by default. I recommend adding more—here are some popular ones:
+            <ul>
+                <li>AdGuard Default Blocklist</li>
+                <li>Fanboy's Enhanced Tracking List</li>
+                <li>NoCoin (cryptomining blocking)</li>
+                <li>AdAway (Android-specific hosts)</li>
+            </ul>
+            You can add these in Settings → DNS Blocklists.
+        </div>
+        
+        <p>After setup, your entire network is ad-free. It's genuinely magical visiting friends' houses and seeing ads everywhere and remembering "oh right, I forgot normal internet has ads."</p>
+
+        <h2 id="tips">Tips for Running These at Home</h2>
+        
+        <p>A few things I've learned running these services:</p>
+        
+        <h3>Backups matter</h3>
+        <p>You're now responsible for your data. If your hard drive dies, you lose everything. Set up backups. The <a href="blog-backups.html">Restic guide</a> on this site covers one approach. At minimum, copy your Docker volumes to another drive periodically.</p>
+        
+        <h3>Get a domain</h3>
+        <p>You can access these services by IP, but that's not sustainable. Get a domain—they're like $10/year. Then set up a reverse proxy (nginx or Caddy) to route traffic to the right container based on subdomain. I'll cover that in a future guide, but it's essential for a proper setup.</p>
+        
+        <h3>Use HTTPS everywhere</h3>
+        <p>Don't expose these services over plain HTTP, especially Bitwarden. Get SSL certificates (Let's Encrypt is free). Your passwords, your files, your data—don't send them over unencrypted connections.</p>
+        
+        <h3>Don't expose everything to the internet</h3>
+        <p>You probably don't need to access everything from outside your home network. For things you do need (Bitwarden), use a VPN or at least enable two-factor authentication. For things you don't (Nextcloud), bind to localhost only.</p>
+        
+        <h3>Keep them updated</h3>
+        <p>These are security tools. Vulnerabilities get found. Check for updates periodically. <code>docker-compose pull && docker-compose up -d</code> handles most of it, but you need to remember to run it.</p>
+
+        <h2>Start Small</h2>
+        
+        <p>Don't try to set up everything at once. Pick one service that annoys you about Big Tech—probably Bitwarden or ad blocking—and start there. Get comfortable running it. Then add another.</p>
+        
+        <p>Every service you self-host is one less piece of your digital life that's owned by someone else. It's one more thing you control. One more thing that's yours.</p>
+        
+        <p>The learning curve is real, but it's worth it. And if you get stuck, there are communities full of people running these same services who can help.</p>
+        
+        <p><strong>The revolution will not be proprietary.</strong></p>
+    </article>
+
+    <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+        <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+        <div id="comments-list" style="margin-bottom: 32px;"></div>
+        <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+            <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+            <div style="display: grid; gap: 16px;">
+                <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                <button onclick="submitComment('blog-selfhosted')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+            </div>
+        </div>
+    </section>
+    <script src="../comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-selfhosted');
+        });
+    </script>
+</body>
+</html>

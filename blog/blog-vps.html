@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-vps.html" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Setting Up Your First VPS - REBEL WITH LINUX</title>
-    <meta name="description" content="A complete beginner's guide to setting up and securing your first Linux VPS.">
-    <meta name="keywords" content="VPS, Linux, server, Debian, setup, security">
+    <meta name="description" content="A complete beginner's guide to hardening and securing your first Linux VPS from scratch.">
+    <meta name="keywords" content="VPS, Linux, server, Debian, security, hardening, privacy">
     <meta name="author" content="Clinton James Boon">
     <meta name="robots" content="index, follow">
 
@@ -15,7 +16,7 @@
     <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-vps.html">
 
     <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-vps.html">
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="../favicon.ico">
     <link rel="stylesheet" href="../fonts.css">
     <link rel="stylesheet" href="../style.css">
     <script>
@@ -39,8 +40,9 @@
         .blog-nav a { color: var(--white); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
         .blog-nav a:hover { color: var(--gray); }
         .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
-        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h2 { font-size: 1.5rem; margin: 40px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
         .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content h4 { font-size: 1.05rem; margin: 20px 0 8px; }
         .blog-content p { margin-bottom: 16px; }
         .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
         .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
@@ -48,6 +50,13 @@
         .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
         .blog-content li { margin-bottom: 8px; }
         .blog-content a { color: var(--black); }
+        .blog-content .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 16px; margin: 20px 0; }
+        .blog-content .info { background: #e7f3ff; border-left: 4px solid #2196F3; padding: 16px; margin: 20px 0; }
+        .blog-content .success { background: #d4edda; border-left: 4px solid #28a745; padding: 16px; margin: 20px 0; }
+        .toc { background: var(--light-gray); padding: 20px; border-radius: 4px; margin: 20px 0; }
+        .toc ul { margin: 0; padding-left: 20px; }
+        .toc li { margin-bottom: 4px; }
+        .toc a { text-decoration: none; }
     </style>
 </head>
 <body>
@@ -72,17 +81,10 @@
                 </a>
                 <div class="nav-links" id="navLinks">
                     <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
-                    <a href="../index.html#distros">DISTRO</a>
                     <a href="../index.html#games">GAMES</a>
                     <a href="../index.html#guides">GUIDES</a>
-                    <a href="../index.html#projects">PROJECTS</a>
-                    <a href="../index.html#resources">RESOURCES</a>
-                    <a href="../index.html#references">REFERENCES</a>
-                    <a href="../index.html#scripts">SCRIPTS</a>
                     <a href="../index.html#blog">BLOG</a>
                     <a href="../index.html#about">ABOUT</a>
-                    <a href="../index.html#contact">CONTACT</a>
-                    <a href="../index.html#stats">STATS</a>
                     <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
                     <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
                 </div>
@@ -92,7 +94,7 @@
 
     <div class="blog-header">
         <h1>Setting Up Your First VPS</h1>
-        <p>March 8, 2026 • Server Administration • 15 min read</p>
+        <p>March 14, 2026 • Server Administration • 25 min read</p>
     </div>
     
     <nav class="blog-nav">
@@ -101,62 +103,385 @@
     </nav>
 
     <article class="blog-content">
-        <p>So you've just rented your first Virtual Private Server (VPS) running Debian Linux. Congratulations! But now what? This comprehensive guide walks you through securing and setting up your server from scratch.</p>
-
-        <h2>First Steps After Login</h2>
+        <p>You just rented your first VPS. Maybe it's from Hetzner, DigitalOcean, or some random provider you found on LowEndBox. It doesn't matter where you got it—what matters is what you do with it now.</p>
         
-        <h3>Update Your System</h3>
+        <p>A fresh VPS is like a blank canvas. It's also like a house with the doors unlocked. The moment you spin it up, bots are already scanning it, trying default passwords, looking for weaknesses. I've watched failed login attempts on a fresh server go from zero to thousands per day within hours.</p>
+        
+        <p>This guide walks you through hardening a Debian VPS from scratch. We'll cover everything from basic updates to kernel hardening, SSH security, firewall configuration, and automated security updates. By the end, you'll have a server that can defend itself against the automated junk that's constantly probing every IP on the internet.</p>
+        
+        <div class="info">
+            <strong>TL;DR:</strong> If you just want to run a script and be done, I've also written an <a href="../server_setup.sh">automated server_setup.sh</a> that does all of this for you. But I'd encourage you to read through this first—understanding what you're actually securing matters.
+        </div>
+
+        <h2 id="toc">What We'll Cover</h2>
+        <div class="toc">
+            <ul>
+                <li><a href="#update">1. Update Your System</a></li>
+                <li><a href="#swap">2. Configure Swap</a></li>
+                <li><a href="#firewall">3. Set Up UFW Firewall</a></li>
+                <li><a href="#user">4. Create a Non-Root User</a></li>
+                <li><a href="#ssh">5. Harden SSH</a></li>
+                <li><a href="#fail2ban">6. Install Fail2ban</a></li>
+                <li><a href="#kernel">7. Kernel Hardening</a></li>
+                <li><a href="#autoupdates">8. Automatic Security Updates</a></li>
+                <li><a href="#logging">9. Log Monitoring</a></li>
+                <li><a href="#permissions">10. Secure File Permissions</a></li>
+                <li><a href="#coredumps">11. Disable Core Dumps</a></li>
+                <li><a href="#services">12. Disable Unnecessary Services</a></li>
+                <li><a href="#cleanup">13. Cleanup</a></li>
+                <li><a href="#webserver">14. Install a Web Server (Optional)</a></li>
+                <li><a href="#onion">15. Set Up a Tor Onion Site (Optional)</a></li>
+            </ul>
+        </div>
+
+        <h2 id="update">1. Update Your System</h2>
+        
+        <p>First things first. When you get a fresh VPS, the first thing you should do is update everything. I don't care if the provider says "pre-configured" or "latest image"—you update anyway. Security patches come out constantly, and your first job is to install them.</p>
+        
         <pre><code>sudo apt update
 sudo apt upgrade -y</code></pre>
+        
+        <p>The <code>apt update</code> part refreshes your package lists—it tells your server what's available. Then <code>apt upgrade</code> actually installs the new versions. The <code>-y</code> flag just answers "yes" to all prompts automatically.</p>
+        
+        <div class="info">
+            <strong>Why this matters:</strong> Every piece of software on your server potentially has vulnerabilities. The maintainers of Debian are constantly releasing security patches. Keeping your system updated is the single most important thing you can do for security.
+        </div>
 
-        <h3>Create a New User</h3>
-        <pre><code>adduser yourname
-usermod -aG sudo yourname</code></pre>
+        <h2 id="swap">2. Configure Swap</h2>
+        
+        <p>Swap is like virtual RAM—it's disk space that your server uses when it runs out of actual memory. Even if you have plenty of RAM, having swap configured prevents your server from crashing when something unexpectedly eats memory. It's a safety net.</p>
+        
+        <p>Let's check if you already have swap:</p>
+        
+        <pre><code>sudo swapon --show</code></pre>
+        
+        <p>If that shows nothing, you need to create swap. A good rule of thumb is to have swap equal to your RAM, or at least 2GB if you have less than that:</p>
+        
+        <pre><code>sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile</code></pre>
+        
+        <p>Now we make it permanent so it comes back after a reboot:</p>
+        
+        <pre><code>sudo cp /etc/fstab /etc/fstab.bak
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab</code></pre>
+        
+        <div class="warning">
+            <strong>Important:</strong> The permissions (chmod 600) are critical. If swap is world-readable, anyone on the server could potentially read sensitive data from it. Never skip this step.
+        </div>
 
-        <h2>SSH Security</h2>
+        <h2 id="firewall">3. Set Up UFW Firewall</h2>
+        
+        <p>A firewall is your first line of defense. It decides what can come into your server and what can't. We're going to use UFW (Uncomplicated Firewall)—it's exactly what it sounds like: a simple interface to the complex iptables firewall built into Linux.</p>
+        
+        <p>The strategy is simple: block everything by default, then explicitly allow only what you need.</p>
+        
+        <pre><code>sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow OpenSSH
+sudo ufw --force enable
+sudo ufw status</code></pre>
+        
+        <p>Let's break this down:</p>
+        <ul>
+            <li><code>deny incoming</code> — Block everything coming in unless we explicitly allow it</li>
+            <li><code>allow outgoing</code> — Let your server make outgoing connections freely</li>
+            <li><code>allow OpenSSH</code> — We need SSH to still work, or we'd lock ourselves out!</li>
+        </ul>
+        
+        <div class="warning">
+            <strong>CRITICAL:</strong> Always make sure SSH is allowed BEFORE enabling the firewall. Otherwise you will lock yourself out of your server. If you're using a custom SSH port, remember to allow that port instead.
+        </div>
 
-        <h3>Key-Based Authentication</h3>
+        <h2 id="user">4. Create a Non-Root User</h2>
+        
+        <p>You're probably tempted to just use root for everything. Don't. Root is the administrator account—it can do literally anything, including destroying your entire server with one command. That's dangerous in two ways: you could accidentally break something, and if someone compromises root, they own everything.</p>
+        
+        <p>Create a regular user instead:</p>
+        
+        <pre><code>sudo adduser yourname</code></pre>
+        
+        <p>Follow the prompts. Pick a strong password (I'll explain why we still need passwords even though we're disabling them later).</p>
+        
+        <p>Now give this user sudo access—that means they can run commands as root when needed:</p>
+        
+        <pre><code>sudo usermod -aG sudo yourname</code></pre>
+        
+        <p>The <code>-aG</code> means "append to group" and <code>sudo</code> is the group that allows administrative commands.</p>
+
+        <h2 id="ssh">5. Harden SSH</h2>
+        
+        <p>SSH (Secure Shell) is how you connect to your server remotely. By default, it's set up pretty loosely. We're going to lock it down hard:</p>
+        
+        <ul>
+            <li><strong>Disable root login</strong> — Never allow root to log in directly</li>
+            <li><strong>Disable password authentication</strong> — Only allow SSH keys</li>
+            <li><strong>Use SSH keys</strong> — Much more secure than passwords</li>
+            <li><strong>Change the SSH port</strong> — Optional, but reduces automated attack noise</li>
+        </ul>
+        
+        <p>First, you need to set up SSH key-based authentication. On your local machine (not the server):</p>
+        
         <pre><code>ssh-keygen -t ed25519
 ssh-copy-id yourname@your-server-ip</code></pre>
+        
+        <p>If you're on Windows or want more options, check out the <a href="blog-gpg.html">GPG guide</a>—you can actually use GPG keys for SSH authentication too.</p>
+        
+        <p>Now let's harden SSH on the server. We'll create a configuration file that overrides the defaults:</p>
+        
+        <pre><code>sudo nano /etc/ssh/sshd_config.d/custom.conf</code></pre>
+        
+        <p>Paste in these settings (change port 2222 to whatever you want, or use 22):</p>
+        
+        <pre><code>PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+MaxAuthTries 3
+ClientAliveInterval 300
+ClientAliveCountMax 2
+X11Forwarding no
+AllowTcpForwarding no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+Port 2222</code></pre>
+        
+        <p>Save and exit (Ctrl+X, then Y, then Enter in nano). Then restart SSH:</p>
+        
+        <pre><code>sudo systemctl restart ssh</code></pre>
+        
+        <div class="warning">
+            <strong>IMPORTANT:</strong> Before you log out, open a NEW terminal window and test that you can still connect with your SSH key! If you lock yourself out, you'll need console access through your VPS provider to fix it.
+        </div>
+        
+        <p>If you changed the port, remember to specify it when connecting:</p>
+        
+        <pre><code>ssh -p 2222 yourname@your-server-ip</code></pre>
+        
+        <div class="info">
+            <strong>Note:</strong> If you changed the SSH port, make sure to update your firewall to allow that port instead of the default 22:
+            <pre><code>sudo ufw allow 2222/tcp</code></pre>
+        </div>
 
-        <h3>Harden SSH Config</h3>
-        <pre><code>sudo nano /etc/ssh/sshd_config</code></pre>
-        <p>Change these settings:</p>
-        <ul>
-            <li>PasswordAuthentication no</li>
-            <li>PermitRootLogin no</li>
-            <li>PubkeyAuthentication yes</li>
-        </ul>
+        <h2 id="fail2ban">6. Install Fail2ban</h2>
+        
+        <p>Fail2ban is beautiful in its simplicity. It watches your logs for failed login attempts, and when some IP tries and fails too many times, it bans them automatically. It's like having a bouncer who throws out troublemakers before they can cause problems.</p>
+        
+        <pre><code>sudo apt install -y fail2ban</code></pre>
+        
+        <p>Now configure it. We'll create a local configuration that overrides the defaults:</p>
+        
+        <pre><code>sudo nano /etc/fail2ban/jail.local</code></pre>
+        
+        <pre><code>[DEFAULT]
+bantime = 1h
+findtime = 10m
+maxretry = 5
 
-        <h3>Enable UFW Firewall</h3>
-        <pre><code>sudo ufw allow OpenSSH
-sudo ufw enable
-sudo ufw status</code></pre>
-
-        <h2>Essential Software</h2>
-
-        <h3>Install Basic Tools</h3>
-        <pre><code>sudo apt install curl wget git vim ufw fail2ban</code></pre>
-
-        <h3>Fail2ban Protection</h3>
+[sshd]
+enabled = true
+port = 2222</code></pre>
+        
+        <p>Adjust the port number if you changed SSH from the default. This config says: ban anyone who fails to log in 5 times within 10 minutes for 1 hour.</p>
+        
         <pre><code>sudo systemctl enable fail2ban
 sudo systemctl start fail2ban</code></pre>
+        
+        <p>Check if it's running:</p>
+        
+        <pre><code>sudo fail2ban-client ping</code></pre>
+        
+        <p>If it replies "pong", you're good. You can see banned IPs with:</p>
+        
+        <pre><code>sudo fail2ban-client status sshd</code></pre>
 
-        <h2>Setting Up a Web Server</h2>
+        <h2 id="kernel">7. Kernel Hardening</h2>
+        
+        <p>The Linux kernel is the core of your operating system. We can tune it with sysctl settings to be more secure against network attacks. This is the "hardening" part—making the OS itself more defensive.</p>
+        
+        <pre><code>sudo nano /etc/sysctl.d/99-custom.conf</code></pre>
+        
+        <pre><code># Prevent SYN flood attacks
+net.ipv4.tcp_syncookies = 1
 
-        <h3>Install Nginx</h3>
-        <pre><code>sudo apt install nginx
+# Prevent IP spoofing
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+
+# Don't accept source routing
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv4.conf.default.accept_source_route = 0
+
+# Ignore broadcast pings (prevents ping floods)
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+
+# Don't accept ICMP redirects (security risk)
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+
+# Log suspicious packets
+net.ipv4.conf.all.log_martians = 1
+net.ipv4.conf.default.log_martians = 1</code></pre>
+        
+        <p>Save and apply these settings:</p>
+        
+        <pre><code>sudo sysctl -p /etc/sysctl.d/99-custom.conf</code></pre>
+        
+        <div class="info">
+            <strong>What these do:</strong> SYN cookies prevent your server from being overwhelmed by SYN flood attacks. RP filter prevents IP spoofing. Disabling source routing and ICMP redirects prevents attackers from manipulating how traffic flows through your server. Logging martian packets helps you spot suspicious activity.
+        </div>
+
+        <h2 id="autoupdates">8. Automatic Security Updates</h2>
+        
+        <p>You won't remember to log in and run apt update every week. That's okay—let the server do it automatically. We'll use Debian's unattended-upgrades package.</p>
+        
+        <pre><code>sudo apt install -y unattended-upgrades</code></pre>
+        
+        <p>Configure it:</p>
+        
+        <pre><code>sudo nano /etc/apt/apt.conf.d/50unattended-upgrades</code></pre>
+        
+        <pre><code>Unattended-Upgrade::Allowed-Origins {
+    "${distro_id}:${distro_codename}-security";
+    "${distro_id}:${distro_codename}-updates";
+};
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-RebootTime "02:00";</code></pre>
+        
+        <p>This tells the server to automatically install security updates and reboot at 2 AM if needed (kernel updates often require a reboot).</p>
+
+        <h2 id="logging">9. Log Monitoring</h2>
+        
+        <p>You can't watch your server 24/7. But you can get daily summaries of what's happening. Logwatch parses your system logs and emails you a digest.</p>
+        
+        <pre><code>sudo apt install -y logwatch</code></pre>
+        
+        <p>Create a cron job to run it daily:</p>
+        
+        <pre><code>sudo nano /etc/cron.daily/logwatch</code></pre>
+        
+        <pre><code>#!/bin/sh
+/usr/sbin/logwatch --output mail --mailto root --detail high</code></pre>
+        
+        <pre><code>sudo chmod 755 /etc/cron.daily/logwatch</code></pre>
+        
+        <div class="info">
+            <strong>Pro tip:</strong> You'll need to forward root's email to your actual email address for this to be useful. You can do that by creating a <code>.forward</code> file in /root/ with your email address.
+        </div>
+
+        <h2 id="permissions">10. Secure File Permissions</h2>
+        
+        <p>Linux file permissions determine who can read, write, or execute files. We need to lock down sensitive directories, especially SSH keys.</p>
+        
+        <pre><code>sudo chmod 700 /root
+sudo chmod 700 /home/*/.ssh 2>/dev/null
+sudo chmod 600 /home/*/.ssh/authorized_keys 2>/dev/null</code></pre>
+        
+        <p>This ensures:</p>
+        <ul>
+            <li>Only root can access /root</li>
+            <li>Only the owner can access their .ssh directory</li>
+            <li>Only the owner can read their authorized_keys file</li>
+        </ul>
+
+        <h2 id="coredumps">11. Disable Core Dumps</h2>
+        
+        <p>When a program crashes, it can dump its memory contents to a file. That memory might contain passwords, keys, or other sensitive data. We should disable this.</p>
+        
+        <pre><code>sudo nano /etc/security/limits.conf</code></pre>
+        
+        <p>Add at the bottom:</p>
+        
+        <pre><code>* soft core 0
+* hard core 0</code></pre>
+        
+        <p>Also add to the kernel hardening file:</p>
+        
+        <pre><code>sudo echo "fs.suid_dumpable = 0" >> /etc/sysctl.d/99-custom.conf
+sudo sysctl -p /etc/sysctl.d/99-custom.conf</code></pre>
+
+        <h2 id="services">12. Disable Unnecessary Services</h2>
+        
+        <p>Every running service is a potential attack vector. If you're not using something, turn it off. This reduces your attack surface.</p>
+        
+        <pre><code>sudo systemctl stop cups bluetooth avahi-daemon
+sudo systemctl disable cups bluetooth avahi-daemon</code></pre>
+        
+        <p>What these are:</p>
+        <ul>
+            <li><strong>cups</strong> — Print service. Unless you have a printer connected, you don't need this.</li>
+            <li><strong>bluetooth</strong> — Almost nobody needs this on a headless server.</li>
+            <li><strong>avahi-daemon</strong> — Service discovery. Useful on a local network, but not on a public server.</li>
+        </ul>
+
+        <h2 id="cleanup">13. Cleanup</h2>
+        
+        <p>Let's clean up unused packages and free some disk space:</p>
+        
+        <pre><code>sudo apt autoremove -y
+sudo apt autoclean</code></pre>
+        
+        <p><code>autoremove</code> removes packages that were installed as dependencies but are no longer needed. <code>autoclean</code> clears the apt package cache.</p>
+
+        <h2 id="webserver">14. Install a Web Server (Optional)</h2>
+        
+        <p>If you're hosting a website, you'll need a web server. I prefer nginx for its performance, but Apache is also fine. Let's install nginx:</p>
+        
+        <pre><code>sudo apt install -y nginx
+sudo ufw allow 'Nginx Full'
 sudo systemctl enable nginx
 sudo systemctl start nginx</code></pre>
+        
+        <p>The firewall rule allows both HTTP (port 80) and HTTPS (port 443) traffic.</p>
+        
+        <p>If you prefer Apache instead:</p>
+        
+        <pre><code>sudo apt install -y apache2
+sudo a2enmod ssl rewrite headers
+sudo ufw allow 'Apache Full'
+sudo systemctl enable apache2
+sudo systemctl start apache2</code></pre>
 
-        <h3>Firewall for Web</h3>
-        <pre><code>sudo ufw allow 'Nginx Full'</code></pre>
+        <h2 id="onion">15. Set Up a Tor Onion Site (Optional)</h2>
+        
+        <p>Want to host your site anonymously? A Tor onion site lets visitors access your site without either of you revealing your IP addresses. It's the ultimate in privacy hosting.</p>
+        
+        <p>Check out my <a href="../projects/project-onion.html">Build an Onion Site</a> tutorial for the full walkthrough.</p>
+        
+        <div class="info">
+            <strong>Pro tip:</strong> Our <a href="../server_setup.sh">server_setup.sh</a> script includes an option to automatically set up a Tor hidden service with all the proper configuration.
+        </div>
 
-        <h2>Automated Backups</h2>
+        <div class="info">
+            <strong>Onion-Location Tip:</strong> To let Tor Browser visitors know your onion site exists, add a meta tag to each HTML page on your main site:<br><br>
+            <code>&lt;meta http-equiv="onion-location" content="http://your-onion-address.onion/path/to/page.html" /&gt;</code><br><br>
+            Each page needs its own meta tag pointing to the corresponding onion page. Tor Browser will show a purple onion icon in the address bar when it detects this.
+        </div>
 
-        <p>Set up automated backups using restic or borgbackup. Check out our <a href="blog-backups.html">Server Backups with Restic</a> guide.</p>
-
-        <p>Your VPS is now secure and ready for use! Remember to keep your system updated and monitor logs regularly.</p>
+        <h2>That's It—Your Server Is Hardened</h2>
+        
+        <p>You now have a VPS that:</p>
+        <ul>
+            <li>Has all security updates installed automatically</li>
+            <li>Uses a firewall to block unauthorized access</li>
+            <li>Requires SSH keys (not passwords) to log in</li>
+            <li>Automatically bans attackers with Fail2ban</li>
+            <li>Has kernel-level protections against network attacks</li>
+            <li>Sends you daily log summaries</li>
+            <li>Keeps sensitive data locked down with proper permissions</li>
+        </ul>
+        
+        <p>This is the foundation. From here, you can host websites, run Docker containers, set up databases, or whatever else you need your server to do.</p>
+        
+        <div class="success">
+            <strong>Want to automate all this?</strong> I've written a bash script called <a href="../server_setup.sh">server_setup.sh</a> that does every step in this guide automatically. Just download it, run it, and answer the prompts. It's designed to be safe—you can skip steps you don't want, and it checks for common pitfalls before making changes.
+        </div>
+        
+        <p>Remember: security isn't a one-time thing. Keep an eye on those logwatch emails. Update your server regularly. Monitor fail2ban to see who's trying to get in. The automation handles a lot, but you're still the one watching the house.</p>
+        
+        <p><strong>The revolution will not be proprietary.</strong></p>
     </article>
 
     <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">

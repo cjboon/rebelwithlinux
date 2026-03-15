@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-terraform.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terraform Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// TERRAFORM TEST</h1>
+            <p>Prove your Terraform mastery</p>
+        </div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What is Terraform?", a: ["Infrastructure as Code tool", "Container platform", "Monitoring tool", "Version control"], correct: 0 },
+            { q: "What language does Terraform use?", a: ["HCL", "Python", "YAML", "JSON"], correct: 0 },
+            { q: "What does HCL stand for?", a: ["HashiCorp Configuration Language", "High Level Configuration", "Host Control Language", "Hybrid Cloud Language"], correct: 0 },
+            { q: "What command initializes Terraform?", a: ["terraform init", "terraform start", "terraform begin", "terraform new"], correct: 0 },
+            { q: "What command shows planned changes?", a: ["terraform plan", "terraform show", "terraform apply", "terraform preview"], correct: 0 },
+            { q: "What command applies changes?", a: ["terraform apply", "terraform plan", "terraform run", "terraform execute"], correct: 0 },
+            { q: "What is a provider?", a: ["Manages resource lifecycle", "Manages state", "Manages variables", "Manages modules"], correct: 0 },
+            { q: "What is a resource?", a: ["Infrastructure component", "Provider", "Module", "Variable"], correct: 0 },
+            { q: "What is a data source?", a: ["Reads external information", "Writes data", "Stores state", "Creates resources"], correct: 0 },
+            { q: "What is state in Terraform?", a: ["Tracks infrastructure", "Defines variables", "Stores code", "Runs commands"], correct: 0 },
+            { q: "What command destroys resources?", a: ["terraform destroy", "terraform delete", "terraform remove", "terraform wipe"], correct: 0 },
+            { q: "What is a variable in Terraform?", a: ["Parameter for configuration", "Resource definition", "Provider config", "Module"], correct: 0 },
+            { q: "How do you define a variable?", a: ["variable \"name\" {}", "var \"name\" {}", "define \"name\" {}", "param \"name\" {}"], correct: 0 },
+            { q: "How do you use a variable?", a: ["var.name", "variable.name", "$name", "${name}"], correct: 0 },
+            { q: "What is an output in Terraform?", a: ["Exposes resource information", "Stores state", "Defines resources", "Creates modules"], correct: 0 },
+            { q: "What command formats Terraform code?", a: ["terraform fmt", "terraform format", "terraform style", "terraform indent"], correct: 0 },
+            { q: "What command validates configuration?", a: ["terraform validate", "terraform check", "terraform test", "terraform verify"], correct: 0 },
+            { q: "What is a module in Terraform?", a: ["Reusable configuration", "Resource type", "Provider", "Variable"], correct: 0 },
+            { q: "How do you call a module?", a: ["module \"name\" {}", "call \"name\" {}", "use \"name\" {}", "import \"name\" {}"], correct: 0 },
+            { q: "What is terraform.tfstate?", a: ["State file", "Configuration file", "Variable file", "Module file"], correct: 0 },
+            { q: "What does .tf extension indicate?", a: ["Terraform file", "Template file", "Test file", "Type file"], correct: 0 },
+            { q: "What is the default backend?", a: ["local", "remote", "s3", "consul"], correct: 0 },
+            { q: "What does backend define?", a: ["Where state is stored", "Provider type", "Resource type", "Module source"], correct: 0 },
+            { q: "What is remote state?", a: ["State stored remotely", "Remote execution", "Remote provider", "Remote module"], correct: 0 },
+            { q: "What command imports existing infrastructure?", a: ["terraform import", "terraform add", "terraform include", "terraform fetch"], correct: 0 },
+            { q: "What is a workspace?", a: ["Isolated state environments", "Network workspace", "Storage workspace", "Module workspace"], correct: 0 },
+            { q: "What command switches workspaces?", a: ["terraform workspace select", "terraform workspace switch", "terraform switch", "terraform use"], correct: 0 },
+            { q: "What is provisioner in Terraform?", a: ["Executes scripts on resources", "Creates resources", "Manages state", "Defines variables"], correct: 0 },
+            { q: "What is local-exec?", a: ["Runs locally after resource", "Runs on remote", "Runs before resource", "Runs instead of resource"], correct: 0 },
+            { q: "What is remote-exec?", a: ["Runs on remote after resource", "Runs locally", "Runs before resource", "Runs instead of resource"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is a Terraform provider?", a: ["Plugin for managing resources", "Infrastructure type", "State storage", "Module source"], correct: 0 },
+            { q: "What is the difference between resource and data?", a: ["Resource manages, data reads", "No difference", "Data manages, resource reads", "Resource is deprecated"], correct: 0 },
+            { q: "What is a resource block?", a: ["Defines infrastructure component", "Imports data", "Defines variables", "Creates module"], correct: 0 },
+            { q: "What is count parameter?", a: ["Creates multiple instances", "Counts resources", "Defines index", "Sets limit"], correct: 0 },
+            { q: "How do you access count index?", a: ["count.index", "count.i", "index.count", "count_idx"], correct: 0 },
+            { q: "What is for_each?", a: ["Creates instances from map/set", "Creates loop", "Creates count", "Creates index"], correct: 0 },
+            { q: "What is the difference between for_each and count?", a: ["for_each iterates map/set, count iterates number", "No difference", "count is deprecated", "for_each is deprecated"], correct: 0 },
+            { q: "What is depends_on?", a: ["Explicit dependency declaration", "Resource dependency", "Module dependency", "Provider dependency"], correct: 0 },
+            { q: "What is lifecycle in Terraform?", a: ["Controls resource lifecycle", "Manages state", "Stores config", "Creates resources"], correct: 0 },
+            { q: "What does create_before_destroy do?", a: ["Creates new before destroying old", "Destroys before creating", "Creates after destroy", "Creates multiple"], correct: 0 },
+            { q: "What does prevent_destroy do?", a: ["Prevents resource deletion", "Prevents creation", "Prevents update", "Prevents import"], correct: 0 },
+            { q: "What is a null_resource?", a: ["Resource with no provider", "No resource", "Hidden resource", "Fake resource"], correct: 0 },
+            { q: "What is a provisioner connection?", a: ["SSH/WinRM to resource", "Database connection", "Network connection", "API connection"], correct: 0 },
+            { q: "What is terraform taint?", a: ["Marks resource for recreation", "Removes resource", "Updates resource", "Imports resource"], correct: 0 },
+            { q: "What is terraform untaint?", a: ["Removes taint mark", "Adds taint", "Creates taint", "Lists taints"], correct: 0 },
+            { q: "What is state file locking?", a: ["Prevents concurrent operations", "Locks resources", "Locks modules", "Locks state"], correct: 0 },
+            { q: "What is backend authentication?", a: ["Authenticates to state storage", "Authenticates providers", "Authenticates modules", "Authenticates resources"], correct: 0 },
+            { q: "What is S3 backend?", a: ["AWS S3 for state storage", "Simple storage", "Secure storage", "State storage"], correct: 0 },
+            { q: "What is Terraform Cloud?", a: ["SaaS for Terraform", "Local cloud", "Private cloud", "Hybrid cloud"], correct: 0 },
+            { q: "What is a sentinel policy?", a: ["Governance rules in Terraform Cloud", "Security policy", "Access policy", "Network policy"], correct: 0 },
+            { q: "What is remote execution?", a: ["Runs Terraform on remote", "Runs locally", "Runs on provider", "Runs on module"], correct: 0 },
+            { q: "What is a workspace variable?", a: ["Workspace-specific values", "Global variables", "Module variables", "Resource variables"], correct: 0 },
+            { q: "What is sensitive values in output?", a: ["Hides sensitive data", "Shows sensitive", "Encrypts sensitive", "Deletes sensitive"], correct: 0 },
+            { q: "What is terraform graph?", a: ["Shows resource dependency graph", "Shows resource map", "Shows module map", "Shows variable map"], correct: 0 },
+            { q: "What is module source?", a: ["Location of module code", "Provider source", "Variable source", "Resource source"], correct: 0 },
+            { q: "What is terraform registry?", a: ["Public module registry", "Private registry", "Local registry", "Provider registry"], correct: 0 },
+            { q: "What is a required provider?", a: ["Must be configured", "Optional", "Built-in", "Default"], correct: 0 },
+            { q: "What is provider version constraint?", a: ["Specifies allowed versions", "Specifies required version", "Specifies latest version", "Specifies minimum version"], correct: 0 },
+            { q: "What does terraform version show?", a: ["Terraform version", "Provider version", "Module version", "State version"], correct: 0 },
+            { q: "What is the purpose of terraform providers mirror?", a: ["Mirrors providers locally", "Mirrors modules", "Mirrors state", "Mirrors config"], correct: 0 },
+            { q: "What is a functional test in Terraform?", a: ["Tests infrastructure", "Tests code", "Tests modules", "Tests state"], correct: 0 },
+            { q: "What is TFC/TFE?", a: ["Terraform Cloud/Enterprise", "Terraform File", "Terraform Format", "Terraform Function"], correct: 0 },
+            { q: "What is policy as code?", a: ["Governance in code", "Code as policy", "Policy in modules", "Code governance"], correct: 0 },
+            { q: "What is OPA in Terraform?", a: ["Open Policy Agent", "Open Platform", "Open Policy API", "Open Authorization"], correct: 0 },
+            { q: "What is run queue in TFC?", a: ["Queue of Terraform runs", "Run history", "Run logs", "Run results"], correct: 0 },
+            { q: "What is cost estimation?", a: ["Estimates infrastructure cost", "Estimates time", "Estimates resources", "Estimates modules"], correct: 0 },
+            { q: "What is sentinel in TFC?", a: ["Policy enforcement language", "Security language", "Config language", "Module language"], correct: 0 },
+            { q: "What is workspace locking?", a: ["Prevents concurrent runs", "Locks workspace", "Locks state", "Locks config"], correct: 0 },
+            { q: "What is state versioning?", a: ["Keeps history of state", "Version control", "State backup", "State migration"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is the difference between for and for_each?", a: ["for iterates lists, for_each iterates map/set", "No difference", "for is deprecated", "for_each is deprecated"], correct: 0 },
+            { q: "What is dynamic block?", a: ["Generates nested blocks", "Creates dynamic resources", "Creates dynamic modules", "Creates dynamic providers"], correct: 0 },
+            { q: "What is splat expression?", a: ["Accesses list/attr of resources", "Splits strings", "Joins strings", "Matches patterns"], correct: 0 },
+            { q: "What is the purpose of lifecycle meta-argument?", a: ["Controls resource lifecycle", "Manages state", "Creates modules", "Manages providers"], correct: 0 },
+            { q: "What does ignore_changes do?", a: ["Ignores certain changes", "Ignores all", "Ignores delete", "Ignores create"], correct: 0 },
+            { q: "What is a generated provider?", a: ["Auto-generated provider code", "Manual provider", "Third-party provider", "Community provider"], correct: 0 },
+            { q: "What is terraform data source?", a: ["Retrieves external data", "Creates data", "Stores data", "Updates data"], correct: 0 },
+            { q: "What is the difference between data and resource?", a: ["data reads, resource manages", "No difference", "data is deprecated", "resource is deprecated"], correct: 0 },
+            { q: "What is module composition?", a: ["Combining modules", "Composing code", "Composing providers", "Composing state"], correct: 0 },
+            { q: "What is module visibility?", a: ["What modules can access", "Public/private", "Internal/external", "Open/closed"], correct: 0 },
+            { q: "What is best practice for state management?", a: ["Remote state with locking", "Local state", "No state", "Shared state"], correct: 0 },
+            { q: "What is state migration?", a: ["Moving state between backends", "Upgrading state", "Backing up state", "Restoring state"], correct: 0 },
+            { q: "What is terraform state pull/push?", a: ["Downloads/uploads state", "Pulls resources", "Pushes resources", "Manages state"], correct: 0 },
+            { q: "What is backend reconfiguration?", a: ["Changing backend config", "Reconfiguring providers", "Reconfiguring modules", "Reconfiguring resources"], correct: 0 },
+            { q: "What is complete state refresh?", a: ["Refreshes state from infrastructure", "Refreshes local", "Refreshes remote", "Refreshes module"], correct: 0 },
+            { q: "What is the difference between apply and plan -out?", a: ["apply executes, plan shows", "No difference", "plan is deprecated", "apply is deprecated"], correct: 0 },
+            { q: "What is terraform show?", a: ["Shows current state", "Shows plan", "Shows config", "Shows modules"], correct: 0 },
+            { q: "What is terraform output?", a: ["Shows output values", "Shows plan", "Shows state", "Shows modules"], correct: 0 },
+            { q: "What is sensitive output?", a: ["Marks output as sensitive", "Encrypts output", "Hides output", "Protects output"], correct: 0 },
+            { q: "What is terraform console?", a: ["Interactive Terraform", "Debug console", "Test console", "Module console"], correct: 0 },
+            { q: "What is terraform 0.13module syntax?", a: ["Module call syntax", "Module syntax", "Provider syntax", "Resource syntax"], correct: 0 },
+            { q: "What is provider installation?", a: ["Installing provider plugins", "Installing modules", "Installing Terraform", "Installing state"], correct: 0 },
+            { q: "What is terraform provider lock?", a: ["Locks provider version", "Locks state", "Locks module", "Locks config"], correct: 0 },
+            { q: "What is terraform 0.12syntax features?", a: ["Modern HCL features", "Old syntax", "Deprecated syntax", "New syntax"], correct: 0 },
+            { q: "What is required_version constraint?", a: ["Specifies Terraform version", "Specifies provider version", "Specifies module version", "Specifies state version"], correct: 0 },
+            { q: "What is terraform import?", a: ["Imports existing infrastructure", "Adds resources", "Includes modules", "Imports state"], correct: 0 },
+            { q: "What is ID format in terraform import?", a: ["Provider-specific resource ID", "Terraform ID", "Resource name", "Module ID"], correct: 0 },
+            { q: "What is terraform refresh?", a: ["Updates state from infrastructure", "Refreshes config", "Refreshes modules", "Refreshes providers"], correct: 0 },
+            { q: "What is terraform state mv?", a: ["Moves resources in state", "Moves files", "Moves modules", "Moves config"], correct: 0 },
+            { q: "What is terraform state rm?", a: ["Removes resource from state", "Removes from config", "Removes from module", "Removes from backend"], correct: 0 },
+            { q: "What is terraform state list?", a: ["Lists resources in state", "Lists modules", "Lists providers", "Lists backends"], correct: 0 },
+            { q: "What is terraform state show?", a: ["Shows resource in state", "Shows plan", "Shows config", "Shows module"], correct: 0 },
+            { q: "What is a workspaces in TFE?", a: ["Isolated environments", "Multiple users", "Multiple regions", "Multiple providers"], correct: 0 },
+            { q: "What is VCS integration in TFC?", a: ["Version control system", "Virtual system", "Vendor system", "Vault system"], correct: 0 },
+            { q: "What is speculative plan?", a: ["Plan without apply", "Applies plan", "Creates plan", "Shows plan"], correct: 0 },
+            { q: "What is policy check in TFC?", a: ["Sentinel policy evaluation", "Security check", "Cost check", "Compliance check"], correct: 0 },
+            { q: "What is run tasks in TFC?", a: ["External integrations", "Task runner", "Task scheduler", "Task manager"], correct: 0 },
+            { q: "What is agent pools in TFE?", a: ["Private infrastructure runners", "Public runners", "Cloud agents", "Local agents"], correct: 0 },
+            { q: "What is Terraform Stacks?", a: ["Multi-regional deployments", "Single deployment", "Module stacks", "Resource stacks"], correct: 0 },
+            { q: "What is policy set in TFC?", a: ["Group of policies", "Policy module", "Policy config", "Policy file"], correct: 0 },
+            { q: "What is team governance in TFC?", a: ["Team access control", "Team management", "Team workspace", "Team policy"], correct: 0 },
+            { q: "What is cost estimation in TFC?", a: ["Predicts cloud costs", "Estimates time", "Estimates resources", "Estimates modules"], correct: 0 },
+            { q: "What is drift detection?", a: ["Detects infrastructure changes", "Detects state", "Detects config", "Detects modules"], correct: 0 },
+            { q: "What is sentinel mock?", a: ["Test policies with mock data", "Mock providers", "Mock modules", "Mock resources"], correct: 0 },
+            { q: "What is TFGovCon?", a: ["Terraform GovCloud", "Terraform Government", "Terraform Governance", "Terraform Guide"], correct: 0 },
+            { q: "What is private registry?", a: ["Private module/provider registry", "Public registry", "Local registry", "Module registry"], correct: 0 },
+            { q: "What is module versioning?", a: ["Version constraints for modules", "Module versions", "Module updates", "Module releases"], correct: 0 },
+            { q: "What is backend authentication best practice?", a: ["Use IAM roles/tokens", "Use static credentials", "Use environment variables", "Use config files"], correct: 0 },
+            { q: "What is workspaces vs directories?", a: ["Same config, different state", "Different config", "No difference", "Directories are deprecated"], correct: 0 },
+            { q: "What is terraform module for_each?", a: ["Create multiple module instances", "Single module", "Module loop", "Module count"], correct: 0 },
+            { q: "What is provider alias?", a: ["Multiple provider configurations", "Multiple providers", "Provider backup", "Provider mirror"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+        function initTest() { difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0; currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0; document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block'; renderQuestion(); }
+        function renderQuestion() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const q = currentQuestions[currentQuestionIndex]; const qDiv = document.createElement('div'); qDiv.className = 'question-container active'; let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join(''); qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`; container.appendChild(qDiv); updateUI(); }
+        function updateUI() { const total = currentQuestions.length; const progress = ((currentQuestionIndex) / total) * 100; document.getElementById('progressFill').style.width = progress + '%'; document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; }
+        function selectAnswer(index) { const q = currentQuestions[currentQuestionIndex]; const buttons = document.querySelectorAll('.answer-btn'); buttons.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); }); totalAnswered++; if (index === q.correct) { streak++; if (streak > maxStreak) maxStreak = streak; consecutiveCorrect++; score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30; if (currentLevel === 1 && consecutiveCorrect >= 7) { currentLevel = 2; difficulty = 'medium'; consecutiveCorrect = 0; currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else if (currentLevel === 2 && consecutiveCorrect >= 7) { currentLevel = 3; difficulty = 'hard'; consecutiveCorrect = 0; currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else { currentQuestionIndex++; } setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 1200); } else { buttons[index].classList.add('incorrect'); streak = 0; consecutiveCorrect = 0; currentQuestionIndex++; setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 2000); return; } }
+        function showResult() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const resultScreen = document.getElementById('resultScreen'); resultScreen.classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '✓' : '✗'; document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score}`; document.getElementById('resultDetails').innerHTML = `Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`; document.getElementById('progressFill').style.width = '100%'; }
+        function restartTest() { initTest(); }
+        document.addEventListener('DOMContentLoaded', function() { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('themeToggle').checked = true; } initTest(); });
+    </script>
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+    <footer><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>

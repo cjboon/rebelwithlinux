@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-jenkins.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Jenkins: The Old Reliable - REBEL WITH LINUX</title>
+    <meta name="description" content="Jenkins has been around forever, and there's a reason. It's flexible, free, and runs everywhere. A practical guide to setting up Jenkins and building your first pipelines.">
+    <meta name="keywords" content="Jenkins, CI/CD, continuous integration, DevOps, automation, pipelines, Jenkinsfile, Jenkins Docker">
+    <meta name="author" content="Clinton James Boon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Jenkins: The Old Reliable">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-jenkins.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-jenkins.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    </script>
+
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: var(--black); border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: var(--white); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 40px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content h4 { font-size: 1.05rem; margin: 20px 0 8px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .blog-content a { color: var(--black); }
+        .warning-box { background: #fff3cd; border: 2px solid #ffc107; padding: 16px; margin: 24px 0; border-radius: 4px; }
+        .tip-box { background: #d4edda; border: 2px solid #28a745; padding: 16px; margin: 24px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <header class="blog-header">
+        <h1>Jenkins</h1>
+        <p>The old reliable that still gets the job done</p>
+    </header>
+
+    <nav class="blog-nav">
+        <a href="../index.html">Home</a>
+        <a href="../index.html#blog">Blog</a>
+        <a href="../projects.html">Projects</a>
+    </nav>
+
+    <article class="blog-content">
+        <p>Jenkins is like that trusty pickup truck in your driveway. It's been around forever, it's not the prettiest thing on the road, but it just works. Day after day. Without complaint.</p>
+        
+        <p>When Hudson (Jenkins' predecessor) was first released in 2005, it revolutionized how teams built software. Jenkins was forked in 2011 and has been going strong ever since. While newer tools like GitHub Actions, GitLab CI, and CircleCI have their place, Jenkins remains the most flexible, most customizable CI/CD platform you can run yourself.</p>
+        
+        <p>And here's the thing: it's completely free. No per-minute pricing. No seat limits. Run it on your laptop, on a cheap VPS, or scale it up to hundreds of agents. Your infrastructure, your rules.</p>
+        
+        <h2>Why Jenkins Still Matters</h2>
+        
+        <p>You might be wondering: why bother with Jenkins when GitHub Actions is right there, built into the platform I already use?</p>
+        
+        <p>Good question. Here's why you might choose Jenkins:</p>
+        
+        <ul>
+            <li><strong>Full control</strong> — You own the infrastructure. No third-party dependency for your CI/CD.</li>
+            <li><strong>Infinite customization</strong> — If there's a thing you want to automate, Jenkins can probably do it.</li>
+            <li><strong>Run anywhere</strong> — Linux, Windows, macOS, containers, cloud, on-prem. Doesn't matter.</li>
+            <li><strong>Huge plugin ecosystem</strong> — Over 1,800 plugins. Need to integrate with something? There's probably a plugin.</li>
+            <li><strong>It's free</strong> — Completely open source. No vendor lock-in.</li>
+            <li><strong>Industry standard</strong> — If you work in enterprise, chances are you'll encounter Jenkins.</li>
+        </ul>
+        
+        <p>The trade-off is that Jenkins requires more setup and maintenance than cloud-native solutions. But for that price, you get complete autonomy.</p>
+        
+        <h2>Installing Jenkins</h2>
+        
+        <p>Jenkins runs anywhere, but let's start simple. I'll show you how to run it with Docker — the fastest way to get up and running.</p>
+        
+        <h3>The Quick Docker Way</h3>
+        
+        <pre><code>docker run -d \
+  --name jenkins \
+  -p 8080:8080 \
+  -v jenkins_home:/var/jenkins_home \
+  jenkins/jenkins:lts</code></pre>
+        
+        <p>Wait a minute for Jenkins to start, then visit <code>http://localhost:8080</code>. You'll be prompted for an initial admin password — get it with:</p>
+        
+        <pre><code>docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword</code></pre>
+        
+        <p>Enter that password, install the suggested plugins, create your admin user, and boom — you're in.</p>
+        
+        <h3>Installing on a Server</h3>
+        
+        <p>If you want to run Jenkins directly on a Linux server (not in Docker), here's how on Debian/Ubuntu:</p>
+        
+        <pre><code># Add Jenkins repository
+curl -fsSL https://pkg.jenkins.io/debian/jenkins.io.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list
+
+# Install Jenkins
+sudo apt update
+sudo apt install jenkins java-17-openjdk
+
+# Start Jenkins
+sudo systemctl start jenkins
+sudo systemctl enable jenkins</code></pre>
+        
+        <p>Jenkins runs on port 8080 by default. Visit <code>http://your-server-ip:8080</code> to set it up.</p>
+        
+        <div class="warning-box">
+            <strong>Important:</strong> Jenkins is a Java app and needs some resources. For a basic setup, I recommend at least 2GB RAM and a decent CPU. If you're running build agents too, add more.
+        </div>
+        
+        <h2>Your First Pipeline</h2>
+        
+        <p>Let's build something. We'll create a simple pipeline that checks out code, runs tests, and reports the results.</p>
+        
+        <h3>Creating a Pipeline Job</h3>
+        
+        <ol>
+            <li>Click "New Item" in Jenkins</li>
+            <li>Give it a name (like "my-first-pipeline")</li>
+            <li>Select "Pipeline" as the type</li>
+            <li>Click OK</li>
+        </ol>
+        
+        <p>Now scroll down to the Pipeline section and paste this in:</p>
+        
+        <pre><code>pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out source code...'
+                # In a real pipeline, you'd use:
+                # git 'https://github.com/your/repo.git'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                echo 'Building the project...'
+                # Example for different languages:
+                // sh 'npm install'
+                // sh 'pip install -r requirements.txt'
+                // sh 'go build'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                // sh 'npm test'
+                // sh 'pytest'
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                echo 'Deploying...'
+                // Your deployment commands here
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo 'Pipeline completed!'
+        }
+        success {
+            echo 'Build succeeded!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
+}</code></pre>
+        
+        <p>Click "Save" and then "Build Now". Watch the console output — you'll see each stage execute.</p>
+        
+        <h2>The Jenkinsfile: Pipeline as Code</h2>
+        
+        <p>The above example had the pipeline defined in Jenkins itself. That's fine for learning, but for real projects, you want your pipeline defined in code, committed to your repository. That's what a Jenkinsfile is.</p>
+        
+        <p>Create a file called <code>Jenkinsfile</code> in your repository root:</p>
+        
+        <pre><code>pipeline {
+    agent {
+        docker {
+            image 'node:18-alpine'
+            args '-p 3000:3000'
+        }
+    }
+    
+    environment {
+        NODE_ENV = 'test'
+    }
+    
+    stages {
+        stage('Install') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+        
+        stage('Lint') {
+            steps {
+                sh 'npm run lint'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                sh 'npm test'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+    }
+    
+    post {
+        always {
+            junit '**/test-results/**/*.xml'
+            archiveArtifacts artifacts: 'build/**', fingerprint: true
+        }
+    }
+}</code></pre>
+        
+        <p>Now update your Jenkins job to use "Pipeline script from SCM" instead of "Pipeline script". Point it at your repository and branch. Now your pipeline is version-controlled, code-reviewed, and tracks with your code.</p>
+        
+        <div class="tip-box">
+            <strong>Pro tip:</strong> Use the <code>agent docker</code> directive to spin up fresh containers for each build. Each build starts clean — no dependency pollution, no "works on my machine" issues.
+        </div>
+        
+        <h2>Distributed Builds with Agents</h2>
+        
+        <p>One Jenkins instance can only do so much. When your builds start piling up, you need agents (formerly called "slaves") — separate machines that do the actual work while your master coordinates.</p>
+        
+        <h3>Setting Up an Agent</h3>
+        
+        <p>On your agent machine (can be another server, your desktop, whatever):</p>
+        
+        <pre><code># Install Java
+sudo apt install openjdk-17-jre-headless
+
+# Create a dedicated user
+sudo useradd -m -s /bin/bash jenkins
+
+# Set up SSH keys for master to connect
+sudo -u jenkins ssh-keygen -t rsa -b 4096</code></pre>
+        
+        <p>Copy the public key to your master:</p>
+        
+        <pre><code>sudo cat /home/jenkins/.ssh/id_rsa.pub</code></pre>
+        
+        <p>Add this as a credential in Jenkins (Manage Jenkins → Manage Credentials → Add Credentials → SSH Username with private key).</p>
+        
+        <p>Now add the agent in Jenkins: Manage Jenkins → Manage Nodes → New Node. Give it a name, select "Permanent Agent", and configure:</p>
+        
+        <ul>
+            <li>Remote root directory: <code>/home/jenkins/agent</code></li>
+            <li>Labels: <code>docker</code> or <code>linux</code></li>
+            <li>Usage: "Use this node as much as possible"</li>
+            <li>Launch method: "Launch agents via SSH"</li>
+            <li>Host: your agent's IP</li>
+            <li>Credentials: the SSH key you just added</li>
+        </ul>
+        
+        <p>Now your builds can run in parallel across multiple machines.</p>
+        
+        <h2>Essential Plugins</h2>
+        
+        <p>Jenkins has thousands of plugins. Here are the ones I install on every Jenkins setup:</p>
+        
+        <ul>
+            <li><strong>Pipeline</strong> — Required for pipeline jobs (usually pre-installed)</li>
+            <li><strong>Git</strong> — Required for checking out code</li>
+            <li><strong>Docker Pipeline</strong> — Build and use Docker inside pipelines</li>
+            <li><strong>Blue Ocean</strong> — Modern UI for Jenkins (highly recommended)</li>
+            <li><strong>Credentials Binding</strong> — Securely use secrets in pipelines</li>
+            <li><strong>Email Extension</strong> — Better email notifications</li>
+            <li><strong>Slack Notification</strong> — Send build results to Slack</li>
+            <li><strong>JUnit</strong> — Publish test results</li>
+            <li><strong>Jenkinsfile Runner</strong> — Test Jenkinsfiles locally</li>
+        </ul>
+        
+        <h2>Security Best Practices</h2>
+        
+        <p>Jenkins is powerful, but it executes arbitrary code. That's a big attack surface. Here's how to secure it:</p>
+        
+        <h3>1. Enable Security</h3>
+        <p>Go to Manage Jenkins → Security. Enable "Jenkins' own user database" and let users sign up only if you want. Or connect to LDAP/Active Directory for enterprise.</p>
+        
+        <h3>2. Use Matrix Authorization</h3>
+        <p>Configure permissions carefully. Developers need to build and configure jobs, but maybe not manage system settings.</p>
+        
+        <h3>3. Don't Run as Root</h3>
+        <p>Jenkins should run as a dedicated service account, not root. Ever.</p>
+        
+        <h3>4. Secrets Management</h3>
+        <p>Use the Credentials Binding plugin or HashiCorp Vault integration for API keys, passwords, and certificates. Never hardcode secrets in Jenkinsfiles.</p>
+        
+        <h3>5. Limit Script Approval</h3>
+        <p>If you use Groovy scripts in pipelines, review what's allowed in Manage Jenkins → In-process Script Approval.</p>
+        
+        <h3>6. Keep It Updated</h3>
+        <p>Jenkins has a history of security vulnerabilities. Update regularly.</p>
+        
+        <h2>Blue Ocean: The Modern UI</h2>
+        
+        <p>If the classic Jenkins UI makes your eyes bleed, try Blue Ocean. It's a modern, visual interface for Jenkins pipelines.</p>
+        
+        <p>Install it from the Plugin Manager. Then either use the Blue Ocean link in the sidebar or open <code>/blue</code> on your Jenkins instance.</p>
+        
+        <p>Blue Ocean shows you:</p>
+        <ul>
+            <li>Pipeline visualization (the pipeline as a flowchart)</li>
+            <li>Branch and pull request builds</li>
+            <li>Parallel stage execution</li>
+            <li>Detailed logs without page reloads</li>
+        </ul>
+        
+        <p>It makes Jenkins feel like a completely different tool.</p>
+        
+        <h2>Jenkins vs. The World</h2>
+        
+        <p>Let's be honest: Jenkins isn't perfect. The UI can be clunky. Plugin maintenance varies. Configuration can feel verbose.</p>
+        
+        <p>Here's how it compares to alternatives:</p>
+        
+        <ul>
+            <li><strong>GitHub Actions</strong> — Easier to start, integrated with GitHub. But you're tied to GitHub and their pricing.</li>
+            <li><strong>GitLab CI</strong> — Excellent integrated CI/CD if you use GitLab. But you need GitLab.</li>
+            <li><strong>CircleCI</strong> — Good cloud service, but expensive at scale.</li>
+            <li><strong>Tekton</strong> — Kubernetes-native, if that's your thing. More complex.</li>
+        </ul>
+        
+        <p>Jenkins wins when you need total control, want to run on your own infrastructure, and don't want vendor lock-in.</p>
+        
+        <h2>Automation Ideas with Jenkins</h2>
+        
+        <p>Once you've got Jenkins running, here are things you can automate beyond just "build and test":</p>
+        
+        <ul>
+            <li><strong>Database migrations</strong> — Run automatically before deploys</li>
+            <li><strong>Infrastructure provisioning</strong> — Spin up/down test environments</li>
+            <li><strong>Security scanning</strong> — Run SAST/DAST tools as part of your pipeline</li>
+            <li><strong>Static site generation</strong> — Rebuild your blog when you push markdown</li>
+            <li><strong>Scheduled jobs</strong> — Nightly builds, weekly reports</li>
+            <li><strong>Container image building</strong> — Build and push Docker images</li>
+            <li><strong>Compliance checking</strong> — Verify infrastructure as code policies</li>
+        </ul>
+        
+        <p>Anything you can script can be automated with Jenkins.</p>
+        
+        <h2>Wrapping Up</h2>
+        
+        <p>Jenkins isn't the shiny new tool. It won't make your dev team ooh and ahh in demo reviews. But it will reliably run your automation 24/7, 365 days a year, without asking for more money.</p>
+        
+        <p>Learn Jenkins. It's a skill that'll serve you in every job you take. And there's something satisfying about having your own CI/CD server, humming along in a corner of your infrastructure, doing the boring work so you don't have to.</p>
+        
+        <p>Now go build something.</p>
+        
+        <p><strong>The revolution will not be proprietary.</strong></p>
+    </article>
+
+    <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+        <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+        <div id="comments-list" style="margin-bottom: 32px;"></div>
+        <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+            <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+            <div style="display: grid; gap: 16px;">
+                <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                <button onclick="submitComment('blog-jenkins')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+            </div>
+        </div>
+    </section>
+    <script src="../comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-jenkins');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-python.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+    </nav>
+    <div class="test-container">
+        <div class="test-header"><h1>// PYTHON TEST</h1><p>Prove your Python mastery</p></div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const easyQuestions = [
+            { q: "How do you print in Python?", a: ["print('hello')", "echo 'hello'", "console.log('hello')", "printf('hello')"], correct: 0 },
+            { q: "How do you create a list in Python?", a: ["[1, 2, 3]", "(1, 2, 3)", "{1, 2, 3}", "<1, 2, 3>"], correct: 0 },
+            { q: "What is Python's for loop syntax?", a: ["for i in range(5):", "for i = 1 to 5:", "foreach i in range(5):", "loop i in range(5):"], correct: 0 },
+            { q: "How do you define a function?", a: ["def my_func():", "function my_func():", "define my_func():", "create my_func():"], correct: 0 },
+            { q: "What does 'len()' return?", a: ["Length of object", "Last element", "Lower bound", "Loop count"], correct: 0 },
+            { q: "How do you access dictionary value?", a: ["dict['key']", "dict.key", "dict->key", "dict.get(key)"], correct: 0 },
+            { q: "What is 'if __name__ == \"__main__\":' used for?", a: ["Check if script runs directly", "Import main module", "Define main function", "Execute main"], correct: 0 },
+            { q: "How do you add to a list?", a: ["list.append()", "list.add()", "list.push()", "list.insert()"], correct: 0 },
+            { q: "What does 'range(5)' generate?", a: ["0 to 4", "1 to 5", "0 to 5", "1 to 4"], correct: 0 },
+            { q: "How do you make a comment?", a: ["# comment", "// comment", "/* comment */", "-- comment"], correct: 0 },
+            { q: "What is 'None' in Python?", a: ["Null value", "Empty string", "Zero", "False"], correct: 0 },
+            { q: "How do you check equality?", a: ["==", "=", "===", "equals()"], correct: 0 },
+            { q: "What does 'input()' do?", a: ["Gets user input", "Outputs data", "Reads file", "Opens console"], correct: 0 },
+            { q: "How do you create a tuple?", a: ["(1, 2, 3)", "[1, 2, 3]", "{1, 2, 3}", "<1, 2, 3>"], correct: 0 },
+            { q: "What does 'str()' do?", a: ["Converts to string", "Creates string", "Returns string type", "All of above"], correct: 0 },
+            { q: "How do you import a module?", a: ["import module", "require module", "include module", "use module"], correct: 0 },
+            { q: "What does 'while' do?", a: ["Loop while condition true", "Until condition false", "Repeat forever", "Skip iterations"], correct: 0 },
+            { q: "How do you get type of variable?", a: ["type(var)", "typeof var", "var.type()", "gettype(var)"], correct: 0 },
+            { q: "What does 'in' operator do?", a: ["Checks membership", "Loops", "Compares", "Assigns"], correct: 0 },
+            { q: "How do you slice a list?", a: ["list[1:3]", "list(1,3)", "list[1,3]", "slice(list,1,3)"], correct: 0 },
+            { q: "What is 'self' in class?", a: ["Instance reference", "Class reference", "Parent class", "Module"], correct: 0 },
+            { q: "How do you create class?", a: ["class MyClass:", "class MyClass()", "create MyClass", "defclass MyClass"], correct: 0 },
+            { q: "What does 'pass' do?", a: ["No operation", "Skips block", "Exits function", "Returns None"], correct: 0 },
+            { q: "How do you format string?", a: ["f'string {var}'", "'string {var}'", "string.format(var)", "Both a and c"], correct: 0 },
+            { q: "What does 'is' compare?", a: ["Object identity", "Equality", "Greater than", "Less than"], correct: 0 }
+        ];
+        const mediumQuestions = [
+            { q: "What is list comprehension?", a: ["Create list from expression", "Loop through list", "Compress list", "Expand list"], correct: 0 },
+            { q: "What does 'lambda' create?", a: ["Anonymous function", "Named function", "Recursive function", "Generator function"], correct: 0 },
+            { q: "What is 'decorator'?", a: ["Modifies function behavior", "Adds documentation", "Creates wrapper", "Both a and c"], correct: 0 },
+            { q: "What does 'map()' return?", a: ["Iterator", "List", "Tuple", "Dictionary"], correct: 0 },
+            { q: "What is 'try/except' for?", a: ["Error handling", "Exception testing", "Try code", "Catch errors"], correct: 0 },
+            { q: "What does 'filter()' return?", a: ["Filtered iterator", "List", "Boolean", "Tuple"], correct: 0 },
+            { q: "What is 'generator'?", a: ["Yields values lazily", "Creates generators", "Produces values", "Iterates forever"], correct: 0 },
+            { q: "What does 'yield' do?", a: ["Pauses and returns value", "Creates generator", "Returns value", "Exits function"], correct: 0 },
+            { q: "What is 'with' statement?", a: ["Context manager", "Opens file", "Manages resources", "Both a and c"], correct: 0 },
+            { q: "What does 'open()' return?", a: ["File object", "String", "Bytes", "Stream"], correct: 0 },
+            { q: "What is 'args and **kwargs'?", a: ["Variable arguments", "Keyword arguments", "Both a and b", "None"], correct: 0 },
+            { q: "What does 'super()' do?", a: ["Calls parent class", "Creates super", "Makes subclass", "Returns parent"], correct: 0 },
+            { q: "What is 'MRO'?", a: ["Method Resolution Order", "Main Run Order", "Module Run Order", "Memory Read Order"], correct: 0 },
+            { q: "What does '@staticmethod' do?", a: ["No instance needed", "Class method", "Property", "Attribute"], correct: 0 },
+            { q: "What is 'abc' module?", a: ["Abstract base classes", "Array basics", "Async basics", "Assertion basics"], correct: 0 }
+        ];
+        const hardQuestions = [
+            { q: "What is 'metaclass'?", a: ["Class that creates classes", "Meta programming", "Class inheritance", "Type of class"], correct: 0 },
+            { q: "What does 'monkey patching' mean?", a: ["Modify runtime", "Add methods", "Replace classes", "All of above"], correct: 0 },
+            { q: "What is 'descriptor protocol'?", a: ["__get__, __set__, __delete__", "Data descriptor", "Non-data descriptor", "All of above"], correct: 0 },
+            { q: "What does 'functools.lru_cache' do?", a: ["Memoization", "Cache function", "Speed up", "All of above"], correct: 0 },
+            { q: "What is 'coroutine'?", a: ["Suspendable function", "Async function", "Generator", "All of above"], correct: 0 },
+            { q: "What does 'await' do?", a: ["Suspends coroutine", "Waits for result", "Async wait", "All of above"], correct: 0 },
+            { q: "What is 'asyncio'?", a: ["Async IO library", "Threading", "Multiprocessing", "Concurrent"], correct: 0 },
+            { q: "What does '__slots__' optimize?", a: ["Memory usage", "Attribute access", "Object size", "All of above"], correct: 0 },
+            { q: "What is 'weakref' used for?", a: ["Non-strong references", "Garbage collection", "Memory management", "All of above"], correct: 0 },
+            { q: "What does 'itertools' provide?", a: ["Iterator functions", "Infinite iterators", "Combinators", "All of above"], correct: 0 },
+            { q: "What is 'contextlib'?", a: ["Context manager tools", "Create managers", "Nesting", "All of above"], correct: 0 },
+            { q: "What does 'pickle' do?", a: ["Serializes Python objects", "Creates pickles", "Stores data", "Caches objects"], correct: 0 },
+            { q: "What is 'multiprocessing'?", a: ["Multiple processes", "Parallelism", "CPU bound tasks", "All of above"], correct: 0 },
+            { q: "What does 'threading' provide?", a: ["Thread based concurrency", "Parallel execution", "Shared memory", "All of above"], correct: 0 },
+            { q: "What is 'GIL'?", a: ["Global Interpreter Lock", "Thread lock", "Process lock", "Memory lock"], correct: 0 }
+        ];
+        let currentQuestions=[],currentQuestionIndex=0,score=0,streak=0,maxStreak=0,difficulty='easy',currentLevel=1,consecutiveCorrect=0,totalAnswered=0;
+        function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+        function shuffleAnswers(q){let a=[...q.a],c=a[q.correct],s=shuffle(a);return{...q,a:s,correct:s.indexOf(c)}}
+        function initTest(){difficulty='easy';currentLevel=1;consecutiveCorrect=0;currentQuestions=shuffle([...easyQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0;score=0;streak=0;maxStreak=0;totalAnswered=0;document.getElementById('resultScreen').classList.remove('active');document.getElementById('quiz').style.display='block';renderQuestion()}
+        function renderQuestion(){let c=document.getElementById('questionsContainer');c.innerHTML='';let q=currentQuestions[currentQuestionIndex],d=document.createElement('div');d.className='question-container active';d.innerHTML=`<div class="question-text">${q.q}</div><div class="answers-grid">${q.a.map((a,i)=>`<button class="answer-btn" onclick="selectAnswer(${i})">${a}</button>`).join('')}</div>`;c.appendChild(d);updateUI()}
+        function updateUI(){let t=currentQuestions.length,p=(currentQuestionIndex/t)*100;document.getElementById('progressFill').style.width=p+'%';document.getElementById('questionNum').textContent=currentQuestionIndex+1;document.getElementById('streakNum').textContent=streak;document.getElementById('scoreNum').textContent=score;document.getElementById('levelNum').textContent=currentLevel}
+        function selectAnswer(i){let q=currentQuestions[currentQuestionIndex],b=document.querySelectorAll('.answer-btn');b.forEach((btn,j)=>{btn.disabled=true;if(j===q.correct)btn.classList.add('correct')});totalAnswered++;if(i===q.correct){streak++;if(streak>maxStreak)maxStreak=streak;consecutiveCorrect++;score+=difficulty==='easy'?10:difficulty==='medium'?20:30;if(currentLevel===1&&consecutiveCorrect>=7){currentLevel=2;difficulty='medium';consecutiveCorrect=0;currentQuestions=shuffle([...mediumQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0}else if(currentLevel===2&&consecutiveCorrect>=7){currentLevel=3;difficulty='hard';consecutiveCorrect=0;currentQuestions=shuffle([...hardQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0}else currentQuestionIndex++;setTimeout(()=>{currentQuestionIndex<currentQuestions.length?renderQuestion():showResult()},1200)}else{b[i].classList.add('incorrect');streak=0;consecutiveCorrect=0;currentQuestionIndex++;setTimeout(()=>{currentQuestionIndex<currentQuestions.length?renderQuestion():showResult()},2000);return}}
+        function showResult(){document.getElementById('questionsContainer').innerHTML='';let p=score>=100;document.getElementById('resultScreen').classList.add('active');document.getElementById('resultIcon').textContent=p?'✓':'✗';document.getElementById('resultText').textContent=p?'PASS':'FAIL';document.getElementById('resultText').className='result-text '+(p?'pass':'fail');document.getElementById('resultScore').textContent=`Score: ${score}`;document.getElementById('resultDetails').innerHTML=`Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`;document.getElementById('progressFill').style.width='100%'}
+        function restartTest(){initTest()}
+        function handleThemeChange(isDark){let t=isDark?'dark':'light';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t)}
+        document.addEventListener('DOMContentLoaded',function(){let s=localStorage.getItem('theme');if(s==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('themeToggle').checked=true}initTest()});
+    </script>
+</body>
+</html>

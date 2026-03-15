@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-sql.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// SQL TEST</h1>
+            <p>Prove your SQL mastery</p>
+        </div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What does SQL stand for?", a: ["Structured Query Language", "Simple Query Language", "Standard Query Language", "System Query Language"], correct: 0 },
+            { q: "Which command retrieves data from a table?", a: ["SELECT", "GET", "FETCH", "RETRIEVE"], correct: 0 },
+            { q: "Which command adds new data to a table?", a: ["INSERT", "ADD", "CREATE", "UPDATE"], correct: 0 },
+            { q: "Which command modifies existing data?", a: ["UPDATE", "MODIFY", "CHANGE", "ALTER"], correct: 0 },
+            { q: "Which command removes data from a table?", a: ["DELETE", "REMOVE", "DROP", "ERASE"], correct: 0 },
+            { q: "How do you select all columns?", a: ["SELECT *", "SELECT ALL", "SELECT COLUMNS", "GET *"], correct: 0 },
+            { q: "Which clause filters rows?", a: ["WHERE", "FILTER", "HAVING", "IF"], correct: 0 },
+            { q: "How do you sort results?", a: ["ORDER BY", "SORT BY", "GROUP BY", "ARRANGE BY"], correct: 0 },
+            { q: "Which keyword removes duplicates?", a: ["DISTINCT", "UNIQUE", "REMOVE DUPLICATES", "NO DUPLICATES"], correct: 0 },
+            { q: "How do you limit results?", a: ["LIMIT", "TOP", "MAX", "TAKE"], correct: 0 },
+            { q: "What does COUNT() function do?", a: ["Counts rows", "Counts columns", "Counts values", "Sums values"], correct: 0 },
+            { q: "What does SUM() function do?", a: ["Adds values", "Counts values", "Averages values", "Finds max"], correct: 0 },
+            { q: "What does AVG() function do?", a: ["Calculates average", "Adds values", "Counts values", "Finds max"], correct: 0 },
+            { q: "What does MAX() function do?", a: ["Finds maximum", "Finds minimum", "Counts values", "Sums values"], correct: 0 },
+            { q: "What does MIN() function do?", a: ["Finds minimum", "Finds maximum", "Counts values", "Sums values"], correct: 0 },
+            { q: "Which operator checks equality?", a: ["=", "==", "===", "EQ"], correct: 0 },
+            { q: "Which operator means NOT equal?", a: ["<> or !=", "=!", "!==", "NOT"], correct: 0 },
+            { q: "How do you combine multiple conditions?", a: ["AND", "OR", "BOTH", "PLUS"], correct: 0 },
+            { q: "What does LIKE operator do?", a: ["Pattern matching", "Equality check", "Range check", "Null check"], correct: 0 },
+            { q: "What does % mean in LIKE?", a: ["Any characters", "Single character", "Escape character", "End of string"], correct: 0 },
+            { q: "What does _ mean in LIKE?", a: ["Single character", "Any characters", "Escape character", "Start of string"], correct: 0 },
+            { q: "How do you check for NULL?", a: ["IS NULL", "= NULL", "== NULL", "NULL"], correct: 0 },
+            { q: "How do you exclude NULL values?", a: ["IS NOT NULL", "NOT NULL", "!= NULL", "EXCLUDE NULL"], correct: 0 },
+            { q: "Which command creates a table?", a: ["CREATE TABLE", "MAKE TABLE", "NEW TABLE", "ADD TABLE"], correct: 0 },
+            { q: "Which command deletes a table?", a: ["DROP TABLE", "DELETE TABLE", "REMOVE TABLE", "ERASE TABLE"], correct: 0 },
+            { q: "Which command modifies table structure?", a: ["ALTER TABLE", "MODIFY TABLE", "CHANGE TABLE", "UPDATE TABLE"], correct: 0 },
+            { q: "How do you add a column?", a: ["ALTER TABLE ADD COLUMN", "ADD COLUMN", "INSERT COLUMN", "CREATE COLUMN"], correct: 0 },
+            { q: "What does PRIMARY KEY do?", a: ["Uniquely identifies rows", "Links tables", "Indexes column", "Limits values"], correct: 0 },
+            { q: "What does UNIQUE constraint do?", a: ["No duplicate values", "Required values", "Default values", "Indexed values"], correct: 0 },
+            { q: "What does NOT NULL constraint do?", a: ["Requires a value", "No duplicates", "Default value", "Primary key"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What does GROUP BY do?", a: ["Groups rows by column", "Sorts rows", "Filters rows", "Joins tables"], correct: 0 },
+            { q: "What does HAVING clause do?", a: ["Filters grouped results", "Filters rows", "Sorts results", "Joins tables"], correct: 0 },
+            { q: "What is the difference between WHERE and HAVING?", a: ["WHERE filters rows, HAVING filters groups", "HAVING is faster", "WHERE is for aggregates", "No difference"], correct: 0 },
+            { q: "What does JOIN do?", a: ["Combines rows from tables", "Deletes rows", "Updates rows", "Creates tables"], correct: 0 },
+            { q: "What does INNER JOIN return?", a: ["Matching rows from both tables", "All rows from left", "All rows from right", "All rows"], correct: 0 },
+            { q: "What does LEFT JOIN return?", a: ["All left rows + matching right", "All right rows + matching left", "Only matching rows", "All rows"], correct: 0 },
+            { q: "What does RIGHT JOIN return?", a: ["All right rows + matching left", "All left rows + matching right", "Only matching rows", "All rows"], correct: 0 },
+            { q: "What does FULL OUTER JOIN return?", a: ["All rows from both tables", "Only matching rows", "Left rows only", "Right rows only"], correct: 0 },
+            { q: "What is a subquery?", a: ["Query within a query", "Simple query", "Join query", "Grouped query"], correct: 0 },
+            { q: "What does IN operator do?", a: ["Matches any value in list", "Checks range", "Pattern match", "Null check"], correct: 0 },
+            { q: "What does BETWEEN operator do?", a: ["Matches range of values", "Matches list", "Pattern match", "Null check"], correct: 0 },
+            { q: "What is a primary key?", a: ["Unique identifier for each row", "First column", "Indexed column", "Required column"], correct: 0 },
+            { q: "What is a foreign key?", a: ["Links to another table", "Primary key", "Unique key", "Index"], correct: 0 },
+            { q: "What does UNION do?", a: ["Combines results from multiple queries", "Joins tables", "Filters results", "Sorts results"], correct: 0 },
+            { q: "What is the difference between UNION and UNION ALL?", a: ["UNION removes duplicates", "UNION ALL is faster", "UNION is slower", "No difference"], correct: 0 },
+            { q: "What is an index?", a: ["Data structure for fast lookup", "Unique constraint", "Primary key", "Foreign key"], correct: 0 },
+            { q: "What does CREATE INDEX do?", a: ["Creates index for fast queries", "Creates constraint", "Creates table", "Creates key"], correct: 0 },
+            { q: "What is normalization?", a: ["Organizing data to reduce redundancy", "Creating tables", "Adding indexes", "Writing queries"], correct: 0 },
+            { q: "What is 1NF?", a: ["Atomic values, no repeating groups", "No duplicates", "Foreign keys", "Indexes"], correct: 0 },
+            { q: "What is 2NF?", a: ["1NF + no partial dependencies", "1NF + no duplicates", "All columns depend on PK", "Foreign keys exist"], correct: 0 },
+            { q: "What is a transaction?", a: ["Group of operations treated as unit", "Single operation", "Query batch", "Connection"], correct: 0 },
+            { q: "What does COMMIT do?", a: ["Saves transaction changes", "Undoes changes", "Starts transaction", "Ends transaction"], correct: 0 },
+            { q: "What does ROLLBACK do?", a: ["Undoes transaction changes", "Saves changes", "Starts transaction", "Ends transaction"], correct: 0 },
+            { q: "What is ACID?", a: ["Atomicity, Consistency, Isolation, Durability", "Authentication", "Authorization", "Access Control"], correct: 0 },
+            { q: "What does COUNT(DISTINCT column) do?", a: ["Counts unique values", "Counts all values", "Counts nulls", "Sums values"], correct: 0 },
+            { q: "What is a view?", a: ["Virtual table based on query", "Physical table", "Index", "Constraint"], correct: 0 },
+            { q: "What does CREATE VIEW do?", a: ["Creates virtual table", "Creates index", "Creates table", "Creates trigger"], correct: 0 },
+            { q: "What is a stored procedure?", a: ["Precompiled SQL code", "Query", "View", "Trigger"], correct: 0 },
+            { q: "What is a trigger?", a: ["Automatic action on event", "Stored procedure", "View", "Index"], correct: 0 },
+            { q: "What does AUTO_INCREMENT do?", a: ["Auto-generates sequential numbers", "Increments value", "Indexes column", "Creates key"], correct: 0 },
+            { q: "What is a composite key?", a: ["Primary key with multiple columns", "Key made of composites", "Foreign key", "Unique key"], correct: 0 },
+            { q: "What does COALESCE() do?", a: ["Returns first non-null value", "Counts values", "Sums values", "Joins values"], correct: 0 },
+            { q: "What does CASE do?", a: ["Conditional expressions", "Creates cases", "Filters cases", "Sorts cases"], correct: 0 },
+            { q: "What is database denormalization?", a: ["Adding redundancy for performance", "Removing redundancy", "Normalizing data", "Creating indexes"], correct: 0 },
+            { q: "What is a self-join?", a: ["Table joined with itself", "Multiple joins", "Inner join", "Outer join"], correct: 0 },
+            { q: "What is the difference between DELETE and TRUNCATE?", a: ["DELETE is DML, TRUNCATE is DDL", "DELETE is slower", "TRUNCATE can be rolled back", "No difference"], correct: 0 },
+            { q: "What does AS keyword do?", a: ["Creates alias", "Creates table", "Creates index", "Creates key"], correct: 0 },
+            { q: "What is a cursor?", a: ["Database object for row-by-row processing", "Pointer to data", "Data type", "Constraint type"], correct: 0 },
+            { q: "What is an ORM?", a: ["Object-Relational Mapping", "Object Relational Model", "Object Reference Manual", "Object Request Manager"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is a composite index?", a: ["Index on multiple columns", "Index on one column", "Unique index", "Primary index"], correct: 0 },
+            { q: "What is index cardinality?", a: ["Number of unique values", "Total rows", "Index size", "Column size"], correct: 0 },
+            { q: "What is a covering index?", a: ["Includes all columns needed by query", "Covers multiple tables", "Primary index", "Unique index"], correct: 0 },
+            { q: "What is query optimization?", a: ["Finding most efficient execution plan", "Optimizing indexes", "Optimizing tables", "Optimizing database"], correct: 0 },
+            { q: "What is an execution plan?", a: ["How database executes query", "Query results", "Query syntax", "Query history"], correct: 0 },
+            { q: "What is a materialized view?", a: ["Physical storage of view results", "Virtual table", "Temporary table", "Index view"], correct: 0 },
+            { q: "What is database partitioning?", a: ["Dividing large tables into pieces", "Creating indexes", "Normalizing tables", "Denormalizing tables"], correct: 0 },
+            { q: "What is sharding?", a: ["Horizontal partitioning across servers", "Vertical partitioning", "Indexing strategy", "Query optimization"], correct: 0 },
+            { q: "What is read replica?", a: ["Copy of database for read operations", "Backup database", "Primary database", "Standby database"], correct: 0 },
+            { q: "What is eventual consistency?", a: ["Data will become consistent over time", "Data is always consistent", "No consistency", "Strong consistency"], correct: 0 },
+            { q: "What is CAP theorem?", a: ["Consistency, Availability, Partition tolerance", "Create, Add, Put", "Connect, Access, Process", "Create, Alter, Drop"], correct: 0 },
+            { q: "What is NoSQL?", a: ["Non-relational database", "Relational database", "Object database", "Network database"], correct: 0 },
+            { q: "What is MongoDB?", a: ["Document database", "Relational database", "Graph database", "Key-value store"], correct: 0 },
+            { q: "What is Redis?", a: ["In-memory data store", "Relational database", "Document database", "Graph database"], correct: 0 },
+            { q: "What is Cassandra?", a: ["Distributed NoSQL database", "Relational database", "In-memory store", "Graph database"], correct: 0 },
+            { q: "What is a database lock?", a: ["Mechanism to control concurrent access", "Security feature", "Backup method", "Recovery method"], correct: 0 },
+            { q: "What is deadlock?", a: ["Two transactions waiting for each other", "Transaction failure", "Query timeout", "Connection lost"], correct: 0 },
+            { q: "What is pessimistic locking?", a: ["Locks resources before use", "Locks after use", "No locking", "Optimistic locking"], correct: 0 },
+            { q: "What is optimistic locking?", a: ["Checks version before committing", "Locks before use", "No locking", "Pessimistic locking"], correct: 0 },
+            { q: "What is isolation level?", a: ["Controls transaction visibility", "Transaction speed", "Transaction size", "Transaction type"], correct: 0 },
+            { q: "What is READ COMMITTED?", a: ["Only committed data is readable", "All data is readable", "No committed data", "Locked reads"], correct: 0 },
+            { q: "What is REPEATABLE READ?", a: ["Same query returns same results", "Reads once", "Committed reads", "Uncommitted reads"], correct: 0 },
+            { q: "What is SERIALIZABLE?", a: ["Highest isolation, no concurrency", "Allows concurrency", "Medium isolation", "Low isolation"], correct: 0 },
+            { q: "What is database clustering?", a: ["Multiple servers working together", "Single server", "Backup solution", "Recovery solution"], correct: 0 },
+            { q: "What is high availability?", a: ["System stays operational", "Fast system", "Secure system", "Reliable system"], correct: 0 },
+            { q: "What is a connection pool?", a: ["Reuses database connections", "Limits connections", "Creates connections", "Closes connections"], correct: 0 },
+            { q: "What is SQL injection?", a: ["Malicious SQL code injection", "Database error", "Connection error", "Query error"], correct: 0 },
+            { q: "How do you prevent SQL injection?", a: ["Use parameterized queries", "Use string concatenation", "Use dynamic SQL", "Use stored procedures only"], correct: 0 },
+            { q: "What is data warehouse?", a: ["Large-scale analytical database", "Transactional database", "In-memory database", "Embedded database"], correct: 0 },
+            { q: "What is ETL?", a: ["Extract, Transform, Load", "Edit, Test, Load", "Extract, Test, Link", "Enter, Transform, Log"], correct: 0 },
+            { q: "What is OLAP?", a: ["Online Analytical Processing", "Online Transaction Processing", "Object Language", "Operational Layer"], correct: 0 },
+            { q: "What is OLTP?", a: ["Online Transaction Processing", "Online Analytical Processing", "Object Language", "Operational Layer"], correct: 0 },
+            { q: "What is a data lake?", a: ["Stores raw data in native format", "Processed data store", "Filtered data store", "Archived data"], correct: 0 },
+            { q: "What is data marts?", a: ["Subset of data warehouse for specific group", "Main data warehouse", "Data lake", "Backup storage"], correct: 0 },
+            { q: "What is star schema?", a: ["Fact table with dimension tables", "Normalized schema", "Complex schema", "Flat schema"], correct: 0 },
+            { q: "What is snowflake schema?", a: ["Normalized star schema", "Denormalized schema", "Simple schema", "Complex schema"], correct: 0 },
+            { q: "What is a fact table?", a: ["Contains measurable data", "Contains dimensions", "Contains metadata", "Contains logs"], correct: 0 },
+            { q: "What is a dimension table?", a: ["Descriptive attributes", "Measurable data", "Transaction data", "Log data"], correct: 0 },
+            { q: "What is Slowly Changing Dimension?", a: ["Tracks historical changes", "Fast changing data", "Static data", "Current data"], correct: 0 },
+            { q: "What is database replication?", a: ["Copying data to multiple servers", "Backing up data", "Restoring data", "Archiving data"], correct: 0 },
+            { q: "What is master-slave replication?", a: ["One primary, multiple replicas", "Multiple primaries", "Peer-to-peer", "Circular"], correct: 0 },
+            { q: "What is multi-master replication?", a: ["Multiple databases accept writes", "One master", "Read-only replicas", "Single master"], correct: 0 },
+            { q: "What is data mining?", a: ["Discovering patterns in data", "Storing data", "Cleaning data", "Loading data"], correct: 0 },
+            { q: "What is OLAP cube?", a: ["Multi-dimensional data structure", "Relational table", "Flat file", "JSON document"], correct: 0 },
+            { q: "What is window function?", a: ["Performs calculations across rows", "Filters data", "Sorts data", "Groups data"], correct: 0 },
+            { q: "What does ROW_NUMBER() do?", a: ["Assigns sequential numbers", "Counts rows", "Sums values", "Finds max"], correct: 0 },
+            { q: "What does RANK() do?", a: ["Assigns ranking with gaps", "Sequential numbers", "Dense ranking", "Row count"], correct: 0 },
+            { q: "What does DENSE_RANK() do?", a: ["Assigns ranking without gaps", "Sequential numbers", "Row numbers", "Count"], correct: 0 },
+            { q: "What does LAG() do?", a: ["Accesses previous row", "Accesses next row", "First row", "Last row"], correct: 0 },
+            { q: "What does LEAD() do?", a: ["Accesses next row", "Accesses previous row", "First row", "Last row"], correct: 0 },
+            { q: "What is bitmap index?", a: ["Uses bits for indexing", "B-tree index", "Hash index", "Full text index"], correct: 0 },
+            { q: "What is columnstore index?", a: ["Stores data by column", "Stores data by row", "Hash index", "B-tree index"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+        function initTest() { difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0; currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0; document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block'; renderQuestion(); }
+        function renderQuestion() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const q = currentQuestions[currentQuestionIndex]; const qDiv = document.createElement('div'); qDiv.className = 'question-container active'; let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join(''); qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`; container.appendChild(qDiv); updateUI(); }
+        function updateUI() { const total = currentQuestions.length; const progress = ((currentQuestionIndex) / total) * 100; document.getElementById('progressFill').style.width = progress + '%'; document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; }
+        function selectAnswer(index) { const q = currentQuestions[currentQuestionIndex]; const buttons = document.querySelectorAll('.answer-btn'); buttons.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); }); totalAnswered++; if (index === q.correct) { streak++; if (streak > maxStreak) maxStreak = streak; consecutiveCorrect++; score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30; if (currentLevel === 1 && consecutiveCorrect >= 7) { currentLevel = 2; difficulty = 'medium'; consecutiveCorrect = 0; currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else if (currentLevel === 2 && consecutiveCorrect >= 7) { currentLevel = 3; difficulty = 'hard'; consecutiveCorrect = 0; currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q)); currentQuestionIndex = 0; } else { currentQuestionIndex++; } setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 1200); } else { buttons[index].classList.add('incorrect'); streak = 0; consecutiveCorrect = 0; currentQuestionIndex++; setTimeout(() => { if (currentQuestionIndex < currentQuestions.length) renderQuestion(); else showResult(); }, 2000); return; } }
+        function showResult() { const container = document.getElementById('questionsContainer'); container.innerHTML = ''; const resultScreen = document.getElementById('resultScreen'); resultScreen.classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '✓' : '✗'; document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score}`; document.getElementById('resultDetails').innerHTML = `Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`; document.getElementById('progressFill').style.width = '100%'; }
+        function restartTest() { initTest(); }
+        document.addEventListener('DOMContentLoaded', function() { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('themeToggle').checked = true; } initTest(); });
+    </script>
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+    <footer><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>
