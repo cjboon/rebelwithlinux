@@ -1,0 +1,2859 @@
+/* =============================================================================
+   CSS (Cascading Style Sheets) - STYLESHEET FILE
+   =============================================================================
+   CSS is what makes websites look good! It controls:
+   - Colors, fonts, spacing
+   - Layout (how elements are arranged)
+   - Animations and transitions
+   - Responsive design (how it looks on different screen sizes)
+   
+   KEY CONCEPTS FOR BEGINNERS:
+   - SELECTORS: Target HTML elements to style (e.g., 'nav', '.lesson-card')
+   - PROPERTIES: What to change (e.g., 'color', 'background', 'margin')
+   - VALUES: The actual values (e.g., 'red', '10px', 'bold')
+   - CASCADE: Multiple styles can apply to one element - later ones win!
+   - SPECIFICITY: More specific selectors override general ones
+   ============================================================================= */
+
+/* =============================================================================
+   BLOCK 1: CSS CUSTOM PROPERTIES (CSS VARIABLES)
+   =============================================================================
+   CSS Variables (also called "Custom Properties") are like reusable values.
+   They start with -- and can be used throughout the file.
+   
+   Benefits:
+   - Easy to change colors across entire site
+   - Consistent theming
+   - Dark mode support (just change the values)
+   
+   Here we define our color palette:
+   - ivory: Off-white background
+   - white: Pure white
+   - black: Near-black for text
+   - charcoal: Dark gray
+   - beige: Warm light gray
+   - dark-red: For errors/alerts
+   - dark-green: For success states
+   ============================================================================= */
+:root {
+    --ivory: #FFFFFF;
+    --white: #FFFFFF;
+    --black: #000000;
+    --charcoal: #666666;
+    --beige: #FFFFFF;
+    --dark-red: #666666;
+    --dark-green: #666666;
+    --nav-color: #FFFFFF;
+}
+
+[data-theme="dark"] {
+    --ivory: #1a1a1a;
+    --white: #1a1a1a;
+    --black: #e0e0e0;
+    --charcoal: #c0c0c0;
+    --beige: #3a3a3a;
+}
+
+[data-theme="dark"] .quiz-input,
+[data-theme="dark"] .form-group input {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border-color: transparent;
+}
+
+[data-theme="dark"] .quiz-input::placeholder {
+    color: #888888;
+}
+
+/* Hide the theme toggle checkbox but keep it functional */
+#themeToggle {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Pure CSS dark mode toggle using data-theme attribute */
+:root[data-theme="dark"] {
+    --ivory: #1a1a1a;
+    --white: #1a1a1a;
+    --black: #e0e0e0;
+    --charcoal: #c0c0c0;
+    --beige: #3a3a3a;
+}
+
+/* JS-free fallback: use checkbox state to switch theme */
+:root:has(#themeToggle:checked) {
+    --ivory: #1a1a1a;
+    --white: #1a1a1a;
+    --black: #e0e0e0;
+    --charcoal: #c0c0c0;
+    --beige: #3a3a3a;
+}
+
+/* Toggle icon visibility */
+.theme-toggle-label .theme-toggle-icon.sun {
+    display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle-label .theme-toggle-icon:not(.sun) {
+    display: none;
+}
+
+:root:has(#themeToggle:checked) .theme-toggle-label .theme-toggle-icon:not(.sun) {
+    display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle-label .theme-toggle-icon.sun {
+    display: inline;
+}
+
+:root:has(#themeToggle:checked) .theme-toggle-label .theme-toggle-icon.sun {
+    display: inline;
+}
+
+/* =============================================================================
+   BLOCK 2: ACCESSIBILITY STYLES
+   =============================================================================
+   These styles help users navigate using keyboards instead of mice.
+   
+   .skip-link: Hidden by default (positioned off-screen), appears when tabbed to
+   This is critical for screen reader users and keyboard-only navigation.
+   ============================================================================= */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--black);
+    color: var(--white);
+    padding: 8px 16px;
+    z-index: 10000;
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* =============================================================================
+   BLOCK 3: FOCUS STATES
+   =============================================================================
+   :focus-visible shows a visible outline when using keyboard navigation.
+   This is better than :focus alone because mouse users don't see it.
+   The outline helps users know which element is currently selected.
+   ============================================================================= */
+*:focus-visible {
+    outline: 3px solid var(--nav-color);
+    outline-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--nav-color);
+    outline-offset: 2px;
+}
+
+/* =============================================================================
+   BLOCK 4: GLOBAL RESET
+   =============================================================================
+   The universal selector (*) targets ALL elements.
+   RESET: Removes default browser margins/padding that vary between browsers.
+   box-sizing: border-box makes width/height include padding and borders
+   (instead of adding them on top), which makes layout calculations easier.
+   ============================================================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* =============================================================================
+   BLOCK 5: BASE TYPOGRAPHY
+   =============================================================================
+   Base styles for the entire page:
+   - font-family: Which font to use (with fallbacks)
+   - background-color: Page background
+   - color: Default text color
+   - line-height: Space between lines (1.6 = 160% of font size)
+   ============================================================================= */
+body {
+    font-family: 'IBM Plex Mono', monospace;
+    background-color: var(--ivory);
+    color: var(--black);
+    line-height: 1.6;
+}
+
+/* CRT Scanline Effect */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.03),
+        rgba(0, 0, 0, 0.03) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 99999;
+}
+
+[data-theme="dark"] body::after {
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+}
+
+/* =============================================================================
+   BLOCK 6: HEADING STYLES
+   =============================================================================
+   All heading tags (h1-h6) get the same styling:
+   - Monospace font (like code)
+   - Bold weight
+   - Uppercase transformation
+   - Slight letter spacing adjustment
+   ============================================================================= */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+}
+
+/* Code-related elements also use monospace */
+code, pre, .terminal {
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+/* =============================================================================
+   BLOCK 7: NAVIGATION BAR
+   ============================================================================= */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--white) !important;
+    color: var(--black) !important;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10000;
+}
+
+[data-theme="dark"] nav {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.nav-right > a {
+    color: var(--black);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.nav-right > a:hover {
+}
+
+.nav-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--black);
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.nav-title:visited {
+    color: var(--black);
+}
+
+.nav-title:hover {
+}
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 1002;
+}
+
+/* Hamburger Menu */
+.menu-details {
+    margin-left: auto;
+}
+
+.menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 24px;
+    cursor: pointer;
+    z-index: 1003;
+    text-decoration: none;
+}
+
+.nav-close-target {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+.hamburger-line {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: var(--black);
+    transition: all 0.3s ease;
+}
+
+/* Hamburger animation when open */
+.menu-details:target .menu-toggle .hamburger-line:nth-child(1),
+.menu-details.is-open .menu-toggle .hamburger-line:nth-child(1) {
+    transform: rotate(45deg) translate(7px, 7px);
+}
+
+.menu-details:target .menu-toggle .hamburger-line:nth-child(2),
+.menu-details.is-open .menu-toggle .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-details:target .menu-toggle .hamburger-line:nth-child(3),
+.menu-details.is-open .menu-toggle .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Dropdown menu - hidden by default, shows when menu is open */
+.nav-links {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: var(--white) !important;
+    color: var(--black) !important;
+    border: 1px solid #ccc;
+    flex-direction: column;
+    padding: 20px;
+    gap: 0;
+    transform: translateY(-100%);
+    opacity: 0;
+    z-index: 10000;
+}
+
+[data-theme="dark"] .nav-links {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+    border-color: #444;
+}
+    visibility: hidden;
+    transition: all 0.3s ease;
+    border-bottom: none;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    z-index: 999;
+}
+
+.menu-details:target .nav-links,
+.menu-details.is-open .nav-links {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.js-nav .nav-links {
+    transform: translateY(-12px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s;
+}
+
+.js-nav body.nav-open .nav-links {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.js-nav body.nav-open {
+    overflow: hidden;
+}
+
+.js-nav .nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 10, 10, 0.45);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 997;
+    pointer-events: none;
+}
+
+.js-nav .nav-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.js-nav body.nav-open .nav-links a {
+    animation: navLinkFade 0.35s ease both;
+}
+
+.js-nav body.nav-open .nav-links a:nth-child(1) { animation-delay: 0.03s; }
+.js-nav body.nav-open .nav-links a:nth-child(2) { animation-delay: 0.06s; }
+.js-nav body.nav-open .nav-links a:nth-child(3) { animation-delay: 0.09s; }
+.js-nav body.nav-open .nav-links a:nth-child(4) { animation-delay: 0.12s; }
+.js-nav body.nav-open .nav-links a:nth-child(5) { animation-delay: 0.15s; }
+.js-nav body.nav-open .nav-links a:nth-child(6) { animation-delay: 0.18s; }
+.js-nav body.nav-open .nav-links a:nth-child(7) { animation-delay: 0.21s; }
+.js-nav body.nav-open .nav-links a:nth-child(8) { animation-delay: 0.24s; }
+.js-nav body.nav-open .nav-links a:nth-child(9) { animation-delay: 0.27s; }
+.js-nav body.nav-open .nav-links a:nth-child(10) { animation-delay: 0.3s; }
+.js-nav body.nav-open .nav-links a:nth-child(11) { animation-delay: 0.33s; }
+.js-nav body.nav-open .nav-links a:nth-child(12) { animation-delay: 0.36s; }
+
+@keyframes navLinkFade {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .js-nav .nav-links,
+    .js-nav body.nav-open .nav-links,
+    .js-nav .nav-overlay,
+    .js-nav body.nav-open .nav-links a {
+        transition: none;
+        animation: none;
+    }
+}
+
+.nav-links a {
+    padding: 16px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 1rem;
+    color: var(--black) !important;
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    display: block;
+}
+
+[data-theme="dark"] .nav-links a {
+    color: #ffffff !important;
+    border-bottom-color: #444;
+}
+
+.nav-links .nav-close {
+    text-align: right;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    color: var(--gray);
+    padding: 10px 0 18px;
+}
+
+.nav-links a:last-child {
+    border-bottom: none;
+}
+
+.desktop-only {
+    display: none;
+}
+
+.mobile-only {
+    display: none;
+}
+
+.desktop-only {
+    display: block;
+}
+
+.mobile-only {
+    display: none;
+}
+
+/* Show More functionality - hide checkbox visually but keep functional */
+.show-more-checkbox,
+#show-more-guides,
+#show-more-projects,
+#show-more-resources,
+#show-more-scripts,
+#show-more-contact,
+#show-more-games,
+#show-more-distros,
+#show-more-references,
+#show-more-blog,
+#show-more-about,
+#show-more-contact,
+#show-more-tests {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Show cards by default - hide only in specific sections */
+.lesson-card {
+    display: block;
+}
+
+#about .about-preview {
+    min-height: 24px;
+    transition: all 0.3s ease;
+}
+
+.manifesto {
+    padding: 32px 32px;
+    max-width: 1030px;
+    margin: 0 auto 32px;
+    background: var(--white);
+}
+
+#manifesto .section-header {
+    padding: 0 32px;
+    margin-bottom: 16px;
+    max-width: 1030px;
+    margin-left: auto;
+    margin-right: auto;
+    min-height: 80px;
+}
+
+.about-preview {
+    margin-top: 0;
+    padding-top: 0;
+    margin-bottom: 0;
+    min-height: 24px;
+}
+
+.about-section .section-header {
+    margin-bottom: 16px;
+    min-height: 80px;
+}
+
+#about .about-preview {
+    min-height: 24px;
+    margin-bottom: 0;
+}
+
+.project-card,
+.resource-card {
+    display: none;
+}
+
+/* Hide cards in specific sections on homepage */
+#guides .lesson-card,
+#games .lesson-card,
+#blog .lesson-card,
+#references .lesson-card,
+#distros .lesson-card {
+    display: none;
+}
+
+/* Show featured cards by default in games section */
+#games .lesson-card.visible {
+    display: block;
+}
+
+/* Show featured cards by default in guides section */
+#guides .lesson-card.visible {
+    display: block;
+}
+
+/* Show featured cards by default in blog section */
+#blog .lesson-card.visible {
+    display: block;
+}
+
+/* Show featured cards by default in distros section */
+#distros .lesson-card.visible {
+    display: block;
+}
+
+/* Show cards when checkbox is checked */
+#guides:has(#section-guides:checked) .lesson-card {
+    display: block;
+}
+
+#projects:has(#section-projects:checked) .project-card {
+    display: block;
+}
+
+#resources:has(#section-resources:checked) .resource-card {
+    display: block;
+}
+
+#scripts:has(#section-scripts:checked) .resource-card {
+    display: block;
+}
+
+#games:has(#section-games:checked) .lesson-card {
+    display: block;
+}
+
+#tests:has(#section-tests:checked) .lesson-card {
+    display: block;
+}
+
+#tests .lesson-card {
+    display: none;
+}
+
+#distros:has(#section-distros:checked) .lesson-card {
+    display: block;
+}
+
+#games .browser-games-header {
+    display: none;
+}
+
+#games:has(#section-games:checked) .browser-games-header {
+    display: block;
+}
+
+#references:has(#section-references:checked) .lesson-card {
+    display: block;
+}
+
+#blog:has(#section-blog:checked) .lesson-card {
+    display: block;
+}
+
+#about .about-content {
+    transition: opacity 0.3s ease;
+}
+
+/* Hide show more button when expanded - DISABLED to show arrow instead */
+#guides:has(#section-guides:checked) .show-more-btn,
+#projects:has(#section-projects:checked) .show-more-btn,
+#resources:has(#section-resources:checked) .show-more-btn,
+#scripts:has(#section-scripts:checked) .show-more-btn,
+#contact:has(#section-contact:checked) .show-more-btn,
+#games:has(#section-games:checked) .show-more-btn,
+#browser-games:has(#show-more-browser-games:checked) .show-more-btn,
+#distros:has(#section-distros:checked) .show-more-btn,
+#references:has(#section-references:checked) .show-more-btn,
+#blog:has(#section-blog:checked) .show-more-btn,
+#about:has(#section-about:checked) .show-more-btn,
+#manifesto:has(#section-manifesto:checked) .show-more-btn,
+#contact:has(#section-contact:checked) .show-more-btn {
+    /* display: none; - removed to show arrow instead */
+}
+
+/* Arrow rotation when expanded - point left when closed, down when open */
+#guides:has(#section-guides:checked) .show-more-btn::after,
+#projects:has(#section-projects:checked) .show-more-btn::after,
+#resources:has(#section-resources:checked) .show-more-btn::after,
+#scripts:has(#section-scripts:checked) .show-more-btn::after,
+#contact:has(#section-contact:checked) .show-more-btn::after,
+#games:has(#section-games:checked) .show-more-btn::after,
+#distros:has(#section-distros:checked) .show-more-btn::after,
+#references:has(#section-references:checked) .show-more-btn::after,
+#blog:has(#section-blog:checked) .show-more-btn::after,
+#about:has(#section-about:checked) .show-more-btn::after,
+#manifesto:has(#section-manifesto:checked) .show-more-btn::after,
+#tests:has(#section-tests:checked) .show-more-btn::after,
+#contact:has(#section-contact:checked) .show-more-btn::after {
+    transform: rotate(90deg);
+}
+
+/* Show more button styling */
+.show-more-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--black);
+    color: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    position: relative;
+    line-height: 1;
+}
+
+.show-more-btn::after {
+    content: '▼';
+    transform: rotate(180deg);
+    transition: transform 0.3s ease;
+}
+
+.show-more-btn:hover {
+}
+
+.show-more-btn:hover::after {
+}
+
+.show-more-container {
+    text-align: center;
+    margin-top: 32px;
+}
+
+.nav-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    position: relative;
+    white-space: nowrap;
+}
+
+/* =============================================================================
+   BLOCK 8: NAVIGATION HOVER EFFECTS
+   =============================================================================
+   ::after creates a pseudo-element (invisible by default)
+   On hover, it becomes visible and expands as an underline animation.
+   
+   transition: Makes the animation smooth over 0.2 seconds
+   width: 0 → width: 100% creates the growing line effect
+   ============================================================================= */
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--black);
+    transition: width 0.2s;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+/* =============================================================================
+   BLOCK 9: PROGRESS BAR (FOR FUTURE USE)
+   =============================================================================
+   A fixed bar below navigation that could show page load progress
+   or user progress through a course.
+   ============================================================================= */
+.progress-container {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: transparent;
+    z-index: 999;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--accent, var(--black));
+    width: 0%;
+    transition: width 0.3s;
+}
+
+/* =============================================================================
+   BLOCK 10: HERO SECTION
+   =============================================================================
+   The main banner area with the headline and manifesto.
+   
+   padding: 120px top accounts for the fixed nav bar
+   max-width: 1200px - Prevents it from getting too wide on large screens
+   margin: 0 auto - Centers it horizontally
+   border-bottom: Creates visual separation from next section
+   ============================================================================= */
+.hero {
+    padding: 120px 32px 64px;
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--ivory);
+    color: var(--black);
+}
+
+.hero h1 {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    line-height: 1.1;
+    margin-bottom: 24px;
+    color: var(--black);
+}
+
+.hero .tagline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.25rem;
+    margin-bottom: 32px;
+    color: var(--charcoal);
+}
+
+/* Manifesto header styling (moved from hero) */
+#manifesto .section-header h1 {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    line-height: 1.1;
+    margin-bottom: 24px;
+    color: var(--black);
+    font-weight: bold;
+}
+
+#manifesto .section-header .tagline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.25rem;
+    margin-bottom: 32px;
+    color: var(--charcoal);
+}
+
+.section-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 70px 16px 16px;
+    background: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+}
+
+/* Hide the radio buttons - they're just for state management */
+input[type="radio"][name="section"] {
+    display: none;
+}
+
+.section-links label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--charcoal);
+    padding: 6px 12px;
+    border: 1px solid var(--charcoal);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.section-links label:hover {
+    background: var(--charcoal);
+    color: var(--white);
+}
+
+[data-theme="dark"] .section-links label {
+    color: var(--black);
+    background: var(--white);
+    border-color: var(--black);
+}
+
+[data-theme="dark"] .section-links label:hover {
+    background: var(--black);
+    color: var(--white);
+}
+
+.section-links a:hover {
+    background: var(--charcoal);
+    color: var(--white);
+}
+
+/* =============================================================================
+   BLOCK 11: MANIFESTO BOX
+   =============================================================================
+   A highlighted box containing the site's core message.
+   
+   background: white - Contrasts with page background
+   border: 3px solid black - Thick border for emphasis
+   box-shadow: 8px 8px 0 black - Creates "brutalist" offset shadow effect
+   ============================================================================= */
+.manifesto {
+    background: var(--white);
+    border: none;
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: none;
+    color: var(--black);
+}
+
+.manifesto p {
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+    color: var(--black);
+}
+
+.manifesto strong {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--black);
+}
+
+/* =============================================================================
+   BLOCK 12: CALL-TO-ACTION BUTTON
+   =============================================================================
+   Buttons that stand out and encourage clicking.
+   
+   display: inline-block - Allows margin/padding but doesn't fill container
+   transition: all 0.1s - Animates all property changes smoothly
+   transform: translate(-4px, -4px) - Moves button up-left on hover
+   box-shadow expansion gives "lifting" effect
+   ============================================================================= */
+.cta-button {
+    display: inline-block;
+    background: var(--black);
+    color: var(--white);
+    padding: 16px 32px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+
+.cta-button:hover {
+    box-shadow: none;
+}
+
+/* =============================================================================
+   BLOCK 13: LESSONS/guides SECTION
+   =============================================================================
+   Container for tutorial cards.
+   
+   max-width: 1400px - Slightly wider for more cards
+   margin: 0 auto - Centers the section
+   ============================================================================= */
+.lessons-section {
+    padding: 64px 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.section-header {
+    margin-bottom: 48px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 0 32px;
+}
+
+.section-header .section-title-wrap {
+    flex: 1;
+    min-width: 200px;
+    min-height: 60px;
+}
+
+.section-header h2 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.section-header p {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--charcoal);
+}
+
+/* =============================================================================
+   BLOCK 14: CSS GRID FOR LESSON CARDS
+   =============================================================================
+   display: grid - Enables CSS Grid layout!
+   
+   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr))
+   This is powerful! It means:
+   - Create as many columns as will fit
+   - Each column must be at least 320px wide
+   - If there's leftover space, distribute it equally (1fr)
+   
+   This creates a RESPONSIVE layout automatically!
+   ============================================================================= */
+.lessons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+/* =============================================================================
+   BLOCK 15: LESSON CARD STYLING
+   =============================================================================
+   Each tutorial card is a clickable box:
+   
+   position: relative - Allows positioning child elements absolutely
+   cursor: pointer - Shows hand cursor on hover
+   transition: all 0.1s - Smooth hover animation
+   ============================================================================= */
+.lesson-card {
+    background: var(--white);
+    border: 1px solid #ccc;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.1s;
+    position: relative;
+    text-decoration: none;
+    color: var(--black);
+}
+
+.lesson-card:link,
+.lesson-card:visited {
+    color: var(--black);
+}
+
+.lesson-card:hover {
+    box-shadow: none;
+}
+
+/* =============================================================================
+   BLOCK 16: COMPLETED LESSON INDICATOR
+   =============================================================================
+   When a user completes a lesson, we add the 'completed' class.
+   This changes the border color and adds a checkmark.
+   
+   ::after creates the checkmark content
+   position: absolute places it in the corner
+   ============================================================================= */
+.lesson-card.completed {
+    border-color: transparent;
+}
+
+.lesson-card.completed::after {
+    content: '✓';
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 1.5rem;
+    color: var(--dark-green);
+    font-weight: bold;
+}
+
+.lesson-card h3 {
+    color: var(--black);
+}
+
+.lesson-number {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    color: var(--charcoal);
+    margin-bottom: 8px;
+}
+
+.lesson-title {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+    line-height: 1.3;
+    color: var(--black);
+}
+
+.lesson-desc {
+    font-size: 0.9rem;
+    color: var(--charcoal);
+    margin-bottom: 16px;
+}
+
+/* =============================================================================
+   BLOCK 17: BADGES (DIFFICULTY LEVELS)
+   =============================================================================
+   Small tags showing beginner/intermediate/advanced.
+   Different styling for different levels.
+   ============================================================================= */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    border: none;
+    text-transform: uppercase;
+}
+
+.badge-beginner {
+    background: var(--ivory);
+}
+
+.badge-intermediate {
+    background: var(--black);
+    color: var(--white);
+}
+
+.badge-advanced {
+    background: var(--white);
+    color: var(--black);
+}
+
+/* =============================================================================
+   BLOCK 18: MODAL (POPUP) STYLES
+   =============================================================================
+   Modal overlay covers the entire screen:
+   - display: none (hidden by default)
+   - position: fixed with top/left/right/bottom: 0 (fullscreen)
+   - background: rgba(0, 0, 0, 0.8) - Semi-transparent black
+   - z-index: 2000 - Above everything else
+   
+   .active class makes it visible (display: block or flex)
+   ============================================================================= */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    overflow-y: auto;
+}
+
+.modal-overlay.active {
+    display: block;
+}
+
+/* =============================================================================
+   LESSON MODAL STYLES (for pages using lesson-modal class)
+   ============================================================================= */
+.lesson-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    overflow-y: auto;
+}
+
+.lesson-modal.active {
+    display: block;
+}
+
+/* Allow anchor-driven lesson modals without JavaScript */
+.lesson-modal:target {
+    display: block;
+}
+
+.lesson-modal > .lesson-header {
+    background: var(--nav-color);
+    color: var(--black);
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    max-width: 900px;
+    margin: 40px auto 0;
+    border: none;
+    border-bottom: none;
+}
+
+.lesson-modal > .lesson-header h2 {
+    font-size: 1.5rem;
+}
+
+.lesson-modal .lesson-content {
+    background: var(--ivory);
+    max-width: 900px;
+    margin: 0 auto 40px;
+    border: none;
+    box-shadow: none;
+}
+
+.lesson-modal .lesson-body {
+    padding: 32px;
+}
+
+.modal {
+    background: var(--ivory);
+    max-width: 900px;
+    margin: 40px auto;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.modal-header {
+    background: var(--nav-color);
+    color: var(--black);
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+}
+
+.close-btn {
+    background: var(--white);
+    color: var(--black);
+    border: none;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+}
+
+.modal-content {
+    padding: 32px;
+}
+
+/* =============================================================================
+   BLOCK 19: LESSON CONTENT STYLING
+   =============================================================================
+   Styles for the actual tutorial content within modals:
+   - Headings with bottom borders
+   - Proper spacing for paragraphs and lists
+    ============================================================================= */
+.lesson-content {
+    margin-bottom: 48px;
+    padding: 0 32px;
+}
+
+.lesson-content h3 {
+    font-size: 1.25rem;
+    margin: 32px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: none;
+}
+
+.lesson-content p {
+    margin-bottom: 16px;
+}
+
+.lesson-content ul, .lesson-content ol {
+    margin-bottom: 16px;
+    padding-left: 24px;
+}
+
+.lesson-content li {
+    margin-bottom: 8px;
+}
+
+.lesson-content pre {
+    background: var(--black);
+    color: var(--ivory);
+    padding: 20px;
+    margin: 16px 0;
+    border: none;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    white-space: pre;
+}
+
+.lesson-content pre .prompt {
+    color: #2ECC71;
+}
+
+.lesson-content pre .command {
+    color: var(--ivory);
+}
+
+.lesson-content pre .output {
+    color: #3498DB;
+}
+
+.lesson-content pre .comment {
+    color: #aaaaaa;
+}
+
+.lesson-content pre .variable {
+    color: #9cdcfe;
+}
+
+.lesson-content pre .keyword {
+    color: #569cd6;
+}
+
+/* =============================================================================
+   BLOCK 20: TERMINAL/CODE BLOCK STYLING
+   =============================================================================
+   Dark background for terminal output and code examples.
+   Different colors for prompts, commands, and output help readability.
+   
+   overflow-x: auto - Horizontal scroll if code is too wide
+   ============================================================================= */
+.terminal-block {
+    background: var(--black);
+    color: var(--ivory);
+    padding: 20px;
+    margin: 16px 0;
+    border: none;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    white-space: pre;
+}
+
+.terminal-block .prompt {
+    color: #2ECC71;
+}
+
+.terminal-block .command {
+    color: var(--white);
+}
+
+.terminal-block .output {
+    color: var(--beige);
+}
+
+.terminal-block .comment {
+    color: #aaaaaa !important;
+}
+
+/* Dark mode readability overrides for code/terminal blocks */
+[data-theme="dark"] .lesson-content pre,
+[data-theme="dark"] .terminal-block,
+[data-theme="dark"] .config-block,
+[data-theme="dark"] .code-block {
+    background: #0f0f0f;
+    border-color: transparent;
+    color: #f2f2f2;
+}
+
+[data-theme="dark"] .lesson-content pre .command,
+[data-theme="dark"] .terminal-block .command {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .lesson-content pre .output,
+[data-theme="dark"] .terminal-block .output {
+    color: #c7e4ff;
+}
+
+[data-theme="dark"] .lesson-content pre .comment,
+[data-theme="dark"] .terminal-block .comment {
+    color: #9a9a9a;
+}
+
+:root:has(#themeToggle:checked) .lesson-content pre,
+:root:has(#themeToggle:checked) .terminal-block,
+:root:has(#themeToggle:checked) .config-block,
+:root:has(#themeToggle:checked) .code-block {
+    background: #0f0f0f;
+    border-color: transparent;
+    color: #f2f2f2;
+}
+
+:root:has(#themeToggle:checked) .lesson-content pre .command,
+:root:has(#themeToggle:checked) .terminal-block .command {
+    color: #ffffff;
+}
+
+:root:has(#themeToggle:checked) .lesson-content pre .output,
+:root:has(#themeToggle:checked) .terminal-block .output {
+    color: #c7e4ff;
+}
+
+:root:has(#themeToggle:checked) .lesson-content pre .comment,
+:root:has(#themeToggle:checked) .terminal-block .comment {
+    color: #9a9a9a;
+}
+
+.config-block {
+    background: var(--black);
+    color: var(--ivory);
+    padding: 20px;
+    margin: 16px 0;
+    border: none;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.code-block {
+    background: #1e1e1e;
+    color: var(--ivory);
+    padding: 20px;
+    margin: 16px 0;
+    border: none;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    font-family: 'Courier New', monospace;
+    white-space: pre;
+}
+
+.code-block .keyword { color: #569cd6; }
+.code-block .function { color: #dcdcaa; }
+.code-block .string { color: #ce9178; }
+.code-block .number { color: #b5cea8; }
+.code-block .comment { color: #6a9955; }
+.code-block .variable { color: #9cdcfe; }
+.code-block .operator { color: #d4d4d4; }
+
+/* =============================================================================
+   BLOCK 21: HIGHLIGHT BOX
+   =============================================================================
+   A box to highlight important information or tips.
+   Uses a left border for visual emphasis.
+   ============================================================================= */
+.highlight-box {
+    background: var(--beige);
+    border-left: none;
+    padding: 16px;
+    margin: 16px 0;
+    font-style: italic;
+}
+
+/* =============================================================================
+   BLOCK 22: QUIZ SECTION STYLING
+   =============================================================================
+   Interactive quiz components:
+   - Question containers
+   - Input fields with focus states
+   - Correct/incorrect feedback styling
+   - Score display
+   ============================================================================= */
+.quiz-section {
+    background: var(--white);
+    border: none;
+    padding: 32px;
+    margin-top: 32px;
+    color: var(--black);
+}
+
+.quiz-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: none;
+}
+
+.quiz-question {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: none;
+}
+
+.quiz-question:last-child {
+    border-bottom: none;
+}
+
+.question-text {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+}
+
+.question-text .blank {
+    display: inline-block;
+    min-width: 120px;
+    border-bottom: none;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--charcoal);
+}
+
+.quiz-input {
+    width: 100%;
+    max-width: 300px;
+    padding: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+    border: none;
+    background: var(--white);
+    margin-bottom: 12px;
+}
+
+.quiz-input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.quiz-input.correct {
+    border-color: transparent;
+    background: #f0fff0;
+}
+
+.quiz-input.incorrect {
+    border-color: transparent;
+    background: #fff0f0;
+}
+
+.quiz-feedback {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    margin-top: 8px;
+    display: none;
+}
+
+.quiz-feedback.correct {
+    color: var(--dark-green);
+    display: block;
+}
+
+.quiz-feedback.incorrect {
+    color: var(--dark-red);
+    display: block;
+}
+
+.quiz-hint {
+    font-size: 0.85rem;
+    color: var(--charcoal);
+    margin-top: 8px;
+    display: none;
+}
+
+.quiz-hint.visible {
+    display: block;
+}
+
+.quiz-answer {
+    display: none;
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--beige);
+    border: none;
+    font-weight: bold;
+}
+
+.quiz-answer.visible {
+    display: block;
+}
+
+.quiz-options {
+    margin: 16px 0;
+}
+
+.quiz-options label {
+    display: block;
+    padding: 8px 12px;
+    margin: 8px 0;
+    background: var(--white);
+    border: none;
+    cursor: pointer;
+}
+
+.quiz-options label:hover {
+}
+
+.quiz-submit {
+    background: var(--black);
+    color: var(--white);
+    padding: 12px 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    margin-right: 12px;
+}
+
+.quiz-submit:hover {
+}
+
+.quiz-score {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+    margin-top: 24px;
+    padding: 16px;
+    background: var(--beige);
+    border: none;
+    display: none;
+}
+
+.quiz-score.visible {
+    display: block;
+}
+
+.quiz-answers-reveal {
+    margin-top: 16px;
+    border: none;
+    background: var(--beige);
+}
+
+.quiz-answers-reveal > summary {
+    cursor: pointer;
+    padding: 12px 16px;
+    background: var(--white);
+    color: var(--black);
+    font-family: 'IBM Plex Mono', monospace;
+    border-bottom: none;
+}
+
+.quiz-answers-reveal[open] > summary {
+    background: var(--nav-color);
+    color: var(--black);
+}
+
+.quiz-answers-display {
+    padding: 16px;
+    color: var(--black);
+}
+
+/* =============================================================================
+   BLOCK 23: ABOUT AND RESOURCES SECTIONS
+   =============================================================================
+   Styling for informational sections:
+   - About section with white background
+   - Resources grid for tool links
+   ============================================================================= */
+.about-section {
+    padding: 64px 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--white);
+    border-top: none;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+}
+
+.links-section {
+    padding: 64px 32px;
+    background: var(--ivory);
+}
+
+.links-section h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 16px;
+}
+
+.section-subtitle {
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--charcoal);
+    margin-bottom: 48px;
+}
+
+.links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.link-category {
+    background: var(--white);
+    border: 1px solid #ccc;
+    padding: 24px;
+    box-shadow: none;
+}
+
+.link-category h3 {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.link-category ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.link-category li {
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.link-category a {
+    color: var(--black);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.link-category a:hover {
+}
+
+.about-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.about-content h2 {
+    font-size: 2rem;
+    margin-bottom: 24px;
+}
+
+.about-content p {
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+}
+
+.resources-section {
+    padding: 64px 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.resources-section h2 {
+    font-size: 2rem;
+    margin-bottom: 32px;
+}
+
+.resources-note {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--charcoal);
+    margin-bottom: 24px;
+}
+
+.resources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.resource-card {
+    background: var(--white);
+    border: 1px solid #ccc;
+    padding: 24px;
+}
+
+.resource-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+}
+
+.resource-card a {
+    color: var(--black);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+}
+
+/* =============================================================================
+   BLOCK 23A: BACK TO TOP BUTTON
+   =============================================================================
+   A floating button that appears when scrolling down,
+   allowing users to quickly return to the top of the page.
+   ============================================================================= */
+.back-to-top {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 48px;
+    height: 48px;
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 4px 4px 0 var(--gray);
+    text-decoration: none;
+}
+
+.back-to-top:hover {
+    box-shadow: none;
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (max-width: 768px) {
+    .back-to-top {
+        bottom: 16px;
+        right: 16px;
+        width: 44px;
+        height: 44px;
+        font-size: 1.25rem;
+    }
+}
+
+/* =============================================================================
+   BLOCK 24: FOOTER STYLING
+   =============================================================================
+   Dark footer with centered content.
+   The copyleft symbol (reversed C) represents the philosophy
+   that free software should remain free.
+   ============================================================================= */
+footer {
+    background: var(--white);
+    color: var(--black);
+    padding: 48px 32px;
+    text-align: center;
+}
+
+footer a {
+    color: var(--black);
+}
+
+footer p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    margin-bottom: 8px;
+}
+
+footer .copyleft {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+}
+
+/* =============================================================================
+   BLOCK 25: RESPONSIVE DESIGN (MEDIA QUERIES)
+   =============================================================================
+   Media queries change styles based on screen size.
+   This is how we make sites work on phones and tablets!
+   
+   @media (max-width: 768px) means:
+   "When the screen is 768px OR SMALLER, apply these styles"
+   
+   Common breakpoints:
+   - 768px: Tablets
+   - 480px: Mobile phones
+   ============================================================================= */
+@media (max-width: 768px) {
+    nav {
+        padding: 8px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+    }
+
+    .nav-title {
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .theme-toggle-label {
+        font-size: 1rem;
+        padding: 4px;
+    }
+
+    .nav-right {
+        gap: 12px;
+    }
+    
+    .nav-right > a {
+        font-size: 0.75rem;
+    }
+    
+    .hero {
+        padding: 60px 16px 48px;
+    }
+
+    .manifesto {
+        padding: 20px;
+    }
+
+    .lessons-section {
+        padding: 48px 16px;
+    }
+
+    .modal {
+        margin: 20px;
+    }
+
+    .modal-content {
+        padding: 20px;
+    }
+
+    .quiz-section {
+        padding: 20px;
+    }
+}
+
+/* =============================================================================
+   BLOCK 26: ANIMATIONS (KEYFRAMES)
+   =============================================================================
+   @keyframes define an animation sequence.
+   fadeIn makes elements gradually appear:
+   - Start: opacity 0, translated down 20px
+   - End: opacity 1, at normal position
+   
+   This creates a nice entrance effect for lesson cards.
+   ============================================================================= */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.lesson-card {
+    animation: fadeIn 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+/* animation-delay: Stagger the cards for a cascading effect */
+.lesson-card:nth-child(1) { animation-delay: 0.05s; }
+.lesson-card:nth-child(2) { animation-delay: 0.1s; }
+.lesson-card:nth-child(3) { animation-delay: 0.15s; }
+.lesson-card:nth-child(4) { animation-delay: 0.2s; }
+.lesson-card:nth-child(5) { animation-delay: 0.25s; }
+.lesson-card:nth-child(6) { animation-delay: 0.3s; }
+.lesson-card:nth-child(7) { animation-delay: 0.35s; }
+.lesson-card:nth-child(8) { animation-delay: 0.4s; }
+.lesson-card:nth-child(9) { animation-delay: 0.45s; }
+.lesson-card:nth-child(10) { animation-delay: 0.5s; }
+.lesson-card:nth-child(11) { animation-delay: 0.55s; }
+.lesson-card:nth-child(12) { animation-delay: 0.6s; }
+
+/* =============================================================================
+   BLOCK 27: AUTH MODAL STYLING
+   =============================================================================
+   The login/register popup modal:
+   - display: flex when active (for centering)
+   - Dark semi-transparent background
+   - White box with thick border
+   ============================================================================= */
+.auth-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-modal.active {
+    display: flex;
+}
+
+.auth-box {
+    background: var(--white);
+    border: none;
+    padding: 32px;
+    max-width: 400px;
+    width: 90%;
+    position: relative;
+    box-shadow: none;
+}
+
+.close-auth {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--black);
+}
+
+.close-auth:hover {
+}
+
+.auth-tabs {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.auth-tab {
+    background: var(--white);
+    border: none;
+    padding: 8px 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    cursor: pointer;
+    color: var(--black);
+}
+
+.auth-tab.active {
+    background: var(--black);
+    color: var(--white);
+}
+
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    margin-bottom: 4px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Error and success messages */
+.auth-error {
+    color: var(--dark-red);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+    display: none;
+}
+
+.auth-error.show {
+    display: block;
+}
+
+.auth-success {
+    color: var(--dark-green);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+    display: none;
+}
+
+.auth-success.show {
+    display: block;
+}
+
+/* User avatar and logout button */
+.user-avatar {
+    background: var(--black);
+    color: var(--white);
+    width: 32px;
+    height: 32px;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.logout-btn:hover {
+}
+
+/* =============================================================================
+   BLOCK 28: PROJECTS SECTION
+   =============================================================================
+   Larger cards for project tutorials.
+   minmax(400px, 1fr) - Projects need more width than lessons.
+   ============================================================================= */
+.projects-section {
+    padding: 64px 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.projects-section h2 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.section-subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--charcoal);
+    margin-bottom: 32px;
+}
+
+.projects-section .section-subtitle {
+    text-align: left;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 24px;
+}
+
+@media (max-width: 500px) {
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.project-card {
+    background: var(--white);
+    border: 1px solid #ccc;
+    padding: 32px;
+    text-decoration: none;
+    color: var(--black);
+    transition: all 0.1s;
+    box-shadow: none;
+}
+
+.project-card:hover {
+    box-shadow: none;
+}
+
+.project-icon {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+}
+
+.project-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+}
+
+.project-card p {
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.project-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.stack-item {
+    background: var(--black);
+    color: var(--white);
+    padding: 4px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    border: none;
+}
+
+.project-level {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    border: none;
+    padding: 4px 12px;
+    display: inline-block;
+}
+
+/* =============================================================================
+   BLOCK 29: ACCOUNT PAGE STYLES
+   =============================================================================
+   Styles for the user account dashboard showing progress and achievements.
+   ============================================================================= */
+
+.account-page {
+    padding: 100px 32px 64px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.account-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 48px;
+    padding: 32px;
+    background: var(--white);
+    border: none;
+    box-shadow: none;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.user-avatar-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 0;
+    background: var(--black);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.user-info h1 {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+}
+
+.user-status {
+    color: var(--charcoal);
+    font-size: 0.9rem;
+}
+
+.level-display {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.level-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 0;
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+}
+
+.level-circle.level-1 { background: #8B4513; }
+.level-circle.level-2 { background: #228B22; }
+.level-circle.level-3 { background: #4169E1; }
+.level-circle.level-4 { background: #9932CC; }
+.level-circle.level-5 { background: #FF6347; }
+.level-circle.level-6 { background: #FF8C00; }
+.level-circle.level-7 { background: #FFD700; }
+.level-circle.level-8 { background: #20B2AA; }
+.level-circle.level-9 { background: #DC143C; }
+.level-circle.level-10 { background: linear-gradient(135deg, #FFD700, #FF6347, #9932CC); }
+
+.level-number {
+    color: var(--white);
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.level-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.level-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.xp-total {
+    color: var(--charcoal);
+    font-size: 0.9rem;
+}
+
+.progress-section {
+    margin-bottom: 48px;
+}
+
+.progress-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+}
+
+.progress-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 24px;
+}
+
+.stat-card {
+    background: var(--white);
+    border: 1px solid #ccc;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.1s;
+}
+
+.stat-card:hover {
+    box-shadow: none;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--black);
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--charcoal);
+    text-transform: uppercase;
+    margin-top: 8px;
+}
+
+.level-progress-section {
+    margin-bottom: 48px;
+}
+
+.level-progress-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+}
+
+.level-bar-container {
+    background: var(--white);
+    border: none;
+    padding: 24px;
+}
+
+.level-bar-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+}
+
+.current-level {
+    font-weight: 700;
+}
+
+.next-level {
+    color: var(--charcoal);
+}
+
+.progress-bar-large {
+    height: 24px;
+    background: var(--ivory);
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill-large {
+    height: 100%;
+    background: var(--black);
+    transition: width 0.5s ease;
+}
+
+.xp-breakdown {
+    margin-top: 8px;
+    text-align: right;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--charcoal);
+}
+
+.achievements-section {
+    margin-bottom: 48px;
+}
+
+.achievements-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.achievement-card {
+    background: var(--white);
+    border: 1px solid #ccc;
+    padding: 20px;
+    position: relative;
+    transition: all 0.1s;
+}
+
+.achievement-card.unlocked {
+    background: var(--white);
+}
+
+.achievement-card.locked {
+    background: var(--ivory);
+    opacity: 0.6;
+}
+
+.achievement-card:hover {
+    box-shadow: none;
+}
+
+.achievement-card-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+}
+
+.achievement-card-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
+
+.achievement-card-desc {
+    font-size: 0.85rem;
+    color: var(--charcoal);
+    margin-bottom: 12px;
+}
+
+.achievement-card-xp {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--dark-green);
+    font-weight: 700;
+}
+
+.achievement-card-status {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 0.8rem;
+}
+
+.guides-progress-section,
+.projects-progress-section,
+.games-progress-section,
+.tests-progress-section {
+    margin-bottom: 48px;
+}
+
+.guides-progress-section h2,
+.projects-progress-section h2,
+.games-progress-section h2,
+.tests-progress-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+}
+
+.guides-list,
+.projects-list,
+.games-list,
+.tests-list {
+    background: var(--white);
+    border: none;
+}
+
+.progress-row {
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: none;
+    transition: background 0.2s;
+}
+
+.progress-row:last-child {
+    border-bottom: none;
+}
+
+.progress-row:hover {
+}
+
+.progress-row.completed {
+    background: #f0fff0;
+}
+
+.progress-row.completed .progress-status {
+    color: var(--dark-green);
+    font-weight: 700;
+}
+
+.progress-icon {
+    font-size: 1.5rem;
+    margin-right: 16px;
+    width: 40px;
+    text-align: center;
+}
+
+.progress-name {
+    flex: 1;
+    font-weight: 600;
+}
+
+.progress-status {
+    margin-right: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--charcoal);
+}
+
+.progress-link {
+    color: var(--black);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    padding: 4px 12px;
+    border: none;
+    transition: all 0.1s;
+}
+
+.progress-link:hover {
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 0;
+}
+
+.nav-links .logout-btn {
+    display: block;
+    width: 100%;
+    padding: 16px 0;
+    border-bottom: none;
+    text-align: left;
+    pointer-events: auto;
+}
+
+.nav-links .logout-btn:hover {
+}
+
+.logout-btn:hover {
+}
+
+@media (max-width: 768px) {
+    .account-page {
+        padding: 80px 16px 48px;
+    }
+
+    .account-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .user-profile {
+        flex-direction: column;
+    }
+
+    .level-display {
+        justify-content: center;
+    }
+
+    .level-bar-info {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .progress-row {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .progress-icon {
+        width: auto;
+    }
+
+    .progress-status {
+        width: 100%;
+        margin-right: 0;
+        margin-top: 8px;
+    }
+
+    .progress-link {
+        width: 100%;
+        text-align: center;
+    }
+
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Override hover for blog and games - remove box shadow and transition */
+.blog-grid .lesson-card,
+#games .lesson-card {
+    border: 1px solid #e0e0e0;
+    outline: none;
+    transition: none !important;
+}
+
+[data-theme="dark"] .blog-grid .lesson-card,
+[data-theme="dark"] #games .lesson-card {
+    border: 1px solid #444;
+}
+
+.blog-grid .lesson-card:hover,
+.blog-grid .lesson-card:focus,
+#games .lesson-card:hover,
+#games .lesson-card:focus {
+    box-shadow: none !important;
+    border: 1px solid #e0e0e0 !important;
+    outline: none !important;
+}
+
+/* ALL SECTIONS HIDDEN BY DEFAULT */
+#manifesto, #distros, #games, #guides, #projects, #resources, #references, #scripts, #blog, #about, #contact, #tests, #stats, #rebels, #site-footer { display: none !important; }
+
+/* SHOW ONLY THE CHECKED SECTION */
+body:has(#section-manifesto:checked) #manifesto,
+body:has(#section-distros:checked) #distros,
+body:has(#section-games:checked) #games,
+body:has(#section-guides:checked) #guides,
+body:has(#section-projects:checked) #projects,
+body:has(#section-resources:checked) #resources,
+body:has(#section-references:checked) #references,
+body:has(#section-scripts:checked) #scripts,
+body:has(#section-blog:checked) #blog,
+body:has(#section-about:checked) #about,
+body:has(#section-contact:checked) #contact,
+body:has(#section-tests:checked) #tests,
+body:has(#section-stats:checked) #stats,
+body:has(#section-rebels:checked) #rebels { 
+    display: block !important;
+    padding-top: 70px;
+}
+
+/* Show section content when section is visible */
+.manifesto, .section-header, .lesson-card, .project-card, .resource-card, .about-content, .contact-hidden, .about-preview { display: block !important; }
+
+#manifesto,
+#distros,
+#games,
+#guides,
+#projects,
+#resources,
+#references,
+#scripts,
+#blog,
+#about,
+#contact,
+#tests,
+#stats,
+#rebels {
+    display: none;
+}
+
+/* Show specific section when its radio is checked */
+/* Just show the entire section when selected */
+body:has(#section-manifesto:checked) #manifesto,
+body:has(#section-distros:checked) #distros,
+body:has(#section-games:checked) #games,
+body:has(#section-guides:checked) #guides,
+body:has(#section-projects:checked) #projects,
+body:has(#section-resources:checked) #resources,
+body:has(#section-references:checked) #references,
+body:has(#section-scripts:checked) #scripts,
+body:has(#section-blog:checked) #blog,
+body:has(#section-about:checked) #about,
+body:has(#section-contact:checked) #contact,
+body:has(#section-tests:checked) #tests,
+body:has(#section-stats:checked) #stats,
+body:has(#section-rebels:checked) #rebels {
+    display: block;
+}
+
+/* Hide the original show-more buttons */
+.show-more-btn {
+    display: none !important;
+}
+
+/* Show footer when footer button is checked */
+body:has(#section-footer:checked) #site-footer {
+    display: block !important;
+    padding-top: 70px;
+}
+
+/* Show the label in section-links as the toggle instead */
+.section-header .show-more-checkbox {
+    display: none;
+}
+
+.section-links::-webkit-scrollbar {
+    display: none;
+}
+
+.section-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    padding: 6px 12px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.section-links a:hover {
+    background: #333;
+    border-color: #555;
+}
+
+/* =============================================================================
+   MOBILE RESPONSIVE STYLES
+   ============================================================================= */
+
+/* Base mobile adjustments */
+@media (max-width: 768px) {
+    /* Hero section */
+    .hero h1 {
+        font-size: 2.5rem !important;
+        line-height: 1.1 !important;
+        letter-spacing: -2px !important;
+    }
+    
+    .hero .tagline {
+        font-size: 0.9rem !important;
+    }
+    
+    /* Navigation */
+    .nav-title {
+        font-size: 0.9rem !important;
+    }
+    
+    .section-links {
+        padding: 60px 12px 10px;
+        gap: 8px;
+    }
+    
+    .section-links a {
+        font-size: 0.65rem;
+        padding: 5px 8px;
+    }
+    
+    /* Section headers */
+    .section-title-wrap h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    /* Grid layouts - single column on mobile */
+    .blog-grid,
+    .lessons-grid,
+    .projects-grid,
+    .resources-grid {
+        grid-template-columns: 1fr !important;
+        padding: 0 16px !important;
+    }
+    
+    /* Cards */
+    .lesson-card,
+    .project-card,
+    .resource-card {
+        min-height: auto !important;
+        padding: 16px !important;
+    }
+    
+    /* Reduce padding everywhere */
+    section {
+        padding: 32px 16px !important;
+    }
+    
+    /* Manifesto */
+    .manifesto {
+        padding: 24px 16px !important;
+    }
+    
+    .manifesto p {
+        font-size: 0.9rem !important;
+        line-height: 1.6 !important;
+    }
+    
+    /* Games section */
+    #games .games-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Guides */
+    #guides {
+        padding: 32px 16px !important;
+    }
+    
+    /* Projects */
+    .projects-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Resources */
+    .resources-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Footer */
+    footer {
+        padding: 32px 16px !important;
+    }
+    
+    footer .footer-content {
+        flex-direction: column !important;
+        gap: 24px !important;
+    }
+    
+    /* Forms */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    textarea {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+    
+    /* Buttons */
+    button,
+    .btn {
+        padding: 12px 20px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    /* Tables */
+    table {
+        font-size: 0.8rem !important;
+        display: block;
+        overflow-x: auto;
+    }
+    
+    /* Code blocks */
+    pre {
+        font-size: 0.75rem !important;
+        padding: 12px !important;
+        overflow-x: auto;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 2rem !important;
+    }
+    
+    .section-links a {
+        font-size: 0.6rem;
+        padding: 4px 6px;
+    }
+    
+    .blog-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
