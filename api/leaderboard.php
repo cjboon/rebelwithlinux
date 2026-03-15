@@ -13,7 +13,7 @@ try {
         LEFT JOIN progress p ON u.id = p.user_id AND p.completed = 1
         GROUP BY u.id, u.email 
         ORDER BY xp DESC 
-        LIMIT 3
+        LIMIT 10
     ");
     $stmt->execute();
     

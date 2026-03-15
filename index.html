@@ -6,6 +6,8 @@
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = true;
         }
     </script>
     <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" />
@@ -1863,17 +1865,7 @@
             }
         });
 
-        const savedTheme = localStorage.getItem('theme');
-        console.log('Index page: savedTheme from localStorage:', savedTheme);
-        if (!savedTheme || savedTheme === 'light') {
-            document.documentElement.setAttribute('data-theme', 'light');
-            document.getElementById('themeToggle').checked = false;
-            console.log('Index page: Applied light mode on load');
-        } else {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.getElementById('themeToggle').checked = true;
-            console.log('Index page: Using dark mode');
-        }
+        // Initialize theme toggle based on saved preference
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').then(registration => {
