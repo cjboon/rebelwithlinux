@@ -1,7 +1,12 @@
 #!/bin/bash
 
-LOG_FILE="${1:-/var/log/apache2/rebelwithlinux.com_access.log}"
-INDEX_FILE="/var/www/rebelwithlinux.com/index.html"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/report_config.sh" ]; then
+    source "$SCRIPT_DIR/report_config.sh"
+fi
+
+LOG_FILE="${1:-$LOG_FILE}"
+INDEX_FILE="${INDEX_FILE:-/var/www/rebelwithlinux.com/index.html}"
 
 setup_systemd_timer() {
     local timer_name="os-report.timer"
@@ -17,7 +22,7 @@ Description=Hourly OS Report Script
 
 [Service]
 Type=oneshot
-ExecStart=/var/www/rebelwithlinux.com/os_report.sh
+ExecStart=${SCRIPT_DIR}/os_report.sh
 EOF
         
         # Create timer file

@@ -1,16 +1,13 @@
 #!/bin/bash
 
-# Determine the correct path (works on both VPS and SSHFS)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [ -f "/var/www/rebelwithlinux.com/index.html" ]; then
-    HTML_FILE="/var/www/rebelwithlinux.com/index.html"
-elif [ -f "/var/www/html/index.html" ]; then
-    HTML_FILE="/var/www/html/index.html"
-elif [ -f "/mnt/remote/var/www/html/index.html" ]; then
-    HTML_FILE="/mnt/remote/var/www/html/index.html"
-else
-    HTML_FILE="$SCRIPT_DIR/index.html"
+if [ -f "$SCRIPT_DIR/report_config.sh" ]; then
+    source "$SCRIPT_DIR/report_config.sh"
 fi
+
+SITE_NAME="${SITE_NAME:-rebelwithlinux.com}"
+WEB_ROOT="${WEB_ROOT:-/var/www/${SITE_NAME}}"
+HTML_FILE="${WEB_ROOT}/index.html"
 
 setup_systemd_timer() {
     local timer_name="server-report.timer"
@@ -26,7 +23,7 @@ Description=Hourly Server Report Script
 
 [Service]
 Type=oneshot
-ExecStart=/var/www/rebelwithlinux.com/server_report.sh
+ExecStart=${SCRIPT_DIR}/server_report.sh
 EOF
         
         # Create timer file
@@ -68,15 +65,33 @@ import re
 
 script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
 
-# Use the same logic as bash
-if os.path.isfile("/var/www/rebelwithlinux.com/index.html"):
-    html_file = "/var/www/rebelwithlinux.com/index.html"
-elif os.path.isfile("/var/www/html/index.html"):
-    html_file = "/var/www/html/index.html"
-elif os.path.isfile("/mnt/remote/var/www/html/index.html"):
-    html_file = "/mnt/remote/var/www/html/index.html"
-else:
-    html_file = os.path.join(script_dir, "index.html")
+# Load config if exists
+config = {}
+config_file = os.path.join(script_dir, "report_config.sh")
+if os.path.isfile(config_file):
+    with open(config_file) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                key, val = line.split('=', 1)
+                config[key] = val.strip('"').strip("'")
+
+site_name = config.get('SITE_NAME', 'rebelwithlinux.com')
+default_location = config.get('DEFAULT_LOCATION', 'Ogden, Utah')
+
+# Determine HTML file
+web_root = config.get('WEB_ROOT', f'/var/www/{site_name}')
+html_file = os.path.join(web_root, 'index.html')
+if not os.path.isfile(html_file):
+    html_file = '/var/www/html/index.html'
+if not os.path.isfile(html_file):
+    html_file = os.path.join(script_dir, 'index.html')
+
+print(f"Checking file: {html_file}")
+if not os.path.isfile(html_file):
+    print(f"Error: {html_file} not found")
+    sys.exit(1)
+print("File exists")
 
 with open(html_file, 'r') as f:
     content = f.read()
@@ -100,15 +115,36 @@ try:
         if region:
             location = f"{location}, {region}"
 except:
-    location = "Unknown"
+    location = default_location
 
-# Update the stats inside the #stats section using simpler replacements
-content = content.replace('>Ogden, Utah<', f'>{location}<')
-content = content.replace('>up 14 hours, 44 minutes<', f'>{uptime}<')
-content = content.replace('>0.52<', f'>{loadavg}<')
-content = content.replace('>1.5Gi/1.9Gi<', f'>{memory}<')
-content = content.replace('>5.9G/59G<', f'>{disk}<')
-content = content.replace('/root/.opencode/bin/opencode<br>21.2% CPU', f'{proc}<br>{cpu}% CPU')
+# Read current values from HTML and replace with new values
+location_match = re.search(r'>([^<]+location[^<]*)<', content)
+if location_match:
+    old_location = location_match.group(1)
+    content = content.replace(f'>{old_location}<', f'>{location}<', 1)
+
+uptime_match = re.search(r'>([^<]+uptime[^<]*)<', content, re.IGNORECASE)
+if uptime_match:
+    old_uptime = uptime_match.group(1)
+    content = content.replace(f'>{old_uptime}<', f'>{uptime}<', 1)
+
+load_match = re.search(r'>(\d+\.\d+)<', content)
+if load_match:
+    old_load = load_match.group(1)
+    content = content.replace(f'>{old_load}<', f'>{loadavg}<', 1)
+
+mem_match = re.search(r'>(\d+\.?\d*[GM]i?/\d+\.?\d*[GM]i?)<', content)
+if mem_match:
+    old_mem = mem_match.group(1)
+    content = content.replace(f'>{old_mem}<', f'>{memory}<', 1)
+
+disk_match = re.search(r'>(\d+\.?\d*[GM]?/\d+\.?\d*[GM]?)<', content)
+if disk_match:
+    old_disk = disk_match.group(1)
+    content = content.replace(f'>{old_disk}<', f'>{disk}<', 1)
+
+# Update process and CPU
+content = re.sub(r'>([^<]+)<br>\d+\.\d+% CPU', f'>{proc}<br>{cpu}% CPU', content)
 
 with open(html_file, 'w') as f:
     f.write(content)
