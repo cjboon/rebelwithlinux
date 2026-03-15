@@ -1,12 +1,13 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [ -f "$SCRIPT_DIR/report_config.sh" ]; then
-    source "$SCRIPT_DIR/report_config.sh"
-fi
+# === CONFIG ===
+SITE_NAME="rebelwithlinux.com"
+WEB_ROOT="/var/www/${SITE_NAME}"
+LOG_FILE="${1:-/var/log/apache2/${SITE_NAME}_access.log}"
+INDEX_FILE="${WEB_ROOT}/index.html"
+# === END CONFIG ===
 
-LOG_FILE="${1:-$LOG_FILE}"
-INDEX_FILE="${INDEX_FILE:-/var/www/rebelwithlinux.com/index.html}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 setup_systemd_timer() {
     local timer_name="os-report.timer"

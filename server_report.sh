@@ -1,12 +1,12 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [ -f "$SCRIPT_DIR/report_config.sh" ]; then
-    source "$SCRIPT_DIR/report_config.sh"
-fi
+# === CONFIG ===
+SITE_NAME="rebelwithlinux.com"
+WEB_ROOT="/var/www/${SITE_NAME}"
+DEFAULT_LOCATION="Ogden, Utah"
+# === END CONFIG ===
 
-SITE_NAME="${SITE_NAME:-rebelwithlinux.com}"
-WEB_ROOT="${WEB_ROOT:-/var/www/${SITE_NAME}}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HTML_FILE="${WEB_ROOT}/index.html"
 
 setup_systemd_timer() {
@@ -56,6 +56,7 @@ fi
 echo "File exists"
 
 # Update server stats inside the Stats section
+export DEFAULT_LOCATION
 
 python3 << 'PYTHON_EOF'
 import os
@@ -63,29 +64,8 @@ import sys
 import json
 import re
 
-script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-
-# Load config if exists
-config = {}
-config_file = os.path.join(script_dir, "report_config.sh")
-if os.path.isfile(config_file):
-    with open(config_file) as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith('#') and '=' in line:
-                key, val = line.split('=', 1)
-                config[key] = val.strip('"').strip("'")
-
-site_name = config.get('SITE_NAME', 'rebelwithlinux.com')
-default_location = config.get('DEFAULT_LOCATION', 'Ogden, Utah')
-
-# Determine HTML file
-web_root = config.get('WEB_ROOT', f'/var/www/{site_name}')
-html_file = os.path.join(web_root, 'index.html')
-if not os.path.isfile(html_file):
-    html_file = '/var/www/html/index.html'
-if not os.path.isfile(html_file):
-    html_file = os.path.join(script_dir, 'index.html')
+html_file = os.environ.get('HTML_FILE', '/var/www/rebelwithlinux.com/index.html')
+default_location = os.environ.get('DEFAULT_LOCATION', 'Ogden, Utah')
 
 print(f"Checking file: {html_file}")
 if not os.path.isfile(html_file):
@@ -115,7 +95,7 @@ try:
         if region:
             location = f"{location}, {region}"
 except:
-    location = default_location
+    location = os.environ.get('DEFAULT_LOCATION', 'Unknown')
 
 # Read current values from HTML and replace with new values
 location_match = re.search(r'>([^<]+location[^<]*)<', content)
