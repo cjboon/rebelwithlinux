@@ -58,24 +58,15 @@ if [ ! -f "$HTML_FILE" ]; then
 fi
 echo "File exists"
 
-# Check if marker exists
-if grep -q "<!--INCLUDE_SERVER_REPORT-->" "$HTML_FILE"; then
-    echo "Marker found"
-else
-    echo "Marker not found, adding it..."
-    sed -i '/<!--INCLUDE_OS_STATS-->/a\    <!--INCLUDE_SERVER_REPORT-->' "$HTML_FILE"
-    echo "Marker added"
-fi
+# Update server stats inside the Stats section
 
-# Test Python works
 python3 << 'PYTHON_EOF'
 import os
 import sys
 import json
+import re
 
 script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-print("Python running")
-print(f"Script directory: {script_dir}")
 
 # Use the same logic as bash
 if os.path.isfile("/var/www/rebelwithlinux.com/index.html"):
@@ -90,58 +81,37 @@ else:
 with open(html_file, 'r') as f:
     content = f.read()
 
-if '<!--INCLUDE_SERVER_REPORT-->' in content:
-    print("Marker found in content")
+# Get server stats
+uptime = os.popen('uptime -p 2>/dev/null || echo "uptime unavailable"').read().strip()
+loadavg = os.popen("cat /proc/loadavg | awk '{print $1}'").read().strip()
+memory = os.popen("free -h | awk '/^Mem:/ {print $3\"/\"$2}'").read().strip()
+disk = os.popen("df -h / | awk 'NR==2 {print $3\"/\"$2}'").read().strip()
+proc = os.popen("ps aux --sort=-%cpu | head -2 | tail -1 | awk '{print $11}'").read().strip()
+cpu = os.popen("ps aux --sort=-%cpu | head -2 | tail -1 | awk '{print $3}'").read().strip()
+
+print(f"Stats: {uptime} | {loadavg} | {memory}")
+
+try:
+    import urllib.request
+    with urllib.request.urlopen('https://ipinfo.io/json', timeout=5) as response:
+        location_data = json.load(response)
+        location = location_data.get('city', 'Unknown')
+        region = location_data.get('region', '')
+        if region:
+            location = f"{location}, {region}"
+except:
+    location = "Unknown"
+
+# Update the stats inside the #stats section using simpler replacements
+content = content.replace('>Ogden, Utah<', f'>{location}<')
+content = content.replace('>up 14 hours, 44 minutes<', f'>{uptime}<')
+content = content.replace('>0.52<', f'>{loadavg}<')
+content = content.replace('>1.5Gi/1.9Gi<', f'>{memory}<')
+content = content.replace('>5.9G/59G<', f'>{disk}<')
+content = content.replace('/root/.opencode/bin/opencode<br>21.2% CPU', f'{proc}<br>{cpu}% CPU')
+
+with open(html_file, 'w') as f:
+    f.write(content)
     
-    uptime = os.popen('uptime -p 2>/dev/null || echo "uptime unavailable"').read().strip()
-    loadavg = os.popen("cat /proc/loadavg | awk '{print $1}'").read().strip()
-    memory = os.popen("free -h | awk '/^Mem:/ {print $3 \"/\" $2}'").read().strip()
-    disk = os.popen("df -h / | awk 'NR==2 {print $3 \"/\" $2}'").read().strip()
-    proc = os.popen("ps aux --sort=-%cpu | head -2 | tail -1 | awk '{print $11}'").read().strip()
-    cpu = os.popen("ps aux --sort=-%cpu | head -2 | tail -1 | awk '{print $3}'").read().strip()
-
-    print(f"Stats: {uptime} | {loadavg} | {memory}")
-
-    try:
-        import urllib.request
-        with urllib.request.urlopen('https://ipinfo.io/json', timeout=5) as response:
-            location_data = json.load(response)
-            location = location_data.get('city', 'Unknown')
-            region = location_data.get('region', '')
-            if region:
-                location = f"{location}, {region}"
-    except:
-        location = "Unknown"
-
-    report = f"""<!-- Dynamic Server Report -->
-    <section style="padding: 32px; text-align: center; background: var(--ivory);">
-        <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">// Live Server Stats</h3>
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;">
-            <div><strong>Location</strong><br>{location}</div>
-            <div><strong>Uptime</strong><br>{uptime}</div>
-            <div><strong>Load</strong><br>{loadavg}</div>
-            <div><strong>Memory</strong><br>{memory}</div>
-            <div><strong>Disk</strong><br>{disk}</div>
-            <div><strong>Top Proc</strong><br>{proc}<br>{cpu}% CPU</div>
-        </div>
-    </section>
-    <!--INCLUDE_SERVER_REPORT-->"""
-
-    import re
-    # Replace any existing report section + marker with the new one
-    pattern = r'<!-- Dynamic Server Report -->.*?<!--INCLUDE_SERVER_REPORT-->'
-    new_content = re.sub(pattern, report, content, flags=re.DOTALL)
-    
-    # If no existing section, just replace the marker
-    if new_content == content and '<!--INCLUDE_SERVER_REPORT-->' in content:
-        new_content = content.replace('<!--INCLUDE_SERVER_REPORT-->', report)
-    
-    if new_content != content:
-        with open(html_file, 'w') as f:
-            f.write(new_content)
-        print("File updated")
-    else:
-        print("Content unchanged")
-else:
-    print("ERROR: Marker not found in content")
+print("Server stats updated in Stats section")
 PYTHON_EOF
