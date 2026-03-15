@@ -1,6 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
+    <script>
+        // Apply saved theme immediately to prevent flash
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
     <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/account.html" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -581,33 +588,11 @@
             }
         });
 
-        // Theme toggle (only apply if element exists - it only exists on homepage)
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
-        
+        // Sync checkbox with saved theme
         const themeToggle = document.getElementById('themeToggle');
-        if (themeToggle) {
-            if (savedTheme === 'dark') {
-                themeToggle.checked = true;
-                const icon = document.querySelector('.theme-toggle-icon');
-                if (icon) icon.textContent = '☀️';
-            }
-            
-            themeToggle.addEventListener('change', function() {
-                const html = document.documentElement;
-                const icon = document.querySelector('.theme-toggle-icon');
-                if (html.getAttribute('data-theme') === 'dark') {
-                    html.setAttribute('data-theme', 'light');
-                    localStorage.setItem('theme', 'light');
-                    if (icon) icon.textContent = '🌙';
-                } else {
-                    html.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('theme', 'dark');
-                    if (icon) icon.textContent = '☀️';
-                }
-            });
+        const savedTheme = localStorage.getItem('theme');
+        if (themeToggle && savedTheme === 'dark') {
+            themeToggle.checked = true;
         }
 
         // Initialize page
