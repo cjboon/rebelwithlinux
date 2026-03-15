@@ -27,8 +27,44 @@ print_header "Matomo Setup Script"
 print_info "This script will set up Matomo analytics on your server."
 print_info "Make sure you have:"
 print_info "  - A subdomain pointing to your server (e.g., matomo.yourdomain.com)"
-print_info "  - MySQL/MariaDB installed"
 print_info ""
+
+# Check dependencies
+print_header "Checking Dependencies"
+
+MISSING_DEPS=()
+
+# Check PHP
+if ! command -v php &> /dev/null; then
+    MISSING_DEPS+=("php")
+fi
+
+# Check MariaDB/MySQL
+if ! command -v mysql &> /dev/null; then
+    MISSING_DEPS+=("mariadb-server")
+fi
+
+# Check required PHP extensions
+PHP_EXTENSIONS=("php-mysql" "php-curl" "php-gd" "php-mbstring" "php-xml" "php-ldap")
+for ext in "${PHP_EXTENSIONS[@]}"; do
+    if ! dpkg -l | grep -q "^ii  $ext"; then
+        MISSING_DEPS+=("$ext")
+    fi
+done
+
+if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
+    print_warning "Missing dependencies: ${MISSING_DEPS[*]}"
+    if confirm "Install missing dependencies?"; then
+        apt update
+        apt install -y "${MISSING_DEPS[@]}"
+        print_success "Dependencies installed."
+    else
+        print_error "Cannot proceed without required dependencies."
+        exit 1
+    fi
+else
+    print_success "All dependencies found."
+fi
 
 if ! confirm "Continue with Matomo setup?"; then
     print_warning "Setup cancelled."
