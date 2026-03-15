@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Hosted Analytics with Matomo - Rebel With Linux</title>
+    <meta name="description" content="How to set up Matomo, a privacy-focused analytics platform, on your own server.">
+    <meta name="author" content="cjboon">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../fonts.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-matomo.html" />
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav>
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title">REBEL WITH LINUX</a>
+        </div>
+    </nav>
+
+    <main id="main-content" style="max-width: 800px; margin: 100px auto 50px; padding: 0 32px;">
+        <article>
+            <h1 style="font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 16px;">Self-Hosted Analytics with Matomo</h1>
+            <p style="color: var(--charcoal); margin-bottom: 32px;">Published: March 2026</p>
+
+            <p>Most websites use Google Analytics to track visitors. But Google collects a lot of data—and that feels wrong for a privacy-focused site. So I installed <strong>Matomo</strong>, an open-source analytics platform that I host myself.</p>
+
+            <h2 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; margin: 32px 0 16px;">Why Matomo?</h2>
+            <ul style="margin-left: 24px; margin-bottom: 24px;">
+                <li>Full ownership of your data</li>
+                <li>GDPR compliant (no consent banner needed)</li>
+                <li>No data leaves your server</li>
+                <li>Open source and free</li>
+            </ul>
+
+            <h2 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; margin: 32px 0 16px;">What I Track</h2>
+            <p>Matomo shows me:</p>
+            <ul style="margin-left: 24px; margin-bottom: 24px;">
+                <li>Total visitors and page views</li>
+                <li>Which pages are most popular</li>
+                <li>Where visitors come from (referrers)</li>
+                <li>Time on site</li>
+                <li>Devices and browsers used</li>
+            </ul>
+
+            <h2 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; margin: 32px 0 16px;">Installation</h2>
+            <p>Here's how I set it up on this server:</p>
+
+            <pre style="background: var(--black); color: var(--white); padding: 16px; overflow-x: auto; margin-bottom: 24px;"># Download Matomo
+cd /var/www
+curl -L -o matomo.tar.gz "https://builds.matomo.org/matomo.tar.gz"
+tar -xzf matomo.tar.gz
+
+# Create database
+mysql -u root -e "CREATE DATABASE matomo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -e "CREATE USER 'matomo'@'localhost' IDENTIFIED BY 'your_password';"
+mysql -u root -e "GRANT ALL PRIVILEGES ON matomo.* TO 'matomo'@'localhost';"
+
+# Set permissions
+chown -R www-data:www-data /var/www/matomo</pre>
+
+            <p>Then configure Apache with a virtual host, get an SSL cert with certbot, and run through the Matomo web installer. That's it.</p>
+
+            <h2 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; margin: 32px 0 16px;">Privacy First</h2>
+            <p>Unlike Google Analytics, Matomo lets me own the data completely. No third parties. No creepy tracking. Just numbers that help me understand who's reading these tutorials.</p>
+
+            <p>If you run a website and care about privacy, consider self-hosted analytics. It's one more step toward owning your digital life.</p>
+
+            <p style="margin-top: 32px;">— cjboon</p>
+        </article>
+
+        <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--charcoal);">
+            <a href="../index.html" style="color: var(--charcoal);">← Back to Home</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p><a href="../site-map.html">All pages</a></p>
+    </footer>
+</body>
+</html>
