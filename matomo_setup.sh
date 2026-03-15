@@ -25,8 +25,12 @@ confirm() {
 print_header "Matomo Setup Script"
 
 print_info "This script will set up Matomo analytics on your server."
-print_info "Make sure you have:"
-print_info "  - A subdomain pointing to your server (e.g., matomo.yourdomain.com)"
+print_info ""
+print_info "Prerequisites:"
+print_info "  1. Create a DNS A record for your subdomain (e.g., matomo.yourdomain.com)"
+print_info "     pointing to your server's IP address"
+print_info "  2. Wait for DNS to propagate (can take up to 24 hours)"
+print_info "  3. Disable adblocker/uBlock during Matomo setup wizard"
 print_info ""
 
 # Check dependencies
