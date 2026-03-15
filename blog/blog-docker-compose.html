@@ -37,17 +37,23 @@
         <p>March 2026 • DevOps • 15 min read</p>
     </div>
     <article class="blog-content">
-        <p>Running one container is easy. Running a dozen that need to talk to each other? That's where Docker Compose shines.</p>
+        <p>Running one Docker container is straightforward. But most real apps need multiple things—a web server, a database, a cache, maybe a message queue. Managing five docker run commands with their various port mappings and environment variables? That's where Compose saves your sanity.</p>
 
-        <h2>What is Docker Compose?</h2>
-        <p>Compose lets you define a multi-container application in a single YAML file. Then start everything with one command.</p>
+        <h2>What's Compose?</h2>
+        <p>Compose lets you define your entire application stack in one file. Instead of running multiple docker run commands, you write a YAML file describing all your services, then start everything with one command.</p>
 
-        <h2>Installing</h2>
+        <p>It's basically "infrastructure as code" for development environments.</p>
+
+        <h2>The Basic Setup</h2>
+        <p>If you followed my Docker guide, you probably have Docker installed. Compose usually comes with it, but if not:</p>
+
         <pre><code>sudo apt install docker-compose
 # or
 sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose</code></pre>
 
-        <h2>A Basic docker-compose.yml</h2>
+        <h2>A Simple Example</h2>
+        <p>Here's a basic docker-compose.yml that runs an Nginx container:</p>
+
         <pre><code>version: '3.8'
 
 services:
@@ -58,8 +64,15 @@ services:
     volumes:
       - ./html:/usr/share/nginx/html</code></pre>
 
-        <h2>The Power: Multi-Container</h2>
-        <p>Here's a real WordPress setup:</p>
+        <p>Save that as docker-compose.yml, create an "html" folder with an index.html, and run:</p>
+
+        <pre><code>docker-compose up -d</code></pre>
+
+        <p>Visit localhost. There's your Nginx. Stop it with <code>docker-compose down</code>.</p>
+
+        <h2>The Real Power: Multi-Container</h2>
+        <p>Okay, that's trivial. Let's do something actually useful—a WordPress site with a database:</p>
+
         <pre><code>version: '3.8'
 
 services:
@@ -82,7 +95,7 @@ services:
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: wp
-      WORDPRESS_DB_PASSWORD: wppass
+      WORDSQL_PASSWORD: wppass
       WORDPRESS_DB_NAME: wordpress
     volumes:
       - ./wp-content:/var/www/html/wp-content
@@ -90,31 +103,43 @@ services:
 volumes:
   db_data:</code></pre>
 
-        <h2>Key Commands</h2>
-        <pre><code># Start everything
+        <p>That's it. One command, and you've got WordPress running with MySQL, linked together, with persistent storage.</p>
+
+        <p>The <code>depends_on</code> line means "don't start WordPress until the database is ready."</p>
+
+        <h2>The Commands You'll Use</h2>
+        <pre><code># Start everything in background
 docker-compose up -d
 
 # Stop everything
 docker-compose down
 
-# View logs
+# Watch logs ( Ctrl+C to exit)
 docker-compose logs -f
 
-# Rebuild (after changes)
+# Rebuild after changing the yml
 docker-compose up -d --build
 
-# Scale a service
-docker-compose up -d --scale web=3</code></pre>
+# Run a command in a service
+docker-compose exec web ls
 
-        <h2>Why This Matters</h2>
+# See what's running
+docker-compose ps</code></pre>
+
+        <h2>Why This Is Actually Great</h2>
+        <p>Here's the thing: new developer joins your team. They clone the repo, run <code>docker-compose up</code>, and 30 seconds later they have a fully working development environment. No "but it works on my machine" discussions. No "I spent three days setting up the local environment" stories.</p>
+
+        <p>Everything is defined in code. The version of the database. The environment variables. The port mappings. It's all right there in the file.</p>
+
+        <h2>What's Next?</h2>
+        <p>You can extend this to run:</p>
         <ul>
-            <li>One command to start your entire stack</li>
-            <li>Services can talk to each other by name</li>
-            <li>Environment variables make it portable</li>
-            <li>Version control your infrastructure</li>
+            <li>A development stack (app + database + redis + mailhog)</li>
+            <li>A full production-replica for testing</li>
+            <li>CI/CD pipelines that spin up clean environments for each test</li>
         </ul>
 
-        <p>Your dev environment becomes reproducible. New developer joins? They run <code>docker-compose up</code> and have a working system in minutes.</p>
+        <p>Once you go Compose, you never go back.</p>
     </article>
     <footer>
         <div class="copyleft">⟲</div>

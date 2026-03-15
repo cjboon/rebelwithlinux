@@ -37,64 +37,94 @@
         <p>March 2026 • PHP • 15 min read</p>
     </div>
     <article class="blog-content">
-        <p>PHP powers 75% of websites. WordPress, Drupal, Laravel—it's everywhere. Here's how to build dynamic web apps with PHP.</p>
+        <p>Okay, real talk: PHP gets a lot of hate. People call it ugly, outdated, whatever. But here's the thing—WordPress runs on PHP. Drupal runs on PHP. Facebook started on PHP. It powers a huge chunk of the web.</p>
 
-        <h2>Why PHP?</h2>
-        <p>PHP was built specifically for the web. It runs on the server, generates HTML, and sends it to the browser. Simple. Fast. Everywhere.</p>
+        <p>Learning PHP is worth it if you want to build dynamic websites. Let's get into it.</p>
 
-        <h2>Installing PHP</h2>
+        <h2>Why Should You Care?</h2>
+        <p>PHP was built specifically for the web. Need a form that sends an email? PHP. Need to fetch data from a database and display it? PHP. Need to build a whole CMS? PHP's got you.</p>
+
+        <p>It's not pretty, but it works. And there's tons of documentation and tutorials out there.</p>
+
+        <h2>Setting Things Up</h2>
         <pre><code>sudo apt install php php-mysql php-curl php-gd php-mbstring php-xml</code></pre>
+
+        <p>That one command installs PHP and all the common extensions you'll need.</p>
 
         <h2>Your First PHP Script</h2>
         <pre><code>&lt;?php
 echo "Hello, World!";
 ?&gt;</code></pre>
-        <p>Save as <code>index.php</code> and access via your web server.</p>
 
-        <h2>Variables</h2>
+        <p>Save that as <code>index.php</code>, put it in your web server's document root, and visit the page. You've officially written PHP.</p>
+
+        <p>The <code>&lt;?php</code> tells the server "hey, this is PHP code." The <code>?&gt;</code> says "okay, we're done with PHP." Everything between runs on the server and becomes HTML when it reaches the browser.</p>
+
+        <h2>Variables: The $ Sign</h2>
+        <p>PHP variables all start with a dollar sign. It's their thing.</p>
+
         <pre><code>$name = "cjboon";
 $age = 25;
 $is_active = true;</code></pre>
 
-        <h2>Arrays</h2>
-        <pre><code>$fruits = ["apple", "banana", "orange"];
-echo $fruits[0];  // apple
+        <p>Simple. No var/let/const confusion. Everything's just <code>$</code>.</p>
 
-// Associative array
+        <h2>Arrays: Lists of Things</h2>
+        <p>Arrays hold multiple values. Super useful.</p>
+
+        <pre><code>// Regular array
+$fruits = ["apple", "banana", "orange"];
+echo $fruits[0];  // prints "apple"
+
+// Associative array - like a dictionary
 $user = ["name" => "cjboon", "email" => "test@test.com"];
-echo $user["name"];  // cjboon</code></pre>
+echo $user["name"];  // prints "cjboon"</code></pre>
 
-        <h2>Conditionals</h2>
+        <p>Associative arrays are everywhere in PHP. They're how objects work internally.</p>
+
+        <h2>Making Decisions</h2>
         <pre><code>if ($age >= 18) {
     echo "Adult";
 } else {
     echo "Minor";
 }</code></pre>
 
-        <h2>Loops</h2>
-        <pre><code>foreach ($fruits as $fruit) {
+        <p>Same as most languages. If the condition is true, do this. Otherwise, do that.</p>
+
+        <h2>Loops: Going Through Lists</h2>
+        <pre><code>// Loop through array
+foreach ($fruits as $fruit) {
     echo $fruit . "\n";
 }</code></pre>
 
-        <h2>Functions</h2>
+        <p>The <code>foreach</code> loop is probably the most used loop in PHP. It just grabs each item in the array, one by one.</p>
+
+        <h2>Functions: Reusable Code</h2>
         <pre><code>function greet($name) {
     return "Hello, " . $name;
 }
 
 echo greet("cjboon");</code></pre>
 
-        <h2>Superglobals</h2>
-        <p>PHP has built-in variables accessible anywhere:</p>
-        <pre><code>// GET parameters
-echo $_GET["name"];
+        <p>The dot (.) joins strings together. Simple concatenation.</p>
 
-// POST data
+        <h2>Getting Input From Users</h2>
+        <p>When someone submits a form or visits a URL with parameters, PHP makes it easy to grab that data.</p>
+
+        <pre><code>// URL like: example.com/page.php?name=cjboon
+echo $_GET["name"];  // prints "cjboon"
+
+// Form submitted with POST
 echo $_POST["email"];
 
-// Session
+// Sessions - persist data across pages
 $_SESSION["user"] = $user;</code></pre>
 
-        <h2>Connecting to MySQL</h2>
+        <p><code>$_GET</code> is for data in the URL (like search queries). <code>$_POST</code> is for form submissions. <code>$_SESSION</code> lets you remember who logged in.</p>
+
+        <h2>Connecting To A Database</h2>
+        <p>Most PHP apps need a database. Here's the modern way using PDO:</p>
+
         <pre><code>$pdo = new PDO(
     "mysql:host=localhost;dbname=mydb",
     "username",
@@ -106,7 +136,17 @@ while ($row = $stmt->fetch()) {
     echo $row["name"];
 }</code></pre>
 
-        <p>You're ready to build!</p>
+        <p>This is safe from SQL injection if you use prepared statements. But that's a topic for another day.</p>
+
+        <h2>Where To Go From Here</h2>
+        <p>You know enough to:</p>
+        <ul>
+            <li>Build a simple form that saves to a database</li>
+            <li>Create a login system</li>
+            <li>Make a blog from scratch</li>
+        </ul>
+
+        <p>Start small. Break things. That's how you learn.</p>
     </article>
     <footer>
         <div class="copyleft">⟲</div>

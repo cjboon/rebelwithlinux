@@ -37,16 +37,22 @@
         <p>March 2026 • SQL • 15 min read</p>
     </div>
     <article class="blog-content">
-        <p>SQL (Structured Query Language) is how you talk to databases. Every app needs data. SQL is how you get it.</p>
+        <p>Every app needs to store data somewhere. User accounts, blog posts, orders, whatever. That's where databases come in, and SQL is how you talk to them.</p>
 
-        <h2>What is a Database?</h2>
-        <p>A database is a structured collection of data. Relational databases (like MySQL, PostgreSQL) organize data into tables with rows and columns.</p>
+        <p>SQL (pronounced "sequel" or "ess-queue-ell") is the language for managing relational databases. Once you know it, you can pull exactly the data you want from thousands (or millions) of records.</p>
 
-        <h2>Creating a Database</h2>
+        <h2>What Are We Working With?</h2>
+        <p>Imagine a spreadsheet. You've got rows (each record) and columns (each property). That's basically a database table.</p>
+
+        <p>Relational databases let you connect tables together. Users table links to Posts table. Orders table links to Customers table. This is the "relational" part.</p>
+
+        <h2>Creating A Database</h2>
         <pre><code>CREATE DATABASE myapp;
 USE myapp;</code></pre>
 
-        <h2>Creating a Table</h2>
+        <p>First you make the database, then you tell MySQL "hey, I'm working in this one."</p>
+
+        <h2>Making A Table</h2>
         <pre><code>CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
@@ -54,56 +60,87 @@ USE myapp;</code></pre>
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );</code></pre>
 
-        <h2>INSERT - Adding Data</h2>
+        <p>Let's break this down:</p>
+        <ul>
+            <li><code>INT</code> - whole number</li>
+            <li><code>VARCHAR(100)</code> - text, max 100 characters</li>
+            <li><code>PRIMARY KEY</code> - unique identifier for each row</li>
+            <li><code>AUTO_INCREMENT</code> - automatically picks next number</li>
+            <li><code>NOT NULL</code> - must have a value</li>
+            <li><code>UNIQUE</code> - no duplicates allowed</li>
+            <li><code>DEFAULT</code> - what to use if nothing provided</li>
+        </ul>
+
+        <h2>Adding Data (INSERT)</h2>
         <pre><code>INSERT INTO users (name, email) VALUES ("cjboon", "test@test.com");
 INSERT INTO users (name, email) VALUES ("alice", "alice@test.com");</code></pre>
 
-        <h2>SELECT - Reading Data</h2>
-        <pre><code>-- All users
+        <p>You specify which columns you're filling, then provide the values in the same order.</p>
+
+        <h2>Reading Data (SELECT)</h2>
+        <p>This is the big one. SELECT is how you get data out.</p>
+
+        <pre><code>-- Get everything
 SELECT * FROM users;
 
--- Specific columns
+-- Just specific columns
 SELECT name, email FROM users;
 
--- With condition
+-- Filter with WHERE
 SELECT * FROM users WHERE id = 1;</code></pre>
 
-        <h2>UPDATE - Modifying Data</h2>
+        <p>The asterisk (*) means "all columns." You can replace it with specific column names if you only need certain data.</p>
+
+        <h2>Changing Data (UPDATE)</h2>
         <pre><code>UPDATE users SET email = "new@test.com" WHERE id = 1;</code></pre>
 
-        <h2>DELETE - Removing Data</h2>
+        <p>Pro tip: always include WHERE when updating. Without it, you'd update every single row in the table.</p>
+
+        <h2>Deleting Data (DELETE)</h2>
         <pre><code>DELETE FROM users WHERE id = 1;</code></pre>
 
-        <h2>JOINs - Combining Tables</h2>
-        <pre><code>-- Users and their posts
-SELECT users.name, posts.title
+        <p>Same deal—always specify which rows. Otherwise you're wiping the whole table.</p>
+
+        <h2>Joining Tables Together</h2>
+        <p>This is where it gets powerful. You can combine data from multiple tables.</p>
+
+        <pre><code>SELECT users.name, posts.title
 FROM users
 JOIN posts ON users.id = posts.user_id;</code></pre>
 
+        <p>You're saying "give me user names and their post titles, matching each user to their posts."</p>
+
         <h2>Types of JOINs</h2>
         <ul>
-            <li><strong>INNER</strong> - Only matching rows</li>
-            <li><strong>LEFT</strong> - All from left table, matching from right</li>
-            <li><strong>RIGHT</strong> - All from right table, matching from left</li>
+            <li><strong>INNER JOIN</strong> - only rows that exist in both tables</li>
+            <li><strong>LEFT JOIN</strong> - all from left table, matching from right</li>
+            <li><strong>RIGHT JOIN</strong> - all from right table, matching from left</li>
         </ul>
 
-        <h2>ORDER BY & LIMIT</h2>
-        <pre><code>-- Newest users first
+        <p>Most of the time you'll use INNER or LEFT.</p>
+
+        <h2>Sorting & Limiting</h2>
+        <pre><code>-- Newest users first, limit to 10
 SELECT * FROM users ORDER BY created_at DESC LIMIT 10;</code></pre>
 
-        <h2>Aggregate Functions</h2>
+        <p>ORDER BY sorts. DESC means descending (newest first). ASC is ascending (oldest first). LIMIT restricts how many results you get.</p>
+
+        <h2>Counting & Aggregating</h2>
         <pre><code>SELECT COUNT(*) FROM users;
 SELECT SUM(amount) FROM orders;
-SELECT AVG(age) FROM users;
-SELECT MAX(price) FROM products;</code></pre>
+SELECT AVG(price) FROM products;</code></pre>
 
-        <h2>GROUP BY</h2>
-        <pre><code>-- Count posts per user
-SELECT user_id, COUNT(*) as post_count
+        <p>These let you do math across all your data.</p>
+
+        <h2>Grouping Results</h2>
+        <pre><code>SELECT user_id, COUNT(*) as post_count
 FROM posts
 GROUP BY user_id;</code></pre>
 
-        <p>You can now query any database!</p>
+        <p>GROUP BY groups rows together so you can count or sum per group. This example counts how many posts each user has.</p>
+
+        <h2>That's The Basics</h2>
+        <p>You can build a lot with just SELECT, INSERT, UPDATE, and DELETE. Practice these commands. Try them on some real data. Once you're comfortable, look into indexes, subqueries, and transactions.</p>
     </article>
     <footer>
         <div class="copyleft">⟲</div>

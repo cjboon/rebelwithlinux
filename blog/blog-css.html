@@ -37,10 +37,13 @@
         <p>March 2026 • CSS • 15 min read</p>
     </div>
     <article class="blog-content">
-        <p>Two layout systems rule modern CSS: Flexbox and Grid. Use Flexbox for one-dimensional layouts (row OR column). Use Grid for two-dimensional layouts (rows AND columns).</p>
+        <p>CSS layouts used to be a nightmare. Floats, clearfixes, negative margins—it's a wonder any of us survived. Then came Flexbox and Grid, and everything got so much better.</p>
 
-        <h2>Flexbox: One Dimension</h2>
-        <p>Perfect for navigation bars, centering content, distributing space.</p>
+        <p>Here's the simple rule: Flexbox for one dimension (a row OR a column). Grid for two dimensions (rows AND columns). That's it.</p>
+
+        <h2>Flexbox: One Dimensional</h2>
+        <p>Flexbox is perfect when you have items in a single line and want to arrange them. Navigation bars. Button groups. Centering things (finally!).</p>
+
         <pre><code>.container {
     display: flex;
     justify-content: space-between;
@@ -48,20 +51,24 @@
     gap: 16px;
 }</code></pre>
 
-        <h3>Key Properties</h3>
+        <p>Let's break it down:</p>
         <ul>
-            <li><strong>justify-content</strong> - main axis (horizontal)</li>
-            <li><strong>align-items</strong> - cross axis (vertical)</li>
-            <li><strong>flex-direction</strong> - row or column</li>
-            <li><strong>flex-wrap</strong> - wrap items to new line</li>
+            <li><code>justify-content</code> - positions items horizontally (the main axis)</li>
+            <li><code>align-items</code> - positions items vertically (the cross axis)</li>
+            <li><code>gap</code> - space between items</li>
         </ul>
+
+        <p>The main axis is however your items flow. If you have <code>flex-direction: row</code> (default), main axis is horizontal. If <code>flex-direction: column</code>, it's vertical.</p>
 
         <h3>Common Values</h3>
         <pre><code>justify-content: flex-start | flex-end | center | space-between | space-around
 align-items: flex-start | flex-end | center | stretch</code></pre>
 
-        <h2>Grid: Two Dimensions</h2>
-        <p>Perfect for page layouts, galleries, dashboards.</p>
+        <p><code>space-between</code> puts equal space between items. <code>space-around</code> puts equal space around each item (so outer items have half as much space on the edges).</p>
+
+        <h2>Grid: Two Dimensional</h2>
+        <p>Grid is for when you need both rows and columns. Page layouts. Photo galleries. Anything that needs to be in a proper table-like structure.</p>
+
         <pre><code>.container {
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
@@ -69,32 +76,31 @@ align-items: flex-start | flex-end | center | stretch</code></pre>
     gap: 20px;
 }</code></pre>
 
-        <h3>Key Properties</h3>
-        <ul>
-            <li><strong>grid-template-columns</strong> - column widths</li>
-            <li><strong>grid-template-rows</strong> - row heights</li>
-            <li><strong>gap</strong> - space between items</li>
-            <li><strong>grid-column</strong> - span columns</li>
-            <li><strong>grid-row</strong> - span rows</li>
-        </ul>
+        <h3>The fr Unit</h3>
+        <p><code>1fr</code> means "one fraction" of available space. So <code>1fr 2fr 1fr</code> gives you four equal parts—the middle gets two, the sides get one each.</p>
 
-        <h3>fr Unit</h3>
-        <p><code>1fr</code> means "one fraction" of available space.</p>
         <pre><code>/* Three equal columns */
 grid-template-columns: 1fr 1fr 1fr;
 
-/* Sidebar + main content */
+/* Sidebar (300px) + main content (fills rest) */
 grid-template-columns: 300px 1fr;</code></pre>
 
-        <h2>Responsive Grid</h2>
+        <h2>Making It Responsive Without Media Queries</h2>
+        <p>This is the magic trick that solves most responsive layout problems:</p>
+
         <pre><code>.container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 16px;
 }</code></pre>
-        <p>This creates responsive columns that auto-wrap! No media queries needed.</p>
+
+        <p>Read this as: "make columns that are at least 250px wide, but stretch to fill space. Fit as many as you can."</p>
+
+        <p>This automatically wraps to new lines on smaller screens. No media queries needed.</p>
 
         <h2>Centering: The Old Way vs Flexbox</h2>
+        <p>Remember when centering was a joke? People made memes about it?</p>
+
         <pre><code>/* The easy way */
 .container {
     display: flex;
@@ -103,7 +109,11 @@ grid-template-columns: 300px 1fr;</code></pre>
     min-height: 100vh;
 }</code></pre>
 
+        <p>That's it. Vertically and horizontally centered. Four lines of code. Works in every modern browser.</p>
+
         <h2>Grid Areas: Name Your Layout</h2>
+        <p>There's a trick where you name your layout areas and place items by name. It's weird but kind of cool:</p>
+
         <pre><code>.container {
     display: grid;
     grid-template-areas:
@@ -118,7 +128,14 @@ grid-template-columns: 300px 1fr;</code></pre>
 .main { grid-area: main; }
 .footer { grid-area: footer; }</code></pre>
 
-        <p>Use these together. Grid for page structure, Flexbox for component internals.</p>
+        <p>Visualize your whole layout in the template-areas property. It's kind of fun.</p>
+
+        <h2>Use Both Together</h2>
+        <p>Here's the secret: use Grid for page structure, Flexbox for pieces inside. They're not competitors—they work together.</p>
+
+        <p>Grid handles the overall layout. Flexbox handles the navigation inside your header. Grid handles the blog post layout. Flexbox handles the author bio at the bottom.</p>
+
+        <p>That's the real workflow.</p>
     </article>
     <footer>
         <div class="copyleft">⟲</div>
