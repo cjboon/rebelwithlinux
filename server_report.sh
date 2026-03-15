@@ -3,7 +3,7 @@
 # === CONFIG ===
 SITE_NAME="rebelwithlinux.com"
 WEB_ROOT="/var/www/${SITE_NAME}"
-DEFAULT_LOCATION="Ogden, Utah"
+DEFAULT_LOCATION="Unknown"
 # === END CONFIG ===
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -98,10 +98,11 @@ except:
     location = os.environ.get('DEFAULT_LOCATION', 'Unknown')
 
 # Read current values from HTML and replace with new values
-location_match = re.search(r'>([^<]+location[^<]*)<', content)
-if location_match:
-    old_location = location_match.group(1)
-    content = content.replace(f'>{old_location}<', f'>{location}<', 1)
+# Replace Location in Stats section (line 1562: <div><strong>Location</strong><br>Ogden, Utah</div>)
+content = re.sub(r'(<div><strong>Location</strong><br>)[^<]+(</div>)', f'\g<1>{location}\g<2>', content, 1)
+
+# Replace Location in script tag (line 1629: <script>Ogden, Utah</script>)
+content = re.sub(r'(<script>)[^<]+(</script>)', f'\g<1>{location}\g<2>', content, 1)
 
 uptime_match = re.search(r'>([^<]+uptime[^<]*)<', content, re.IGNORECASE)
 if uptime_match:
