@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-logging.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logging & Centralized Logging - Monitor Everything | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn centralized logging from beginner to advanced. Master log aggregation, ELK stack, Loki, and build robust observability.">
+    <meta name="keywords" content: "logging, centralized logging, ELK stack, Loki, Logstash, Elasticsearch, Kibana, Grafana, observability, log aggregation, syslog">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    <script src="../terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #FF6F00;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">LOGGING MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>SEE EVERYTHING</h1>
+        <p class="tagline">// If it happens, log it.</p>
+        
+        <div class="manifesto">
+            <p><strong>LOGGING IS OBSERVABILITY.</strong></p>
+            <p>In production, you can't debug with print statements. You need structured logs, centralized aggregation, and powerful search. When things break at 3 AM, good logs are your best friend.</p>
+            <p><strong>WHY CENTRALIZED LOGGING?</strong></p>
+            <p>With dozens of servers and services, checking logs on each machine is impossible. Centralized logging aggregates everything in one place. Search across all logs, create dashboards, and get alerts when errors spike.</p>
+            <p><strong>BECOME OBSERVABLE.</strong></p>
+            <p>Master the ELK stack (Elasticsearch, Logstash, Kibana) or Grafana Loki. Learn to structure logs, create alerts, and build dashboards. The key to running reliable systems is seeing what's happening.</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to Mastery</h2>
+            <p>12 lessons. Complete logging control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Logging Fundamentals</h3>
+                <p class="lesson-desc">Understand log levels, structured logging, and best practices.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">System Logging</h3>
+                <p class="lesson-desc">Configure syslog, journald, and system log rotation.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Application Logging</h3>
+                <p class="lesson-desc">Implement logging in Python, Go, and Node.js applications.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Log Format & Structure</h3>
+                <p class="lesson-desc">Create JSON logs with timestamps, levels, and context.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Log Shippers</h3>
+                <p class="lesson-desc">Use Filebeat, Fluentd, and journalbeat to forward logs.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Elasticsearch Basics</h3>
+                <p class="lesson-desc">Install Elasticsearch and understand the data model.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Logstash & Ingest</h3>
+                <p class="lesson-desc">Parse, transform, and enrich logs with Logstash pipelines.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Kibana Dashboards</h3>
+                <p class="lesson-desc">Build visualizations and dashboards in Kibana.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Grafana Loki</h3>
+                <p class="lesson-desc">Set up Loki for cost-effective log aggregation.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Log Alerts</h3>
+                <p class="lesson-desc">Create alerts for errors, spikes, and anomalies.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Performance & Scaling</h3>
+                <p class="lesson-desc">Optimize Elasticsearch and handle billions of logs.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Security & Compliance</h3>
+                <p class="lesson-desc">Secure logs, manage access, and meet compliance requirements.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why Centralized Logging</h2>
+            <p>The old approach—ssh to each server and grep through log files—doesn't scale. When you have microservices, containers, and auto-scaling, you need centralized logging.</p>
+            <p>The ELK stack (Elasticsearch, Logstash, Kibana) is the most popular solution. Elasticsearch stores and searches logs, Logstash processes them, and Kibana provides the interface.</p>
+            <p>Grafana Loki offers a cheaper alternative, storing logs in object storage and only indexing labels. Either way, centralized logging is essential for debugging production issues.</p>
+            <p><strong>You can't fix what you can't see. Own your logs.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>📖 Elasticsearch Docs</h3>
+                <p>Official Documentation</p>
+                <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html" target="_blank">elastic.co</a>
+            </div>
+            <div class="resource-card">
+                <h3>📦 Logstash</h3>
+                <p>Log Processing</p>
+                <a href="https://www.elastic.co/logstash" target="_blank">logstash</a>
+            </div>
+            <div class="resource-card">
+                <h3>📊 Kibana</h3>
+                <p>Visualization</p>
+                <a href="https://www.elastic.co/kibana" target="_blank">kibana</a>
+            </div>
+            <div class="resource-card">
+                <h3>🐳 Loki</h3>
+                <p>Grafana Logging</p>
+                <a href="https://grafana.com/oss/loki/" target="_blank">grafana.com/loki</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Rebel With Linux. See everything, fix anything.</p>
+    </footer>
+
+    <!-- Lesson 1: Logging Fundamentals -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Logging Fundamentals</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Logging?</h3>
+                <p>Logging is the practice of recording events, errors, and information from your applications. Good logs help you understand what your system is doing and debug when things go wrong.</p>
+                
+                <h3>Log Levels</h3>
+                <ul>
+                    <li><strong>DEBUG:</strong> Detailed diagnostic info</li>
+                    <li><strong>INFO:</strong> General information about operations</li>
+                    <li><strong>WARNING:</strong> Something unexpected, but not an error</li>
+                    <li><strong>ERROR:</strong> A problem that prevented something from working</li>
+                    <li><strong>FATAL:</strong> Critical error causing application crash</li>
+                </ul>
+                
+                <div class="highlight-box">
+                    <strong>PRO TIP:</strong> Use INFO for normal operations, WARNING for recoverable issues, ERROR for failures. Reserve DEBUG for development only.
+                </div>
+
+                <h3>Basic Logging</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">logger "Application started"</span>
+<span class="output">Feb 15 10:30:00 server logger: Application started</span>
+                </div>
+
+                <h3>Logging in Applications</h3>
+                <div class="code-block">
+<span class="comment"># Python</span>
+<span class="keyword">import</span> logging
+logging.<span class="function">info</span>(<span class="string">"User logged in"</span>)
+logging.<span class="function">error</span>(<span class="string">"Connection failed"</span>)
+
+<span class="comment"># Go</span>
+log.<span class="function">Info</span>(<span class="string">"Request processed"</span>)
+log.<span class="function">Error</span>(<span class="string">"Database timeout"</span>)
+
+<span class="comment"># JavaScript/Node</span>
+console.<span class="function">log</span>(<span class="string">"Info message"</span>);
+console.<span class="function">error</span>(<span class="string">"Error message"</span>);
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What level for normal operations?</p>
+                        <input type="text" class="quiz-input" data-answer="INFO" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What level for application crashes?</p>
+                        <input type="text" class="quiz-input" data-answer="FATAL" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2: System Logging -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// System Logging</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>syslog</h3>
+                <p>Standard logging daemon on Unix systems:</p>
+                
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">logger -p user.info "My application message"</span>
+<span class="output"># Write to /var/log/syslog</span>
+<span class="prompt">$</span> <span class="command">tail -f /var/log/syslog</span>
+<span class="output"># Watch logs in real-time</span>
+                </div>
+
+                <h3>systemd Journal</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">journalctl -xe</span>
+<span class="output"># View journal</span>
+<span class="prompt">$</span> <span class="command">journalctl -u nginx.service</span>
+<span class="output"># Logs for specific service</span>
+<span class="prompt">$</span> <span class="command">journalctl --since "1 hour ago"</span>
+<span class="output"># Recent logs</span>
+                </div>
+
+                <h3>Log Locations</h3>
+                <div class="code-block">
+/var/log/syslog      <span class="comment"># General system messages</span>
+/var/log/auth.log    <span class="comment"># Authentication</span>
+/var/log/kern.log    <span class="comment"># Kernel messages</span>
+/var/log/dmesg       <span class="comment"># Boot messages</span>
+/var/log/nginx/      <span class="comment"># Application logs</span>
+                </div>
+
+                <h3>Log Rotation</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo logrotate -f /etc/logrotate.conf</span>
+<span class="output"># Force rotation</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What command views systemd logs?</p>
+                        <input type="text" class="quiz-input" data-answer="journalctl" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3: Application Logging -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Application Logging</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Python Logging</h3>
+                <div class="code-block">
+<span class="keyword">import</span> logging
+
+logging.<span class="function">basicConfig</span>(
+    level=logging.INFO,
+    format=<span class="string">'%(asctime)s - %(name)s - %(levelname)s - %(message)s'</span>
+)
+logger = logging.<span class="function">getLogger</span>(__name__)
+
+logger.<span class="function">info</span>(<span class="string">"Application started"</span>)
+logger.<span class="function">error</span>(<span class="string">"Database connection failed"</span>)
+                </div>
+
+                <h3>Go Logging</h3>
+                <div class="code-block">
+<span class="keyword">import</span> (
+    <span class="string">"log"</span>
+    <span class="string">"os"</span>
+)
+
+<span class="comment">// Set output</span>
+log.<span class="function">SetOutput</span>(os.Stdout)
+
+log.<span class="function">Info</span>(<span class="string">"Server starting on port 8080"</span>)
+log.<span class="function">Error</span>(<span class="string">"Failed to connect to database"</span>)
+                </div>
+
+                <h3>Node.js Logging</h3>
+                <div class="code-block">
+<span class="comment"># npm install pino</span>
+<span class="keyword">const</span> pino = <span class="function">require</span>(<span class="string">'pino'</span>)
+<span class="keyword">const</span> logger = <span class="function">pino</span>()
+
+logger.<span class="function">info</span>(<span class="string">"Server started"</span>)
+logger.<span class="function">error</span>(<span class="string">"Connection refused"</span>)
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What module for logging in Python?</p>
+                        <input type="text" class="quiz-input" data-answer="logging" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4: Log Format & Structure -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Log Format & Structure</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Structured Logging</h3>
+                <p>JSON logs are machine-parseable and work great with log aggregation:</p>
+                
+                <div class="code-block">
+{
+  <span class="string">"timestamp"</span>: <span class="string">"2024-02-15T10:30:00Z"</span>,
+  <span class="string">"level"</span>: <span class="string">"INFO"</span>,
+  <span class="string">"message"</span>: <span class="string">"User logged in"</span>,
+  <span class="string">"user_id"</span>: <span class="number">12345</span>,
+  <span class="string">"ip_address"</span>: <span class="string">"192.168.1.1"</span>
+}
+                </div>
+
+                <h3>Key Fields</h3>
+                <div class="code-block">
+<span class="comment"># Essential fields for every log</span>
+- timestamp     <span class="comment"># ISO 8601 format</span>
+- level        <span class="comment"># DEBUG, INFO, WARN, ERROR, FATAL</span>
+- message      <span class="comment"># Human-readable description</span>
+- service      <span class="comment"># Which service generated it</span>
+- trace_id     <span class="comment"># For request tracing</span>
+                </div>
+
+                <h3>Context is King</h3>
+                <div class="code-block">
+<span class="comment"># Good log - has context</span>
+{
+  <span class="string">"message"</span>: <span class="string">"Payment failed"</span>,
+  <span class="string">"user_id"</span>: <span class="number">123</span>,
+  <span class="string">"amount"</span>: <span class="number">99.99</span>,
+  <span class="string">"currency"</span>: <span class="string">"USD"</span>,
+  <span class="string">"error_code"</span>: <span class="string">"CARD_DECLINED"</span>
+}
+
+<span class="comment"># Bad log - no context</span>
+<span class="string">"Payment failed"</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What format is machine-parseable?</p>
+                        <input type="text" class="quiz-input" data-answer="JSON" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5: Log Shippers -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Log Shippers</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Log Shippers?</h3>
+                <p>Agents that forward logs from servers to centralized logging systems:</p>
+
+                <h3>Filebeat</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apt install filebeat</span>
+<span class="output"># Install Filebeat</span>
+                </div>
+                <div class="code-block">
+<span class="comment"># /etc/filebeat/filebeat.yml</span>
+filebeat.inputs:
+- type: log
+  paths:
+    - /var/log/nginx/*.log
+  fields:
+    service: nginx
+
+output.elasticsearch:
+  hosts: [<span class="string">"localhost:9200"</span>]
+                </div>
+
+                <h3>Fluentd</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">curl -L https://toolbelt.treasuredata.com/sh/install-ubuntu-fluentd-{{site.version}}-2.sh | sh</span>
+                </div>
+
+                <h3>syslog-ng</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apt install syslog-ng</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What forwards logs to central systems?</p>
+                        <input type="text" class="quiz-input" data-answer="log shipper" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6: Elasticsearch Basics -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Elasticsearch Basics</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Elasticsearch?</h3>
+                <p>Distributed search and analytics engine, optimized for log storage and searching:</p>
+
+                <h3>Installing</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -</span>
+<span class="prompt">$</span> <span class="command">echo "deb https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list</span>
+<span class="prompt">$</span> <span class="command">sudo apt update && sudo apt install elasticsearch</span>
+                </div>
+
+                <h3>Starting Elasticsearch</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo systemctl enable elasticsearch</span>
+<span class="prompt">$</span> <span class="command">sudo systemctl start elasticsearch</span>
+<span class="prompt">$</span> <span class="command">curl http://localhost:9200</span>
+                </div>
+
+                <h3>Elasticsearch Concepts</h3>
+                <div class="code-block">
+Index     <span class="comment"># Like a database</span>
+Type      <span class="comment"># Like a table (deprecated in ES 7+)</span>
+Document  <span class="comment"># Like a row (JSON)</span>
+Shard     <span class="comment"># Fragment of an index</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What stores documents in Elasticsearch?</p>
+                        <input type="text" class="quiz-input" data-answer="index" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7: Logstash & Ingest -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Logstash & Ingest</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Logstash Pipeline</h3>
+                <p>Input → Filter → Output</p>
+
+                <div class="code-block">
+input {
+  beats {
+    port => <span class="number">5044</span>
+  }
+}
+
+filter {
+  grok {
+    match => { <span class="string">"message"</span> => <span class="string">"%{TIMESTAMP:timestamp} %{LOGLEVEL:level} %{GREEDYDATA:msg}"</span> }
+  }
+  date {
+    match => [ <span class="string">"timestamp"</span>, <span class="string">"ISO8601"</span> ]
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => [<span class="string">"localhost:9200"</span>]
+    index => <span class="string">"logs-%{+YYYY.MM.dd}"</span>
+  }
+}
+                </div>
+
+                <h3>Grok Patterns</h3>
+                <div class="code-block">
+<span class="comment"># Common patterns</span>
+%{TIMESTAMP_ISO8601:timestamp}
+%{LOGLEVEL:level}
+%{IP:client_ip}
+%{NUMBER:response_time}
+%{URI:request_path}
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What parses unstructured logs?</p>
+                        <input type="text" class="quiz-input" data-answer="grok" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8: Kibana Dashboards -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Kibana Dashboards</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Kibana?</h3>
+                <p>Visualization and dashboarding for Elasticsearch:</p>
+
+                <h3>Installing</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apt install kibana</span>
+<span class="prompt">$</span> <span class="command">sudo systemctl enable kibana</span>
+<span class="prompt">$</span> <span class="command">sudo systemctl start kibana</span>
+<span class="prompt">$</span> <span class="command">curl -X GET "localhost:5601/api/status"</span>
+                </div>
+
+                <h3>Creating Visualizations</h3>
+                <div class="code-block">
+<span class="comment"># Steps to create a dashboard</span>
+1. Go to Visualize → Create new
+2. Choose chart type (line, bar, pie, etc.)
+3. Select index pattern
+4. Choose metric (count, average, etc.)
+5. Choose bucket (terms, date histogram)
+6. Save and add to dashboard
+                </div>
+
+                <h3>Common Visualizations</h3>
+                <ul>
+                    <li><strong>Line Chart:</strong> Errors over time</li>
+                    <li><strong>Bar Chart:</strong> Requests by endpoint</li>
+                    <li><strong>Pie Chart:</strong> Status code distribution</li>
+                    <li><strong>Metric:</strong> Total requests, error rate</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What visualizes Elasticsearch data?</p>
+                        <input type="text" class="quiz-input" data-answer="Kibana" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9: Grafana Loki -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Grafana Loki</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Loki?</h3>
+                <p>Cost-effective log aggregation from Grafana. Unlike ELK, it only indexes labels, not full text:</p>
+
+                <h3>Installing</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">docker run -d --name loki -p 3100:3100 grafana/loki:latest</span>
+<span class="output"># Or use docker-compose</span>
+                </div>
+
+                <h3>Promtail Configuration</h3>
+                <div class="code-block">
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://localhost:3100/loki/api/v1/push
+
+scrape_configs:
+- job_name: system
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: syslog
+      __path__: /var/log/syslog
+                </div>
+
+                <h3>Loki vs ELK</h3>
+                <table>
+                    <tr><td>Feature</td><td>Loki</td><td>ELK</td></tr>
+                    <tr><td>Storage</td><td>Cheap (S3/GCS)</td><td>Expensive</td></tr>
+                    <tr><td>Indexing</td><td>Labels only</td><td>Full text</td></tr>
+                    <tr><td>Setup</td><td>Simple</td><td>Complex</td></tr>
+                </table>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What indexes only labels?</p>
+                        <input type="text" class="quiz-input" data-answer="Loki" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10: Log Alerts -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Log Alerts</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Kibana Alerts</h3>
+                <div class="code-block">
+<span class="comment"># Create alert in Kibana</span>
+1. Stack Management → Alerts → Create
+2. Define condition (threshold)
+3. Set action (email, Slack, webhook)
+4. Enable and test
+                </div>
+
+                <h3>Grafana Alerts</h3>
+                <div class="code-block">
+<span class="comment"># Alert rule</span>
+- Query: rate(http_requests_total{status=<span class="string">"500"</span>}[5m]) > 10
+- For: 5m
+- Labels: severity=critical
+- Annotations: description: High error rate detected
+                </div>
+
+                <h3>Alert Actions</h3>
+                <ul>
+                    <li><strong>Email:</strong> Send notification</li>
+                    <li><strong>Slack:</strong> Post to channel</li>
+                    <li><strong>PagerDuty:</strong> Incident management</li>
+                    <li><strong>Webhook:</strong> Trigger automation</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What triggers on conditions?</p>
+                        <input type="text" class="quiz-input" data-answer="alert" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11: Performance & Scaling -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Performance & Scaling</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Index Management</h3>
+                <div class="code-block">
+<span class="comment"># Close old indices</span>
+POST /logs-2023.01/_close
+
+<span class="comment"># Delete very old indices</span>
+DELETE /logs-2022.01
+
+<span class="comment"># Use index templates</span>
+PUT /_index_template/logs-template
+{
+  <span class="string">"index_patterns"</span>: [<span class="string">"logs-*"</span>],
+  <span class="string">"template"</span>: {
+    <span class="string">"settings"</span>: {
+      <span class="string">"number_of_shards"</span>: <span class="number">3</span>
+    }
+  }
+}
+                </div>
+
+                <h3>ILM (Index Lifecycle Management)</h3>
+                <div class="code-block">
+<span class="comment"># Hot → Warm → Cold → Delete</span>
+PUT /_ilm/policy/logs-policy
+{
+  <span class="string">"policy"</span>: {
+    <span class="string">"phases"</span>: {
+      <span class="string">"hot"</span>: { <span class="string">"min_age"</span>: <span class="string">"0ms"</span> },
+      <span class="string">"warm"</span>: { <span class="string">"min_age"</span>: <span class="string">"30d"</span> },
+      <span class="string">"cold"</span>: { <span class="string">"min_age"</span>: <span class="string">"90d"</span> },
+      <span class="string">"delete"</span>: { <span class="string">"min_age"</span>: <span class="string">"1y"</span> }
+    }
+  }
+}
+                </div>
+
+                <h3>Scaling Strategies</h3>
+                <ul>
+                    <li>Add more data nodes</li>
+                    <li>Use proper shard counts</li>
+                    <li>Implement ILM policies</li>
+                    <li>Use ultra-warm nodes for historical data</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What manages index lifecycle?</p>
+                        <input type="text" class="quiz-input" data-answer="ILM" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12: Security & Compliance -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Security & Compliance</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Encrypting Logs</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command"># Enable TLS for Elasticsearch</span>
+xpack.security.http.ssl.enabled: true
+xpack.security.http.ssl.certificate: /path/to/cert.crt
+xpack.security.http.ssl.key: /path/to/cert.key
+                </div>
+
+                <h3>Access Control</h3>
+                <div class="code-block">
+<span class="comment"># Kibana spaces for team isolation</span>
+- Admin space: Full access
+- Dev space: Development logs only
+- Support space: Production read-only
+                </div>
+
+                <h3>Audit Logging</h3>
+                <div class="code-block">
+<span class="comment"># Enable audit logging</span>
+xpack.security.audit.enabled: true
+xpack.security.audit.outputs: [index, logfile]
+                </div>
+
+                <h3>Data Retention</h3>
+                <div class="code-block">
+<span class="comment"># Compliance requirements</span>
+- PCI-DSS: 1 year
+- HIPAA: 6 years
+- GDPR: Based on purpose
+- SOC 2: 1 year
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What tracks access to data?</p>
+                        <input type="text" class="quiz-input" data-answer="audit logging" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../nav.js" defer></script>
+</body>
+</html>

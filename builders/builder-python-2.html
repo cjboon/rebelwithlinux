@@ -442,6 +442,26 @@
         function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
         function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = 'builder-python-3.html'; }
         
+        // Keyboard support
+        document.addEventListener('keydown', function(e) {
+            const key = e.key.toLowerCase();
+            if (key.length === 1 && key >= 'a' && key <= 'z') {
+                const emptyIndex = placedLetters.indexOf(null);
+                if (emptyIndex !== -1) {
+                    const poolItems = document.querySelectorAll('.letter-tile');
+                    for (let item of poolItems) {
+                        if (item.textContent.toLowerCase() === key) {
+                            placedLetters[emptyIndex] = { letter: item.textContent, index: parseInt(item.dataset.originalIndex) };
+                            renderLetterSlots();
+                            renderLetterPool();
+                            if (!placedLetters.includes(null)) setTimeout(checkAnswer, 300);
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+        
         initLevel();
 
         const savedTheme = localStorage.getItem('theme');

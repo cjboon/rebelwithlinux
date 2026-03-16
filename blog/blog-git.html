@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-git.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Git - Stop Losing Your Code</title>
+    <meta name="description" content="Learn Git version control before you lose weeks of work.">
+    <meta name="keywords" content="Git, programming, version control">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Git - Stop Losing Your Code">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-git.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-git.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: #000; border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: #fff; text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="blog-header">
+        <h1>Git</h1>
+        <p>March 16, 2026 • Git • Version control is not optional.</p>
+    </div>
+    
+    <nav class="blog-nav">
+        <a href="../index.html#blog">← Back to Blog</a>
+    </nav>
+
+    <article class="blog-content">
+        <p>You're still emailing yourself zip files? Naming files like "final_v2_REAL_final.txt"? Stop. Git exists. Use it. You will lose code otherwise. It's not a matter of if, it's a matter of when.</p>
+
+        <h2>What Git Actually Does</h2>
+        <p>Git tracks changes to your files. Every time you commit, you're saving a snapshot of your project at that moment. You can go back to any snapshot. You can create branches to experiment without destroying your working code. You can merge changes back together.</p>
+        
+        <p>Linus Torvalds created Git in 2005 because the existing version control systems all sucked. He needed something to manage the Linux kernel - the biggest open source project on the planet. Git handles it. It can handle your shit too.</p>
+
+        <h2>The Only Commands You Need</h2>
+        <p>Forget the 47 Git tutorials you've bookmarked. Here's the basics:</p>
+        
+        <pre><code># Initialize a new repository
+git init
+
+# Check what's changed
+git status
+
+# Stage changes (prepare them for commit)
+git add filename.py
+git add .    # Stage ALL changes
+
+# Commit (save the snapshot)
+git commit -m "Describe what you changed"
+
+# See history
+git log
+
+# Go back to a previous commit
+git checkout commit-hash
+
+# Create a new branch
+git branch experiment-name
+
+# Switch to a branch
+git checkout experiment-name
+
+# Merge a branch
+git merge experiment-name</code></pre>
+
+        <h2>How It All Fits Together</h2>
+        <p>Think of it like this:</p>
+        
+        <ul>
+            <li><strong>Repository (repo)</strong> - The entire project, including its history</li>
+            <li><strong>Commit</strong> - A saved snapshot with a message explaining what changed</li>
+            <li><strong>Branch</strong> - A parallel version of your code</li>
+            <li><strong>Merge</strong> - Combining branches back together</li>
+            <li><strong>HEAD</strong> - Your current position (which commit you're on)</li>
+        </ul>
+
+        <p>The main branch is usually called "main" or "master". Don't touch main directly. Create a branch, work on it, test it, then merge.</p>
+
+        <h2>The Workflow That Works</h2>
+        <p>Here's the minimum viable workflow:</p>
+        
+        <pre><code>1. git init              # Start tracking a project
+2. git add .             # Stage all your changes
+3. git commit -m "msg"  # Save a snapshot
+4. Repeat 2-3 as you work
+
+# When you break something:
+5. git log              # See your commits
+6. git checkout hash    # Go back to when it worked</code></pre>
+
+        <p>That's it. That's the entire workflow for solo development.</p>
+
+        <h2>When You Need More</h2>
+        <p>Eventually you'll need these:</p>
+        
+        <ul>
+            <li><code>git diff</code> - See exactly what changed between commits</li>
+            <li><code>git stash</code> - Temporarily save changes without committing</li>
+            <li><code>git reset --hard</code> - Blow away uncommitted changes (careful!)</li>
+            <li><code>.gitignore</code> - Files you don't want Git to track</li>
+        </ul>
+
+        <h2>GitHub Is Not Git</h2>
+        <p>Stop confusing these. Git is the version control system. GitHub is a hosting service for Git repositories. You can use Git without GitHub. You can use GitHub without using their (creepy) AI features.</p>
+        
+        <p>Self-host your Git repos if you care about privacy. Gitea is excellent. GitLab is fine. Or just use Git over SSH on your own server. The choice is yours. That's the point.</p>
+
+        <h2>Start Now</h2>
+        <p>Every project, no matter how small, should be in Git. Right now. Go initialize a repo. Make your first commit. It's not that hard.</p>
+        
+        <p><strong>Learn more:</strong></p>
+        <ul>
+            <li><a href="../guides/guide-git.html">Our Git Guide</a> - Interactive lessons</li>
+            <li><a href="../hangman/hangman-git.html">Git Hangman</a> - Test your knowledge</li>
+            <li><a href="https://git-scm.com/doc">Official Git Documentation</a> - Read it</li>
+        </ul>
+    </article>
+
+    <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+        <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+        <div id="comments-list" style="margin-bottom: 32px;"></div>
+        <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+            <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+            <div style="display: grid; gap: 16px;">
+                <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                <button onclick="submitComment('blog-git')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+            </div>
+        </div>
+    </section>
+    <script src="../js/comments.js"></script>
+    <script src="../nav.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-git');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-typescript.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeScript Programming - Type-Safe JavaScript | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn TypeScript from beginner to advanced. Master types, interfaces, generics, and build type-safe applications that scale.">
+    <meta name="keywords" content="TypeScript, TypeScript tutorial, learn TypeScript, JavaScript types, type safety, interfaces, generics, frontend development, backend development">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    <script src="../terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #3178C6;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">TYPESCRIPT MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>TYPE YOUR<br>WAY TO SAFETY</h1>
+        <p class="tagline">// JavaScript that scales.</p>
+        
+        <div class="manifesto">
+            <p><strong>JAVASCRIPT WITH GUARDS.</strong></p>
+            <p>TypeScript adds static typing to JavaScript, catching errors at compile time instead of runtime. It's JavaScript that self-documents, refactors safely, and scales with your project.</p>
+            <p><strong>WHY TYPESCRIPT?</strong></p>
+            <p>TypeScript is JavaScript with syntax for types. It helps you catch mistakes early through type checking and makes your code more maintainable. IDEs provide better autocomplete, refactoring, and inline documentation.</p>
+            <p><strong>ADOPT TYPESCRIPT.</strong></p>
+            <p>Major companies like Microsoft, Google, and Airbnb use TypeScript. It powers VS Code, Angular, and countless enterprise applications. Type errors are cheaper to fix than runtime bugs.</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to Mastery</h2>
+            <p>12 lessons. Complete TypeScript control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to TypeScript</h3>
+                <p class="lesson-desc">Install TypeScript and understand why types matter.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Basic Types</h3>
+                <p class="lesson-desc">Learn string, number, boolean, arrays, and tuples.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Type Inference</h3>
+                <p class="lesson-desc">Understand how TypeScript infers types automatically.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Functions & Types</h3>
+                <p class="lesson-desc">Type function parameters, returns, and arrow functions.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Interfaces</h3>
+                <p class="lesson-desc">Define object shapes and contracts with interfaces.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Type Aliases</h3>
+                <p class="lesson-desc">Create reusable type definitions with aliases.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Union & Intersection</h3>
+                <p class="lesson-desc">Combine types with unions and intersections.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Classes</h3>
+                <p class="lesson-desc">Type classes with access modifiers and inheritance.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Generics</h3>
+                <p class="lesson-desc">Write reusable, type-safe code with generics.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Utility Types</h3>
+                <p class="lesson-desc">Master built-in types like Partial, Required, Pick, Omit.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Type Guards</h3>
+                <p class="lesson-desc">Narrow types with custom type predicates.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Declaration Files</h3>
+                <p class="lesson-desc">Create .d.ts files and work with untyped JavaScript.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why TypeScript</h2>
+            <p>TypeScript was created by Microsoft in 2012 and released as open source in 2014. It was designed to address the challenges of building large JavaScript applications.</p>
+            <p>TypeScript is a superset of JavaScript that compiles to plain JavaScript. It adds optional static typing, classes, interfaces, and modules. Any valid JavaScript is valid TypeScript.</p>
+            <p>The TypeScript compiler (tsc) transforms TypeScript code into JavaScript that runs in any browser or Node.js environment. It provides excellent tooling support in VS Code and other editors.</p>
+            <p><strong>The future of JavaScript is typed. Own it.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>📖 TypeScript Docs</h3>
+                <p>Official Documentation</p>
+                <a href="https://www.typescriptlang.org/docs/" target="_blank">typescriptlang.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>📦 DefinitelyTyped</h3>
+                <p>Type Definitions</p>
+                <a href="https://definitelytyped.org" target="_blank">definitelytyped.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>🎮 TypeScript Playground</h3>
+                <p>Try TypeScript Online</p>
+                <a href="https://www.typescriptlang.org/play" target="_blank">playground</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔰 TSConfig Reference</h3>
+                <p>Compiler Options</p>
+                <a href="https://www.typescriptlang.org/tsconfig" target="_blank">tsconfig</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Rebel With Linux. Type safety matters.</p>
+    </footer>
+
+    <!-- Lesson 1: Introduction to TypeScript -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Introduction to TypeScript</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is TypeScript?</h3>
+                <p>TypeScript is JavaScript with syntax for types. It helps you catch errors before your code runs. TypeScript compiles to plain JavaScript that works in any browser or Node.js environment.</p>
+                
+                <h3>Why TypeScript?</h3>
+                <ul>
+                    <li><strong>Type Safety:</strong> Catch errors at compile time</li>
+                    <li><strong>Better IDE Support:</strong> Autocomplete, refactoring, inline docs</li>
+                    <li><strong>Self-Documenting:</strong> Types serve as documentation</li>
+                    <li><strong>Modern Features:</strong> Use latest JS features</li>
+                    <li><strong>Gradual Adoption:</strong> Can be added incrementally</li>
+                </ul>
+                
+                <div class="highlight-box">
+                    <strong>HISTORY:</strong> TypeScript was created by Microsoft in 2012, led by Anders Hejlsberg (creator of C#). It's now one of the most popular programming languages.
+                </div>
+
+                <h3>Installing TypeScript</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">npm install -g typescript</span>
+<span class="output"># Install globally</span>
+<span class="prompt">$</span> <span class="command">tsc --version</span>
+<span class="output">Version 5.3.x</span>
+                </div>
+
+                <h3>Your First TypeScript</h3>
+                <div class="code-block">
+<span class="comment">// hello.ts</span>
+<span class="keyword">const</span> message: <span class="type">string</span> = <span class="string">"Hello, TypeScript!"</span>;
+console.<span class="function">log</span>(message);
+                </div>
+
+                <h3>Compile & Run</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">tsc hello.ts</span>
+<span class="output"># Creates hello.js</span>
+<span class="prompt">$</span> <span class="command">node hello.js</span>
+<span class="output">Hello, TypeScript!</span>
+                </div>
+
+                <h3>tsconfig.json</h3>
+                <div class="code-block">
+{
+  <span class="string">"compilerOptions"</span>: {
+    <span class="string">"target"</span>: <span class="string">"ES2020"</span>,
+    <span class="string">"module"</span>: <span class="string">"commonjs"</span>,
+    <span class="string">"strict"</span>: <span class="literal">true</span>,
+    <span class="string">"outDir"</span>: <span class="string">"./dist"</span>
+  }
+}
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. TypeScript compiles to _____ .</p>
+                        <input type="text" class="quiz-input" data-answer="javascript" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Who created TypeScript?</p>
+                        <input type="text" class="quiz-input" data-answer="microsoft" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2: Basic Types -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Basic Types</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>JavaScript Types</h3>
+                <div class="code-block">
+<span class="keyword">let</span> name: <span class="type">string</span> = <span class="string">"Alice"</span>;
+<span class="keyword">let</span> age: <span class="type">number</span> = <span class="number">25</span>;
+<span class="keyword">let</span> isActive: <span class="type">boolean</span> = <span class="literal">true</span>;
+
+<span class="comment">// Arrays</span>
+<span class="keyword">let</span> numbers: <span class="type">number</span>[] = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+<span class="keyword">let</span> names: <span class="type">Array</span><<span class="type">string</span>> = [<span class="string">"a"</span>, <span class="string">"b"</span>];
+                </div>
+
+                <h3>Special Types</h3>
+                <div class="code-block">
+<span class="comment">// Any - opt out of type checking</span>
+<span class="keyword">let</span> anything: <span class="type">any</span> = <span class="string">"hello"</span>;
+anything = <span class="number">42</span>;
+
+<span class="comment">// Unknown - safer any</span>
+<span class="keyword">let</span> unknown: <span class="type">unknown</span> = <span class="string">"hello"</span>;
+<span class="keyword">if</span> (<span class="keyword">typeof</span> unknown === <span class="string">"string"</span>) {
+    <span class="keyword">let</span> str: <span class="type">string</span> = unknown;  <span class="comment">// OK</span>
+}
+
+<span class="comment">// Void - no return</span>
+<span class="keyword">function</span> <span class="function">log</span>(msg: <span class="type">string</span>): <span class="type">void</span> {
+    console.<span class="function">log</span>(msg);
+}
+
+<span class="comment">// Never - never returns</span>
+<span class="keyword">function</span> <span class="function">fail</span>(): <span class="type">never</span> {
+    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="function">Error</span>(<span class="string">"Failed"</span>);
+}
+                </div>
+
+                <h3>Tuples</h3>
+                <div class="code-block">
+<span class="comment">// Fixed-length arrays with specific types</span>
+<span class="keyword">let</span> coord: [<span class="type">number</span>, <span class="type">number</span>] = [<span class="number">10</span>, <span class="number">20</span>];
+<span class="keyword">let</span> user: [<span class="type">string</span>, <span class="type">number</span>] = [<span class="string">"Alice"</span>, <span class="number">25</span>];
+
+<span class="comment">// Optional elements</span>
+<span class="keyword">let</span> optional: [<span class="type">string</span>, <span class="type">number</span>?] = [<span class="string">"hello"</span>];
+                </div>
+
+                <h3>Enums</h3>
+                <div class="code-block">
+<span class="keyword">enum</span> <span class="type">Color</span> {
+    Red = <span class="string">"RED"</span>,
+    Green = <span class="string">"GREEN"</span>,
+    Blue = <span class="string">"BLUE"</span>
+}
+
+<span class="keyword">let</span> c: <span class="type">Color</span> = Color.Red;
+
+<span class="comment">// Numeric enum (default)</span>
+<span class="keyword">enum</span> <span class="type">Direction</span> {
+    Up,    <span class="comment">// 0</span>
+    Down,  <span class="comment">// 1</span>
+    Left,  <span class="comment">// 2</span>
+    Right  <span class="comment">// 3</span>
+}
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What type opt out of type checking?</p>
+                        <input type="text" class="quiz-input" data-answer="any" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What type represents a fixed-size array?</p>
+                        <input type="text" class="quiz-input" data-answer="tuple" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3: Type Inference -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Type Inference</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>How Inference Works</h3>
+                <p>TypeScript infers types when you don't specify them:</p>
+                
+                <div class="code-block">
+<span class="comment">// Type is inferred from value</span>
+<span class="keyword">let</span> x = <span class="number">10</span>;        <span class="comment">// number</span>
+<span class="keyword">let</span> y = <span class="string">"hello"</span>;    <span class="comment">// string</span>
+<span class="keyword">let</span> z = [<span class="number">1</span>, <span class="number">2</span>];    <span class="comment">// number[]</span>
+
+<span class="comment">// Return type inferred</span>
+<span class="keyword">function</span> <span class="function">add</span>(a: <span class="type">number</span>, b: <span class="type">number</span>) {
+    <span class="keyword">return</span> a + b;  <span class="comment">// inferred as number</span>
+}
+                </div>
+
+                <h3>Contextual Typing</h3>
+                <div class="code-block">
+<span class="comment">// Type inferred from context</span>
+document.<span class="function">addEventListener</span>(<span class="string">"click"</span>, (e) => {
+    e.<span class="function">preventDefault</span>();  <span class="comment">// e is MouseEvent</span>
+});
+                </div>
+
+                <h3>Best Common Type</h3>
+                <div class="code-block">
+<span class="comment">// Infers number[] | string[]</span>
+<span class="keyword">let</span> arr = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>];
+
+<span class="comment">// With different types - union</span>
+<span class="keyword">let</span> mixed = [<span class="number">0</span>, <span class="string">"a"</span>, <span class="number">2</span>];  <span class="comment">// (string | number)[]</span>
+                </div>
+
+                <h3>When to Explicitly Type</h3>
+                <div class="code-block">
+<span class="comment">// Function parameters need explicit types</span>
+<span class="keyword">function</span> <span class="function">greet</span>(name: <span class="type">string</span>): <span class="type">string</span> {
+    <span class="keyword">return</span> <span class="string">`Hello, ${name}!`</span>;
+}
+
+<span class="comment">// Return type often inferred, but can specify</span>
+<span class="keyword">function</span> <span class="function">parse</span>(str: <span class="type">string</span>): <span class="type">number</span> {
+    <span class="keyword">return</span> Number(str);
+}
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. TypeScript infers types when _____ are not specified.</p>
+                        <input type="text" class="quiz-input" data-answer="types" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4: Functions & Types -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Functions & Types</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Function Types</h3>
+                <div class="code-block">
+<span class="comment">// Parameter and return types</span>
+<span class="keyword">function</span> <span class="function">add</span>(a: <span class="type">number</span>, b: <span class="type">number</span>): <span class="type">number</span> {
+    <span class="keyword">return</span> a + b;
+}
+
+<span class="comment">// Optional parameters</span>
+<span class="keyword">function</span> <span class="function">greet</span>(name: <span class="type">string</span>, greeting?: <span class="type">string</span>): <span class="type">string</span> {
+    <span class="keyword">return</span> greeting ? <span class="string">`${greeting}, ${name}!`</span> : <span class="string">`Hello, ${name}!`</span>;
+}
+                </div>
+
+                <h3>Arrow Functions</h3>
+                <div class="code-block">
+<span class="comment">// Arrow function with types</span>
+<span class="keyword">const</span> <span class="function">multiply</span> = (a: <span class="type">number</span>, b: <span class="type">number</span>): <span class="type">number</span> => a * b;
+
+<span class="comment">// Type annotation for function variable</span>
+<span class="keyword">let</span> <span class="function">calculate</span>: (a: <span class="type">number</span>, b: <span class="type">number</span>) => <span class="type">number</span>;
+<span class="function">calculate</span> = (a, b) => a + b;
+                </div>
+
+                <h3>Default & Rest Parameters</h3>
+                <div class="code-block">
+<span class="comment">// Default parameters</span>
+<span class="keyword">function</span> <span class="function">createUser</span>(name: <span class="type">string</span>, role: <span class="type">string</span> = <span class="string">"user"</span>): <span class="type">string</span> {
+    <span class="keyword">return</span> <span class="string">`${name} is a ${role}`</span>;
+}
+
+<span class="comment">// Rest parameters</span>
+<span class="keyword">function</span> <span class="function">sum</span>(...numbers: <span class="type">number</span>[]): <span class="type">number</span> {
+    <span class="keyword">return</span> numbers.<span class="function">reduce</span>((a, b) => a + b, <span class="number">0</span>);
+}
+                </div>
+
+                <h3>Overloads</h3>
+                <div class="code-block">
+<span class="keyword">function</span> <span class="function">parse</span>(input: <span class="type">string</span>): <span class="type">number</span>;
+<span class="keyword">function</span> <span class="function">parse</span>(input: <span class="type">number</span>): <span class="type">string</span>;
+<span class="keyword">function</span> <span class="function">parse</span>(input: <span class="type">string</span> | <span class="type">number</span>): <span class="type">number</span> | <span class="type">string</span> {
+    <span class="keyword">if</span> (<span class="keyword">typeof</span> input === <span class="string">"string"</span>) {
+        <span class="keyword">return</span> Number(input);
+    }
+    <span class="keyword">return</span> input.<span class="function">toString</span>();
+}
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What symbol makes a parameter optional?</p>
+                        <input type="text" class="quiz-input" data-answer="?" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What collects remaining arguments into an array?</p>
+                        <input type="text" class="quiz-input" data-answer="rest" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5: Interfaces -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Interfaces</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Defining Interfaces</h3>
+                <div class="code-block">
+<span class="keyword">interface</span> <span class="type">User</span> {
+    id: <span class="type">number</span>;
+    name: <span class="type">string</span>;
+    email: <span class="type">string</span>;
+    isActive?: <span class="type">boolean</span>;  <span class="comment">// optional</span>
+}
+
+<span class="keyword">const</span> user: <span class="type">User</span> = {
+    id: <span class="number">1</span>,
+    name: <span class="string">"Alice"</span>,
+    email: <span class="string">"alice@example.com"</span>
+};
+                </div>
+
+                <h3>Readonly Properties</h3>
+                <div class="code-block">
+<span class="keyword">interface</span> <span class="type">Config</span> {
+    readonly apiKey: <span class="type">string</span>;
+    readonly version: <span class="type">string</span>;
+}
+
+<span class="keyword">const</span> config: <span class="type">Config</span> = {
+    apiKey: <span class="string">"abc123"</span>,
+    version: <span class="string">"1.0"</span>
+};
+
+config.apiKey = <span class="string">"new"</span>;  <span class="comment">// Error!</span>
+                </div>
+
+                <h3>Method Signatures</h3>
+                <div class="code-block">
+<span class="keyword">interface</span> <span class="type">Calculator</span> {
+    add(a: <span class="type">number</span>, b: <span class="type">number</span>): <span class="type">number</span>;
+    subtract(a: <span class="type">number</span>, b: <span class="type">number</span>): <span class="type">number</span>;
+}
+
+<span class="keyword">const</span> calc: <span class="type">Calculator</span> = {
+    add: (a, b) => a + b,
+    subtract: (a, b) => a - b
+};
+                </div>
+
+                <h3>Extending Interfaces</h3>
+                <div class="code-block">
+<span class="keyword">interface</span> <span class="type">Person</span> {
+    name: <span class="type">string</span>;
+}
+
+<span class="keyword">interface</span> <span class="type">Employee</span> <span class="keyword">extends</span> <span class="type">Person</span> {
+    employeeId: <span class="type">number</span>;
+    department: <span class="type">string</span>;
+}
+                </div>
+
+                <h3>Interface vs Type</h3>
+                <div class="code-block">
+<span class="comment">// Interface - better for objects</span>
+<span class="keyword">interface</span> <span class="type">Point</span> {
+    x: <span class="type">number</span>;
+    y: <span class="type">number</span>;
+}
+
+<span class="comment">// Type - better for unions/primitives</span>
+<span class="keyword">type</span> <span class="type">ID</span> = <span class="type">string</span> | <span class="type">number</span>;
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What makes a property unchangeable?</p>
+                        <input type="text" class="quiz-input" data-answer="readonly" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6: Type Aliases -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Type Aliases</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Creating Type Aliases</h3>
+                <div class="code-block">
+<span class="keyword">type</span> <span class="type">ID</span> = <span class="type">string</span> | <span class="type">number</span>;
+
+<span class="keyword">type</span> <span class="type">User</span> = {
+    id: <span class="type">ID</span>;
+    name: <span class="type">string</span>;
+};
+
+<span class="keyword">type</span> <span class="type">Status</span> = <span class="string">"pending"</span> | <span class="string">"active"</span> | <span class="string">"completed"</span>;
+                </div>
+
+                <h3>Aliasing Functions</h3>
+                <div class="code-block">
+<span class="keyword">type</span> <span class="type">Callback</span> = (data: <span class="type">string</span>) => <span class="type">void</span>;
+
+<span class="keyword">function</span> <span class="function">fetch</span>(callback: <span class="type">Callback</span>) {
+    callback(<span class="string">"data"</span>);
+}
+                </div>
+
+                <h3>Aliased Unions</h3>
+                <div class="code-block">
+<span class="keyword">type</span> <span class="type">Result</span><<span class="type">T</span>> = 
+    | { success: <span class="literal">true</span>; data: <span class="type">T</span> }
+    | { success: <span class="literal">false</span>; error: <span class="type">string</span> };
+
+<span class="keyword">const</span> ok: <span class="type">Result</span><<span class="type">string</span>> = { success: <span class="literal">true</span>, data: <span class="string">"hello"</span> };
+<span class="keyword">const</span> fail: <span class="type">Result</span><<span class="type">string</span>> = { success: <span class="literal">false</span>, error: <span class="string">"oops"</span> };
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What keyword creates a type alias?</p>
+                        <input type="text" class="quiz-input" data-answer="type" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7: Union & Intersection -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Union & Intersection</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Union Types</h3>
+                <div class="code-block">
+<span class="comment">// Value can be one of several types</span>
+<span class="keyword">let</span> id: <span class="type">string</span> | <span class="type">number</span>;
+id = <span class="string">"abc"</span>;
+id = <span class="number">123</span>;
+
+<span class="comment">// Narrowing with typeof</span>
+<span class="keyword">function</span> <span class="function">format</span>(value: <span class="type">string</span> | <span class="type">number</span>): <span class="type">string</span> {
+    <span class="keyword">if</span> (<span class="keyword">typeof</span> value === <span class="string">"string"</span>) {
+        <span class="keyword">return</span> value.<span class="function">toUpperCase</span>();
+    }
+    <span class="keyword">return</span> value.<span class="function">toFixed</span>(<span class="number">2</span>);
+}
+                </div>
+
+                <h3>Literal Types</h3>
+                <div class="code-block">
+<span class="keyword">type</span> <span class="type">Direction</span> = <span class="string">"north"</span> | <span class="string">"south"</span> | <span class="string">"east"</span> | <span class="string">"west"</span>;
+
+<span class="keyword">let</span> dir: <span class="type">Direction</span> = <span class="string">"north"</span>;
+                </div>
+
+                <h3>Intersection Types</h3>
+                <div class="code-block">
+<span class="keyword">type</span> <span class="type">A</span> = { a: <span class="type">string</span> };
+<span class="keyword">type</span> <span class="type">B</span> = { b: <span class="type">number</span> };
+
+<span class="keyword">type</span> <span class="type">C</span> = <span class="type">A</span> & <span class="type">B</span>;
+
+<span class="keyword">const</span> c: <span class="type">C</span> = { a: <span class="string">"hello"</span>, b: <span class="number">42</span> };
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What symbol creates a union type?</p>
+                        <input type="text" class="quiz-input" data-answer="|" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What symbol combines types?</p>
+                        <input type="text" class="quiz-input" data-answer="&" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8: Classes -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Classes</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Basic Class</h3>
+                <div class="code-block">
+<span class="keyword">class</span> <span class="type">Person</span> {
+    name: <span class="type">string</span>;
+    age: <span class="type">number</span>;
+
+    <span class="keyword">constructor</span>(name: <span class="type">string</span>, age: <span class="type">number</span>) {
+        this.name = name;
+        this.age = age;
+    }
+
+    greet(): <span class="type">void</span> {
+        console.<span class="function">log</span>(<span class="string">`Hello, I'm ${this.name}`</span>);
+    }
+}
+                </div>
+
+                <h3>Access Modifiers</h3>
+                <div class="code-block">
+<span class="keyword">class</span> <span class="type">BankAccount</span> {
+    <span class="keyword">public</span> readonly id: <span class="type">string</span>;
+    <span class="keyword">private</span> balance: <span class="type">number</span>;
+    <span class="keyword">protected</span> owner: <span class="type">string</span>;
+
+    <span class="keyword">constructor</span>(id: <span class="type">string</span>, balance: <span class="type">number</span>) {
+        this.id = id;
+        this.balance = balance;
+    }
+
+    <span class="keyword">public</span> <span class="function">deposit</span>(amount: <span class="type">number</span>): <span class="type">void</span> {
+        <span class="keyword">this</span>.balance += amount;
+    }
+}
+                </div>
+
+                <h3>Inheritance</h3>
+                <div class="code-block">
+<span class="keyword">class</span> <span class="type">Employee</span> <span class="keyword">extends</span> <span class="type">Person</span> {
+    employeeId: <span class="type">number</span>;
+
+    <span class="keyword">constructor</span>(name: <span class="type">string</span>, age: <span class="type">number</span>, id: <span class="type">number</span>) {
+        <span class="keyword">super</span>(name, age);
+        this.employeeId = id;
+    }
+
+    greet(): <span class="type">void</span> {
+        console.<span class="function">log</span>(<span class="string">`I'm ${this.name}, employee #${this.employeeId}`</span>);
+    }
+}
+                </div>
+
+                <h3>Abstract Classes</h3>
+                <div class="code-block">
+<span class="keyword">abstract</span> <span class="keyword">class</span> <span class="type">Animal</span> {
+    <span class="keyword">abstract</span> makeSound(): <span class="type">void</span>;
+
+    move(): <span class="type">void</span> {
+        console.<span class="function">log</span>(<span class="string">"Moving..."</span>);
+    }
+}
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What modifier restricts access to the class?</p>
+                        <input type="text" class="quiz-input" data-answer="private" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9: Generics -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Generics</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Generic Functions</h3>
+                <div class="code-block">
+<span class="keyword">function</span> <span class="function">identity</span><<span class="type">T</span>>(value: <span class="type">T</span>): <span class="type">T</span> {
+    <span class="keyword">return</span> value;
+}
+
+<span class="keyword">const</span> num = <span class="function">identity</span>(<span class="number">42</span>);       <span class="comment">// number</span>
+<span class="keyword">const</span> str = <span class="function">identity</span>(<span class="string">"hello"</span>);   <span class="comment">// string</span>
+                </div>
+
+                <h3>Generic Interfaces</h3>
+                <div class="code-block">
+<span class="keyword">interface</span> <span class="type">Container</span><<span class="type">T</span>> {
+    value: <span class="type">T</span>;
+    getValue(): <span class="type">T</span>;
+}
+
+<span class="keyword">const</span> box: <span class="type">Container</span><<span class="type">number</span>> = {
+    value: <span class="number">10</span>,
+    getValue() { <span class="keyword">return</span> <span class="keyword">this</span>.value; }
+};
+                </div>
+
+                <h3>Constraints</h3>
+                <div class="code-block">
+<span class="keyword">interface</span> <span class="type">HasLength</span> {
+    length: <span class="type">number</span>;
+}
+
+<span class="keyword">function</span> <span class="function">logLength</span><<span class="type">T</span> <span class="keyword">extends</span> <span class="type">HasLength</span>>(item: <span class="type">T</span>): <span class="type">void</span> {
+    console.<span class="function">log</span>(item.length);
+}
+
+<span class="function">logLength</span>(<span class="string">"hello"</span>);  <span class="comment">// OK - strings have length</span>
+<span class="function">logLength</span>([<span class="number">1</span>, <span class="number">2</span>]);  <span class="comment">// OK - arrays have length</span>
+<span class="function">logLength</span>(<span class="number">42</span>);      <span class="comment">// Error!</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What limits a generic type?</p>
+                        <input type="text" class="quiz-input" data-answer="constraint" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10: Utility Types -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Utility Types</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Partial & Required</h3>
+                <div class="code-block">
+<span class="keyword">interface</span> <span class="type">User</span> {
+    id: <span class="type">number</span>;
+    name: <span class="type">string</span>;
+    email: <span class="type">string</span>;
+}
+
+<span class="comment">// All properties optional</span>
+<span class="keyword">type</span> <span class="type">PartialUser</span> = <span class="type">Partial</span><<span class="type">User</span>>;
+
+<span class="comment">// All properties required</span>
+<span class="keyword">type</span> <span class="type">RequiredUser</span> = <span class="type">Required</span><<span class="type">PartialUser</span>>;
+                </div>
+
+                <h3>Pick & Omit</h3>
+                <div class="code-block">
+<span class="comment">// Select specific properties</span>
+<span class="keyword">type</span> <span class="type">UserPreview</span> = <span class="type">Pick</span><<span class="type">User</span>, <span class="string">"id"</span> | <span class="string">"name"</span>>;
+
+<span class="comment">// Exclude specific properties</span>
+<span class="keyword">type</span> <span class="type">UserWithoutEmail</span> = <span class="type">Omit</span><<span class="type">User</span>, <span class="string">"email"</span>>;
+                </div>
+
+                <h3>Record</h3>
+                <div class="code-block">
+<span class="comment">// Create object type with specific keys and values</span>
+<span class="keyword">type</span> <span class="type">UsersById</span> = <span class="type">Record</span><<span class="type">string</span>, <span class="type">User</span>>;
+
+<span class="keyword">const</span> users: <span class="type">UsersById</span> = {
+    <span class="string">"1"</span>: { id: <span class="number">1</span>, name: <span class="string">"Alice"</span>, email: <span class="string">"a@a.com"</span> },
+    <span class="string">"2"</span>: { id: <span class="number">2</span>, name: <span class="string">"Bob"</span>, email: <span class="string">"b@b.com"</span> }
+};
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What makes all properties optional?</p>
+                        <input type="text" class="quiz-input" data-answer="Partial" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11: Type Guards -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Type Guards</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>typeof Guards</h3>
+                <div class="code-block">
+<span class="keyword">function</span> <span class="function">print</span>(value: <span class="type">string</span> | <span class="type">number</span>) {
+    <span class="keyword">if</span> (<span class="keyword">typeof</span> value === <span class="string">"string"</span>) {
+        console.<span class="function">log</span>(value.<span class="function">toUpperCase</span>());
+    } <span class="keyword">else</span> {
+        console.<span class="function">log</span>(value.<span class="function">toFixed</span>(<span class="number">2</span>));
+    }
+}
+                </div>
+
+                <h3>instanceof Guards</h3>
+                <div class="code-block">
+<span class="keyword">class</span> <span class="type">Dog</span> {
+    bark(): <span class="type">void</span> { console.<span class="function">log</span>(<span class="string">"Woof!"</span>); }
+}
+<span class="keyword">class</span> <span class="type">Cat</span> {
+    meow(): <span class="type">void</span> { console.<span class="function">log</span>(<span class="string">"Meow!"</span>); }
+}
+
+<span class="keyword">function</span> <span class="function">makeSound</span>(animal: <span class="type">Dog</span> | <span class="type">Cat</span>) {
+    <span class="keyword">if</span> (animal <span class="keyword">instanceof</span> <span class="type">Dog</span>) {
+        animal.<span class="function">bark</span>();
+    } <span class="keyword">else</span> {
+        animal.<span class="function">meow</span>();
+    }
+}
+                </div>
+
+                <h3>Custom Type Predicates</h3>
+                <div class="code-block">
+<span class="keyword">interface</span> <span class="type">Fish</span> { swim(): <span class="type">void</span>; }
+<span class="keyword">interface</span> <span class="type">Bird</span> { fly(): <span class="type">void</span>; }
+
+<span class="keyword">function</span> <span class="function">isFish</span>(animal: <span class="type">Fish</span> | <span class="type">Bird</span>): animal is <span class="type">Fish</span> {
+    <span class="keyword">return</span> (<span class="type">Fish</span>.<span class="function">prototype</span>.<span class="function">isPrototypeOf</span>(animal));
+}
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What narrows union types in TypeScript?</p>
+                        <input type="text" class="quiz-input" data-answer="type guard" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12: Declaration Files -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Declaration Files</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>.d.ts Files</h3>
+                <p>Declaration files provide type information for JavaScript:</p>
+                
+                <div class="code-block">
+<span class="comment">// math.d.ts</span>
+<span class="keyword">declare</span> <span class="keyword">function</span> <span class="function">add</span>(a: <span class="type">number</span>, b: <span class="type">number</span>): <span class="type">number</span>;
+
+<span class="keyword">declare</span> <span class="keyword">const</span> PI: <span class="type">number</span>;
+
+<span class="keyword">export</span> { <span class="function">add</span>, PI };
+                </div>
+
+                <h3>Ambient Variables</h3>
+                <div class="code-block">
+<span class="comment">// globals.d.ts</span>
+<span class="keyword">declare</span> <span class="keyword">const</span> MY_API_KEY: <span class="type">string</span>;
+
+<span class="keyword">declare</span> <span class="keyword">interface</span> <span class="type">Window</span> {
+    myPlugin: <span class="type">any</span>;
+}
+                </div>
+
+                <h3>DefinitelyTyped</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">npm install --save-dev @types/lodash</span>
+<span class="output"># Install type definitions</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What file extension do type declarations use?</p>
+                        <input type="text" class="quiz-input" data-answer=".d.ts" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../nav.js" defer></script>
+</body>
+</html>

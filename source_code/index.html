@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<!-- =============================================================================
+     INDEX.HTML - Main Homepage
+     =============================================================================
+     
+     WHAT IS HTML?
+     - HTML = HyperText Markup Language
+     - It's the skeleton of every webpage
+     - Defines the structure: headers, paragraphs, images, links, etc.
+     
+     BASIC STRUCTURE:
+     <!DOCTYPE html>    - Tells browser this is an HTML5 document
+     <html>            - Root element, everything goes inside
+       <head>          - Meta info (title, links, scripts) - NOT visible to users
+       <body>          - Visible content (what users see)
+     </html>
+     
+     OUR PAGE STRUCTURE:
+     1. <head>: Title, meta tags, CSS links, JavaScript
+     2. <body>:
+        - Skip link (accessibility)
+        - Theme toggle (dark/light mode)
+        - Navigation bar
+        - Radio inputs (for section switching without JavaScript!)
+        - Main sections: Manifesto, Distros, Games, Guides, Projects, Resources, Blog
+        - Footer
+     
+     KEY CONCEPTS WE USE:
+     - Radio button hack: Checkboxes/radios can control CSS without JS!
+       (See the section switching at the top of <body>)
+     - CSS Variables: Define colors once, use everywhere
+     - Semantic HTML: <nav>, <header>, <section>, <footer> for meaning
+     - Accessibility: aria-labels, skip links, focus states
+     
+     TIP: Open this file in a browser and use F12 DevTools to inspect
+     elements and understand the structure!
+     ============================================================================= -->
+<html lang="en">
+<head>
+    <script>
+        // Apply saved theme immediately to prevent flash (default to dark)
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = true;
+        }
+
+        function handleThemeChange(isDark) {
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+    </script>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>REBEL WITH LINUX - Free Your Mind. Own Your Data.</title>
+    <meta name="description" content="Learn Linux, programming, and web development with free interactive tutorials. Master command line, bash scripting, git, docker, and more. Take control of your digital life with FOSS.">
+    <meta name="keywords" content="Linux, free software, open source, FOSS, bash, git, docker, programming, tutorial, learn to code, command line, VPS, web development, privacy, security">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0A0A0A">
+
+    <meta property="og:title" content="REBEL WITH LINUX - Free Your Mind. Own Your Data">
+    <meta property="og:description" content="Learn Linux, programming, and web development with free interactive tutorials.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/">
+    <meta property="og:site_name" content="Rebel With Linux">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/">
+    <link rel="sitemap" type="application/xml" href="sitemap.xml">
+    <link rel="manifest" href="manifest.json">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "EducationalWebSite",
+        "name": "Rebel With Linux",
+        "description": "Learn Linux, programming, and web development with free interactive tutorials. Master command line, bash scripting, git, docker, and more.",
+        "url": "https://rebelwithlinux.com/",
+        "author": {
+            "@type": "Person",
+            "name": "cjboon"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Rebel With Linux"
+        },
+        "inLanguage": "en",
+        "learningResourceType": "tutorial",
+        "about": [
+            {"@type": "Thing", "name": "Linux"},
+            {"@type": "Thing", "name": "Bash Scripting"},
+            {"@type": "Thing", "name": "Git Version Control"},
+            {"@type": "Thing", "name": "Docker Containers"},
+            {"@type": "Thing", "name": "Python Programming"},
+            {"@type": "Thing", "name": "JavaScript"},
+            {"@type": "Thing", "name": "PHP"},
+            {"@type": "Thing", "name": "Web Development"}
+        ],
+        "hasPart": [
+            {"@type": "WebPage", "name": "Linux Fundamentals", "url": "https://rebelwithlinux.com/guides/guide-linux.html"},
+            {"@type": "WebPage", "name": "Bash Scripting", "url": "https://rebelwithlinux.com/guides/guide-bash.html"},
+            {"@type": "WebPage", "name": "Git Version Control", "url": "https://rebelwithlinux.com/guides/guide-git.html"},
+            {"@type": "WebPage", "name": "Docker Containers", "url": "https://rebelwithlinux.com/guides/guide-docker.html"},
+            {"@type": "WebPage", "name": "Python Programming", "url": "https://rebelwithlinux.com/guides/guide-python.html"},
+            {"@type": "WebPage", "name": "JavaScript", "url": "https://rebelwithlinux.com/guides/guide-javascript.html"}
+        ]
+    }
+    </script>
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
+    <link rel="preconnect" href="https://rebelwithlinux.com" crossorigin>
+    <link rel="preload" href="fonts/ibmplexmono-400.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/ibmplexmono-700.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="achievements.js" defer></script>
+</head>
+
+<body id="top">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- =============================================================================
+         NAVIGATION BAR - Fixed top menu with logo, links, and theme toggle
+         =============================================================================
+         The nav stays fixed at the top using CSS position:fixed.
+         It contains:
+         - Logo/site title (REBEL WITH LINUX)
+         - Theme toggle checkbox (switches dark/light mode)
+         - Hamburger menu for mobile (shows/hides nav links)
+         ============================================================================= -->
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="handleThemeChange(this.checked)">
+        <div class="nav-left">
+            <a href="#top" class="nav-title" aria-label="Go to top">
+                REBEL WITH LINUX
+            </a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: #000000;">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: #000000;">× Close</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;" style="color: #000000;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none; color: #000000;">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Radio buttons for mutually exclusive sections -->
+    <input type="radio" name="section" id="section-manifesto" checked>
+    <input type="radio" name="section" id="section-manifesto">
+    <input type="radio" name="section" id="section-distros">
+    <input type="radio" name="section" id="section-games">
+    <input type="radio" name="section" id="section-guides">
+    <input type="radio" name="section" id="section-projects">
+    <input type="radio" name="section" id="section-resources">
+    <input type="radio" name="section" id="section-references">
+    <input type="radio" name="section" id="section-scripts">
+    <input type="radio" name="section" id="section-blog">
+    <input type="radio" name="section" id="section-about">
+    <input type="radio" name="section" id="section-contact">
+    <input type="radio" name="section" id="section-tests">
+    <input type="radio" name="section" id="section-stats">
+    <input type="radio" name="section" id="section-rebels">
+    <input type="radio" name="section" id="section-footer">
+
+    <div class="section-links" style="background: var(--white);">
+        <label for="section-manifesto">Manifesto</label>
+        <label for="section-distros">Distros</label>
+        <label for="section-games">Games</label>
+        <label for="section-guides">Guides</label>
+        <label for="section-projects">Projects</label>
+        <label for="section-resources">Resources</label>
+        <label for="section-references">References</label>
+        <label for="section-scripts">Scripts</label>
+        <label for="section-blog">Blog</label>
+        <label for="section-about">About</label>
+        <label for="section-contact">Contact</label>
+        <label for="section-tests">Tests</label>
+        <label for="section-stats">Stats</label>
+        <label for="section-rebels">Rebels</label>
+        <label for="section-footer">Footer</label>
+    </div>
+
+    <!-- =============================================================================
+         MANIFESTO SECTION - The main hero/intro section
+         =============================================================================
+         This is the landing section that welcomes visitors.
+         Uses a "show more" checkbox pattern to expand/collapse content.
+         The checkbox is hidden but its state controls the content visibility via CSS!
+         ============================================================================= -->
+    <section id="manifesto">
+        <div class="section-header">
+            <div class="section-title-wrap">
+                <h1>TAKE BACK<br>YOUR COMPUTER</h1>
+                <p class="tagline" style="font-family: 'IBM Plex Mono', monospace; font-size: 1.2rem; margin-top: 16px;">// Free your mind. Own your data.</p>
+            </div>
+            <input type="checkbox" id="checkbox-manifesto" class="show-more-checkbox">
+            
+        </div>
+        <div class="manifesto manifesto-hidden">
+            <p><strong>PROPRIETARY SOFTWARE IS MALWARE.</strong><br>Every line of closed-source code is a potential backdoor. Every update could be spying on you. Your personal data is being harvested, sold, and weaponized against you.</p>
+            <p><strong>THE ALTERNATIVE EXISTS.</strong><br>Free and Open Source Software (FOSS) puts you in control. With end-to-end encryption, your communications stay private. Your computing stays yours.</p>
+            <p><strong>LINUX IS THE REBEL'S CHOICE.</strong><br>Join the rebellion. Learn to take full ownership of your digital life. No telemetry. No licensing fees. No surveillance.</p>
+        </div>
+    </section>
+
+    <section class="lessons-section" id="distros">
+        <div class="section-header">
+            <div class="section-title-wrap">
+                <h2>// Distros</h2>
+                <p>Distros that put your freedom first</p>
+            </div>
+            <input type="checkbox" id="checkbox-distros" class="show-more-checkbox">
+            
+        </div>
+        <div class="lessons-grid">
+            <!-- LIVE USB / AMNESIC -->
+            <a href="https://tails.net" target="_blank" rel="noopener noreferrer" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Tails</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">The Amnesic Incognito Live System. Boot from USB, leave no trace. Tor browser pre-installed.</p>
+                </article>
+            </a>
+            <a href="https://www.parrotsec.org" target="_blank" rel="noopener noreferrer" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SECURITY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Parrot OS</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Security, forensics, and development. Lightweight alternative to Kali with a full desktop.</p>
+                </article>
+            </a>
+            <a href="https://www.kali.org" target="_blank" rel="noopener noreferrer" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SECURITY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Kali Linux</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Penetration testing and security auditing. Know your enemy by becoming your enemy.</p>
+                </article>
+            </a>
+
+            <!-- ISOLATION / VM -->
+            <a href="https://www.whonix.org" target="_blank" rel="noopener noreferrer" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Whonix</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Runs inside a VM with a Tor gateway. Isolation that even the NSA can't easily break.</p>
+                </article>
+            </a>
+
+            <!-- BUILD FROM SCRATCH -->
+            <a href="https://www.archlinux.org" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">BUILD</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Arch Linux</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Build it yourself from scratch. No bloat, full control. You decide what runs on your machine.</p>
+                </article>
+            </a>
+
+            <!-- PRIVACY-FOCUSED -->
+            <a href="https://kicksecure.com" target="_blank" rel="noopener noreferrer" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Kicksecure</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Whonix-based hardened Linux. Everyday privacy for regular users.</p>
+                </article>
+            </a>
+        </div>
+    </section>
+
+    <section class="lessons-section" id="games">
+        <div class="section-header">
+            <div class="section-title-wrap">
+                <h2>// Games</h2>
+                <p>Learn by doing with interactive games</p>
+            </div>
+            <input type="checkbox" id="checkbox-games" class="show-more-checkbox">
+            
+        </div>
+
+<div class="lessons-grid">
+            <a href="builders/builder-main.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🏗️ CODE BUILDER</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Code Builder</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Drag & drop to build code</p>
+                </article>
+            </a>
+
+            <a href="hangman/hangman-main.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🎯 HANGMAN</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman Games</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Guess the code from definitions</p>
+                </article>
+            </a>
+
+            <a href="terms/term-main.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">💻 TERM GAMES</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Term Games</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Terminal-based learning games</p>
+                </article>
+            </a>
+
+            <a href="games/game-debian.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🖥️ DEBIAN</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Debian Sysadmin 1</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Learn Debian system administration</p>
+                </article>
+            </a>
+
+            <a href="games/game-debian-2.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🖥️ DEBIAN</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Debian Sysadmin 2</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Intermediate Debian administration</p>
+                </article>
+            </a>
+
+            <a href="games/game-debian-3.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🖥️ DEBIAN</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Debian Sysadmin 3</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Advanced Debian management</p>
+                </article>
+            </a>
+
+            <a href="games/game-turing.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🤖 PUZZLE</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Turing Game</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Guess what the code does</p>
+                </article>
+            </a>
+
+            <a href="games/game-speed.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">⚡ SPEED</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Speed Typing</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Type Linux commands fast</p>
+                </article>
+            </a>
+
+            <a href="games/game-quiz.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">❓ QUIZ</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Quiz Trivia</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Linux & FOSS knowledge</p>
+                </article>
+            </a>
+        </div>
+    </section>
+
+    <section class="lessons-section" id="guides" style="padding: 64px 32px; background: var(--white); max-width: 1100px; margin: 0 auto;">
+        <div class="section-header">
+            <div class="section-title-wrap">
+                <h2 style="font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 8px;">// CHOOSE YOUR PATH</h2>
+                <p style="font-family: 'IBM Plex Mono', monospace; color: var(--charcoal);">Pick a guide and start your rebellion</p>
+            </div>
+            <input type="checkbox" id="checkbox-guides" class="show-more-checkbox">
+            
+        </div>
+
+        <div class="lessons-grid">
+            <a href="guides/guide-linux.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">LINUX</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Linux Fundamentals</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Master the command line and understand how Linux works under the hood.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-bash.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">BASH</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Bash Scripting</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Write powerful shell scripts to automate tasks and control your system.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-git.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">GIT</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Git Version Control</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Track your changes, collaborate with others, and never lose work again.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-vim.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">VIM</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Vim Editor</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Master the killer text editor. Modal editing, motions, macros, and vimrc.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-html.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">HTML</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">HTML Code</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Learn the foundation of all web pages. Structure your content with semantic markup.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-css.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">CSS</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">CSS Styling</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Style your websites with modern CSS techniques.</p>
+                </article>
+            </a>
+            </a>
+
+            <a href="guides/guide-javascript.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">JAVASCRIPT</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">JavaScript</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Add interactivity to your websites with client-side scripting.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-php.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PHP</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">PHP Programming</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Build dynamic websites and applications with server-side scripting.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-python.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PYTHON</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Python Scripting</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Automate tasks and build powerful tools with Python.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-mariadb.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">DATABASE</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">MariaDB Database</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Set up and manage your own SQL databases for your applications.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-apache2.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SERVER</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Apache2 Web Server</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Host your own websites with the world's most popular web server.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-nginx.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SERVER</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">NGINX Web Server</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Master high-performance web serving, reverse proxies, and load balancing.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-docker.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">CONTAINERS</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Docker Containers</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Package your applications with all their dependencies into portable containers.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-vps.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">HOSTING</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">VPS Hosting</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Rent your own server and take full control of your online presence.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-networking.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">NETWORK</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Linux Networking</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Master IP configuration, iptables, routing, DNS, SSH tunnels, and WireGuard VPNs.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-dns.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">NETWORK</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">DNS Management</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Learn DNS records, BIND, DNS validation, and DNS troubleshooting.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-go.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">CODE</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Go Programming</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Master Go. Build CLI tools, APIs, and concurrent services.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-hardening.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SECURITY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Server Hardening</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Secure your Linux server. SSH, firewall, fail2ban, automatic updates, and permissions.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-kubernetes.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">ORCHESTRATION</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Kubernetes</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Master container orchestration. Pods, services, deployments, ingress, and helm.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-logging.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">MONITORING</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Logging</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Centralized logging with journald, rsyslog, and Loki. Parse, filter, and analyze logs.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-monitoring.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">MONITORING</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Monitoring</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Monitor with Prometheus, Grafana, and alerting. Track metrics and get notified.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-postgresql.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">DATABASE</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">PostgreSQL</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Master PostgreSQL. Queries, indexes, replication, backup, and performance tuning.</p>
+                </article>
+            </a>
+
+            <a href="guides/guide-typescript.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">CODE</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">TypeScript</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Type-safe JavaScript. Interfaces, generics, decorators, and strict typing.</p>
+                </article>
+            </a>
+        </div>
+    </section>
+
+    <section class="projects-section" id="projects">
+        <div class="section-header">
+            <div class="section-title-wrap">
+                <h2>// Projects</h2>
+                <p class="section-subtitle">Apply what you've learned</p>
+            </div>
+            <input type="checkbox" id="checkbox-projects" class="show-more-checkbox">
+            
+        </div>
+
+        <div class="projects-grid">
+            <a href="projects/project-matrix.html" class="project-card hidden">
+                <div class="project-icon">💻</div>
+                <h3>Matrix Chat Server</h3>
+                <p>Self-host your own encrypted chat platform. Break free from centralized messaging apps.</p>
+                <div class="project-stack">
+                    <span class="stack-item">Matrix</span>
+                    <span class="stack-item">Synapse</span>
+                    <span class="stack-item">Docker</span>
+                    <span class="stack-item">VPS</span>
+                    <span class="stack-item">Encryption</span>
+                </div>
+                <span class="project-level">Intermediate</span>
+            </a>
+
+            <a href="projects/project-i3.html" class="project-card hidden">
+                <div class="project-icon">🖥️</div>
+                <h3>i3 Window Manager</h3>
+                <p>Install Debian CLI and set up i3. Master the keyboard, reject bloat, and reclaim your system resources.</p>
+                <div class="project-stack">
+                    <span class="stack-item">Debian</span>
+                    <span class="stack-item">i3</span>
+                    <span class="stack-item">xinit</span>
+                    <span class="stack-item">CLI</span>
+                    <span class="stack-item">Minimal</span>
+                </div>
+                <span class="project-level">Intermediate</span>
+            </a>
+
+            <a href="projects/project-blog.html" class="project-card hidden">
+                <div class="project-icon">✍️</div>
+                <h3>Personal Blog</h3>
+                <p>Build a minimal blog with static site generation. Write in Markdown, publish with Git.</p>
+                <div class="project-stack">
+                    <span class="stack-item">Markdown</span>
+                    <span class="stack-item">Git</span>
+                    <span class="stack-item">Static</span>
+                    <span class="stack-item">VPS</span>
+                </div>
+                <span class="project-level">Intermediate</span>
+            </a>
+
+            <a href="projects/project-paste.html" class="project-card hidden">
+                <div class="project-icon">🔐</div>
+                <h3>Paste Bin</h3>
+                <p>Host your own pastebin. Private code and text sharing without the surveillance.</p>
+                <div class="project-stack">
+                    <span class="stack-item">PHP</span>
+                    <span class="stack-item">SQLite</span>
+                    <span class="stack-item">Docker</span>
+                    <span class="stack-item">VPS</span>
+                </div>
+                <span class="project-level">Intermediate</span>
+            </a>
+
+            <a href="projects/project-fileshare.html" class="project-card hidden">
+                <div class="project-icon">📁</div>
+                <h3>File Share</h3>
+                <p>Create your own WeTransfer alternative. Send files up to 10GB with expiring links.</p>
+                <div class="project-stack">
+                    <span class="stack-item">PHP</span>
+                    <span class="stack-item">JavaScript</span>
+                    <span class="stack-item">Docker</span>
+                    <span class="stack-item">VPS</span>
+                </div>
+                <span class="project-level">Intermediate</span>
+            </a>
+
+            <a href="projects/project-onion.html" class="project-card hidden">
+                <div class="project-icon">🧅</div>
+                <h3>Onion Site</h3>
+                <p>Create a Tor hidden service. Host anonymously with operational security best practices.</p>
+                <div class="project-stack">
+                    <span class="stack-item">Tor</span>
+                    <span class="stack-item">Linux</span>
+                    <span class="stack-item">nginx</span>
+                    <span class="stack-item">VPS</span>
+                    <span class="stack-item">OpSec</span>
+                </div>
+                <span class="project-level">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources" style="padding: 64px 32px; background: var(--white); max-width: 1100px; margin: 0 auto;">
+        <div class="section-header">
+            <div class="section-title-wrap">
+                <h2 style="font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 8px;">// TOOLS OF THE REBELLION</h2>
+                <p style="font-family: 'IBM Plex Mono', monospace; color: var(--charcoal);" class="resources-note">Privacy-first software picks to harden your setup and reduce surveillance risk.</p>
+            </div>
+            <input type="checkbox" id="checkbox-resources" class="show-more-checkbox">
+            
+        </div>
+
+        <div class="resources-grid">
+            <a href="https://torproject.org" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>🧅 Privacy Browser</h3>
+                <p>Tor Browser</p>
+            </a>
+
+            <a href="https://mozilla.org/firefox" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>🌐 Browser</h3>
+                <p>Firefox (with privacy extensions)</p>
+            </a>
+
+            <a href="https://debian.org" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>🐧 OS</h3>
+                <p>Debian</p>
+            </a>
+
+            <a href="https://grapheneos.org" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>📱 Privacy OS</h3>
+                <p>GrapheneOS</p>
+            </a>
+
+            <a href="https://gnupg.org" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>🔐 Encryption</h3>
+                <p>GNU Privacy Guard (GPG)</p>
+            </a>
+
+            <a href="https://keepassxc.org" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>🔑 Passwords</h3>
+                <p>KeePassXC</p>
+            </a>
+
+            <a href="https://dd-wrt.com" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>📡 Router</h3>
+                <p>DD-WRT</p>
+            </a>
+
+            <a href="https://signal.org" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>💬 Secure Messaging</h3>
+                <p>Signal Protocol</p>
+            </a>
+
+            <a href="https://simplex.chat" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>📱 Messaging</h3>
+                <p>Simplex Chat</p>
+            </a>
+
+            <a href="https://mailvelope.com" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>📧 Email Encryption</h3>
+                <p>Mailvelope</p>
+            </a>
+
+            <a href="https://getmonero.org" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>💰 Privacy Currency</h3>
+                <p>Monero</p>
+            </a>
+
+            <a href="https://electrum.org" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>₿ Wallet</h3>
+                <p>Electrum</p>
+            </a>
+
+            <a href="https://featherwallet.org" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>💸 Wallet</h3>
+                <p>Feather Wallet</p>
+            </a>
+
+            <a href="https://gimp.org" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>🖼️ Image Editing</h3>
+                <p>GIMP</p>
+            </a>
+
+            <a href="https://virtualbox.org" target="_blank" rel="noopener noreferrer" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>🖥️ Virtualization</h3>
+                <p>VirtualBox</p>
+            </a>
+        </div>
+    </section>
+
+    <section class="lessons-section" id="references">
+        <div class="section-header">
+            <div class="section-title-wrap">
+                <h2>// References</h2>
+                <p>Documentation, communities, and resources</p>
+            </div>
+            <input type="checkbox" id="checkbox-references" class="show-more-checkbox">
+            
+        </div>
+
+        <div class="lessons-grid">
+            <a href="https://wiki.archlinux.org" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">DOCS</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Arch Wiki</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">The best Linux documentation. Comprehensive guides for every Linux distro.</p>
+                </article>
+            </a>
+
+            <a href="https://debian.org/doc" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">DOCS</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Debian Documentation</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Official Debian documentation and manuals.</p>
+                </article>
+            </a>
+
+            <a href="https://explainshell.com" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">CLI</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">ExplainShell</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Parse shell commands and see what each part does.</p>
+                </article>
+            </a>
+
+            <a href="https://cheat.sh" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">CLI</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">cheat.sh</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">CLI cheatsheets for developers.</p>
+                </article>
+            </a>
+
+            <a href="https://tldr.sh" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">CLI</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">tldr</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Simplified man pages.</p>
+                </article>
+            </a>
+
+            <a href="https://git-scm.com/doc" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TOOLS</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Git Docs</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Official Git documentation.</p>
+                </article>
+            </a>
+
+            <a href="https://docs.docker.com" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TOOLS</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Docker Docs</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Official Docker documentation.</p>
+                </article>
+            </a>
+
+            <a href="https://nginx.org/en/docs" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TOOLS</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">NGINX Docs</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Official NGINX documentation.</p>
+                </article>
+            </a>
+
+            <a href="https://httpd.apache.org/docs" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TOOLS</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Apache Docs</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Official Apache HTTP Server documentation.</p>
+                </article>
+            </a>
+
+            <a href="https://reddit.com/r/linux" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">COMMUNITY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">r/linux</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">The largest Linux community on Reddit.</p>
+                </article>
+            </a>
+
+            <a href="https://reddit.com/r/selfhosted" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">COMMUNITY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">r/selfhosted</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Community for self-hosting enthusiasts.</p>
+                </article>
+            </a>
+
+            <a href="https://stackexchange.com" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">COMMUNITY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Stack Exchange</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Q&A communities for developers.</p>
+                </article>
+            </a>
+
+            <a href="https://discord.gg/linux" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">COMMUNITY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Linux Discord</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Linux community on Discord.</p>
+                </article>
+            </a>
+
+            <a href="https://security.stackexchange.com" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SECURITY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Security SE</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Information security Q&A.</p>
+                </article>
+            </a>
+
+            <a href="https://hardening.ansible.com" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SECURITY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Ansible Hardening</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Security hardening with Ansible.</p>
+                </article>
+            </a>
+
+            <a href="https://safebrowsing.google.com" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SECURITY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Google Safe Browsing</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Check URLs for safety.</p>
+                </article>
+            </a>
+
+            <a href="https://haveibeenpwned.com" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SECURITY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Have I Been Pwned</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Check if your email was compromised.</p>
+                </article>
+            </a>
+
+            <a href="https://linuxjourney.com" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">LEARN</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Linux Journey</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Learn Linux from the ground up.</p>
+                </article>
+            </a>
+
+            <a href="https://linuxhandbook.com" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">LEARN</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Linux Handbook</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Linux tutorials and guides.</p>
+                </article>
+            </a>
+
+            <a href="https://overthewire.org/wargames" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">LEARN</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">OverTheWire</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Wargames for learning security and Linux.</p>
+                </article>
+            </a>
+
+            <a href="https://exercism.org/tracks/bash" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">LEARN</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Exercism Bash</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Learn Bash through exercises.</p>
+                </article>
+            </a>
+
+            <a href="https://linuxcommand.org" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">LEARN</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Linux Command</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Learn the Linux command line.</p>
+                </article>
+            </a>
+
+            <a href="https://developer.mozilla.org" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">DOCS</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">MDN Web Docs</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Comprehensive documentation for web technologies.</p>
+                </article>
+            </a>
+
+            <a href="https://www.w3schools.com" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">LEARN</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">W3Schools</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Tutorials for web development.</p>
+                </article>
+            </a>
+
+            <a href="https://freecodecamp.org" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">LEARN</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">freeCodeCamp</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Free coding curriculum.</p>
+                </article>
+            </a>
+
+            <a href="https://www.theodinproject.com" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">LEARN</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">The Odin Project</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Full-stack web development curriculum.</p>
+                </article>
+            </a>
+
+            <a href="https://github.com/awesome-selfhosted/awesome-selfhosted" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SELFHOSTED</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Awesome Selfhosted</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">List of self-hosted software.</p>
+                </article>
+            </a>
+
+            <a href="https://docs.linuxserver.io" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SELFHOSTED</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">LinuxServer.io</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Docker containers and guides.</p>
+                </article>
+            </a>
+
+            <a href="https://www.privacyguides.org" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Privacy Guides</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Privacy and security recommendations.</p>
+                </article>
+            </a>
+
+            <a href="https://kycnot.me" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">KYC Not Me</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Resources for financial privacy.</p>
+                </article>
+            </a>
+
+            <a href="https://monerica.com" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Monerica</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Monero ecosystem directory.</p>
+                </article>
+            </a>
+
+            <a href="https://reddit.com/r/homelab" target="_blank" rel="noopener noreferrer" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">COMMUNITY</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">r/homelab</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Home lab enthusiasts.</p>
+                </article>
+            </a>
+        </div>
+    </section>
+
+    <section id="scripts" style="padding: 64px 32px; background: var(--white); max-width: 1100px; margin: 0 auto;">
+        <div class="section-header">
+            <div class="section-title-wrap">
+                <h2 style="font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 8px;">// AUTOMATION SCRIPTS</h2>
+                <p style="font-family: 'IBM Plex Mono', monospace; color: var(--charcoal);">Download automation scripts to help set up your server</p>
+            </div>
+            <input type="checkbox" id="checkbox-scripts" class="show-more-checkbox">
+            
+        </div>
+
+        <div class="resources-grid">
+            <a href="server_setup.sh" class="resource-card" style="text-decoration: none; color: inherit;">
+                <h3>🖥️ Server Setup</h3>
+                <p>Automated Debian server setup. Installs and configures basic server essentials.</p>
+            </a>
+
+            <a href="mail_server_setup.sh" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>📧 Mail Server Setup</h3>
+                <p>Automated Mailcow installation for self-hosted email.</p>
+            </a>
+
+            <a href="mail_server_uninstall.sh" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>🗑️ Mail Server Uninstall</h3>
+                <p>Remove Mailcow and all related containers from your server.</p>
+            </a>
+
+            <a href="matomo_setup.sh" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>📊 Matomo Setup</h3>
+                <p>Install Matomo analytics for privacy-focused website tracking.</p>
+            </a>
+
+            <a href="matomo_uninstall.sh" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>📊 Matomo Uninstall</h3>
+                <p>Remove Matomo analytics from your server.</p>
+            </a>
+
+            <a href="os_report.sh" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>📈 OS Report</h3>
+                <p>Generate daily OS/browser stats from access logs.</p>
+            </a>
+
+            <a href="server_report.sh" class="resource-card hidden" style="text-decoration: none; color: inherit;">
+                <h3>🖥️ Server Report</h3>
+                <p>up 2 hours, 5 minutes</p>
+            </a>
+        </div>
+    </section>
+
+    <!-- Blog Section -->
+    <section id="blog" style="padding: 64px 32px; background: var(--white); max-width: 1100px; margin: 0 auto;">
+        <div class="section-header">
+            <div class="section-title-wrap">
+                <h2 style="font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 8px;">// THE REBEL BLOG</h2>
+                <p style="font-family: 'IBM Plex Mono', monospace; color: var(--charcoal);">Thoughts on free software, privacy, and taking back control</p>
+            </div>
+            <input type="checkbox" id="checkbox-blog" class="show-more-checkbox">
+            
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; max-width: 1100px; margin: 0 auto; padding: 0 32px;" class="blog-grid">
+            <a href="blog/blog-metadata-privacy.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">2026-03-12 • 8 min • Privacy</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Metadata: The Data That Reveals Everything</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">How AI analyzes your metadata and how DAITA fights back.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-network-privacy.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">2026-03-12 • 8 min • Privacy</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Network Privacy 101</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Protecting your digital footprint from tracking.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-cicd.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">2026-03-14 • 10 min • DevOps</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">CI/CD: Automating Your Path to Production</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Learn the fundamentals of Continuous Integration and Deployment.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-ansible.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">2026-03-14 • 8 min • DevOps</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Ansible: Configuration Management</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Simplify server configuration with agentless automation.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-terraform.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">2026-03-14 • 10 min • DevOps</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Infrastructure as Code with Terraform</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Why Terraform is the future of infrastructure management.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-device-security.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">2026-03-12 • 6 min • Security</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Device Security</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Physical protection, encryption, and wireless risks.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-fullstack-linux.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">2026-03-03 • 12 min • Web Dev</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">How to Learn Full-Stack Web Dev Using Linux</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">A Linux-first roadmap to learn the full stack.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-editing.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">2026-03-02 • 10 min • Workflow</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Powerful Editing Commands for Linux</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Use bash, grep, regex, sed, and Vim to edit files.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-monero.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">2026-03-01 • 15 min • Privacy</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Monero on the Command Line</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">A privacy-first guide to cryptocurrency.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-homelab.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">2026-03-11 • 10 min • Homelab</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Homelab on the Cheap</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Build your own infrastructure for under $100.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-degoogle.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">2026-03-11 • 12 min • Privacy</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Breaking Up with Google</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">A practical guide to ditching Google.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-gpg.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">2026-03-01 • 12 min • Security</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Mastering GPG Encryption</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Encryption for the command line.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-foss.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">2026-02-28 • 8 min • FOSS</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">The Need for FOSS</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Why free and open source software matters.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-linux-commands.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Linux Basics</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Basic Linux Commands</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Commands every beginner should know.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-vps.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Server Admin</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Setting Up Your First VPS</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">A step-by-step guide to get started.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-linux-for-everyone.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Linux Basics</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Linux for Non-Techies</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Why your grandma should use Linux.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-ssh-keys.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Security</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">SSH Keys: The Complete Guide</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Secure passwordless authentication.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-server-software.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Server Tools</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Essential Server Software</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Software you need to run a server.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-docker.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Docker</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Getting Started with Docker</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Containerization for beginners.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-backups.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Backups</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Server Backups with Restic</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Automated backups made simple.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-email.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Self-Hosting</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Self-Hosted Email Guide</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Run your own mail server.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-wireguard.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Security</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Build Your Own VPN with WireGuard</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Your own VPN in 15 minutes.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-pihole.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Privacy</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Block Ads Everywhere with Pi-hole</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Network-level ad blocking.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-selfhosted.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Self-Hosting</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Self-Hosted Services Guide</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Replace Google, Netflix, and more.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-security-keys.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Security</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hardware Security Keys</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">The key to unbreakable accounts.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-browser-hardening.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Privacy</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Browser Hardening Guide</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Take back your privacy.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-jenkins.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">DevOps</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Jenkins: The Old Reliable</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">CI/CD that just works.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-grafana.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">DevOps</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Grafana: See Everything</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Beautiful dashboards for metrics.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-prometheus.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">DevOps</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Monitor Everything with Prometheus</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">The metrics engine for DevOps.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-vault.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Security</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Manage Secrets with HashiCorp Vault</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Your secrets, properly managed.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-nginx.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Web Servers</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Production-Ready Nginx</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">The高性能 web server.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-kubernetes.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">DevOps</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Kubernetes for Beginners</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Container orchestration explained.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-secure-messaging.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Privacy</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Secure Messaging Guide</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Signal, Session, and more.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-ansible.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">DevOps</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Ansible: Automation at Scale</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Configure all the things.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-backups.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Backups</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Server Backups with Restic</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Automated backups made simple.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-math-for-cs.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Math</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Math for Computer Science</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">The math behind the magic.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-javascript.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">JavaScript</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">JavaScript Basics</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Understand the risks. Use sparingly.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-php.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PHP</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">PHP Basics</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Server-side scripting. Powers WordPress.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-sql.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SQL</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">SQL Basics</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Talk to databases. Get data.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-css.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">CSS</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">CSS Grid & Flexbox</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Layouts without the headache.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-docker-compose.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Docker</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Docker Compose</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Multi-container apps. One command.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-github-actions.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">DevOps</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">GitHub Actions</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Automate tests. Automate deploys.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-bash.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Terminal</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Bash</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Control your computer properly.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-git.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Version Control</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Git</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Stop losing your code.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-go.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Programming</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Go</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Simple, fast, concurrent.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-html.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Web Development</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">HTML</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">The only language your browser understands.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-javascript.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Web Development</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">JavaScript</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Make websites interactive.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-linux.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Operating Systems</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Linux</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Take control of your machine.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-postgresql.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Database</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">PostgreSQL</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">The world's most advanced open source database.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-python.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Programming</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Python</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">The magic wand of programming.</p>
+                </article>
+            </a>
+
+            <a href="blog/blog-typescript.html" class="lesson-card hidden" style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">Programming</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">TypeScript</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">JavaScript with types.</p>
+                </article>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="section-header">
+            <div class="section-title-wrap">
+                <h2>// About</h2>
+            </div>
+            <input type="checkbox" id="checkbox-about" class="show-more-checkbox">
+            
+        </div>
+        <div class="about-content about-hidden">
+            <p>Every time you use proprietary software, you're trusting corporations with your data. They're not earning that trust—they're extracting value from you while telling you what's best for your computer.</p>
+            <p>Linux isn't just an alternative—it's a philosophy. When you run Linux, you own your operating system. When you use FOSS encryption tools, only you hold the keys to your data.</p>
+            <p>This isn't about being a "hacker" or "techie." It's about digital sovereignty. It's about privacy as a human right. It's about refusing to be the product.</p>
+            <p><strong>The revolution will not be proprietary.</strong></p>
+        </div>
+    </section>
+
+    <section id="contact" style="padding: 64px 32px; background: var(--white); max-width: 1100px; margin: 0 auto;">
+        <div class="section-header">
+            <div class="section-title-wrap">
+                <h2 style="font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 8px;">// Work With Me</h2>
+                <p style="font-family: 'IBM Plex Mono', monospace; color: var(--charcoal);">Freelance, contract, or full-time opportunities</p>
+            </div>
+            <input type="checkbox" id="checkbox-contact" class="show-more-checkbox">
+            
+        </div>
+
+        <div class="contact-hidden" style="padding: 32px 0;">
+            <div style="display: grid; grid-template-columns: 300px 1fr; gap: 48px; align-items: start;">
+                <div>
+                    <img src="cjb.jpg" alt="Photo of me" style="width: 100%; max-width: 300px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                </div>
+                <div>
+                    <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">// About Me</h3>
+                    <p style="margin-bottom: 16px;">I'm a systems administrator and developer with a passion for building reliable, privacy-focused infrastructure. I specialize in Linux servers, automation, and security.</p>
+                    
+                    <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">// What I Do</h3>
+                    <p style="margin-bottom: 16px;">I build and manage production servers, write practical tutorials that actually help people learn, and create interactive learning tools. My work spans from self-hosted services to enterprise infrastructure.</p>
+
+                    <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">// Skills & Technologies</h3>
+                    <p style="margin-bottom: 16px;"><strong>Linux:</strong> Server administration, security hardening, performance tuning<br>
+                    <strong>Automation:</strong> Terraform, Ansible, CI/CD pipelines, scripting<br>
+                    <strong>Security:</strong> PGP, Tor, network hardening, operational security<br>
+                    <strong>Web:</strong> HTML, CSS, JavaScript, Python, PHP<br>
+                    <strong>Infrastructure:</strong> Docker, Nginx, Apache, databases</p>
+                    
+                    <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">// Let's Work Together</h3>
+                    <p style="margin-bottom: 16px;">I'm currently available for freelance projects, contract work, and long-term positions. Whether you need help setting up infrastructure, automating deployments, securing your servers, or building a web application—I can help. Contact me here: <strong>busydrama@proton.me</strong></p>
+                </div>
+            </div>
+            <style>
+                @media (max-width: 700px) {
+                    #contact > .contact-hidden > div {
+                        grid-template-columns: 1fr !important;
+                        display: flex !important;
+                        flex-direction: column-reverse;
+                    }
+                    #contact > .contact-hidden > div > div:first-child img {
+                        width: 100%;
+                        max-width: 100% !important;
+                    }
+                }
+            </style>
+        </div>
+    </section>
+
+    <section class="lessons-section" id="tests" style="padding: 64px 32px; background: var(--white); max-width: 1100px; margin: 0 auto;">
+        <div class="section-header">
+            <div class="section-title-wrap">
+                <h2 style="font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 8px;">// TEST YOUR KNOWLEDGE</h2>
+                <p style="font-family: 'IBM Plex Mono', monospace; color: var(--charcoal);">Take a test to prove your mastery</p>
+            </div>
+            <input type="checkbox" id="checkbox-tests" class="show-more-checkbox">
+            
+        </div>
+
+        <div class="lessons-grid">
+            <a href="tests/test-linux.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Linux Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Linux knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-bash.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Bash Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Bash scripting knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-git.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Git Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Git knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-html.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">HTML Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your HTML knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-css.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">CSS Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your CSS knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-javascript.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">JavaScript Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your JavaScript knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-python.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Python Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Python knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-php.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">PHP Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your PHP knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-sql.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">SQL Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your SQL knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-docker.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Docker Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Docker knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-kubernetes.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Kubernetes Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Kubernetes knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-terraform.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Terraform Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Terraform knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-ansible.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Ansible Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Ansible knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-cicd.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">CI/CD Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your CI/CD knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-networking.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Networking Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Networking knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-nginx.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Nginx Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Nginx knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-apache.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Apache Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Apache knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-vps.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">VPS Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your VPS knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-vim.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Vim Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Vim knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-aws.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">AWS Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your AWS knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-security.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Security Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Security knowledge</p>
+                </article>
+            </a>
+
+            <a href="tests/test-monitoring.html" class="lesson-card" hidden style="text-decoration: none; color: inherit;">
+                <article style="padding: 24px; background: var(--white); height: 100%;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">TEST</div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Monitoring Test</h3>
+                    <p style="font-size: 0.875rem; color: var(--charcoal);">Test your Monitoring knowledge</p>
+                </article>
+            </a>
+        </div>
+    </section>    <!-- Daily OS Report -->
+    <section id="stats" style="padding: 32px; text-align: center; background: var(--ivory); max-width: 1200px; margin: 0 auto;">
+        <p style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 8px;">Last updated: 2026-03-15 06:00:55</p>
+        <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">191 rebelled today.</h3>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            <li>macOS: 79 IPs</li>
+            <li>Other: 50 IPs</li>
+            <li>Windows: 34 IPs</li>
+            <li>Linux: 18 IPs</li>
+            <li>Android: 10 IPs</li>
+        </ul>
+        
+        <!-- Live Server Stats -->
+        <div style="margin-top: 32px; padding-top: 24px;">
+            <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">// Live Server Stats</h3>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;">
+                <div><strong>Location</strong><br>Ogden, Utah</div>
+                <div><strong>Uptime</strong><br>up 13 hours, 54 minutes</div>
+                <div><strong>Load</strong><br>0.04</div>
+                <div><strong>Memory</strong><br>1.3Gi/1.9Gi</div>
+                <div><strong>Disk</strong><br>5.8G/59G</div>
+                <div><strong>Top Proc</strong><br>ps<br>16.6% CPU</div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="rebels" style="padding: 32px; text-align: center; background: var(--ivory);">
+        <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">// Top Rebels</h3>
+        <div id="leaderboard-list" style="max-width: 400px; margin: 0 auto; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem;">
+            <p style="color: var(--charcoal);">Loading...</p>
+        </div>
+    </section>
+    
+    <a class="back-to-top" href="#top" aria-label="Back to top">↑</a>
+
+    <footer id="site-footer">
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        
+        <p><a href="site-map.html">All pages</a></p>
+    </footer>
+
+    <div class="auth-modal" id="authModal" onclick="closeAuthModal(event)">
+        <div class="auth-box" onclick="event.stopPropagation()">
+            <button class="close-auth" onclick="hideAuthModal()" aria-label="Close modal">×</button>
+            <h2>// Account</h2>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="register">Register</button>
+            </div>
+
+            <div class="auth-error" id="authError"></div>
+            <div class="auth-success" id="authSuccess"></div>
+
+            <form class="auth-form active" id="loginForm">
+                <input type="hidden" name="csrf_token" id="loginCsrfToken">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required autocomplete="off">
+                </div>
+                <button type="submit" class="cta-button">Login</button>
+            </form>
+
+            <form class="auth-form" id="registerForm">
+                <input type="hidden" name="csrf_token" id="registerCsrfToken">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required minlength="6" autocomplete="off">
+                </div>
+                <button type="submit" class="cta-button">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="nav.js" defer></script>
+    
+    <script>
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch('api/leaderboard.php');
+                const data = await response.json();
+                
+                const container = document.getElementById('leaderboard-list');
+                
+                if (data.error || !data.leaderboard || data.leaderboard.length === 0) {
+                    container.innerHTML = '<p style="color: var(--charcoal);">No leaders yet. Be the first!</p>';
+                    return;
+                }
+                
+                const medals = ['🥇', '🥈', '🥉'];
+                let html = '';
+                
+                data.leaderboard.forEach((user, index) => {
+                    const email = user.email;
+                    const displayName = email.split('@')[0];
+                    const xp = user.xp || 0;
+                    html += `<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--charcoal); color: var(--black);">
+                        <span>${medals[index] || '4.'} ${displayName}</span>
+                        <span>${xp} XP</span>
+                    </div>`;
+                });
+                
+                container.innerHTML = html;
+            } catch (e) {
+                const container = document.getElementById('leaderboard-list');
+                container.innerHTML = '<p style="color: var(--gray);">Leaderboard unavailable</p>';
+            }
+        }
+        
+        loadLeaderboard();
+    </script>
+</body>
+</html>

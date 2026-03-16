@@ -145,17 +145,16 @@ timestamp = sys.argv[4]
 with open(index_file, 'r') as f:
     content = f.read()
 
-content = re.sub(r'\s*<!--\s*Daily OS Report\s*-->.*?<!--\s*INCLUDE_OS_STATS\s*-->', '<!--INCLUDE_OS_STATS-->', content, flags=re.DOTALL)
-
-section_html = f'''    <!-- Daily OS Report -->
-    <section id="stats" style="padding: 32px; text-align: center; background: var(--ivory); max-width: 1200px; margin: 0 auto;">
+# Replace the OS stats section (the one with "rebelled today")
+# Match from the stats section start to the Live Server Stats comment
+pattern = r'(<section id="stats"[^>]*>)' + r'.*?Last updated:.*?rebelled today.*?</section>'
+replacement = r'\1' + f'''
         <p style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 8px;">Last updated: {timestamp}</p>
         <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">{total} rebelled today.</h3>
 {report_html}
-    </section>
-    <!--INCLUDE_OS_STATS-->'''
+    </section>'''
 
-content = content.replace('<!--INCLUDE_OS_STATS-->', section_html)
+content = re.sub(pattern, replacement, content, flags=re.DOTALL)
 
 with open(index_file, 'w') as f:
     f.write(content)

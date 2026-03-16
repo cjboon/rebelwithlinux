@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-bash.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bash - Control Your Computer Properly</title>
+    <meta name="description" content="Learn Bash scripting. Automate or die clicking.">
+    <meta name="keywords" content="Bash, shell, scripting, terminal, Linux">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Bash - Control Your Computer Properly">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-bash.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-bash.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: #000; border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: #fff; text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="blog-header">
+        <h1>Bash</h1>
+        <p>March 16, 2026 • Bash • Clicking is for people who have time to waste.</p>
+    </div>
+    
+    <nav class="blog-nav">
+        <a href="../index.html#blog">← Back to Blog</a>
+    </nav>
+
+    <article class="blog-content">
+        <p>You click the same things every day. Copy files. Rename a batch of photos. Restart a service. Stop doing that manually. Write a script. Let the machine work for you.</p>
+
+        <h2>What Bash Actually Is</h2>
+        <p>Bash is a shell - a way to talk to your computer through text. You type commands, the computer executes them. This is how all computers worked before GUIs. It's still the most powerful way to work.</p>
+        
+        <p>Bash is the default shell on most Linux systems and macOS. On Windows, use WSL (Windows Subsystem for Linux) or Git Bash. Stop using PowerShell if you can avoid it.</p>
+
+        <h2>The Commands You Need</h2>
+        <p>These are the basics. Use these every day:</p>
+        
+        <pre><code>ls                  # List files
+ls -la              # List all files with details
+cd myfolder         # Change to myfolder
+cd ..               # Go back one level
+cd ~                # Go to home directory
+pwd                 # Print working directory (where are you?)
+mkdir myfolder      # Create a folder
+rm file.txt         # Delete a file
+rm -rf folder       # Delete folder and everything in it
+cp source dest       # Copy file
+mv old new          # Move or rename
+cat file.txt        # Print file contents
+head file.txt       # First 10 lines
+tail file.txt       # Last 10 lines
+grep "search" file  # Search in file</code></pre>
+
+        <h2>Pipes - Chain Commands Together</h2>
+        <p>This is where it gets powerful. The pipe character (|) takes the output of one command and feeds it to the next:</p>
+        
+        <pre><code>ls | grep ".txt"          # List only .txt files
+cat log.txt | tail -20   # Last 20 lines of log
+ps aux | grep nginx      # Find nginx process
+history | grep git       # Find previous git commands</code></pre>
+
+        <p>Chaining commands this way is what makes the terminal actually useful. Learn this pattern.</p>
+
+        <h2>Variables - Store Things</h2>
+        <p>Like any programming language, Bash has variables:</p>
+        
+        <pre><code>name="Alex"
+age=25
+echo "Hello, $name"
+echo "You are $age years old"</code></pre>
+
+        <p>No spaces around the = sign. Always use quotes around strings. The $ sign accesses the variable.</p>
+
+        <h2>Conditionals - Make Decisions</h2>
+        <pre><code>if [ $age -ge 18 ]; then
+    echo "Adult"
+else
+    echo "Minor"
+fi</code></pre>
+
+        <p>Bash has if/then/else/fi. The condition goes in square brackets. Watch your spaces - <code>[$age</code> will break. It must be <code>[ $age</code>.</p>
+
+        <h2>Loops - Do Things Multiple Times</h2>
+        <pre><code># Loop through files
+for file in *.txt; do
+    echo "Processing $file"
+done
+
+# Count to 5
+for i in 1 2 3 4 5; do
+    echo $i
+done</code></pre>
+
+        <p>Loops automate repetitive tasks. Batch rename files. Process every image in a folder. Whatever needs doing repeatedly.</p>
+
+        <h2>Write Scripts - Save Your Work</h2>
+        <p>A script is just a file with commands in it. Make it executable and run it:</p>
+        
+        <pre><code>#!/bin/bash
+
+echo "Starting backup..."
+
+# Get current date
+date=$(date +%Y-%m-%d)
+
+# Create backup folder
+mkdir -p backups/$date
+
+# Copy important files
+cp -r ~/Documents backups/$date/
+
+echo "Backup complete!"</code></pre>
+
+        <p>Save this as <code>backup.sh</code>, run <code>chmod +x backup.sh</code>, then execute with <code>./backup.sh</code>.</p>
+
+        <h2>Why Bother?</h2>
+        <p>Because clicking is slow. Because scripts are reproducible. Because you can run the same task on 100 servers with one command. Because the terminal is what actual engineers use.</p>
+        
+        <p>The GUI is for casuals. The terminal is for people who want control.</p>
+
+        <h2>Get Started</h2>
+        <p>Open your terminal. Run these commands. Then start writing small scripts to automate something you do regularly. Backups. File organization. Service monitoring. Anything.</p>
+        
+        <p><strong>Learn more:</strong></p>
+        <ul>
+            <li><a href="../guides/guide-bash.html">Our Bash Guide</a> - Interactive lessons</li>
+            <li><a href="../hangman/hangman-bash.html">Bash Hangman</a> - Test your knowledge</li>
+            <li><a href="https://www.gnu.org/software/bash/manual/">Bash Manual</a> - The official docs</li>
+        </ul>
+    </article>
+
+    <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+        <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+        <div id="comments-list" style="margin-bottom: 32px;"></div>
+        <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+            <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+            <div style="display: grid; gap: 16px;">
+                <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                <button onclick="submitComment('blog-bash')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+            </div>
+        </div>
+    </section>
+    <script src="../js/comments.js"></script>
+    <script src="../nav.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-bash');
+        });
+    </script>
+</body>
+</html>

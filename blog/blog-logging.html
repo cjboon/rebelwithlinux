@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-logging.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logging - The Only Way to Know What's Happening</title>
+    <meta name="description" content="Learn logging. Without logs, you're blind.">
+    <meta name="keywords" content="Logging, Syslog, Linux, DevOps">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Logging - The Only Way to Know What's Happening">
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-logging.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>const savedTheme = localStorage.getItem('theme'); if (!savedTheme || savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); }</script>
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: #000; border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: #fff; text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .warning { background: rgba(255, 107, 53, 0.1); border-left: 4px solid #ff6b35; padding: 16px; margin: 24px 0; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left"><div class="nav-title"><a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a></div><label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label></div>
+        <div class="nav-right"><div class="menu-details" id="nav-menu"><a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></a><div class="nav-links" id="navLinks"><a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a><a href="../index.html#games">GAMES</a><a href="../index.html#guides">GUIDES</a><a href="../index.html#blog">BLOG</a><a href="../index.html#about">ABOUT</a></div></div></div>
+    </nav>
+    <div class="blog-header"><h1>Logging</h1><p>March 16, 2026 • Logging • Without logs, you're blind.</p></div>
+    <nav class="blog-nav"><a href="../index.html#blog">← Back to Blog</a></nav>
+    <article class="blog-content">
+        <p>Your server is doing things. You don't know what. Your application is running. Is it working? Is it broken? You have no idea. That's what happens when you don't log. You're flying blind, hoping everything is fine. That's not operations. That's optimism.</p>
+
+        <div class="warning"><strong>No logs = no visibility = no debugging. Hope is not a strategy.</strong></div>
+
+        <h2>Log Levels</h2>
+        <p>Not all messages are equal. Use the right level:</p>
+        
+        <ul>
+            <li><strong>DEBUG</strong> - Detailed info for development</li>
+            <li><strong>INFO</strong> - Normal operation events</li>
+            <li><strong>WARNING</strong> - Something weird happened</li>
+            <li><strong>ERROR</strong> - Something failed</li>
+            <li><strong>CRITICAL</strong> - System is going down</li>
+        </ul>
+
+        <pre><code># Syslog levels (low to high)
+0: Emergency   - system is unusable
+1: Alert       - action must be taken immediately
+2: Critical    - critical conditions
+3: Error       - error conditions
+4: Warning     - warning conditions
+5: Notice      - normal but significant
+6: Informational - informational messages
+7: Debug       - debug-level messages</code></pre>
+
+        <h2>System Logging</h2>
+        <p>Linux has built-in logging. Use it:</p>
+        
+        <pre><code># View system logs
+journalctl                    # Systemd journal
+tail -f /var/log/syslog      # Debian/Ubuntu
+tail -f /var/log/messages    # RHEL/CentOS
+
+# Filter by service
+journalctl -u nginx
+journalctl -u docker
+
+# Filter by time
+journalctl --since "1 hour ago"
+journalctl --since "2026-01-01"
+
+# Follow in real-time
+journalctl -f</code></pre>
+
+        <h2>Application Logging</h2>
+        <p>Your code should log. Here's how:</p>
+        
+        <pre><code># Python
+import logging
+logging.basicConfig(level=logging.INFO)
+logging.info("Server started on port 8080")
+logging.error("Connection failed")
+
+# Node.js
+const winston = require('winston');
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [new winston.transports.File({ filename: 'app.log' })]
+});
+logger.info('Server started');
+
+# Go
+import "log"
+log.Printf("Server started on port %d", port)
+log.Fatal("Failed to start server")</code></pre>
+
+        <h2>Centralized Logging</h2>
+        <p>When you have multiple servers, aggregate logs in one place:</p>
+        
+        <pre><code># ELK Stack (Elasticsearch, Logstash, Kibana)
+# Logstash receives, Elasticsearch stores, Kibana visualizes
+
+# Loki (Grafana's logging solution)
+# Much cheaper than ELK, integrates with Prometheus
+
+# Rsyslog config for remote logging
+*.* @@logserver.example.com:514</code></pre>
+
+        <h2>Log Rotation</h2>
+        <p>Logs grow forever. That will fill your disk. Rotate them:</p>
+        
+        <pre><code># /etc/logrotate.d/nginx
+/var/log/nginx/*.log {
+    daily           # Rotate daily
+    missingok       # OK if missing
+    rotate 14       # Keep 14 days
+    compress        # Compress old logs
+    delaycompress  # Compress after rotation
+    notifempty     # Don't rotate empty
+    create 0640 www-data adm  # New file permissions
+}</code></pre>
+
+        <h2>What to Log</h2>
+        <p>Log the important stuff. Not everything:</p>
+        
+        <ul>
+            <li><strong>Requests</strong> - Start/end of important operations</li>
+            <li><strong>Errors</strong> - What went wrong, stack traces</li>
+            <li><strong>Auth</strong> - Logins, logouts, failures</li>
+            <li><strong>Changes</strong> - Configuration modifications</li>
+            <li><strong>Performance</strong> - Slow queries, timeouts</li>
+        </ul>
+
+        <p>Don't log:</p>
+        
+        <ul>
+            <li>Passwords or secrets</li>
+            <li>Personal identifiable information (PII)</li>
+            <li>Every single request (too much noise)</li>
+            <li>Debug info in production</li>
+        </ul>
+
+        <h2>The Point</h2>
+        <p>When something breaks at 3am, you don't have time to reproduce the issue. You need to look at what happened. That's what logs are for. They're your time machine. They show you the past.</p>
+        
+        <p>Configure logging properly. Use the right levels. Rotate your logs. Store them somewhere you can search. Because the moment something goes wrong, you'll thank your past self for setting this up.</p>
+    </article>
+    <footer id="contact"><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>

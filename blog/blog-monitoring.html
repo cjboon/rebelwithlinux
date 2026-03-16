@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-monitoring.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring - Watch Your Systems or Be Blind</title>
+    <meta name="description" content="Learn system monitoring. You can't fix what you can't see.">
+    <meta name="keywords" content="Monitoring, Prometheus, Grafana, Linux, DevOps">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Monitoring - Watch Your Systems or Be Blind">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-monitoring.html">
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-monitoring.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); }
+    </script>
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: #000; border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: #fff; text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .warning { background: rgba(255, 107, 53, 0.1); border-left: 4px solid #ff6b35; padding: 16px; margin: 24px 0; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title"><a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a></div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></a>
+                <div class="nav-links" id="navLinks"><a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a><a href="../index.html#games">GAMES</a><a href="../index.html#guides">GUIDES</a><a href="../index.html#blog">BLOG</a><a href="../index.html#about">ABOUT</a></div>
+            </div>
+        </div>
+    </nav>
+    <div class="blog-header">
+        <h1>Monitoring</h1>
+        <p>March 16, 2026 • Monitoring • You can't fix what you can't see.</p>
+    </div>
+    <nav class="blog-nav"><a href="../index.html#blog">← Back to Blog</a></nav>
+    <article class="blog-content">
+        <p>Your server is lying to you. It says everything is fine when it's actually on fire. Why? Because you're not watching. You're flying blind. That's not a strategy - that's hope.</p>
+        
+        <div class="warning">
+            <strong>Hope is not a strategy.</strong> If you're not monitoring your systems, you're not running a service. You're running a guessing game.
+        </div>
+
+        <h2>The Bare Minimum</h2>
+        <p>Before you do anything else, set up basic system monitoring. Today. Right now:</p>
+        
+        <pre><code># CPU, memory, disk - the holy trinity
+top
+free -h
+df -h
+
+# What's running
+ps aux | head -20
+
+# Network connections
+ss -tunap
+
+# Disk I/O
+iostat -x 1 5</code></pre>
+
+        <p>These commands are your eyes. Run them regularly. Know what's normal so you recognize the abnormal.</p>
+
+        <h2>Enter Prometheus</h2>
+        <p>Prometheus is the monitoring system for people who actually give a damn. It scrapes metrics, stores them, and lets you query them. No middleware. No database required. Just pull-based monitoring that works.</p>
+        
+        <pre><code># Install Prometheus
+wget https://prometheus.io/download/prometheus-2.45.0.linux-amd64.tar.gz
+tar xzf prometheus-2.45.0.linux-amd64.tar.gz
+cd prometheus-2.45.0.linux-amd64
+
+# Run it
+./prometheus --config.file=prometheus.yml</code></pre>
+
+        <p>Prometheus is open source. It's not owned by a corporation trying to lock you in. It just works.</p>
+
+        <h2>Grafana: Make It Pretty</h2>
+        <p>Raw numbers don't tell stories. Grafana does. Connect it to Prometheus and build dashboards that show you exactly what's happening.</p>
+        
+        <pre><code># Install Grafana
+wget https://dl.grafana.com/oss/release/grafana-10.0.0.linux-amd64.tar.gz
+tar -zxvf grafana-10.0.0.linux-amd64.tar.gz
+cd grafana-10.0.0
+
+# Start it
+./bin/grafana-server</code></pre>
+
+        <p>Point your browser to <code>http://localhost:3000</code>. Default login is admin/admin. Change that immediately.</p>
+
+        <h2>The Metrics That Matter</h2>
+        <p>Don't monitor everything. Monitor what kills you:</p>
+        
+        <ul>
+            <li><strong>CPU usage</strong> - If it hits 100% for too long, something is wrong</li>
+            <li><strong>Memory</strong> - OOM killer is not your friend</li>
+            <li><strong>Disk</strong> - Full disks break everything</li>
+            <li><strong>Network</strong> - Saturation means dropped packets</li>
+            <li><strong>Latency</strong> - Slow responses drive users away</li>
+        </ul>
+
+        <h2>Alerting: Wake Up</h2>
+        <p>Monitoring without alerting is just expensive logging. Configure alerts that actually matter:</p>
+        
+        <pre><code>groups:
+- name: alerts
+  rules:
+  - alert: HighCPU
+    expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU on {{ $labels.instance }}"</code></pre>
+
+        <p>Only alert on things that need action. Alert fatigue is real. When everything is an alert, nothing is.</p>
+
+        <h2>The Point</h2>
+        <p>You built the system. You deployed it. Now watch it. The moment you stop monitoring is the moment something breaks and you don't find out until a user complains.</p>
+        
+        <p>Use open tools. Prometheus, Grafana, node_exporter - all free, all open source. Build your monitoring stack on software that respects your freedom.</p>
+        
+        <p>Because the best time to set up monitoring was before something broke. The second best time is now.</p>
+    </article>
+    <footer id="contact">
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p><a href="../site-map.html">All pages</a></p>
+    </footer>
+</body>
+</html>

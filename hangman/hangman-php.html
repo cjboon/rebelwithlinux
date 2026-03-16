@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/hangman/hangman-php.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman: PHP - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: var(--white); color: var(--black); font-family: 'Courier New', monospace; font-size: 15px; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        h1 { margin-bottom: 10px; font-size: 1.8rem; color: #777bb4; }
+        .subtitle { margin-bottom: 20px; color: var(--charcoal); }
+        .definition-label { font-weight: bold; margin-bottom: 8px; color: var(--charcoal); }
+        .definition-text { line-height: 1.5; }
+        .guesses-label { margin-bottom: 8px; color: var(--charcoal); font-size: 0.9rem; }
+        .game-container { display: flex; gap: 40px; flex-wrap: nowrap; justify-content: center; align-items: flex-start; max-width: 900px; }
+        .hangman-area { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+        .definition-area { display: flex; flex-direction: column; align-items: center; flex-grow: 1; min-width: 280px; }
+        canvas { background: var(--black); }
+        @media (prefers-color-scheme: light) { canvas { background: var(--white); } }
+        .definition-box { background: var(--beige); padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+        .word-display { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; font-size: 1.5rem; font-family: 'Courier New', monospace; }
+        .letter-slot { width: 18px; text-align: center; }
+        .letter-slot.correct { color: #00aa00; }
+        .letter-slot.wrong { color: #ff0000; }
+        .input-area { margin-bottom: 15px; }
+        .guess-input { padding: 10px 15px; font-size: 1rem; border: 2px solid var(--charcoal); border-radius: 6px; font-family: 'Courier New', monospace; width: 120px; text-align: center; text-transform: lowercase; }
+        .guess-input:focus { outline: none; border-color: #777bb4; }
+        .guessed-chars { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; justify-content: center; }
+        .guessed-char { padding: 4px 8px; background: var(--beige); border-radius: 4px; font-size: 0.85rem; }
+        .stats { display: flex; gap: 30px; justify-content: center; }
+        .stat { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #777bb4; }
+        .stat-label { font-size: 0.75rem; color: var(--charcoal); }
+        .message { margin-top: 20px; padding: 20px; border-radius: 8px; text-align: center; }
+        .message.win { background: rgba(0, 255, 0, 0.1); border: 2px solid green; }
+        .message.lose { background: rgba(255, 0, 0, 0.1); border: 2px solid red; }
+        .message button { margin-top: 15px; padding: 10px 20px; font-size: 1rem; cursor: pointer; background: #777bb4; color: white; border: none; border-radius: 6px; }
+        .back-link { margin-top: 20px; }
+        .back-link a { color: #58a6ff; text-decoration: none; }
+        .difficulty { font-size: 0.9rem; }
+        @media (max-width: 600px) { .game-container { flex-direction: column; align-items: center; } .definition-area { min-width: auto; } }
+        @media (max-width: 400px) { canvas { width: 120px; height: 150px; } .word-display { font-size: 1rem; } .letter-slot { width: 11px; } h1 { font-size: 1.2rem; } }
+    </style>
+</head>
+<body>
+    <h1>HANGMAN: PHP</h1>
+    <p class="subtitle">Guess the PHP term from its definition</p>
+    <p class="difficulty" id="difficultyDisplay" style="color: var(--charcoal); margin-bottom: 10px;">Difficulty: Easy</p>
+    
+    <div class="game-container">
+        <div class="hangman-area">
+            <canvas id="hangmanCanvas" width="300" height="400"></canvas>
+        </div>
+        
+        <div class="game-info">
+            <div class="definition-box">
+                <div class="definition-label">DEFINITION:</div>
+                <div class="definition-text" id="definition"></div>
+            </div>
+            
+            <div class="word-display" id="wordDisplay" style="display: flex; flex-wrap: nowrap; gap: 2px;"></div>
+            
+            <div class="input-area">
+                <input type="text" class="guess-input" id="guessInput" placeholder="type a-z" autocomplete="off" autofocus>
+            </div>
+            
+            <div class="guesses-label">GUESSED:</div>
+            <div class="guessed-chars" id="guessedChars"></div>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="wrongCount">0</div>
+                    <div class="stat-label">Wrong</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="score">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="streak">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+            </div>
+            
+            <div class="message" id="messageBox" style="display: none;"></div>
+        </div>
+    </div>
+    
+    <div class="back-link">
+        <a href="hangman-main.html">&lt;&lt; back to hangman games</a>
+    </div>
+
+    <script>
+        const commands = {
+            easy: [
+                { command: 'echo', definition: 'Output text to screen' },
+                { command: 'php', definition: 'PHP opening tag' },
+                { command: 'var', definition: 'Declare a variable' },
+                { command: 'if', definition: 'Conditional statement' },
+                { command: 'for', definition: 'Loop statement' },
+                { command: 'arr', definition: 'Array type' },
+                { command: 'str', definition: 'String type' },
+                { command: 'int', definition: 'Integer type' },
+                { command: 'def', definition: 'Define function (function keyword)' },
+                { command: 'cls', definition: 'Class keyword' }
+            ],
+            medium: [
+                { command: 'echo', definition: 'Output one or more strings' },
+                { command: 'print', definition: 'Output a string (slower than echo)' },
+                { command: 'array', definition: 'Create an array' },
+                { command: 'function', definition: 'Define a function' },
+                { command: 'return', definition: 'Return value from function' },
+                { command: 'foreach', definition: 'Loop through array' },
+                { command: 'class', definition: 'Define a class' },
+                { command: 'public', definition: 'Public visibility modifier' },
+                { command: 'private', definition: 'Private visibility modifier' },
+                { command: 'static', definition: 'Static method or property' },
+                { command: 'extends', definition: 'Inherit from a class' },
+                { command: 'interface', definition: 'Define interface contract' },
+                { command: 'implements', definition: 'Implement an interface' },
+                { command: 'namespace', definition: 'Declare namespace' },
+                { command: 'use', definition: 'Import trait or namespace' }
+            ],
+            hard: [
+                { command: '__construct', definition: 'Class constructor method' },
+                { command: '__destruct', definition: 'Class destructor method' },
+                { command: '__get', definition: 'Magic getter' },
+                { command: '__set', definition: 'Magic setter' },
+                { command: '__call', definition: 'Magic method for undefined methods' },
+                { command: 'trait', definition: 'Code reuse mechanism' },
+                { command: 'abstract', definition: 'Abstract class or method' },
+                { command: 'final', definition: 'Prevent inheritance/override' },
+                { command: 'interface', definition: 'Contract for classes' },
+                { command: 'implements', definition: 'Fulfill interface contract' },
+                { command: 'instanceof', definition: 'Check object type' },
+                { command: 'clone', definition: 'Copy object' },
+                { command: 'throw', definition: 'Throw an exception' },
+                { command: 'try', definition: 'Exception handling block' },
+                { command: 'catch', definition: 'Handle exception' }
+            ]
+        };
+
+        let currentWord = '';
+        let currentDefinition = '';
+        let guessedLetters = [];
+        let wrongCount = 0;
+        let score = 0;
+        let streak = 0;
+        let difficulty = 'easy';
+        let isGameOver = false;
+        
+        const canvas = document.getElementById('hangmanCanvas');
+        const ctx = canvas.getContext('2d');
+        const definitionEl = document.getElementById('definition');
+        const wordDisplayEl = document.getElementById('wordDisplay');
+        const guessedCharsEl = document.getElementById('guessedChars');
+        const guessInput = document.getElementById('guessInput');
+        const messageBox = document.getElementById('messageBox');
+        
+        function init() {
+            newGame();
+        }
+        
+        function newGame() {
+            guessedLetters = [];
+            wrongCount = 0;
+            isGameOver = false;
+            messageBox.style.display = 'none';
+            guessInput.value = '';
+            guessInput.focus();
+            
+            const words = commands[difficulty];
+            const randomIndex = Math.floor(Math.random() * words.length);
+            const selected = words[randomIndex];
+            currentWord = selected.command.toLowerCase();
+            currentDefinition = selected.definition;
+            
+            drawHangman();
+            updateDisplay();
+        }
+        
+        function drawHangman() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            
+            // Base
+            if (wrongCount >= 0) {
+                ctx.beginPath();
+                ctx.moveTo(60, 380);
+                ctx.lineTo(60, 20);
+                ctx.lineTo(180, 20);
+                ctx.lineTo(180, 60);
+                ctx.stroke();
+            }
+            
+            // Head
+            if (wrongCount >= 1) {
+                ctx.beginPath();
+                ctx.arc(180, 100, 40, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Body
+            if (wrongCount >= 2) {
+                ctx.beginPath();
+                ctx.moveTo(180, 140);
+                ctx.lineTo(180, 240);
+                ctx.stroke();
+            }
+            
+            // Left arm
+            if (wrongCount >= 3) {
+                ctx.beginPath();
+                ctx.moveTo(180, 160);
+                ctx.lineTo(140, 200);
+                ctx.stroke();
+            }
+            
+            // Right arm
+            if (wrongCount >= 4) {
+                ctx.beginPath();
+                ctx.moveTo(180, 160);
+                ctx.lineTo(220, 200);
+                ctx.stroke();
+            }
+            
+            // Left leg
+            if (wrongCount >= 5) {
+                ctx.beginPath();
+                ctx.moveTo(180, 240);
+                ctx.lineTo(140, 300);
+                ctx.stroke();
+            }
+            
+            // Right leg
+            if (wrongCount >= 6) {
+                ctx.beginPath();
+                ctx.moveTo(180, 240);
+                ctx.lineTo(220, 300);
+                ctx.stroke();
+            }
+        }
+        
+        function updateDisplay() {
+            definitionEl.textContent = currentDefinition;
+            
+            wordDisplayEl.innerHTML = '';
+            const isWon = currentWord.split('').every(char => guessedLetters.includes(char));
+            const isLost = wrongCount >= 6;
+            
+            for (const char of currentWord) {
+                const slot = document.createElement('span');
+                slot.className = 'letter-slot';
+                if (guessedLetters.includes(char)) {
+                    slot.textContent = char;
+                    if (isWon) {
+                        slot.classList.add('correct');
+                    } else if (isLost) {
+                        slot.classList.add('wrong');
+                    }
+                } else {
+                    if (isLost) {
+                        slot.textContent = char;
+                        slot.classList.add('wrong');
+                    } else {
+                        slot.textContent = '_';
+                    }
+                }
+                wordDisplayEl.appendChild(slot);
+            }
+            
+            guessedCharsEl.innerHTML = '';
+            for (const char of guessedLetters) {
+                const span = document.createElement('span');
+                span.className = 'guessed-char';
+                span.textContent = char;
+                guessedCharsEl.appendChild(span);
+            }
+            
+            document.getElementById('wrongCount').textContent = wrongCount;
+            document.getElementById('score').textContent = score;
+            document.getElementById('streak').textContent = streak;
+        }
+        
+        function makeGuess(letter) {
+            const guess = letter.toLowerCase();
+            
+            if (!guess || guess.length !== 1 || !/[a-z]/.test(guess)) return;
+            if (guessedLetters.includes(guess)) return;
+            
+            guessedLetters.push(guess);
+            
+            if (!currentWord.includes(guess)) {
+                wrongCount++;
+                streak = 0;
+                drawHangman();
+            } else {
+                const uniqueLetters = new Set(currentWord.split('')).size;
+                const revealed = currentWord.split('').filter(c => guessedLetters.includes(c)).length;
+                score += Math.floor(100 / uniqueLetters);
+                streak++;
+            }
+            
+            updateDisplay();
+            checkGameOver();
+        }
+        
+        function checkGameOver() {
+            const isWon = currentWord.split('').every(char => guessedLetters.includes(char));
+            const isLost = wrongCount >= 6;
+            
+            if (isWon) {
+                score += 50 * (streak || 1);
+                isGameOver = true;
+                showMessage('win', `You won! Score: ${score}`);
+            } else if (isLost) {
+                isGameOver = true;
+                showMessage('lose', `Game over! The word was: ${currentWord}`);
+            }
+        }
+        
+        function showMessage(type, text) {
+            messageBox.className = 'message ' + type;
+            messageBox.innerHTML = `<div>${text}</div><button id="playAgainBtn" onclick="newGame()">Play Again</button>`;
+            messageBox.style.display = 'block';
+            document.getElementById('playAgainBtn').focus();
+        }
+        
+        guessInput.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            if (key.length === 1 && /[a-z]/.test(key)) {
+                e.preventDefault();
+                makeGuess(key);
+            }
+        });
+        
+        guessInput.addEventListener('input', (e) => {
+            const value = e.target.value.toLowerCase();
+            if (value.length > 0) {
+                const lastChar = value[value.length - 1];
+                if (/[a-z]/.test(lastChar)) {
+                    makeGuess(lastChar);
+                    e.target.value = '';
+                }
+            }
+        });
+        
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+
+        init();
+    </script>
+</body>
+</html>

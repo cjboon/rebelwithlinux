@@ -3,6 +3,13 @@
         const menu = document.querySelector('.menu-details');
         if (!menu) return;
 
+        // Handle URL hash to select correct section
+        const hash = window.location.hash.replace('#', '');
+        if (hash && hash !== 'nav-menu') {
+            const radio = document.getElementById('section-' + hash);
+            if (radio) radio.checked = true;
+        }
+
         const toggle = menu.querySelector('.menu-toggle');
         const links = menu.querySelector('.nav-links');
         if (!toggle || !links) return;

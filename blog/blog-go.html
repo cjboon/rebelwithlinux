@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-go.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Getting Started with Go (Golang) - REBEL WITH LINUX</title>
+    <meta name="description" content="Learn Go programming language basics and why it's taking over the cloud-native world.">
+    <meta name="keywords" content="Go, Golang, programming, cloud-native, backend">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Getting Started with Go">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-go.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-go.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: #000; border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: #fff; text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="blog-header">
+        <h1>Getting Started with Go (Golang)</h1>
+        <p>March 16, 2026 • Go • 10 min read</p>
+    </div>
+    
+    <nav class="blog-nav">
+        <a href="../index.html#blog">← Back to Blog</a>
+    </nav>
+
+    <article class="blog-content">
+        <p>Go (also called Golang) is Google's programming language that powers Docker, Kubernetes, Terraform, and countless other tools. If you want to work with modern infrastructure, Go is essential.</p>
+
+        <h2>Why Go?</h2>
+        <p>Go was designed to solve problems at Google scale. It combines the performance of compiled languages with the simplicity of interpreted ones. The entire language can be learned in days.</p>
+        <ul>
+            <li><strong>Fast:</strong> Compiles in seconds, runs as fast as C</li>
+            <li><strong>Simple:</strong> Only 25 keywords</li>
+            <li><strong>Concurrent:</strong> Built-in goroutines</li>
+            <li><strong>Standard Library:</strong> Batteries included</li>
+        </ul>
+
+        <h2>Installing Go</h2>
+        <pre><code>sudo apt update
+sudo apt install golang-go
+go version</code></pre>
+
+        <h2>Your First Go Program</h2>
+        <pre><code>package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, World!")
+}</code></pre>
+
+        <h2>Running Your Program</h2>
+        <pre><code>go run hello.go</code></pre>
+
+        <h2>Variables</h2>
+        <pre><code>// Explicit type
+var name string = "Alice"
+
+// Type inference
+city := "London"
+
+// Constants
+const Pi = 3.14159</code></pre>
+
+        <h2>Functions</h2>
+        <pre><code>func add(a int, b int) int {
+    return a + b
+}
+
+// Multiple return values
+func divide(a, b float64) (float64, error) {
+    if b == 0 {
+        return 0, errors.New("cannot divide by zero")
+    }
+    return a / b, nil
+}</code></pre>
+
+        <h2>Goroutines - Go's Superpower</h2>
+        <p>Goroutines are lightweight threads managed by the Go runtime. You can have thousands running simultaneously:</p>
+        <pre><code>func main() {
+    // Start a goroutine
+    go sayHello()
+    
+    // Do other work
+    fmt.Println("Main function continues")
+}
+
+func sayHello() {
+    fmt.Println("Hello from goroutine!")
+}</code></pre>
+
+        <h2>Channels</h2>
+        <p>Channels let goroutines communicate safely:</p>
+        <pre><code>ch := make(chan string)
+
+go func() {
+    ch <- "Hello from goroutine!"
+}()
+
+msg := <-ch
+fmt.Println(msg)</code></pre>
+
+        <h2>What's Next?</h2>
+        <p>Go is perfect for APIs, microservices, CLI tools, and cloud-native applications. Check out our Go guide to master the language!</p>
+    </article>
+
+    <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+        <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+        <div id="comments-list" style="margin-bottom: 32px;"></div>
+        <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+            <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+            <div style="display: grid; gap: 16px;">
+                <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                <button onclick="submitComment('blog-go')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+            </div>
+        </div>
+    </section>
+    <script src="../js/comments.js"></script>
+    <script src="../nav.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-go');
+        });
+    </script>
+</body>
+</html>

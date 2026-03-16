@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-apache2.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache2 - The Web Server That Powers The Internet</title>
+    <meta name="description" content="Learn Apache2. The web server that won't die.">
+    <meta name="keywords" content="Apache, Web Server, HTTP, Linux">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Apache2 - The Web Server That Powers The Internet">
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-apache2.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>const savedTheme = localStorage.getItem('theme'); if (!savedTheme || savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); }</script>
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: #000; border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: #fff; text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .warning { background: rgba(255, 107, 53, 0.1); border-left: 4px solid #ff6b35; padding: 16px; margin: 24px 0; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left"><div class="nav-title"><a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a></div><label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label></div>
+        <div class="nav-right"><div class="menu-details" id="nav-menu"><a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></a><div class="nav-links" id="navLinks"><a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a><a href="../index.html#games">GAMES</a><a href="../index.html#guides">GUIDES</a><a href="../index.html#blog">BLOG</a><a href="../index.html#about">ABOUT</a></div></div></div>
+    </nav>
+    <div class="blog-header"><h1>Apache2</h1><p>March 16, 2026 • Apache2 • The dinosaur that still runs the web.</p></div>
+    <nav class="blog-nav"><a href="../index.html#blog">← Back to Blog</a></nav>
+    <article class="blog-content">
+        <p>nginx is trendy. Everyone loves nginx. It's fast, it's lightweight, it handles more connections. But Apache2 is still out there, still running half the web, still supported by a massive community. Don't dismiss it.</p>
+
+        <div class="warning"><strong>Apache is not dead.</strong> It powers Netflix, Airbnb, Uber. Sometimes "newer" doesn't mean "better for your use case."</div>
+
+        <h2>Installation</h2>
+        <p>It's probably in your package manager:</p>
+        
+        <pre><code># Debian/Ubuntu
+apt install apache2
+
+# RHEL/CentOS
+yum install httpd
+
+# Start it
+systemctl start apache2    # or httpd
+systemctl enable apache2   # start on boot</code></pre>
+
+        <h2>The Directory Structure</h2>
+        <p>Everything you need is where it should be:</p>
+        
+        <pre><code>/etc/apache2/           # Configuration
+  /sites-available/     # Site configs
+  /sites-enabled/      # Active sites
+  /modules/            # Loaded modules
+  /ports.conf          # Listen ports
+/var/log/apache2/      # Logs
+/var/www/html/        # Default web root</code></pre>
+
+        <h2>Virtual Hosts</h2>
+        <p>Host multiple sites on one server:</p>
+        
+        <pre><code># Create config
+vim /etc/apache2/sites-available/mysite.conf
+
+&lt;VirtualHost *:80&gt;
+    ServerName mysite.com
+    ServerAlias www.mysite.com
+    DocumentRoot /var/www/mysite
+    
+    &lt;Directory /var/www/mysite&gt;
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    &lt;/Directory&gt;
+    
+    ErrorLog ${APACHE_LOG_DIR}/mysite-error.log
+    CustomLog ${APACHE_LOG_DIR}/mysite-access.log combined
+&lt;/VirtualHost&gt;
+
+# Enable it
+a2ensite mysite
+systemctl reload apache2</code></pre>
+
+        <h2>Modules</h2>
+        <p>Apache is modular. Enable what you need:</p>
+        
+        <pre><code># Enable SSL
+a2enmod ssl
+
+# Enable rewrite (for .htaccess)
+a2enmod rewrite
+
+# Enable headers
+a2enmod headers
+
+# Enable proxy
+a2enmod proxy
+a2enmod proxy_http
+
+# List enabled modules
+apache2ctl -M</code></pre>
+
+        <h2>Security</h2>
+        <p>Don't serve the world your entire filesystem:</p>
+        
+        <pre><code># Deny access to everything by default
+&lt;Directory /&gt;
+    Require all denied
+&lt;/Directory&gt;
+
+# Only allow specific directories
+&lt;Directory /var/www&gt;
+    Require all granted
+&lt;/Directory&gt;
+
+# Hide Apache version
+ServerTokens Prod
+ServerSignature Off</code></pre>
+
+        <h2>SSL/TLS</h2>
+        <p>Let's Encrypt changed everything. Get free SSL:</p>
+        
+        <pre><code># Install certbot
+apt install certbot python3-certbot-apache
+
+# Get certificate
+certbot --apache -d mysite.com -d www.mysite.com
+
+# Auto-renewal is automatic
+# Certificate renews before expiry</code></pre>
+
+        <h2>The Point</h2>
+        <p>Apache has been around since 1995. It's battle-tested. It has documentation for everything. It works with .htaccess which makes per-directory configuration easy. It's not the fastest, but it's the most flexible.</p>
+        
+        <p>Use nginx for high-concurrency static file serving. Use Apache for everything else. They're not enemies - they're tools.</p>
+        
+        <p>The best web server is the one that does what you need. Apache still does what most people need.</p>
+    </article>
+    <footer id="contact"><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>

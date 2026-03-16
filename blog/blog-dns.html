@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-dns.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS - The Phonebook of the Internet</title>
+    <meta name="description" content="Learn DNS. The system that translates names to addresses.">
+    <meta name="keywords" content="DNS, Domain, Networking, Linux">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="DNS - The Phonebook of the Internet">
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-dns.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>const savedTheme = localStorage.getItem('theme'); if (!savedTheme || savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); }</script>
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: #000; border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: #fff; text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .warning { background: rgba(255, 107, 53, 0.1); border-left: 4px solid #ff6b35; padding: 16px; margin: 24px 0; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left"><div class="nav-title"><a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a></div><label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label></div>
+        <div class="nav-right"><div class="menu-details" id="nav-menu"><a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></a><div class="nav-links" id="navLinks"><a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a><a href="../index.html#games">GAMES</a><a href="../index.html#guides">GUIDES</a><a href="../index.html#blog">BLOG</a><a href="../index.html#about">ABOUT</a></div></div></div>
+    </nav>
+    <div class="blog-header"><h1>DNS</h1><p>March 16, 2026 • DNS • The internet's address book.</p></div>
+    <nav class="blog-nav"><a href="../index.html#blog">← Back to Blog</a></nav>
+    <article class="blog-content">
+        <p>You type google.com into your browser. Your computer doesn't know where google.com is. It has to ask someone. That's DNS. It's the system that translates the names humans remember into the numbers computers use.</p>
+
+        <div class="warning"><strong>DNS is fundamentally broken.</strong> It's slow, it's insecure, and it's mostly unencrypted. But it's what we have, so you need to understand it.</div>
+
+        <h2>How DNS Works</h2>
+        <p>When you type a domain name, your computer asks a series of questions:</p>
+        
+        <ol>
+            <li><strong>Local cache</strong> - Do I already know this?</li>
+            <li><strong>Recursive resolver</strong> - Ask the ISP's DNS server</li>
+            <li><strong>Root server</strong> - Who knows about .com?</li>
+            <li><strong>TLD server</strong> - Who knows about google.com?</li>
+            <li><strong>Authoritative server</strong> - Here's the IP address</li>
+        </ol>
+
+        <h2>Record Types</h2>
+        <p>DNS is full of different record types. Here are the ones you need to know:</p>
+        
+        <pre><code>A           # IPv4 address
+AAAA        # IPv6 address
+CNAME       # Canonical name (alias)
+MX          # Mail exchange
+TXT         # Text record ( SPF, DKIM )
+NS          # Name server
+SOA         # Start of authority
+PTR         # Reverse DNS (IP to name)</code></pre>
+
+        <h2>Query Commands</h2>
+        <p>Talk to DNS servers directly:</p>
+        
+        <pre><code># Basic query
+dig google.com
+nslookup google.com
+host google.com
+
+# Specific record type
+dig google.com A
+dig google.com MX
+
+# Reverse DNS
+dig -x 8.8.8.8
+nslookup 8.8.8.8
+
+# Trace the full path
+dig +trace google.com</code></pre>
+
+        <h2>Your Own DNS Server</h2>
+        <p>Run your own DNS for privacy:</p>
+        
+        <pre><code># Install bind9
+apt install bind9
+
+# Configure in /etc/bind/
+# Forward queries to upstream (like 1.1.1.1 or 8.8.8.8)
+# Or run a caching resolver</code></pre>
+
+        <h2>DNS over HTTPS</h2>
+        <p>Traditional DNS is plaintext. Everyone can see what you're looking up. DoH encrypts it:</p>
+        
+        <pre><code># Firefox DNS-over-HTTPS
+# Go to: about:preferences#privacy
+# Enable "Enable DNS over HTTPS"
+
+# Or use a CLI tool
+curl https://cloudflare-dns.com/dns-query \
+  -H 'accept: application/dns-json' \
+  -A 'curl' \
+  '?name=example.com&type=A'</code></pre>
+
+        <h2>Common Problems</h2>
+        <p>When DNS breaks, nothing works:</p>
+        
+        <ul>
+            <li><strong>NXDOMAIN</strong> - Domain doesn't exist</li>
+            <li><strong>Slow resolution</strong> - Bad upstream DNS servers</li>
+            <li><strong>Caching issues</strong> - Old records cached somewhere</li>
+            <li><strong>DNSSEC</strong> - Validation failures</li>
+        </ul>
+
+        <h2>The Point</h2>
+        <p>DNS is one of those things you don't think about until it breaks. When your site goes down and people can't reach it, DNS is often the culprit. Learn to query it, troubleshoot it, and when possible, secure it.</p>
+    </article>
+    <footer id="contact"><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>

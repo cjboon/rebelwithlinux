@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-vim.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vim - The Editor That Refuses to Die</title>
+    <meta name="description" content="Learn Vim. The editor that outlasted every trend.">
+    <meta name="keywords" content="Vim, Editor, Linux, Terminal">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Vim - The Editor That Refuses to Die">
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-vim.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>const savedTheme = localStorage.getItem('theme'); if (!savedTheme || savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); }</script>
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: #000; border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: #fff; text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .warning { background: rgba(255, 107, 53, 0.1); border-left: 4px solid #ff6b35; padding: 16px; margin: 24px 0; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left"><div class="nav-title"><a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a></div><label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label></div>
+        <div class="nav-right"><div class="menu-details" id="nav-menu"><a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></a><div class="nav-links" id="navLinks"><a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a><a href="../index.html#games">GAMES</a><a href="../index.html#guides">GUIDES</a><a href="../index.html#blog">BLOG</a><a href="../index.html#about">ABOUT</a></div></div></div>
+    </nav>
+    <div class="blog-header"><h1>Vim</h1><p>March 16, 2026 • Vim • Escape from editor hell.</p></div>
+    <nav class="blog-nav"><a href="../index.html#blog">← Back to Blog</a></nav>
+    <article class="blog-content">
+        <p>There's a joke about Vim users: they spend weeks configuring their editor, then spend 20 minutes actually editing files. It's funny because it's true. But here's the thing - once you actually learn Vim, you never go back.</p>
+        
+        <div class="warning"><strong>Learning curve is real.</strong> You'll feel stupid. You'll type things and nothing will happen. You'll type :wq to save and quit and accidentally type :w only to realize :q doesn't do what you think. Stick with it. It's worth it.</div>
+
+        <h2>The Modes</h2>
+        <p>Vim is not like other editors. It has modes. This confuses everyone at first:</p>
+        
+        <ul>
+            <li><strong>Normal</strong> - Move around, delete, copy. This is where you spend 90% of your time.</li>
+            <li><strong>Insert</strong> - Actually type text. Press <code>i</code> to enter.</li>
+            <li><strong>Visual</strong> - Select text. Press <code>v</code>.</li>
+            <li><strong>Command</strong> - Run commands. Press <code>:</code></li>
+        </ul>
+
+        <h2>Movement</h2>
+        <p>Learn these keys. They're your new home:</p>
+        
+        <pre><code>h j k l       # Left, Down, Up, Right
+w             # Word forward
+b             # Word backward
+0             # Start of line
+$             # End of line
+gg            # Top of file
+G             # Bottom of file
+:20           # Go to line 20
+%             # Jump to matching bracket</code></pre>
+
+        <h2>Editing</h2>
+        <p>Once you're in Normal mode:</p>
+        
+        <pre><code>x              # Delete character
+dw             # Delete word
+dd             # Delete line
+u              # Undo
+Ctrl+r         # Redo
+yy             # Yank (copy) line
+p              # Paste
+cw             # Change word (delete + insert)</code></pre>
+
+        <h2>Search and Replace</h2>
+        <p>Find things. Replace things:</p>
+        
+        <pre><code>/pattern        # Search forward
+?pattern        # Search backward
+n               # Next match
+N               # Previous match
+:%s/old/new/g   # Replace all
+:%s/old/new/gc  # Replace all with confirm</code></pre>
+
+        <h2>Save and Quit</h2>
+        <p>The commands everyone needs but forgets:</p>
+        
+        <pre><code>:w              # Save
+:w!             # Save (force)
+:q              # Quit
+:q!             # Quit (don't save)
+:wq             # Save and quit
+:x              # Save and quit (shorter)
+ZZ              # Save and quit (even shorter)</code></pre>
+
+        <h2>Windows and Buffers</h2>
+        <p>Vim isn't just one file:</p>
+        
+        <pre><code>:sp file        # Split horizontal
+:vsp file       # Split vertical
+Ctrl+w          # Window navigation
+:bn             # Next buffer
+:bp             # Previous buffer
+:bd             # Close buffer</code></pre>
+
+        <h2>The Point</h2>
+        <p>Vim is old. It looks weird. It has a learning curve that makes you want to quit. But it's on every server you'll ever touch. It's faster than anything with a mouse. It respects your freedom because it's free software and it doesn't try to be an IDE.</p>
+        
+        <p>Learn Vim. Not because it's cool - because it makes you faster. Because when you're on a broken server at 3am, you want to be editing files as fast as possible.</p>
+        
+        <p>The mouse is slow. Vim is fast. That's all that matters.</p>
+    </article>
+    <footer id="contact"><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>

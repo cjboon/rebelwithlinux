@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-terraform.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terraform - Infrastructure as Code | REBEL WITH LINUX</title>
+    <meta name="description" content="Master Terraform for Infrastructure as Code. Learn HCL, providers, modules, state management, and multi-cloud deployments.">
+    <meta name="keywords" content="Terraform, Infrastructure as Code, IaC, HCL, HashiCorp, AWS, GCP, Azure, cloud provisioning, DevOps">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        :root { --nav-color: #5c4ee5; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">TERRAFORM MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>INFRASTRUCTURE<br>AS CODE</h1>
+        <p class="tagline">// Define your infrastructure. Deploy with confidence.</p>
+        
+        <div class="manifesto">
+            <p><strong>TERRAFORM CHANGED THE GAME.</strong></p>
+            <p>Manual server provisioning is a relic of the past. In a world where infrastructure can scale instantly, where cloud resources spin up and down by the minute, you need a way to define your entire infrastructure in code. You need Terraform.</p>
+            <p><strong>WHY TERRAFORM?</strong></p>
+            <p>Terraform uses a declarative approach—you describe what you want, not how to get there. It figures out the implementation. This means reproducible, version-controlled, auditable infrastructure that you can deploy to AWS, GCP, Azure, or your own on-premises servers with the same configuration language.</p>
+            <p><strong>BECOME INFRASTRUCTURE-AS-CODE NATIVE.</strong></p>
+            <p>Learn HCL (HashiCorp Configuration Language), understand providers and modules, master state management, and build production-grade infrastructure that scales. Whether you're managing one VPS or ten thousand servers, Terraform gives you the power to control it all.</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to Infrastructure Mastery</h2>
+            <p>10 lessons. Complete Terraform control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Terraform</h3>
+                <p class="lesson-desc">What is Infrastructure as Code? Installing Terraform and writing your first configuration.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">HCL Fundamentals</h3>
+                <p class="lesson-desc">Syntax, variables, outputs, and the building blocks of Terraform configurations.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Providers & Resources</h3>
+                <p class="lesson-desc">Understanding providers, resources, and data sources. Working with AWS, GCP, Azure.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Variables & Outputs</h3>
+                <p class="lesson-desc">Input variables, output values, and creating reusable configurations.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">State Management</h3>
+                <p class="lesson-desc">Understanding Terraform state, backends, and remote state for teams.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Modules</h3>
+                <p class="lesson-desc">Creating reusable infrastructure modules. Modular design patterns.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Workspaces</h3>
+                <p class="lesson-desc">Managing multiple environments. Dev, staging, production isolation.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Provisioning & Automation</h3>
+                <p class="lesson-desc">Provisioners, remote-exec, cloud-init, and bootstrapping instances.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Testing & Security</h3>
+                <p class="lesson-desc">Terratest, Sentinel policies, secrets management, and secure configurations.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Production Patterns</h3>
+                <p class="lesson-desc">CI/CD integration,Atlantis, Terraform Cloud, and enterprise patterns.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section id="lesson1" class="lesson-content">
+        <div class="lesson-nav">
+            <a href="#lessons">← Back to Lessons</a>
+        </div>
+        <h2>// Lesson 1: Introduction to Terraform</h2>
+        
+        <h3>What is Infrastructure as Code?</h3>
+        <p>Infrastructure as Code (IaC) is the practice of managing and provisioning computer data centers through machine-readable definition files, rather than physical hardware configuration or interactive configuration tools. Think of it like this: instead of manually clicking through a cloud console to create servers, networks, and storage, you write code that describes exactly what you want—and the IaC tool makes it happen.</p>
+        
+        <p>Terraform is HashiCorp's answer to IaC. It was released in 2014 and has since become the industry standard for multi-cloud infrastructure provisioning. Unlike cloud-specific tools (like AWS CloudFormation or Azure Resource Manager), Terraform is provider-agnostic—you can manage resources across AWS, GCP, Azure, Kubernetes, and even on-premises infrastructure using the same language and workflow.</p>
+
+        <h3>The Declarative Paradigm</h3>
+        <p>Here's what makes Terraform special: it's declarative. When you write a Terraform configuration, you're not writing a script that says "do this, then do that." Instead, you're declaring the desired end state of your infrastructure. Terraform then figures out how to achieve that state.</p>
+        
+        <p>Consider the difference:</p>
+        
+        <ul>
+            <li><strong>Imperative:</strong> "Create a VPC, then create a subnet in that VPC, then launch an EC2 instance in that subnet, then attach a security group..."</li>
+            <li><strong>Declarative:</strong> "I want an EC2 instance in a VPC with these specifications."</li>
+        </ul>
+        
+        <p>The declarative approach means Terraform can analyze your current infrastructure state, compare it to your desired state, and generate an execution plan. You review the plan, make sure it looks right, and then Terraform applies only the changes needed. This is called the Terraform workflow.</p>
+
+        <h3>The Terraform Workflow</h3>
+        <p>Every Terraform project follows the same basic workflow:</p>
+        
+        <ol>
+            <li><strong>Write:</strong> You create configuration files that describe your infrastructure.</li>
+            <li><strong>Init:</strong> Run <code>terraform init</code> to initialize the working directory and download necessary providers.</li>
+            <li><strong>Plan:</strong> Run <code>terraform plan</code> to see what changes Terraform will make. This is your chance to review before applying.</li>
+            <li><strong>Apply:</strong> Run <code>terraform apply</code> to make the changes happen.</li>
+            <li><strong>Destroy:</strong> Run <code>terraform destroy</code> when you want to tear down the infrastructure.</li>
+        </ol>
+        
+        <p>This workflow is idempotent—running it multiple times with the same configuration produces the same result. Terraform is smart enough to know what's already there and only modify what's changed.</p>
+
+        <h3>Installing Terraform</h3>
+        <p>On Linux or macOS, the easiest way to install Terraform is using the official install script or your package manager:</p>
+        
+        <pre><code># Using the official install script
+curl -fsSL https://get.terraform.io | sh
+
+# Or on macOS with Homebrew
+brew install terraform
+
+# On Debian/Ubuntu
+wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor > /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+apt update && apt install terraform</code></pre>
+        
+        <p>On Windows, you can use Chocolatey, Scoop, or download the binary directly from terraform.io. Verify the installation:</p>
+        
+        <pre><code>terraform version</code></pre>
+
+        <h3>Your First Terraform Configuration</h3>
+        <p>Let's create something simple—a local file. This demonstrates Terraform without requiring cloud credentials:</p>
+        
+        <pre><code># main.tf
+resource "local_file" "hello" {
+  filename = "hello.txt"
+  content  = "Hello from Terraform!"
+}</code></pre>
+        
+        <p>Now let's walk through the workflow:</p>
+        
+        <pre><code># Initialize Terraform (downloads providers)
+terraform init
+
+# See what will be created
+terraform plan
+
+# Apply the configuration
+terraform apply
+
+# Verify the file was created
+cat hello.txt</code></pre>
+        
+        <p>Congratulations—you've just created infrastructure with code! That <code>local_file</code> resource is now managed by Terraform. If you change the content and run <code>terraform apply</code> again, Terraform will update the file. If you run <code>terraform destroy</code>, it will delete the file.</p>
+
+        <h3>Understanding the Directory</h3>
+        <p>After running <code>terraform init</code>, you'll notice some new files and directories:</p>
+        
+        <ul>
+            <li><code>.terraform/</code> - Contains downloaded providers and modules</li>
+            <li><code>.terraform.lock.hcl</code> - Locks provider versions</li>
+        </ul>
+        
+        <p>The <code>.terraform.lock.hcl</code> file is important—commit it to version control to ensure everyone on your team uses the same provider versions.</p>
+
+        <div class="lesson-nav">
+            <a href="#lesson2">Next: HCL Fundamentals →</a>
+        </div>
+    </section>
+
+    <section id="lesson2" class="lesson-content">
+        <div class="lesson-nav">
+            <a href="#lessons">← Back to Lessons</a>
+        </div>
+        <h2>// Lesson 2: HCL Fundamentals</h2>
+        
+        <p>HashiCorp Configuration Language (HCL) is Terraform's domain-specific language. It's designed to be both human-readable and machine-parseable. If you've worked with JSON, you'll find HCL familiar—but much more pleasant to write.</p>
+
+        <h3>Blocks and Arguments</h3>
+        <p>The fundamental building blocks of HCL are blocks and arguments:</p>
+        
+        <pre><code># This is a block
+resource "aws_instance" "web" {
+  # These are arguments
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+  
+  tags = {
+    Name = "HelloWorld"
+  }
+}</code></pre>
+        
+        <p>Blocks have a type (<code>resource</code>), zero or more labels (<code>"aws_instance"</code> and <code>"web"</code>), and a body containing arguments. Arguments are key-value pairs that configure the resource.</p>
+
+        <h3>Identifiers and Strings</h3>
+        <p>Identifiers (names of resources, variables, etc.) can contain letters, digits, underscores, and hyphens. They must start with a letter:</p>
+        
+        <pre><code># Valid identifiers
+my_resource
+aws_instance
+web_server_01
+
+# Invalid
+123resource  # Can't start with number
+my-resource  # Hyphens not allowed in names</code></pre>
+        
+        <p>Strings are wrapped in double quotes. HCL supports escape sequences:</p>
+        
+        <pre><code>content = "Hello\nWorld"  # Newline
+path    = "C:\\Users\\name"  # Windows path</code></pre>
+
+        <h3>Data Types</h3>
+        <p>HCL supports several data types:</p>
+        
+        <h4>Strings</h4>
+        <pre><code>name = "web-server"</code></pre>
+        
+        <h4>Numbers</h4>
+        <pre><code>count = 5
+timeout = 300</code></pre>
+        
+        <h4>Booleans</h4>
+        <pre><code>enable_monitoring = true</code></pre>
+        
+        <h4>Lists (Arrays)</h4>
+        <pre><code># Implicit list
+ports = [80, 443, 8080]
+
+# Or with explicit type (rarely needed)
+ports = list(number) [80, 443, 8080]</code></pre>
+        
+        <h4>Maps (Objects)</h4>
+        <pre><code>tags = {
+  Name = "web-server"
+  Environment = "production"
+  Owner = "team-infra"
+}</code></pre>
+        
+        <h4>Sets</h4>
+        <pre><code># Sets are like lists but with no duplicates and no order
+availability_zones = toset(["us-east-1a", "us-east-1b"])</code></pre>
+
+        <h3>References</h3>
+        <p>One of HCL's most powerful features is the ability to reference values from other resources:</p>
+        
+        <pre><code>resource "aws_security_group" "web" {
+  name = "web-sg"
+  
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+  
+  # Reference the security group
+  vpc_security_group_ids = [aws_security_group.web.id]
+}</code></pre>
+        
+        <p>The syntax <code>resource_type.resource_name.attribute</code> lets you access resource attributes. In this case, we're grabbing the ID of the security group we created.</p>
+
+        <h3>Expressions and Functions</h3>
+        <p>HCL supports a rich expression syntax including arithmetic, comparisons, and built-in functions:</p>
+        
+        <pre><code># String interpolation
+name = "server-${var.environment}"
+
+# Arithmetic
+total = var.count * 2
+
+# Conditionals
+instance_type = var.is_production ? "t3.large" : "t3.micro"
+
+# Built-in functions
+upper_name = upper(var.name)
+joined_ids = join(",", aws_instance.web[*].id)</code></pre>
+        
+        <p>Terraform includes hundreds of functions for string manipulation, arithmetic, IP calculations, and more. Check the docs for the full list.</p>
+
+        <h3>Comments</h3>
+        <p>HCL supports three comment styles:</p>
+        
+        <pre><code># Single-line comment (hash style)
+// Single-line comment (C++ style)
+/* Multi-line
+   comment */</code></pre>
+
+        <div class="lesson-nav">
+            <a href="#lesson3">Next: Providers & Resources →</a>
+        </div>
+    </section>
+
+    <section id="lesson3" class="lesson-content">
+        <div class="lesson-nav">
+            <a href="#lessons">← Back to Lessons</a>
+        </div>
+        <h2>// Lesson 3: Providers & Resources</h2>
+        
+        <p>Providers are plugins that Terraform uses to interact with cloud platforms, SaaS providers, and other services. Each provider exposes resources that you can manage with Terraform.</p>
+
+        <h3>How Providers Work</h3>
+        <p>When you run <code>terraform init</code>, Terraform downloads the providers specified in your configuration. These are typically distributed as plugins—binary executables that Terraform calls out to when managing resources.</p>
+        
+        <p>Providers are configured in a <code>provider</code> block:</p>
+        
+        <pre><code>provider "aws" {
+  region = "us-east-1"
+  
+  # You can also configure credentials here
+  # But prefer using environment variables or shared config
+}</code></pre>
+        
+        <p>Common ways to provide credentials (in order of precedence):</p>
+        
+        <ol>
+            <li>Environment variables (<code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code>)</li>
+            <li>Shared credentials file (<code>~/.aws/credentials</code>)</li>
+            <li>Shared config file (<code>~/.aws/config</code>)</li>
+            <li>Provider configuration</li>
+        </ol>
+
+        <h3>Common Providers</h3>
+        
+        <h4>AWS Provider</h4>
+        <pre><code>provider "aws" {
+  region = "us-east-1"
+}</code></pre>
+        
+        <h4>Google Cloud Provider</h4>
+        <pre><code>provider "google" {
+  project = "my-project"
+  region  = "us-central1"
+}</code></pre>
+        
+        <h4>Azure Provider</h4>
+        <pre><code>provider "azurerm" {
+  features {}
+}</code></pre>
+
+        <h3>Resources</h3>
+        <p>Resources are the most important element in Terraform. Each resource block describes one or more infrastructure objects:</p>
+        
+        <pre><code>resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+  
+  tags = {
+    Name = "web-server"
+  }
+}</code></pre>
+        
+        <p>The resource type (<code>aws_instance</code>) tells Terraform which provider to use. The first label (<code>web</code>) is a local name you use to reference this resource within your configuration. The arguments depend on the resource type.</p>
+
+        <h3>Resource Behavior</h3>
+        <p>Terraform's lifecycle for each resource:</p>
+        
+        <ol>
+            <li><strong>Create:</strong> Resource doesn't exist—Terraform creates it</li>
+            <li><strong>Read:</strong> Terraform reads the current state</li>
+            <li><strong>Update:</strong> Configuration changed—Terraform updates in place if supported</li>
+            <li><strong>Destroy:</strong> Resource removed—Terraform destroys it</li>
+        </ol>
+        
+        <h4>Update-in-Place</h4>
+        <p>Many resources support in-place updates. For example, changing tags on an AWS instance:</p>
+        
+        <pre><code>resource "aws_instance" "web" {
+  # Changing this will update in place
+  tags = {
+    Name = "updated-name"
+  }
+}</code></pre>
+        
+        <h4>Recreate</h4>
+        <p>Some changes require destroying and recreating the resource. For example, changing an EC2 instance type:</p>
+        
+        <pre><code>resource "aws_instance" "web" {
+  # This will destroy and recreate the instance
+  instance_type = "t3.small"
+}</code></pre>
+        
+        <p>Terraform will warn you when this happens in the plan phase.</p>
+
+        <h3>Data Sources</h3>
+        <p>Data sources let you fetch information from existing infrastructure—resources that weren't created by Terraform:</p>
+        
+        <pre><code># Get information about an existing AMI
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"]  # Canonical
+  
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+}
+
+# Use it in a resource
+resource "aws_instance" "web" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t2.micro"
+}</code></pre>
+        
+        <p>Data sources are read-only—they don't create or modify anything.</p>
+
+        <div class="lesson-nav">
+            <a href="#lesson4">Next: Variables & Outputs →</a>
+        </div>
+    </section>
+
+    <section id="lesson4" class="lesson-content">
+        <div class="lesson-nav">
+            <a href="#lessons">← Back to Lessons</a>
+        </div>
+        <h2>// Lesson 4: Variables & Outputs</h2>
+        
+        <p>Variables and outputs make your Terraform configurations reusable and composable. They allow you to parameterize your infrastructure and expose important values for use elsewhere.</p>
+
+        <h3>Input Variables</h3>
+        <p>Input variables let you customize Terraform configurations without modifying the code. Think of them like function parameters.</p>
+        
+        <h4>Defining Variables</h4>
+        <pre><code># variables.tf
+variable "instance_type" {
+  description = "EC2 instance type"
+  type        = string
+  default     = "t2.micro"
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+}</code></pre>
+        
+        <h4>Variable Types</h4>
+        <pre><code># String
+variable "name" {
+  type    = string
+  default = "web-server"
+}
+
+# Number
+variable "count" {
+  type    = number
+  default = 3
+}
+
+# Boolean
+variable "enable_monitoring" {
+  type    = bool
+  default = true
+}
+
+# List
+variable "ports" {
+  type    = list(number)
+  default = [80, 443]
+}
+
+# Map
+variable "tags" {
+  type = map(string)
+  default = {
+    Environment = "production"
+    Team        = "infra"
+  }
+}
+
+# Object
+variable "server_config" {
+  type = object({
+    cpu    = number
+    memory = number
+    disk   = number
+  })
+  default = {
+    cpu    = 2
+    memory = 4096
+    disk   = 50
+  }
+}
+
+# Set
+variable "availability_zones" {
+  type    = set(string)
+  default = ["us-east-1a", "us-east-1b"]
+}</code></pre>
+
+        <h4>Using Variables</h4>
+        <pre><code>resource "aws_instance" "web" {
+  # Reference variable with var.variable_name
+  instance_type = var.instance_type
+  
+  tags = var.tags
+}</code></pre>
+
+        <h4>Passing Variables</h4>
+        <pre><code># Via command line
+terraform apply -var="environment=prod" -var="instance_type=t3.large"
+
+# Via file
+terraform apply -var-file="prod.tfvars"
+
+# Via environment variables
+export TF_VAR_environment=prod</code></pre>
+
+        <h4>Variable Files</h4>
+        <pre><code># dev.tfvars
+environment  = "development"
+instance_type = "t3.micro"
+
+# prod.tfvars
+environment  = "production"
+instance_type = "t3.large"</code></pre>
+
+        <h3>Output Values</h3>
+        <p>Output values expose information about your infrastructure to the CLI, or for use by other Terraform configurations:</p>
+        
+        <pre><code># outputs.tf
+output "instance_id" {
+  description = "The ID of the EC2 instance"
+  value       = aws_instance.web.id
+}
+
+output "instance_public_ip" {
+  description = "Public IP address"
+  value       = aws_instance.web.public_ip
+  sensitive   = true  # Hide from output
+}
+
+output "all_instance_ids" {
+  description = "IDs of all instances"
+  value       = aws_instance.web[*].id
+}</code></pre>
+        
+        <p>After running <code>terraform apply</code>, Terraform displays outputs:</p>
+        
+        <pre><code>Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+instance_id        = i-0abc123def456789
+instance_public_ip  = 54.123.45.67</code></pre>
+        
+        <p>You can also retrieve outputs later:</p>
+        
+        <pre><code>terraform output
+terraform output instance_id</code></pre>
+
+        <h3>Local Values</h3>
+        <p>Local values let you define intermediate values that are calculated once per configuration:</p>
+        
+        <pre><code>locals {
+  # Common tags applied to all resources
+  common_tags = {
+    Project     = "my-app"
+    Environment = var.environment
+    ManagedBy   = "terraform"
+  }
+  
+  # Derived values
+  name_prefix = "${var.environment}-${var.project}"
+}
+
+resource "aws_instance" "web" {
+  # Use local value
+  tags = merge(local.common_tags, { Name = local.name_prefix })
+}</code></pre>
+
+        <div class="lesson-nav">
+            <a href="#lesson5">Next: State Management →</a>
+        </div>
+    </section>
+
+    <section id="lesson5" class="lesson-content">
+        <div class="lesson-nav">
+            <a href="#lessons">← Back to Lessons</a>
+        </div>
+        <h2>// Lesson 5: State Management</h2>
+        
+        <p>Terraform uses state to map your configuration to real-world resources. Understanding state is crucial for working effectively with Terraform, especially in team environments.</p>
+
+        <h3>What is State?</h3>
+        <p>When Terraform reads your configuration, it doesn't know what resources currently exist. Instead, it looks at its state file—a JSON document that maps resource addresses to their real-world identifiers and attributes.</p>
+        
+        <pre><code>{
+  "version": 4,
+  "terraform_version": "1.5.0",
+  "resources": {
+    "aws_instance.web": {
+      "type": "aws_instance",
+      "depends_on": [],
+      "primary": {
+        "id": "i-0abc123def456789",
+        "attributes": {
+          "id": "i-0abc123def456789",
+          "instance_type": "t2.micro",
+          "public_ip": "54.123.45.67",
+          ...
+        }
+      }
+    }
+  }
+}</code></pre>
+        
+        <p>Without state, Terraform wouldn't know that <code>aws_instance.web</code> corresponds to the EC2 instance <code>i-0abc123def456789</code>.</p>
+
+        <h3>Local State</h3>
+        <p>By default, Terraform stores state in a local file called <code>terraform.tfstate</code>:</p>
+        
+        <pre><code># Default behavior - local state
+terraform {
+  # This is actually the default
+  backend "local" {
+    path = "terraform.tfstate"
+  }
+}</code></pre>
+        
+        <p>Local state works for individual development but has problems:</p>
+        
+        <ul>
+            <li>No collaboration—only one person can work at a time</li>
+            <li>Risk of state file corruption</li>
+            <li>State file not backed up</li>
+            <li>Credentials might be stored in state</li>
+        </ul>
+
+        <h3>Remote Backends</h3>
+        <p>Remote backends store state in a shared location accessible by your team:</p>
+        
+        <h4>S3 Backend (AWS)</h4>
+        <pre><code>terraform {
+  backend "s3" {
+    bucket         = "my-terraform-state"
+    key            = "prod/terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+    dynamodb_table = "terraform-locks"
+  }
+}</code></pre>
+        
+        <p>The DynamoDB table enables state locking—preventing concurrent modifications:</p>
+        
+        <pre><code># Create DynamoDB table for locking
+resource "aws_dynamodb_table" "terraform_locks" {
+  name         = "terraform-locks"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}</code></pre>
+
+        <h4>Google Cloud Storage</h4>
+        <pre><code>terraform {
+  backend "gcs" {
+    bucket = "my-terraform-state"
+    prefix = "prod/state"
+  }
+}</code></pre>
+
+        <h4>Azure Blob Storage</h4>
+        <pre><code>terraform {
+  backend "azurerm" {
+    resource_group_name  = "terraform-rg"
+    storage_account_name = "terraformstate"
+    container_name       = "terraform-state"
+    key                  = "prod.terraform.tfstate"
+  }
+}</code></pre>
+
+        <h4>Terraform Cloud/Enterprise</h4>
+        <pre><code>terraform {
+  backend "remote" {
+    organization = "my-org"
+    workspaces {
+      name = "prod"
+    }
+  }
+}</code></pre>
+
+        <h3>State Locking</h3>
+        <p>When using remote backends with locking, Terraform acquires a lock before performing any operation:</p>
+        
+        <pre><code>$ terraform apply
+Acquiring state lock... (ID: abc123)
+Acquired state lock.
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+
+Releasing state lock... 
+Released state lock.</code></pre>
+        
+        <p>If another user or process tries to run Terraform while it's locked, they'll get an error:</p>
+        
+        <pre><code>Error: Error acquiring the state lock
+
+Error message: 2 errors occurred:
+    * Lock Info:
+        ID:        abc123
+        Path:      my-terraform-state/prod/terraform.tfstate
+        Operation: OperationTypeApply
+        Who:       user@hostname
+        Version:   1.5.0
+        Created:   2024-01-15 10:30:00.0000000Z
+        Info:      
+
+    * Lock Info:
+        ID:        def456
+        Path:      my-terraform-state/prod/terraform.tfstate
+        Operation: OperationTypeApply
+        Who:       another-user@hostname
+        Version:   1.5.0
+        Created:   2024-01-15 10:31:00.0000000Z
+
+    ...</code></pre>
+
+        <h3>State Manipulation</h3>
+        <p>Sometimes you need to manipulate state directly (with caution):</p>
+        
+        <pre><code># List resources in state
+terraform state list
+
+# Show a specific resource
+terraform state show aws_instance.web
+
+# Move a resource to a new name
+terraform state mv aws_instance.web aws_instance.app
+
+# Remove a resource from state (doesn't destroy the actual resource)
+terraform state rm aws_instance.old
+
+# Pull current state (for debugging)
+terraform state pull</code></pre>
+        
+        <p><strong>Warning:</strong> Direct state manipulation is dangerous. Always make a backup first:</p>
+        
+        <pre><code>cp terraform.tfstate terraform.tfstate.backup</code></pre>
+
+        <div class="lesson-nav">
+            <a href="#lesson6">Next: Modules →</a>
+        </div>
+    </section>
+
+    <section id="lesson6" class="lesson-content">
+        <div class="lesson-nav">
+            <a href="#lessons">← Back to Lessons</a>
+        </div>
+        <h2>// Lesson 6: Modules</h2>
+        
+        <p>Modules are containers for multiple resources that are used together. They're the key to creating reusable, composable infrastructure code.</p>
+
+        <h3>Why Modules?</h3>
+        <p>Without modules, your Terraform configuration grows unwieldy. With modules, you can:</p>
+        
+        <ul>
+            <li>Group related resources together</li>
+            <li>Create reusable components (VPCs, compute clusters, databases)</li>
+            <li>Organize code by team or project</li>
+            <li>Version infrastructure like application code</li>
+        </ul>
+
+        <h3>Creating Modules</h3>
+        <p>A module is simply a collection of <code>.tf</code> files in a directory:</p>
+        
+        <pre><code># modules/ec2/main.tf
+variable "instance_type" {
+  description = "EC2 instance type"
+  type        = string
+  default     = "t2.micro"
+}
+
+variable "ami" {
+  description = "AMI ID"
+  type        = string
+}
+
+variable "tags" {
+  description = "Tags to apply"
+  type        = map(string)
+  default     = {}
+}
+
+resource "aws_instance" "this" {
+  ami           = var.ami
+  instance_type = var.instance_type
+  tags          = var.tags
+}
+
+output "instance_id" {
+  description = "EC2 instance ID"
+  value       = aws_instance.this.id
+}
+
+output "public_ip" {
+  description = "Public IP address"
+  value       = aws_instance.this.public_ip
+}</code></pre>
+
+        <h3>Using Modules</h3>
+        <p>Call a module using the <code>module</code> block:</p>
+        
+        <pre><code># main.tf
+module "web_server" {
+  source = "./modules/ec2"
+  
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+  
+  tags = {
+    Name = "web-server"
+  }
+}
+
+# Reference module outputs
+resource "aws_security_group" "web" {
+  # Use module.web_server.public_ip
+}</code></pre>
+
+        <h3>Module Sources</h3>
+        <p>Modules can be sourced from various locations:</p>
+        
+        <pre><code># Local path
+module "local" {
+  source = "./modules/ec2"
+}
+
+# Terraform Registry (public)
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "3.0.0"
+}
+
+# GitHub
+module "example" {
+  source = "github.com/user/repo//path/to/module"
+}
+
+# GitLab
+module "example" {
+  source = "gitlab.com/user/repo//path/to/module"
+}
+
+# Bitbucket
+module "example" {
+  source = "bitbucket.org/user/repo//path/to/module"
+}
+
+# Generic Git repository
+module "example" {
+  source = "git::https://example.com/repo.git"
+}
+
+# S3 bucket (for private modules)
+module "example" {
+  source = "s3::https://s3.amazonaws.com/bucket/module.zip"
+}</code></pre>
+
+        <h3>Module Versioning</h3>
+        <p>For modules from external sources, specify versions:</p>
+        
+        <pre><code># From Terraform Registry
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 3.0"  # Any 3.x version
+}
+
+# From Git
+module "example" {
+  source = "github.com/user/repo//module?ref=v1.2.3"
+}</code></pre>
+
+        <h3>Child Modules</h3>
+        <p>Modules can contain other modules:</p>
+        
+        <pre><code># modules/networking/vpc.tf
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 3.0"
+  
+  name = "my-vpc"
+  cidr = "10.0.0.0/16"
+}
+
+# modules/networking/subnets.tf
+module "subnets" {
+  source  = "terraform-aws-modules/subnets/aws"
+  version = "~> 3.0"
+  
+  depends_on = [module.vpc]
+  
+  cidr_variants          = module.vpc.vpc_cidr_block
+  availability_zones    = ["us-east-1a", "us-east-1b"]
+  map_public_ip_on_launch = true
+}</code></pre>
+
+        <h3>Module Composition</h3>
+        <p>Build higher-level modules from lower-level ones:</p>
+        
+        <pre><code># modules/application/main.tf
+module "networking" {
+  source = "../networking"
+}
+
+module "compute" {
+  source = "../compute"
+  
+  vpc_id = module.networking.vpc_id
+}
+
+module "database" {
+  source = "../database"
+  
+  subnet_ids = module.networking.database_subnet_ids
+}</code></pre>
+
+        <div class="lesson-nav">
+            <a href="#lesson7">Next: Workspaces →</a>
+        </div>
+    </section>
+
+    <section id="lesson7" class="lesson-content">
+        <div class="lesson-nav">
+            <a href="#lessons">← Back to Lessons</a>
+        </div>
+        <h2>// Lesson 7: Workspaces</h2>
+        
+        <p>Workspaces let you manage multiple environments (dev, staging, production) with a single Terraform configuration. They provide isolation without code duplication.</p>
+
+        <h3>How Workspaces Work</h3>
+        <p>Each workspace has its own state file. When you switch workspaces, Terraform uses a different state:</p>
+        
+        <pre><code># Default workspace is "default"
+$ terraform workspace list
+* default
+
+# Create a new workspace
+$ terraform workspace new staging
+Created and switched to workspace "staging"!
+
+# List workspaces
+$ terraform workspace list
+  default
+* staging
+  production
+
+# Switch workspace
+$ terraform workspace select production
+Switched to workspace "production".</code></pre>
+
+        <h3>Workspace-Specific Configuration</h3>
+        <p>Use the <code>terraform.workspace</code> variable to customize behavior per workspace:</p>
+        
+        <pre><code>variable "environment" {
+  description = "Environment name"
+  type        = string
+}
+
+locals {
+  environment = terraform.workspace == "default" ? "dev" : terraform.workspace
+  
+  # Environment-specific configuration
+  config = {
+    development = {
+      instance_type = "t3.micro"
+      desired_size  = 1
+    }
+    staging = {
+      instance_type = "t3.small"
+      desired_size  = 2
+    }
+    production = {
+      instance_type = "t3.large"
+      desired_size  = 5
+    }
+  }
+  
+  # Look up config for current environment
+  env_config = local.config[local.environment]
+}
+
+resource "aws_instance" "web" {
+  instance_type = local.env_config.instance_type
+  # ...
+}</code></pre>
+
+        <h3>Workspaces vs. Modules</h3>
+        <p>Use workspaces for environment isolation within the same configuration:</p>
+        
+        <pre><code># Same code, different workspaces
+# Dev: terraform workspace new dev
+# Stage: terraform workspace new staging
+# Prod: terraform workspace new production
+
+resource "aws_instance" "server" {
+  # This instance exists in each workspace's state
+  tags = {
+    Environment = terraform.workspace
+  }
+}</code></pre>
+        
+        <p>Use separate configurations (or modules) for complete infrastructure separation:</p>
+        
+        <pre><code># Separate directories for complete isolation
+# infrastructure/
+#   dev/
+#     main.tf (workspace = "dev")
+#   prod/
+#     main.tf (workspace = "prod")</code></pre>
+
+        <h3>Workspace Gotchas</h3>
+        <p>Be aware of these common pitfalls:</p>
+        
+        <ul>
+            <li><strong>Backend configuration:</strong> Ensure your backend supports workspaces (most do)</li>
+            <li><strong>Workspace-sensitive resources:</strong> Some resources should never be workspace-specific</li>
+            <li><strong>Cost estimation:</strong> Costs multiply across workspaces—monitor usage</li>
+        </ul>
+
+        <div class="lesson-nav">
+            <a href="#lesson8">Next: Provisioning & Automation →</a>
+        </div>
+    </section>
+
+    <section id="lesson8" class="lesson-content">
+        <div class="lesson-nav">
+            <a href="#lessons">← Back to Lessons</a>
+        </div>
+        <h2>// Lesson 8: Provisioning & Automation</h2>
+        
+        <p>While Terraform is great for creating infrastructure, provisioners let you customize instances after creation—installing software, configuring systems, and bootstrapping applications.</p>
+
+        <h3>Provisioner Types</h3>
+        
+        <h4>local-exec</h4>
+        <p>Runs commands on the machine running Terraform:</p>
+        
+        <pre><code>resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+  
+  provisioner "local-exec" {
+    command = "echo 'Instance ${self.public_ip} created!' > created.txt"
+  }
+}</code></pre>
+        
+        <h4>remote-exec</h4>
+        <p>Runs commands on the created resource via SSH or WinRM:</p>
+        
+        <pre><code>resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+  
+  connection {
+    type        = "ssh"
+    host        = self.public_ip
+    user        = "ubuntu"
+    private_key = file("~/.ssh/id_rsa")
+  }
+  
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get update",
+      "sudo apt-get install -y nginx",
+      "sudo systemctl enable nginx",
+      "sudo systemctl start nginx"
+    ]
+  }
+}</code></pre>
+
+        <h3>File Provisioner</h3>
+        <p>Upload files or directories to the created resource:</p>
+        
+        <pre><code>resource "aws_instance" "web" {
+  # ... connection config ...
+  
+  provisioner "file" {
+    content      = file("templates/nginx.conf")
+    destination  = "/tmp/nginx.conf"
+  }
+  
+  provisioner "file" {
+    source       = "scripts/"
+    destination  = "/home/ubuntu/scripts/"
+  }
+}</code></pre>
+
+        <h3>Provisioner Lifecycle</h3>
+        <p>By default, provisioners run after resource creation. Use <code>when</code> to change this:</p>
+        
+        <pre><code># Run on destroy
+provisioner "local-exec" {
+  when    = "destroy"
+  command = "echo 'Cleaning up...'"
+}</code></pre>
+        
+        <p>Use <code>on_failure</code> to control behavior when provisioners fail:</p>
+        
+        <pre><code>provisioner "remote-exec" {
+  on_failure = "continue"  # Don't fail the whole apply
+  inline     = ["some command"]
+}</code></pre>
+
+        <h3>Cloud-Init</h3>
+        <p>For cloud instances, cloud-init is often better than Terraform provisioners:</p>
+        
+        <pre><code>resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+  
+  user_data = <<-EOF
+              #!/bin/bash
+              apt-get update
+              apt-get install -y nginx
+              systemctl enable nginx
+              systemctl start nginx
+              EOF
+}</code></pre>
+
+        <h3>Alternative: EC2 Instance Connect</h3>
+        <p>Modern AWS accounts support EC2 Instance Connect for passwordless SSH:</p>
+        
+        <pre><code>resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t2.micro"
+  
+  # EC2 Instance Connect - no key management needed
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+  }
+}</code></pre>
+
+        <h3>Provisioner Alternatives</h3>
+        <p>Consider these alternatives for production use:</p>
+        
+        <ul>
+            <li><strong>Configuration management:</strong> Ansible, Chef, Puppet</li>
+            <li><strong>Container orchestration:</strong> Kubernetes, ECS</li>
+            <li><strong>Specialized tools:</strong> Packer for AMIs, Consul for service discovery</li>
+        </ul>
+
+        <div class="lesson-nav">
+            <a href="#lesson9">Next: Testing & Security →</a>
+        </div>
+    </section>
+
+    <section id="lesson9" class="lesson-content">
+        <div class="lesson-nav">
+            <a href="#lessons">← Back to Lessons</a>
+        </div>
+        <h2>// Lesson 9: Testing & Security</h2>
+        
+        <p>Infrastructure as Code needs the same testing rigor as application code. Additionally, Terraform configurations often contain sensitive data that requires careful handling.</p>
+
+        <h3>Static Analysis</h3>
+        
+        <h4>terraform validate</h4>
+        <pre><code># Validates syntax and internal consistency
+terraform validate</code></pre>
+        
+        <h4>tfsec</h4>
+        <pre><code># Security scanning
+tfsec .
+# Install: brew install tfsec
+
+# Example output:
+# 
+# Result #1 HIGH Security group allows SSH from internet
+# 
+# https://aqua.twist/tafsec/terraform/aws/
+# 
+# 1 tests, 0 passed, 1 high, 0 medium, 0 low
+# 
+# terraform/aws/main.tf:6
+</code></pre>
+        
+        <h4>Checkov</h4>
+        <pre><code># Another security scanner
+checkov -d .
+# Install: pip install checkov</code></pre>
+
+        <h3>Automated Testing with Terratest</h3>
+        <p>Terratest is a Go library for testing Terraform:</p>
+        
+        <pre><code>package test
+
+import (
+    "testing"
+    "github.com/gruntwork-io/terratest/modules/terraform"
+    "github.com/stretchr/testify/assert"
+)
+
+func TestTerraformWebServer(t *testing.T) {
+    terraformOptions := &terraform.Options{
+        TerraformDir: "../examples/web-server",
+        Vars: map[string]interface{}{
+            "environment": "test",
+        },
+    }
+    
+    defer terraform.Destroy(t, terraformOptions)
+    terraform.InitAndApply(t, terraformOptions)
+    
+    instanceID := terraform.Output(t, terraformOptions, "instance_id")
+    assert.NotEmpty(t, instanceID)
+}</code></pre>
+
+        <h3>Sensitive Variables</h3>
+        <p>Mark variables as sensitive to prevent exposure:</p>
+        
+        <pre><code>variable "db_password" {
+  description = "Database password"
+  type        = string
+  sensitive   = true  # Won't show in CLI output
+}
+
+variable "api_key" {
+  description = "Third-party API key"
+  type        = string
+  sensitive   = true
+}</code></pre>
+        
+        <p>Note: Sensitive variables still appear in state file. Use appropriate access controls.</p>
+
+        <h3>Secrets in State</h3>
+        <p>Terraform state can contain sensitive data. Protect accordingly:</p>
+        
+        <ul>
+            <li>Use remote backends with encryption</li>
+            <li>Restrict access to state files</li>
+            <li>Consider using Vault for secrets</li>
+        </ul>
+        
+        <h3>Terraform Cloud/Enterprise</h3>
+        <p>For enterprise use, Terraform Cloud provides:</p>
+        
+        <ul>
+            <li>Secure variable storage (encrypted at rest)</li>
+            <li>Policy as Code (Sentinel)</li>
+            <li>Cost estimation</li>
+            <li>Run history and audit logs</li>
+        </ul>
+
+        <div class="lesson-nav">
+            <a href="#lesson10">Next: Production Patterns →</a>
+        </div>
+    </section>
+
+    <section id="lesson10" class="lesson-content">
+        <div class="lesson-nav">
+            <a href="#lessons">← Back to Lessons</a>
+        </div>
+        <h2>// Lesson 10: Production Patterns</h2>
+        
+        <p>Running Terraform in production requires careful consideration of workflows, collaboration, and automation. This lesson covers patterns for teams.</p>
+
+        <h3>CI/CD Integration</h3>
+        
+        <h4>GitHub Actions</h4>
+        <pre><code>name: Terraform
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+          
+      - name: Terraform Init
+        run: terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
+      - name: Terraform Plan
+        run: terraform plan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}</code></pre>
+
+        <h3>Atlantis</h3>
+        <p>Atlantis is a self-hosted tool for Terraform CI/CD:</p>
+        
+        <ul>
+            <li>Runs on pull requests</li>
+            <li>Posts plan results as comments</li>
+            <li>Requires /apply comment to proceed</li>
+            <li>Works with GitHub, GitLab, Bitbucket</li>
+        </ul>
+        
+        <pre><code># atlantis.yaml
+version: 1
+projects:
+  - name: production
+    dir: .
+    workflow: production
+    terraform_version: 1.5.0
+
+workflows:
+  production:
+    plan:
+      steps:
+        - init
+        - plan
+    apply:
+      steps:
+        - apply</code></pre>
+
+        <h3>Terraform Cloud</h3>
+        <p>Terraform Cloud (formerly Terraform Enterprise) provides hosted infrastructure:</p>
+        
+        <ul>
+            <li>Remote execution</li>
+            <li>Secure variable storage</li>
+            <li>Policy enforcement</li>
+            <li>Cost estimation</li>
+            <li>Private module registry</li>
+        </ul>
+
+        <h3>Repository Structure</h3>
+        <p>Recommended repository layout:</p>
+        
+        <pre><code>infrastructure/
+├── .gitignore
+├── .terraform-version
+├── main.tf
+├── variables.tf
+├── outputs.tf
+├── versions.tf
+├── environments/
+│   ├── dev/
+│   │   ├── main.tf
+│   │   └── terraform.tfvars
+│   ├── staging/
+│   │   ├── main.tf
+│   │   └── terraform.tfvars
+│   └── prod/
+│       ├── main.tf
+│       └── terraform.tfvars
+├── modules/
+│   ├── networking/
+│   ├── compute/
+│   └── database/
+└── Makefile</code></pre>
+
+        <h3>The Road Ahead</h3>
+        <p>Congratulations on completing this guide! You've learned:</p>
+        
+        <ul>
+            <li>Infrastructure as Code principles</li>
+            <li>HCL syntax and expressions</li>
+            <li>Providers and resources</li>
+            <li>Variables, outputs, and modules</li>
+            <li>State management and backends</li>
+            <li>Workspaces for environments</li>
+            <li>Testing and security</li>
+            <li>Production deployment patterns</li>
+        </ul>
+        
+        <p>Continue your journey with:</p>
+        
+        <ul>
+            <li>Helm for Kubernetes deployments</li>
+            <li>Terraform with Kubernetes provider</li>
+            <li>Terraform CDK (using Python/TypeScript)</li>
+            <li>OpenTofu (open-source Terraform fork)</li>
+        </ul>
+
+        <div class="lesson-nav">
+            <a href="#lessons">← Back to Lessons</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+    </footer>
+
+    <script>
+        const lessonCards = document.querySelectorAll('.lesson-card');
+        const progressBar = document.getElementById('progressBar');
+        
+        lessonCards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                const lessonId = card.getAttribute('href');
+                document.querySelector(lessonId).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+        
+        window.addEventListener('scroll', () => {
+            const scrolled = window.scrollY;
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrolled / max) * 100;
+            progressBar.style.width = progress + '%';
+        });
+    </script>
+</body>
+</html>

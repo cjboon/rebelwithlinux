@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-hardening.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hardening - Security or Convenience. Pick One.</title>
+    <meta name="description" content="Learn system hardening. The internet is hostile.">
+    <meta name="keywords" content="Hardening, Security, Linux, Firewall">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Hardening - Security or Convenience. Pick One.">
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-hardening.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>const savedTheme = localStorage.getItem('theme'); if (!savedTheme || savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); }</script>
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: #000; border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: #fff; text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .warning { background: rgba(255, 107, 53, 0.1); border-left: 4px solid #ff6b35; padding: 16px; margin: 24px 0; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left"><div class="nav-title"><a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a></div><label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label></div>
+        <div class="nav-right"><div class="menu-details" id="nav-menu"><a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></a><div class="nav-links" id="navLinks"><a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a><a href="../index.html#games">GAMES</a><a href="../index.html#guides">GUIDES</a><a href="../index.html#blog">BLOG</a><a href="../index.html#about">ABOUT</a></div></div></div>
+    </nav>
+    <div class="blog-header"><h1>Hardening</h1><p>March 16, 2026 • Hardening • The internet wants your server.</p></div>
+    <nav class="blog-nav"><a href="../index.html#blog">← Back to Blog</a></nav>
+    <article class="blog-content">
+        <p>The internet is a hostile place. Every minute, your server is being scanned, probed, and attacked. Default installations are target practice. If you're not hardening your systems, you're making it easy for the bad guys.</p>
+
+        <div class="warning"><strong>Security is not optional.</strong> Every exposed service is a potential entry point. The moment you connect to the internet, you're in the fight.</div>
+
+        <h2>SSH: Your Front Door</h2>
+        <p>SSH is the first thing hackers try. Don't make it easy:</p>
+        
+        <pre><code># Edit SSH config
+vim /etc/ssh/sshd_config
+
+# Disable root login
+PermitRootLogin no
+
+# Disable password authentication
+PasswordAuthentication no
+
+# Use only SSH keys
+PubkeyAuthentication yes
+
+# Change default port (security through obscurity, but it helps)
+Port 2222
+
+# Restart SSH
+systemctl restart sshd</code></pre>
+
+        <h2>SSH Keys: Passwords Are Weak</h2>
+        <p>Generate keys. Use them. Never use passwords again:</p>
+        
+        <pre><code># On your local machine
+ssh-keygen -t ed25519 -C "your@email.com"
+
+# Copy to server
+ssh-copy-id user@your-server.com
+
+# Test it works, then disable passwords</code></pre>
+
+        <h2>Firewall: UFW</h2>
+        <p>Block everything. Open only what you need:</p>
+        
+        <pre><code># Install
+apt install ufw
+
+# Default deny everything
+ufw default deny incoming
+ufw default allow outgoing
+
+# Allow SSH (your new port!)
+ufw allow 2222/tcp
+
+# Allow HTTP/HTTPS
+ufw allow 80/tcp
+ufw allow 443/tcp
+
+# Enable
+ufw enable
+
+# Check status
+ufw status verbose</code></pre>
+
+        <h2>Fail2Ban: Ban the Bad Guys</h2>
+        <p>When someone tries to brute force your SSH, ban them:</p>
+        
+        <pre><code># Install
+apt install fail2ban
+
+# Start
+systemctl enable fail2ban
+systemctl start fail2ban
+
+# It's pre-configured for SSH
+# Add more jails in /etc/fail2ban/jail.local</code></pre>
+
+        <h2>Updates: Patch or Die</h2>
+        <p>Security vulnerabilities are found constantly. Update:</p>
+        
+        <pre><code># Debian/Ubuntu
+apt update && apt upgrade
+
+# RHEL/CentOS
+yum update
+
+# Enable automatic security updates
+apt install unattended-upgrades</code></pre>
+
+        <h2>Users and Sudo</h2>
+        <p>Don't use root. Create users:</p>
+        
+        <pre><code># Create user
+adduser cjboon
+
+# Add to sudo group
+usermod -aG sudo cjboon
+
+# Check who's logged in
+who
+last
+lastlog</code></pre>
+
+        <h2>System Limits</h2>
+        <p>Prevent resource exhaustion:</p>
+        
+        <pre><code># Check limits
+ulimit -a
+
+# Edit limits.conf
+vim /etc/security/limits.conf
+
+# Add:
+* soft nofile 65536
+* hard nofile 65536
+* soft nproc 4096
+* hard nproc 4096</code></pre>
+
+        <h2>The Point</h2>
+        <p>Hardening is not a product. It's a mindset. Default settings exist for convenience, not security. Every service you run is a risk. Every open port is a potential attack vector.</p>
+        
+        <p>The goal isn't perfect security - that's impossible. The goal is to be harder to crack than the next guy. Make attackers move on to easier targets.</p>
+        
+        <p>Security and convenience are opposites. Pick security. You'll sleep better.</p>
+    </article>
+    <footer id="contact"><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>

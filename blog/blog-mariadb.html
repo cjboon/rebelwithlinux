@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-mariadb.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MariaDB - The Database Oracle Bought But Didn't Want</title>
+    <meta name="description" content="Learn MariaDB. The open source database that Oracle accidentally made relevant.">
+    <meta name="keywords" content="MariaDB, MySQL, Database, SQL, Linux">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="MariaDB - The Database Oracle Bought But Didn't Want">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-mariadb.html">
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-mariadb.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); }
+    </script>
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: #000; border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: #fff; text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .warning { background: rgba(255, 107, 53, 0.1); border-left: 4px solid #ff6b35; padding: 16px; margin: 24px 0; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title"><a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a></div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></a>
+                <div class="nav-links" id="navLinks"><a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a><a href="../index.html#games">GAMES</a><a href="../index.html#guides">GUIDES</a><a href="../index.html#blog">BLOG</a><a href="../index.html#about">ABOUT</a></div>
+            </div>
+        </div>
+    </nav>
+    <div class="blog-header">
+        <h1>MariaDB</h1>
+        <p>March 16, 2026 • MariaDB • The database Oracle made for us.</p>
+    </div>
+    <nav class="blog-nav"><a href="../index.html#blog">← Back to Blog</a></nav>
+    <article class="blog-content">
+        <p>Oracle bought MySQL. Then they did what Oracle does - they strangled it. Closed the code, slowed development, made it enterprisey. But the original developer, Michael Widenius, had a plan. He forked MySQL before the sale was complete. Called it MariaDB. That's the database you should be using.</p>
+
+        <div class="warning">
+            <strong>MySQL is dead.</strong> It's Oracle's product now. They will squeeze you for money and lock you in. MariaDB is the community-driven continuation that actually respects your freedom.
+        </div>
+
+        <h2>Installation</h2>
+        <p>Install MariaDB. It's in most package managers:</p>
+        
+        <pre><code># Debian/Ubuntu
+apt install mariadb-server
+
+# RHEL/CentOS
+yum install mariadb-server
+
+# Start it
+systemctl start mariadb
+systemctl enable mariadb
+
+# Secure it
+mysql_secure_installation</code></pre>
+
+        <h2>The Basics</h2>
+        <p>Connect to your database. Try things. Break things. That's how you learn:</p>
+        
+        <pre><code># Connect
+mysql -u root -p
+
+# Show databases
+SHOW DATABASES;
+
+# Create a database
+CREATE DATABASE myapp;
+
+# Use it
+USE myapp;
+
+# Create a table
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    email VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+# Insert data
+INSERT INTO users (username, email) VALUES ('cjboon', 'cj@rebelwithlinux.com');
+
+# Query it
+SELECT * FROM users;</code></pre>
+
+        <h2>Users and Permissions</h2>
+        <p>Never use root for your applications. Create users with only what they need:</p>
+        
+        <pre><code># Create a user
+CREATE USER 'appuser'@'localhost' IDENTIFIED BY 'strong_password_here';
+
+# Grant permissions
+GRANT SELECT, INSERT, UPDATE, DELETE ON myapp.* TO 'appuser'@'localhost';
+
+# Reload privileges
+FLUSH PRIVILEGES;
+
+# Show grants
+SHOW GRANTS FOR 'appuser'@'localhost';</code></pre>
+
+        <h2>Indexes: Speed Up Your Queries</h2>
+        <p>Slow queries are the enemy. Add indexes:</p>
+        
+        <pre><code># Add an index
+CREATE INDEX idx_username ON users(username);
+
+# Add composite index
+CREATE INDEX idx_email_created ON users(email, created_at);
+
+# Show indexes
+SHOW INDEX FROM users;</code></pre>
+
+        <h2>Backups: Don't Be That Guy</h2>
+        <p>You will lose data. It's not a question of if, but when. Be ready:</p>
+        
+        <pre><code># Dump all databases
+mysqldump -u root -p --all-databases > backup.sql
+
+# Dump specific database
+mysqldump -u root -p myapp > myapp_backup.sql
+
+# Restore
+mysql -u root -p myapp < myapp_backup.sql
+
+# Point in time recovery needs binlogs - that's advanced stuff</code></pre>
+
+        <h2>Storage Engines</h2>
+        <p>MariaDB gives you choices. Use them:</p>
+        
+        <ul>
+            <li><strong>InnoDB</strong> - Default. ACID compliant. Use this for most things.</li>
+            <li><strong>MyISAM</strong> - Legacy. Fast reads, slow writes. Good for read-heavy logs.</li>
+            <li><strong>MariaDB ColumnStore</strong> - Analytics. Petabyte scale.</li>
+            <li><strong>Aria</strong> - MariaDB's MyISAM replacement. Crash-safe.</li>
+        </ul>
+
+        <h2>The Point</h2>
+        <p>MariaDB is MySQL done right. It's open. It's free. It's actually maintained by people who care, not by a corporation that sees you as a revenue source.</p>
+        
+        <p>Your data is the most valuable thing you have. Don't store it in Oracle's prison. Use MariaDB.</p>
+    </article>
+    <footer id="contact">
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p><a href="../site-map.html">All pages</a></p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-postgresql.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostgreSQL - The World's Most Advanced Database | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn PostgreSQL from beginner to advanced. Master SQL, queries, indexes, transactions, and build robust database applications.">
+    <meta name="keywords" content="PostgreSQL, PostgreSQL tutorial, learn PostgreSQL, SQL, database, relational database, PostgreSQL indexes, PostgreSQL optimization">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle && savedTheme === 'dark') {
+                toggle.checked = true;
+            }
+        });
+    <script src="../terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #336791;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">POSTGRESQL MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>MASTER YOUR<br>DATA</h1>
+        <p class="tagline">// The world's most advanced open source database.</p>
+        
+        <div class="manifesto">
+            <p><strong>POSTGRESQL IS THE GOLD STANDARD.</strong></p>
+            <p>PostgreSQL is an enterprise-grade, ACID-compliant relational database. It handles terabytes of data, supports complex queries, and powers applications from startups to Fortune 500 companies.</p>
+            <p><strong>WHY POSTGRESQL?</strong></p>
+            <p>PostgreSQL offers more features than any other database—JSON support, full-text search, spatial data, pub/sub, partitioning, and more. It's rock-solid reliable and completely free.</p>
+            <p><strong>BECOME A DATA ARCHITECT.</strong></p>
+            <p>Master SQL from basics to advanced queries. Learn to design schemas, create indexes for performance, and optimize your database. Every application needs a solid data foundation.</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to Mastery</h2>
+            <p>12 lessons. Complete PostgreSQL control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to PostgreSQL</h3>
+                <p class="lesson-desc">Install PostgreSQL and understand database concepts.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Basic SQL</h3>
+                <p class="lesson-desc">Learn SELECT, INSERT, UPDATE, and DELETE commands.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Data Types</h3>
+                <p class="lesson-desc">Understand PostgreSQL's rich type system.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Tables & Constraints</h3>
+                <p class="lesson-desc">Create tables with primary keys, foreign keys, and constraints.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Filtering & Sorting</h3>
+                <p class="lesson-desc">Master WHERE, ORDER BY, LIMIT, and OFFSET.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Joins</h3>
+                <p class="lesson-desc">Combine data from multiple tables with JOINs.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Aggregations</h3>
+                <p class="lesson-desc">Use GROUP BY, HAVING, COUNT, SUM, AVG, and more.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Indexes</h3>
+                <p class="lesson-desc">Speed up queries with B-tree, GIN, and other index types.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Subqueries</h3>
+                <p class="lesson-desc">Write nested queries and common table expressions.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Transactions</h3>
+                <p class="lesson-desc">Ensure data integrity with ACID transactions.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Views & Functions</h3>
+                <p class="lesson-desc">Create reusable logic with views and stored functions.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">JSON & Advanced Types</h3>
+                <p class="lesson-desc">Work with JSONB, arrays, and PostgreSQL's advanced features.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why PostgreSQL</h2>
+            <p>PostgreSQL began as Ingres, a project at UC Berkeley in the 1970s. It evolved into PostgreSQL in 1996 and has been actively developed ever since. It's the most feature-rich open source database available.</p>
+            <p>PostgreSQL supports SQL standards fully and extends them with powerful features. It handles complex queries, massive datasets, and high concurrency. Companies like Apple, Instagram, and Spotify trust PostgreSQL for their most critical data.</p>
+            <p>With JSON support, PostgreSQL can also serve as a document database. With PostGIS, it's a spatial database. With full-text search, it's a search engine. PostgreSQL is the ultimate all-in-one database.</p>
+            <p><strong>Data is the foundation. Own it with PostgreSQL.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>📖 PostgreSQL Docs</h3>
+                <p>Official Documentation</p>
+                <a href="https://www.postgresql.org/docs/" target="_blank">postgresql.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>📦 PG Admin</h3>
+                <p>Database Management</p>
+                <a href="https://www.pgadmin.org" target="_blank">pgadmin.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>🎓 PostgreSQL Tutorial</h3>
+                <p>Interactive Learning</p>
+                <a href="https://www.postgresqltutorial.com" target="_blank">postgresqltutorial.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔧 PSQL Cheatsheet</h3>
+                <p>Command Reference</p>
+                <a href="https://www.postgresqltutorial.com/psql-commands/" target="_blank">psql commands</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Rebel With Linux. Data rules everything.</p>
+    </footer>
+
+    <!-- Lesson 1: Introduction to PostgreSQL -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Introduction to PostgreSQL</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is PostgreSQL?</h3>
+                <p>PostgreSQL is the world's most advanced open source relational database. It supports SQL standards, ACID transactions, and offers many advanced features like JSON, arrays, and full-text search.</p>
+                
+                <h3>Why PostgreSQL?</h3>
+                <ul>
+                    <li><strong>ACID Compliant:</strong> Reliable transactions</li>
+                    <li><strong>Open Source:</strong> Free with great community</li>
+                    <li><strong>Extensible:</strong> Custom types, functions, indexes</li>
+                    <li><strong>JSON Support:</strong> Both JSON and JSONB</li>
+                    <li><strong>Performance:</strong> Handles terabytes of data</li>
+                </ul>
+                
+                <div class="highlight-box">
+                    <strong>HISTORY:</strong> PostgreSQL began as Ingres project at UC Berkeley in 1977. It's been actively developed for over 40 years.
+                </div>
+
+                <h3>Installing PostgreSQL</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo apt update && sudo apt install postgresql postgresql-contrib</span>
+<span class="output"># Install PostgreSQL</span>
+<span class="prompt">$</span> <span class="command">sudo systemctl start postgresql</span>
+<span class="output"># Start the service</span>
+<span class="prompt">$</span> <span class="command">sudo systemctl enable postgresql</span>
+<span class="output"># Enable on boot</span>
+                </div>
+
+                <h3>Connecting to PostgreSQL</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">sudo -u postgres psql</span>
+<span class="output"># Connect as postgres user</span>
+<span class="prompt">postgres=#</span> <span class="command">\q</span>
+<span class="output"># Exit psql</span>
+                </div>
+
+                <h3>Create a Database</h3>
+                <div class="terminal-block">
+<span class="prompt">postgres=#</span> <span class="command">CREATE DATABASE myapp;</span>
+<span class="output">CREATE DATABASE</span>
+<span class="prompt">postgres=#</span> <span class="command">\c myapp</span>
+<span class="output">You are now connected to database "myapp"</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does ACID stand for?</p>
+                        <input type="text" class="quiz-input" data-answer="atomicity consistency isolation durability" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What command connects to a database in psql?</p>
+                        <input type="text" class="quiz-input" data-answer="\c" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2: Basic SQL -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Basic SQL</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>SELECT - Query Data</h3>
+                <div class="code-block">
+<span class="comment">-- Select all columns</span>
+SELECT * FROM users;
+
+<span class="comment">-- Select specific columns</span>
+SELECT name, email FROM users;
+
+<span class="comment">-- With calculations</span>
+SELECT name, price * quantity AS total FROM orders;
+                </div>
+
+                <h3>INSERT - Add Data</h3>
+                <div class="code-block">
+<span class="comment">-- Insert single row</span>
+INSERT INTO users (name, email, age) 
+VALUES ('Alice', 'alice@example.com', 30);
+
+<span class="comment">-- Insert multiple rows</span>
+INSERT INTO users (name, email) VALUES 
+  ('Bob', 'bob@example.com'),
+  ('Charlie', 'charlie@example.com');
+                </div>
+
+                <h3>UPDATE - Modify Data</h3>
+                <div class="code-block">
+<span class="comment">-- Update single row</span>
+UPDATE users SET email = 'newemail@example.com' 
+WHERE id = 1;
+
+<span class="comment">-- Update multiple columns</span>
+UPDATE users 
+SET name = 'Alice Smith', age = 31 
+WHERE name = 'Alice';
+                </div>
+
+                <h3>DELETE - Remove Data</h3>
+                <div class="code-block">
+<span class="comment">-- Delete specific row</span>
+DELETE FROM users WHERE id = 5;
+
+<span class="comment">-- Delete all rows (careful!)</span>
+DELETE FROM users;
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What command adds new data?</p>
+                        <input type="text" class="quiz-input" data-answer="INSERT" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. What command removes data?</p>
+                        <input type="text" class="quiz-input" data-answer="DELETE" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3: Data Types -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Data Types</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Numeric Types</h3>
+                <div class="code-block">
+<span class="comment">-- Integers</span>
+SMALLINT    <span class="comment">-- -32768 to 32767</span>
+INTEGER     <span class="comment">-- -2B to 2B (use this)</span>
+BIGINT      <span class="comment">-- very large numbers</span>
+
+<span class="comment">-- Decimals</span>
+DECIMAL(10,2)  <span class="comment">-- 10 digits, 2 decimal places</span>
+NUMERIC(10,2)   <span class="comment">-- Same as DECIMAL</span>
+REAL          <span class="comment">-- 4-byte floating point</span>
+DOUBLE PRECISION  <span class="comment">-- 8-byte floating point</span>
+                </div>
+
+                <h3>String Types</h3>
+                <div class="code-block">
+CHAR(10)     <span class="comment">-- Fixed length, padded</span>
+VARCHAR(255)  <span class="comment">-- Variable length, up to limit</span>
+TEXT         <span class="comment">-- Unlimited length (use this)</span>
+                </div>
+
+                <h3>Date/Time Types</h3>
+                <div class="code-block">
+DATE         <span class="comment">-- Calendar date</span>
+TIME         <span class="comment">-- Time of day</span>
+TIMESTAMP    <span class="comment">-- Date and time</span>
+TIMESTAMPTZ  <span class="comment">-- Date with timezone</span>
+INTERVAL     <span class="comment">-- Duration</span>
+                </div>
+
+                <h3>Boolean</h3>
+                <div class="code-block">
+<span class="comment">-- Boolean values</span>
+is_active BOOLEAN  <span class="comment">-- TRUE, FALSE, NULL</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What type for unlimited text?</p>
+                        <input type="text" class="quiz-input" data-answer="TEXT" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4: Tables & Constraints -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Tables & Constraints</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Creating Tables</h3>
+                <div class="code-block">
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    age INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+                </div>
+
+                <h3>Primary Keys</h3>
+                <div class="code-block">
+<span class="comment">-- Auto-increment primary key</span>
+id SERIAL PRIMARY KEY
+
+<span class="comment">-- Or with BIGINT</span>
+id BIGSERIAL PRIMARY KEY
+                </div>
+
+                <h3>Foreign Keys</h3>
+                <div class="code-block">
+CREATE TABLE orders (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    total DECIMAL(10,2),
+    status VARCHAR(20) DEFAULT 'pending'
+);
+                </div>
+
+                <h3>Constraints</h3>
+                <div class="code-block">
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    price DECIMAL(10,2) CHECK (price > 0),
+    category VARCHAR(50) DEFAULT 'general',
+    UNIQUE(name, category)
+);
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What uniquely identifies a row?</p>
+                        <input type="text" class="quiz-input" data-answer="primary key" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5: Filtering & Sorting -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Filtering & Sorting</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>WHERE Clause</h3>
+                <div class="code-block">
+<span class="comment">-- Basic filtering</span>
+SELECT * FROM users WHERE age >= 18;
+
+<span class="comment">-- Multiple conditions</span>
+SELECT * FROM users 
+WHERE age >= 18 AND country = 'USA';
+
+<span class="comment">-- OR condition</span>
+SELECT * FROM users 
+WHERE country = 'USA' OR country = 'Canada';
+                </div>
+
+                <h3>IN and BETWEEN</h3>
+                <div class="code-block">
+<span class="comment">-- IN - match any in list</span>
+SELECT * FROM users 
+WHERE country IN ('USA', 'Canada', 'UK');
+
+<span class="comment">-- BETWEEN - range</span>
+SELECT * FROM users 
+WHERE age BETWEEN 18 AND 30;
+                </div>
+
+                <h3>LIKE Pattern Matching</h3>
+                <div class="code-block">
+<span class="comment">-- Contains</span>
+SELECT * FROM users WHERE email LIKE '%@gmail.com';
+
+<span class="comment">-- Starts with</span>
+SELECT * FROM users WHERE name LIKE 'A%';
+
+<span class="comment">-- Case insensitive</span>
+SELECT * FROM users WHERE name ILIKE 'alice';
+                </div>
+
+                <h3>ORDER BY</h3>
+                <div class="code-block">
+<span class="comment">-- Sort ascending (default)</span>
+SELECT * FROM users ORDER BY name;
+
+<span class="comment">-- Sort descending</span>
+SELECT * FROM users ORDER BY created_at DESC;
+
+<span class="comment">-- Multiple columns</span>
+SELECT * FROM users ORDER BY country ASC, name ASC;
+                </div>
+
+                <h3>LIMIT and OFFSET</h3>
+                <div class="code-block">
+<span class="comment">-- First 10 rows</span>
+SELECT * FROM users LIMIT 10;
+
+<span class="comment">-- Skip first 20, get next 10</span>
+SELECT * FROM users LIMIT 10 OFFSET 20;
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What sorts results?</p>
+                        <input type="text" class="quiz-input" data-answer="ORDER BY" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6: Joins -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Joins</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>INNER JOIN</h3>
+                <div class="code-block">
+<span class="comment">-- Matched rows from both tables</span>
+SELECT orders.id, users.name, orders.total
+FROM orders
+INNER JOIN users ON orders.user_id = users.id;
+                </div>
+
+                <h3>LEFT JOIN</h3>
+                <div class="code-block">
+<span class="comment">-- All from left, matched from right</span>
+SELECT users.name, orders.id
+FROM users
+LEFT JOIN orders ON users.id = orders.user_id;
+                </div>
+
+                <h3>Multiple Joins</h3>
+                <div class="code-block">
+SELECT orders.id, users.name, products.name
+FROM orders
+JOIN users ON orders.user_id = users.id
+JOIN products ON orders.product_id = products.id;
+                </div>
+
+                <h3>Self Join</h3>
+                <div class="code-block">
+<span class="comment">-- Join table to itself</span>
+SELECT e.name AS employee, m.name AS manager
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.id;
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What join includes all left table rows?</p>
+                        <input type="text" class="quiz-input" data-answer="LEFT JOIN" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7: Aggregations -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Aggregations</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>COUNT, SUM, AVG</h3>
+                <div class="code-block">
+<span class="comment">-- Count rows</span>
+SELECT COUNT(*) FROM users;
+
+<span class="comment">-- Sum values</span>
+SELECT SUM(total) FROM orders;
+
+<span class="comment">-- Average</span>
+SELECT AVG(age) FROM users;
+                </div>
+
+                <h3>MIN and MAX</h3>
+                <div class="code-block">
+SELECT MIN(price) AS cheapest, MAX(price) AS most_expensive
+FROM products;
+                </div>
+
+                <h3>GROUP BY</h3>
+                <div class="code-block">
+<span class="comment">-- Group and aggregate</span>
+SELECT country, COUNT(*) as user_count
+FROM users
+GROUP BY country;
+
+<span class="comment">-- With multiple aggregates</span>
+SELECT country, 
+       COUNT(*) as total,
+       AVG(age) as avg_age
+FROM users
+GROUP BY country;
+                </div>
+
+                <h3>HAVING</h3>
+                <div class="code-block">
+<span class="comment">-- Filter groups</span>
+SELECT country, COUNT(*) as count
+FROM users
+GROUP BY country
+HAVING COUNT(*) > 10;
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What filters grouped results?</p>
+                        <input type="text" class="quiz-input" data-answer="HAVING" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8: Indexes -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Indexes</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Creating Indexes</h3>
+                <div class="code-block">
+<span class="comment">-- Basic index</span>
+CREATE INDEX idx_users_email ON users(email);
+
+<span class="comment">-- Composite index</span>
+CREATE INDEX idx_orders_user_status ON orders(user_id, status);
+                </div>
+
+                <h3>Unique Index</h3>
+                <div class="code-block">
+CREATE UNIQUE INDEX idx_users_email ON users(email);
+                </div>
+
+                <h3>Index Types</h3>
+                <div class="code-block">
+<span class="comment">-- B-tree (default, good for comparisons)</span>
+CREATE INDEX idx_users_name ON users USING btree(name);
+
+<span class="comment">-- GIN (good for arrays, JSONB)</span>
+CREATE INDEX idx_products_tags ON products USING GIN(tags);
+
+<span class="comment">-- Full-text search</span>
+CREATE INDEX idx_articles_content ON articles 
+USING GIN(to_tsvector('english', content));
+                </div>
+
+                <h3>Explain Plans</h3>
+                <div class="code-block">
+EXPLAIN SELECT * FROM users WHERE email = 'test@example.com';
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What command shows query plan?</p>
+                        <input type="text" class="quiz-input" data-answer="EXPLAIN" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9: Subqueries -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Subqueries</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Subquery in WHERE</h3>
+                <div class="code-block">
+<span class="comment">-- Users who placed orders</span>
+SELECT * FROM users
+WHERE id IN (SELECT user_id FROM orders);
+
+<span class="comment">-- Products not ordered</span>
+SELECT * FROM products
+WHERE id NOT IN (SELECT product_id FROM orders);
+                </div>
+
+                <h3>Scalar Subquery</h3>
+                <div class="code-block">
+<span class="comment">-- Subquery returning single value</span>
+SELECT name, 
+       (SELECT COUNT(*) FROM orders WHERE user_id = users.id) as order_count
+FROM users;
+                </div>
+
+                <h3>Common Table Expressions (CTE)</h3>
+                <div class="code-block">
+WITH recent_orders AS (
+    SELECT * FROM orders WHERE created_at > '2024-01-01'
+)
+SELECT * FROM recent_orders 
+JOIN users ON recent_orders.user_id = users.id;
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is CTE short for?</p>
+                        <input type="text" class="quiz-input" data-answer="Common Table Expression" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10: Transactions -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Transactions</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>BEGIN, COMMIT, ROLLBACK</h3>
+                <div class="code-block">
+<span class="comment">-- Start transaction</span>
+BEGIN;
+
+<span class="comment">-- Multiple operations</span>
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+
+<span class="comment">-- Save work</span>
+COMMIT;
+
+<span class="comment">-- Or undo</span>
+ROLLBACK;
+                </div>
+
+                <h3>Savepoints</h3>
+                <div class="code-block">
+BEGIN;
+INSERT INTO logs (action) VALUES ('start');
+
+SAVEPOINT sp1;
+
+INSERT INTO logs (action) VALUES ('middle');
+
+ROLLBACK TO SAVEPOINT sp1;
+
+INSERT INTO logs (action) VALUES ('end');
+
+COMMIT;
+                </div>
+
+                <h3>Isolation Levels</h3>
+                <div class="code-block">
+<span class="comment">-- Set isolation level</span>
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+<span class="comment">-- Options: READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, SERIALIZABLE</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What undoes a transaction?</p>
+                        <input type="text" class="quiz-input" data-answer="ROLLBACK" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11: Views & Functions -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Views & Functions</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Views</h3>
+                <div class="code-block">
+<span class="comment">-- Create view</span>
+CREATE VIEW user_orders AS
+SELECT users.name, COUNT(orders.id) as order_count
+FROM users
+LEFT JOIN orders ON users.id = orders.user_id
+GROUP BY users.id;
+
+<span class="comment">-- Use view</span>
+SELECT * FROM user_orders;
+                </div>
+
+                <h3>Stored Functions</h3>
+                <div class="code-block">
+CREATE OR REPLACE FUNCTION get_user_count()
+RETURNS INTEGER AS $$
+BEGIN
+    RETURN (SELECT COUNT(*) FROM users);
+END;
+$$ LANGUAGE plpgsql;
+
+<span class="comment">-- Call function</span>
+SELECT get_user_count();
+                </div>
+
+                <h3>Functions with Parameters</h3>
+                <div class="code-block">
+CREATE OR REPLACE FUNCTION get_user_by_name(name VARCHAR)
+RETURNS TABLE(id INTEGER, email VARCHAR) AS $$
+BEGIN
+    RETURN QUERY 
+    SELECT users.id, users.email 
+    FROM users 
+    WHERE users.name = get_user_by_name.name;
+END;
+$$ LANGUAGE plpgsql;
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is a saved query called?</p>
+                        <input type="text" class="quiz-input" data-answer="VIEW" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12: JSON & Advanced Types -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// JSON & Advanced Types</h2>
+                <a href="#lessons" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>JSON and JSONB</h3>
+                <div class="code-block">
+<span class="comment">-- Create table with JSON</span>
+CREATE TABLE events (
+    id SERIAL PRIMARY KEY,
+    data JSON
+);
+
+<span class="comment">-- Insert JSON data</span>
+INSERT INTO events (data) VALUES 
+('{"type": "click", "page": "/home"}');
+                </div>
+
+                <h3>Querying JSON</h3>
+                <div class="code-block">
+<span class="comment">-- Extract field (-> returns JSON, ->> returns text)</span>
+SELECT data->>'type' FROM events;
+
+<span class="comment">-- Query nested</span>
+SELECT * FROM events 
+WHERE data->>'page' = '/home';
+                </div>
+
+                <h3>Arrays</h3>
+                <div class="code-block">
+<span class="comment">-- Create table with array</span>
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    tags TEXT[]
+);
+
+<span class="comment">-- Query array</span>
+SELECT * FROM products 
+WHERE 'electronics' = ANY(tags);
+                </div>
+
+                <h3>Range Types</h3>
+                <div class="code-block">
+<span class="comment">-- Date ranges</span>
+CREATE TABLE reservations (
+    id SERIAL PRIMARY KEY,
+    room INTEGER,
+    dates DATERANGE
+);
+
+<span class="comment">-- Overlap operator</span>
+SELECT * FROM reservations 
+WHERE dates && '[2024-01-15,2024-01-20)'::daterange;
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What extracts text from JSON?</p>
+                        <input type="text" class="quiz-input" data-answer="->>" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../nav.js" defer></script>
+</body>
+</html>

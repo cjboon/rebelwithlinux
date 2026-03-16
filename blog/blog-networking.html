@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-networking.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Networking - How the Internet Actually Works</title>
+    <meta name="description" content="Learn networking. The magic that makes the internet work.">
+    <meta name="keywords" content: "Networking, TCP, IP, DNS, Linux">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Networking - How the Internet Actually Works">
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-networking.html">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>const savedTheme = localStorage.getItem('theme'); if (!savedTheme || savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); }</script>
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: #000; border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: #fff; text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .warning { background: rgba(255, 107, 53, 0.1); border-left: 4px solid #ff6b35; padding: 16px; margin: 24px 0; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left"><div class="nav-title"><a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a></div><label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label></div>
+        <div class="nav-right"><div class="menu-details" id="nav-menu"><a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></a><div class="nav-links" id="navLinks"><a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a><a href="../index.html#games">GAMES</a><a href="../index.html#guides">GUIDES</a><a href="../index.html#blog">BLOG</a><a href="../index.html#about">ABOUT</a></div></div></div>
+    </nav>
+    <div class="blog-header"><h1>Networking</h1><p>March 16, 2026 • Networking • It's all just packets.</p></div>
+    <nav class="blog-nav"><a href="../index.html#blog">← Back to Blog</a></nav>
+    <article class="blog-content">
+        <p>You use networks every day. You connect to WiFi, you browse websites, you send emails. But do you actually understand what's happening? When something breaks - and it will - you need to know how to diagnose it.</p>
+
+        <div class="warning"><strong>Networking is not magic.</strong> It's layers of protocols stacked on each other. Learn the layers, and everything makes sense.</div>
+
+        <h2>The Basics: IP Addresses</h2>
+        <p>Every device needs an address. IPv4 is running out, but it's what you're using:</p>
+        
+        <pre><code># See your IP addresses
+ip addr
+ip a
+
+# Check specific interface
+ip addr show eth0
+
+# Old command (still works)
+ifconfig
+ifconfig -a</code></pre>
+
+        <h2>Connectivity: Can You Reach It?</h2>
+        <p>The first test for any network problem:</p>
+        
+        <pre><code># Ping - can you reach it?
+ping google.com
+ping 8.8.8.8
+
+# Continuous ping (Ctrl+C to stop)
+ping -c 4 google.com
+
+# Trace the path
+traceroute google.com
+tracert google.com   # Windows
+mtr google.com      # Continuous traceroute</code></pre>
+
+        <h2>DNS: The Phonebook</h2>
+        <p>Names to addresses. Addresses to names:</p>
+        
+        <pre><code># Query DNS
+nslookup google.com
+dig google.com
+host google.com
+
+# Reverse DNS
+dig -x 8.8.8.8
+nslookup 8.8.8.8
+
+# Check your DNS servers
+cat /etc/resolv.conf</code></pre>
+
+        <h2>Ports and Connections</h2>
+        <p>What's listening? What's connected?</p>
+        
+        <pre><code># See listening ports
+ss -tuln
+netstat -tuln
+
+# See established connections
+ss -tunap
+netstat -tunap
+
+# Specific port
+ss -tlnp | grep :80
+lsof -i :80</code></pre>
+
+        <h2>HTTP: The Web Protocol</h2>
+        <p>Talk to web servers directly:</p>
+        
+        <pre><code># GET request
+curl https://example.com
+
+# GET with headers
+curl -I https://example.com
+curl -v https://example.com
+
+# Download file
+curl -O https://example.com/file.txt
+
+# POST data
+curl -X POST -d "name=value" https://example.com</code></pre>
+
+        <h2>Transfer Files</h2>
+        <p>Move data between machines:</p>
+        
+        <pre><code># Secure copy
+scp file.txt user@server:/path/
+scp user@server:/path/file.txt ./
+
+# rsync - better for syncing
+rsync -avz ./local/ user@server:/remote/
+rsync -avz --delete ./local/ user@server:/remote/
+
+# wget
+wget https://example.com/file.zip</code></
+
+        <h2>SSH: The Remote Shell</h2>
+        <p>Your encrypted tunnel to any server:</p>
+        
+        <pre><code># Connect
+ssh user@server
+
+# Specific port
+ssh -p 2222 user@server
+
+# Run command remotely
+ssh user@server "df -h"
+
+# Copy key for passwordless login
+ssh-copy-id user@server
+
+# SSH tunnel (proxy through server)
+ssh -D 8080 user@server</code></pre>
+
+        <h2>Network Troubleshooting Flow</h2>
+        <p>When something doesn't work:</p>
+        
+        <ol>
+            <li><strong>Can you reach it?</strong> ping the IP</li>
+            <li><strong>Can you resolve it?</strong> nslookup the domain</li>
+            <li><strong>Is the port open?</strong> ss or netstat</li>
+            <li><strong>Can you talk to it?</strong> curl or telnet</li>
+            <li><strong>What's the route?</strong> traceroute</li>
+            <li><strong>Check the logs</strong></li>
+        </ol>
+
+        <h2>The Point</h2>
+        <p>Networking seems complex, but it's built on simple concepts. Packets flow from A to B. Addresses get them there. Ports identify the destination service. Protocols define the conversation.</p>
+        
+        <p>Learn the commands. Practice them. When your site goes down and users complain, you'll be the one who can figure out why.</p>
+        
+        <p>The network is the foundation of everything. Know it.</p>
+    </article>
+    <footer id="contact"><div class="copyleft">⟲</div><p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p><p><a href="../site-map.html">All pages</a></p></footer>
+</body>
+</html>
