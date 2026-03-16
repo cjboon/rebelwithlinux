@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-grafana.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafana - Observability & Metrics Mastery | REBEL WITH LINUX</title>
+    <meta name="description" content="Master Grafana for observability. Learn dashboards, metrics, alerting, and visualization.">
+    <meta name="keywords" content="Grafana, observability, metrics, dashboards, monitoring, alerting, time series, visualization, Prometheus">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        :root { --nav-color: #f79c25; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">GRAFANA MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>DATA<br>VISUALIZATION</h1>
+        <p class="tagline">// See everything. Know instantly.</p>
+        
+        <div class="manifesto">
+            <p><strong>GRAFANA GIVES YOU SUPERPOWERS.</strong></p>
+            <p>In a world drowning in data, Grafana transforms raw metrics into actionable insights. It's not just a dashboard tool—it's the lens through which you view your entire infrastructure. When something breaks at 3 AM, Grafana tells you what, when, and why.</p>
+            <p><strong>VISUALIZE ANYTHING.</strong></p>
+            <p>From server CPU usage to business KPIs, from network traffic to application latency. Grafana connects to Prometheus, InfluxDB, Elasticsearch, PostgreSQL, and dozens of other data sources. You decide what to measure. Grafana makes it beautiful.</p>
+            <p><strong>ALERT BEFORE DISASTER STRIKES.</strong></p>
+            <p>Proactive monitoring means fixing problems before users notice. Grafana's alerting system notifies you via email, Slack, PagerDuty, or webhook when metrics cross thresholds. Sleep better at night knowing Grafana is watching your systems.</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to Observability Mastery</h2>
+            <p>12 lessons. Complete Grafana control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Grafana</h3>
+                <p class="lesson-desc">What is observability? Installing Grafana and understanding the interface.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Data Sources</h3>
+                <p class="lesson-desc">Connecting to Prometheus, InfluxDB, Elasticsearch, and more.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Your First Dashboard</h3>
+                <p class="lesson-desc">Creating panels, queries, and organizing dashboards.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Query Language</h3>
+                <p class="lesson-desc">PromQL, InfluxQL, and other query languages for time series data.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Visualizations</h3>
+                <p class="lesson-desc">Graphs, heatmaps, tables, gauges, and advanced visualizations.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Variables & Templating</h3>
+                <p class="lesson-desc">Dynamic dashboards with variables and template queries.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Alerting System</h3>
+                <p class="lesson-desc">Creating alerts, notification policies, and alert rules.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Alert Notifications</h3>
+                <p class="lesson-desc">Email, Slack, PagerDuty, webhook integrations.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">User Management</h3>
+                <p class="lesson-desc">Teams, permissions, and organization management.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Plugins & Extensions</h3>
+                <p class="lesson-desc">Installing plugins, building custom panels, Grafana Loki.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">API & Automation</h3>
+                <p class="lesson-desc">Grafana API, provisioning, and infrastructure as code.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Production Best Practices</h3>
+                <p class="lesson-desc">High availability, security, and scaling Grafana.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section id="lesson1" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 01: Introduction to Grafana</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>What is Grafana?</h3>
+            <p>Grafana is an open-source platform for data visualization and monitoring. It connects to various data sources and transforms data into beautiful, interactive dashboards. Originally created in 2014, it has become the de facto standard for observability dashboards.</p>
+            
+            <p>Grafana is used by companies of all sizes—from small startups to massive enterprises like Google, Netflix, and PayPal. It's the visualization layer for monitoring systems, providing the "what happened" and "why" behind your metrics.</p>
+            
+            <div class="warning-box">
+                <strong>⚡ POWER MOVE:</strong> Grafana is free and open source. You can run it on your own infrastructure, customize it, and contribute back to the community. No vendor lock-in, no SaaS pricing.
+            </div>
+        </div>
+
+        <div class="content-block">
+            <h3>What is Observability?</h3>
+            <p>Observability is the ability to measure the internal states of a system by examining its outputs. In IT operations, this means:</p>
+            
+            <ul>
+                <li><strong>Metrics:</strong> Quantitative measurements (CPU usage, request count, latency)</li>
+                <li><strong>Logs:</strong> Timestamped records of events</li>
+                <li><strong>Traces:</strong> Request paths through distributed systems</li>
+            </ul>
+            
+            <p>Grafana excels at metrics and can integrate with logging (Loki) and tracing (Tempo) systems for complete observability.</p>
+        </div>
+
+        <div class="content-block">
+            <h3>Installing Grafana</h3>
+            
+            <h4>Ubuntu/Debian</h4>
+            <pre class="code-block"># Add Grafana repository
+sudo apt-get install -y apt-transport-https software-properties-common wget
+wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+
+# Install
+sudo apt update
+sudo apt install grafana
+
+# Start
+sudo systemctl start grafana-server
+sudo systemctl enable grafana-server</pre>
+            
+            <h4>Docker</h4>
+            <pre class="code-block"># Run Grafana
+docker run -d \
+  --name=grafana \
+  -p 3000:3000 \
+  -v grafana-data:/var/lib/grafana \
+  grafana/grafana</pre>
+            
+            <p>Access Grafana at <code>http://localhost:3000</code>. Default credentials: <code>admin/admin</code></p>
+        </div>
+
+        <div class="content-block">
+            <h3>Grafana Interface</h3>
+            <p>The Grafana interface consists of several key areas:</p>
+            
+            <ul>
+                <li><strong>Left Sidebar:</strong> Navigation - Dashboards, Explore, Alerts, Configuration, Server Admin</li>
+                <li><strong>Top Bar:</strong> Search, User menu, Notifications</li>
+                <li><strong>Dashboard View:</strong> Panels arranged in rows</li>
+                <li><strong>Panel Editor:</strong> Query builder, visualization options, metadata</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Key Concepts</h3>
+            
+            <ul>
+                <li><strong>Data Source:</strong> A storage backend that provides metrics (Prometheus, InfluxDB, Elasticsearch, etc.)</li>
+                <li><strong>Dashboard:</strong> A collection of panels organized in rows</li>
+                <li><strong>Panel:</strong> A single visualization (graph, stat, table, etc.)</li>
+                <li><strong>Query:</strong> A request for data from a data source</li>
+                <li><strong>Alert:</strong> A rule that triggers notifications when conditions are met</li>
+                <li><strong>Folder:</strong> Organization unit for dashboards</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lessons" class="nav-button">← Back to Lessons</a>
+            <a href="#lesson2" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson2" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 02: Data Sources</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Data Sources Overview</h3>
+            <p>Grafana supports 50+ data sources. Let's cover the most popular ones.</p>
+        </div>
+
+        <div class="content-block">
+            <h3>Prometheus</h3>
+            <p>Prometheus is the most common pairing with Grafana—a powerful time-series database designed for metrics collection.</p>
+            
+            <ol>
+                <li>Go to Configuration > Data Sources</li>
+                <li>Click "Add data source"</li>
+                <li>Select "Prometheus"</li>
+                <li>Configure URL: <code>http://localhost:9090</code></li>
+                <li>Click "Save & Test"</li>
+            </ol>
+            
+            <pre class="code-block"># If you don't have Prometheus, install it:
+docker run -d \
+  --name=prometheus \
+  -p 9090:9090 \
+  -v prometheus.yml:/etc/prometheus/prometheus.yml \
+  prom/prometheus
+
+# prometheus.yml:
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>InfluxDB</h3>
+            <p>InfluxDB is popular for custom application metrics.</p>
+            
+            <pre class="code-block"># Run InfluxDB
+docker run -d \
+  --name=influxdb \
+  -p 8086:8086 \
+  influxdb:2
+
+# Configure in Grafana:
+# URL: http://localhost:8086
+# Database: mydb
+# Username: admin
+# Password: yourpassword</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>PostgreSQL / MySQL</h3>
+            <p>Use SQL databases for metrics that live in your application database.</p>
+            
+            <pre class="code-block"># Query example:
+SELECT
+  $__timeGroup(created_at, '5m') AS time,
+  count(*) AS request_count,
+  avg(response_time) AS avg_response_time
+FROM http_requests
+WHERE $__timeFilter(created_at)
+GROUP BY 1
+ORDER BY 1</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Elasticsearch</h3>
+            <p>For log and document storage visualization.</p>
+            
+            <pre class="code-block"># Configure:
+# URL: http://localhost:9200
+# Index name: logs-*
+# Time field: @timestamp</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Multiple Data Sources</h3>
+            <p>You can add multiple data sources and reference them in different panels:</p>
+            
+            <pre class="code-block"># In a single dashboard:
+# - Panel 1: Queries Prometheus (infrastructure metrics)
+# - Panel 2: Queries InfluxDB (application metrics)
+# - Panel 3: Queries PostgreSQL (business metrics)</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson1" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson3" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson3" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 03: Your First Dashboard</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Creating a Dashboard</h3>
+            <ol>
+                <li>Click "+" icon in sidebar or "Create" > "Dashboard"</li>
+                <li>Click "Add panel"</li>
+                <li>Select your data source</li>
+                <li>Write a query</li>
+                <li>Choose visualization</li>
+                <li>Save dashboard</li>
+            </ol>
+        </div>
+
+        <div class="content-block">
+            <h3>Your First Query</h3>
+            <p>Let's query Prometheus for CPU usage:</p>
+            
+            <pre class="code-block"># Prometheus query:
+100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)</pre>
+            
+            <p>This calculates the percentage of CPU that's NOT idle, giving you total CPU usage.</p>
+        </div>
+
+        <div class="content-block">
+            <h3>Panel Editor</h3>
+            <p>The panel editor has several tabs:</p>
+            
+            <ul>
+                <li><strong>Query:</strong> Write and test queries</li>
+                <li><strong>Visualization:</strong> Choose chart type</li>
+                <li><strong>Panel:</strong> Panel settings (title, description, links)</li>
+                <li><strong>Field:</strong> Field options, units, thresholds</li>
+                <li><strong>Alert:</strong> Create alert rules</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Organizing Dashboards</h3>
+            
+            <ul>
+                <li><strong>Folders:</strong> Group related dashboards</li>
+                <li><strong>Tags:</strong> Add tags for filtering</li>
+                <li><strong>Annotations:</strong> Add event markers to graphs</li>
+                <li><strong>Dashboard links:</strong> Link between related dashboards</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Sharing Dashboards</h3>
+            <p>Grafana offers multiple sharing options:</p>
+            
+            <ul>
+                <li><strong>Share:</strong> Generate a link or embed</li>
+                <li><strong>Export:</strong> Download JSON for backup/sharing</li>
+                <li><strong>Snapshot:</strong> Save current data as snapshot</li>
+                <li><strong>PDF:</strong> Export dashboard as PDF</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson2" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson4" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson4" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 04: Query Language</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>PromQL Fundamentals</h3>
+            <p>Prometheus Query Language (PromQL) is powerful for time-series data.</p>
+            
+            <h4>Basic Queries</h4>
+            <pre class="code-block"># Direct metric
+node_cpu_seconds_total
+
+# With label filter
+node_cpu_seconds_total{mode="idle"}
+
+# Rate - per-second rate of change
+rate(node_cpu_seconds_total[5m])
+
+# Irate - instant rate
+irate(node_cpu_seconds_total[5m])</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Aggregations</h4>
+            <pre class="code-block"># Sum all values
+sum(node_cpu_seconds_total)
+
+# Average
+avg(rate(http_requests_total[5m]))
+
+# Max/Min
+max(node_memory_MemAvailable_bytes)
+
+# Count
+count(node_cpu_seconds_total{mode="user"})
+
+# By label
+sum by (instance) (rate(node_cpu_seconds_total[5m]))</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Functions</h3>
+            <pre class="code-block"># Calculate percentage
+100 - (avg by (mode) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+
+# Moving average
+avg_over_time(node_memory_MemAvailable_bytes[5m])
+
+# Predict future
+predict_linear(node_memory_MemAvailable_bytes[1h], 3600)</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Grafana Variables in Queries</h3>
+            <pre class="code-block"># Use $variable in queries
+node_exporter_build_info{job="$job"}
+
+# Multi-value variable
+node_exporter_build_info{job=~"$job"}
+
+# Time ranges
+$__range_s</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Query Performance</h3>
+            
+            <ul>
+                <li><strong>Use [5m] ranges</strong> instead of [1h] for faster queries</li>
+                <li><strong>Reduce cardinality</strong> - avoid high-cardinality labels</li>
+                <li><strong>Use recording rules</strong> - pre-aggregate expensive queries</li>
+                <li><strong>Limit time range</strong> - don't query more data than needed</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson3" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson5" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson5" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 05: Visualizations</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Visualization Types</h3>
+            <p>Grafana offers dozens of visualizations:</p>
+            
+            <ul>
+                <li><strong>Time series:</strong> Line, area, bar charts</li>
+                <li><strong>Stat:</strong> Single big number with sparkline</li>
+                <li><strong>Bar gauge:</strong> Horizontal/vertical gauges</li>
+                <li><strong>Table:</strong> Tabular data</li>
+                <li><strong>Heatmap:</strong> Density visualization</li>
+                <li><strong>pieChart:</strong> Pie/Donut charts</li>
+                <li><strong>Logs:</strong> Log entries display</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Graph Panel</h3>
+            <p>The classic time-series visualization:</p>
+            
+            <pre class="code-block"># Visualization options:
+# - Mode: Lines, Bars, Points
+# - Line interpolation: Smooth, Step, Linear
+# - Line width: 1-5px
+# - Fill opacity: 0-100%
+# - Gradient mode: Opacity, Hue, Saturation</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Stat Panel</h3>
+            <p>Display a single value prominently:</p>
+            
+            <ul>
+                <li><strong>Sparkline:</strong> Mini chart in background</li>
+                <li><strong>Color by:</strong> Background or value</li>
+                <li><strong>Orientation:</strong> Horizontal/Vertical</li>
+                <li><strong>Text mode:</strong> Value only, name only, value and name</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Thresholds</h3>
+            <p>Color-code values based on thresholds:</p>
+            
+            <pre class="code-block"># Thresholds:
+# Green: 0-70
+# Yellow: 70-90
+# Red: 90-100
+
+# Base: green
+# Threshold 1: 70 (yellow)
+# Threshold 2: 90 (red)</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Value Mappings</h3>
+            <p>Transform values for display:</p>
+            
+            <pre class="code-block"># Map numeric codes to text:
+# 0 -> OK
+# 1 -> Warning
+# 2 -> Critical
+
+# Map boolean:
+# true -> Active
+# false -> Inactive</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson4" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson6" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson6" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 06: Variables & Templating</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Dashboard Variables</h3>
+            <p>Variables make dashboards dynamic and reusable.</p>
+        </div>
+
+        <div class="content-block">
+            <h3>Creating Variables</h3>
+            <ol>
+                <li>Go to Dashboard Settings (gear icon)</li>
+                <li>Click "Variables" > "Add variable"</li>
+                <li>Configure name, type, query</li>
+                <li>Use in queries: <code>$variableName</code></li>
+            </ol>
+            
+            <pre class="code-block"># Query type: Query
+# Data source: Prometheus
+# Query: label_values(node_exporter_build_info, job)
+# Name: job
+# Multi-value: ✓
+# Include All option: ✓</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Variable Types</h3>
+            
+            <ul>
+                <li><strong>Query:</strong> Dynamic values from data source</li>
+                <li><strong>Constant:</strong> Fixed value</li>
+                <li><strong>Textbox:</strong> User input</li>
+                <li><strong>Interval:</strong> Time intervals</li>
+                <li><strong>Datasource:</strong> Select data source</li>
+                <li><strong>Custom:</strong> Comma-separated values</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Chained Variables</h3>
+            <p>Make selections cascade:</p>
+            
+            <pre class="code-block"># Variable 1: $environment
+# Query: label_values(node_exporter_build_info, environment)
+
+# Variable 2: $host
+# Query: label_values(node_exporter_build_info{environment="$environment"}, instance)
+
+# Result: Select environment, then available hosts in that environment</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Advanced Queries</h3>
+            <pre class="code-block"># Prometheusadhoc variable (filters):
+# Metric: node_network_receive_bytes_total
+# Filters: {{label}}="{{value}}"
+
+# Using regex:
+# Query: label_values(up{job=~"$job.*"}, instance)</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson5" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson7" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson7" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 07: Alerting System</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Alerting Overview</h3>
+            <p>Grafana alerting monitors your metrics and notifies you when thresholds are crossed.</p>
+            
+            <div class="warning-box">
+                <strong>⚡ NOTE:</strong> Grafana 8+ introduced unified alerting. Legacy alerts still exist but unified is recommended.
+            </div>
+        </div>
+
+        <div class="content-block">
+            <h3>Creating Alert Rules</h3>
+            <ol>
+                <li>Open a panel > Click "Alert" tab</li>
+                <li>Click "Create Alert Rule"</li>
+                <li>Define query and conditions</li>
+                <li>Set evaluation behavior</li>
+                <li>Configure notifications</li>
+            </ol>
+            
+            <pre class="code-block"># Condition:
+# WHEN: avg() OF query(A, 5m, now) IS ABOVE 80
+
+# This triggers when the 5-minute average 
+# of query A exceeds 80</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Alert Conditions</h3>
+            <pre class="code-block"># Basic: IS ABOVE / IS BELOW / IS OUTSIDE RANGE / IS WITHIN RANGE
+
+# Example queries:
+# CPU usage above 80%
+avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) < 20
+
+# Memory above 90%
+(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+
+# Request errors above 5%
+rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Evaluation</h3>
+            <pre class="code-block"># How often to check:
+# Evaluation interval: 5m (check every 5 minutes)
+
+# How long condition must be true:
+# For: 5m (trigger after 5 minutes of violation)
+
+# This prevents flapping alerts</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Alert States</h3>
+            
+            <ul>
+                <li><strong>Normal:</strong> Below threshold</li>
+                <li><strong>Pending:</strong> Above threshold but not yet firing</li>
+                <li><strong>Firing:</strong> Above threshold for the "for" duration</li>
+                <li><strong>No Data:</strong> No data returned</li>
+                <li><strong>Error:</strong> Query error</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson6" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson8" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson8" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 08: Alert Notifications</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Notification Channels</h3>
+            <p>Grafana supports many notification destinations:</p>
+            
+            <ul>
+                <li>Email</li>
+                <li>Slack</li>
+                <li>PagerDuty</li>
+                <li>OpsGenie</li>
+                <li>Webhook</li>
+                <li>Telegram</li>
+                <li>Microsoft Teams</li>
+                <li>Discord</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Configuring Email</h3>
+            <ol>
+                <li>Go to Configuration > Notification channels</li>
+                <li>Add "Email" channel</li>
+                <li>Configure SMTP in grafana.ini:</li>
+            </ol>
+            
+            <pre class="code-block">[smtp]
+enabled = true
+host = smtp.example.com:587
+user = grafana@example.com
+password = yourpassword
+from_address = grafana@example.com
+from_name = Grafana Alert</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Slack Integration</h3>
+            <pre class="code-block"># In Slack:
+# 1. Create Incoming Webhook
+# 2. Copy webhook URL
+
+# In Grafana:
+# 1. Add Slack notification channel
+# 2. Paste webhook URL
+# 3. Set recipient (#alerts or @username)
+# 4. Test notification</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Webhook for Custom Integrations</h3>
+            <pre class="code-block"># Webhook sends JSON:
+{
+  "title": "[FIRING:1] CPU High (grafana)",
+  "message": "CPU usage above 80%",
+  "state": "alerting",
+  "evalMatches": [...],
+  "ruleUrl": "http://localhost:3000/alerting/..."
+}
+
+# Handle in your application to:
+# - Create tickets
+# - Page on-call
+# - Run automation</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Notification Policies</h3>
+            <p>Route alerts based on labels:</p>
+            
+            <pre class="code-block"># Default policy: All alerts go to email
+
+# Custom policies:
+# - IF severity=critical -> Slack #critical + PagerDuty
+# - IF team=backend -> Slack #backend-alerts
+# - IF service=api -> Email on-call@company.com</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson7" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson9" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson9" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 09: User Management</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Organization Model</h3>
+            <p>Grafana uses organizations for multi-tenancy:</p>
+            
+            <ul>
+                <li><strong>Org:</strong> Isolated workspace with own data sources and dashboards</li>
+                <li><strong>Users:</strong> Belong to one or more orgs with different roles</li>
+                <li><strong>Teams:</strong> Groups within an org for easier permission management</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Roles</h3>
+            
+            <ul>
+                <li><strong>Viewer:</strong> View dashboards only</li>
+                <li><strong>Editor:</strong> View and edit dashboards</li>
+                <li><strong>Admin:</strong> Full org management</li>
+                <li><strong>Server Admin:</strong> User management, global settings (Grafana admin)</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Team Permissions</h3>
+            <ol>
+                <li>Create team in Configuration > Teams</li>
+                <li>Add members</li>
+                <li>Set team permissions on folders/dashboards</li>
+            </ol>
+            
+            <pre class="code-block"># Team permissions:
+# - Members can edit
+# - Can admin
+# - View only</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>LDAP Integration</h3>
+            <pre class="code-block"># grafana.ini
+[auth.ldap]
+enabled = true
+config_file = /etc/grafana/ldap.toml
+
+# ldap.toml
+[[servers]]
+host = "ldap.example.com"
+port = 636
+use_ssl = true
+
+[[servers.group_mappings]]
+group_dn = "cn=admins,ou=groups,dc=example,dc=com"
+org_role = "Admin"</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson8" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson10" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson10" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 10: Plugins & Extensions</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Grafana Plugin Ecosystem</h3>
+            <p>Extend Grafana with plugins:</p>
+            
+            <ul>
+                <li><strong>Data Source Plugins:</strong> Connect to new databases</li>
+                <li><strong>Panel Plugins:</strong> New visualization types</li>
+                <li><strong>App Plugins:</strong> Bundled dashboards and plugins</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Installing Plugins</h3>
+            
+            <pre class="code-block"># Via grafana-cli
+grafana-cli plugins install grafana-worldmap-panel
+grafana-cli plugins install grafana-piechart-panel
+
+# Via Docker
+docker run -d -p 3000:3000 \
+  -v $(pwd)/plugins:/var/lib/grafana/plugins \
+  -e GF_PLUGINS=/var/lib/grafana/plugins \
+  grafana/grafana
+
+# Restart Grafana after installation
+sudo systemctl restart grafana-server</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Grafana Loki</h3>
+            <p>Loki is Grafana's log aggregation system:</p>
+            
+            <pre class="code-block"># Run Loki
+docker run -d --name=loki -p 3100:3100 grafana/loki
+
+# Configure Loki as data source:
+# URL: http://localhost:3100
+
+# LogQL queries:
+{job="nginx"} |= "error"
+{job="nginx"} | json | status_code >= 500
+rate({job="app"}[5m])</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Popular Plugins</h3>
+            
+            <ul>
+                <li><strong>Worldmap Panel:</strong> Geographic visualization</li>
+                <li><strong>Pie Chart:</strong> Donut/pie charts</li>
+                <li><strong>Geomap:</strong> Advanced mapping</li>
+                <li><strong>Apache ECharts:</strong> Rich visualizations</li>
+                <li><strong>JSON API:</strong> Query any REST API</li>
+                <li><strong>CloudWatch:</strong> AWS CloudWatch metrics</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson9" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson11" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson11" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 11: API & Automation</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Grafana API</h3>
+            <p>Everything in Grafana can be automated via API.</p>
+            
+            <pre class="code-block"># Get API key: Configuration > API Keys
+
+# Base URL
+curl -H "Authorization: Bearer $API_KEY" \
+  http://localhost:3000/api/dashboards/uid/my-dashboard
+
+# List dashboards
+curl -H "Authorization: Bearer $API_KEY" \
+  http://localhost:3000/api/search?type=dash-db
+
+# Create dashboard
+curl -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -X POST http://localhost:3000/api/dashboards/db \
+  -d '{"dashboard": {...}}'</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Provisioning</h3>
+            <p>Declaratively define dashboards, data sources, and more:</p>
+            
+            <pre class="code-block"># provisioning/datasources/datasources.yml
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+
+  - name: Loki
+    type: loki
+    url: http://loki:3100
+
+# provisioning/dashboards/dashboards.yml
+apiVersion: 1
+
+providers:
+  - name: 'Dashboards'
+    orgId: 1
+    folder: 'Monitoring'
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Dashboard as Code</h3>
+            <pre class="code-block"># Export dashboard JSON and version control
+curl -H "Authorization: Bearer $API_KEY" \
+  http://localhost:3000/api/dashboards/uid/my-dashboard \
+  > dashboards/my-dashboard.json
+
+# Or use grafonnet library to generate from templates
+# https://github.com/grafana/grafonnet</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson10" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson12" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson12" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 12: Production Best Practices</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Security</h3>
+            
+            <ul>
+                <li><strong>Enable HTTPS</strong> - Use reverse proxy with TLS</li>
+                <li><strong>API Keys</strong> - Rotate regularly</li>
+                <li><strong>Disable anonymous access</strong></li>
+                <li><strong>Data source proxy</strong> - Don't expose data sources to browsers</li>
+                <li><strong>RBAC</strong> - Use teams and permissions</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>High Availability</h3>
+            <p>For HA, use multiple Grafana instances:</p>
+            
+            <pre class="code-block"># Use external database:
+# PostgreSQL or MySQL
+
+# grafana.ini:
+[database]
+type = postgres
+host = dbserver:5432
+name = grafana
+user = grafana
+password = yourpassword
+
+# Use shared data sources:
+# Configure data sources with same URL across instances
+# Or use load balancer</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Performance</h3>
+            
+            <ul>
+                <li><strong>Query caching</strong> - Enable data source query caching</li>
+                <li><strong>Limit time ranges</strong> - Don't query more than needed</li>
+                <li><strong>Recording rules</strong> - Pre-aggregate expensive queries</li>
+                <li><strong>Resource limits</strong> - Set query timeouts</li>
+                <li><strong>Dashboard optimization</strong> - Reduce panel count</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Backup & Recovery</h3>
+            <pre class="code-block"># Backup:
+# - Database (dashboards, users, settings)
+# - Provisioning files
+# - Plugins
+# - Dashboards JSON
+
+# Grafana stores in:
+# - Database (SQLite, PostgreSQL, MySQL)
+# - /var/lib/grafana (dashboards, plugins, etc.)</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Conclusion</h3>
+            <p>You've completed the Grafana mastery guide. You now know how to:</p>
+            
+            <ul>
+                <li>Install and configure Grafana</li>
+                <li>Connect to various data sources</li>
+                <li>Build beautiful dashboards</li>
+                <li>Write complex queries</li>
+                <li>Create dynamic dashboards with variables</li>
+                <li>Set up alerting</li>
+                <li>Configure notifications</li>
+                <li>Manage users and permissions</li>
+                <li>Extend with plugins</li>
+                <li>Automate with API</li>
+                <li>Deploy production-grade Grafana</li>
+            </ul>
+            
+            <p><strong>Next steps:</strong></p>
+            <ul>
+                <li>Build dashboards for your infrastructure</li>
+                <li>Set up alerting for critical metrics</li>
+                <li>Explore Grafana Loki for logs</li>
+                <li>Integrate with Prometheus</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson11" class="nav-button">← Previous Lesson</a>
+            <a href="#lessons" class="nav-button">Back to Lessons ↑</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>// REBEL WITH LINUX - SEE EVERYTHING, KNOW INSTANTLY</p>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', function() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+    </script>
+</body>
+</html>

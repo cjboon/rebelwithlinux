@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-homelab.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homelab - Self-Hosting Mastery | REBEL WITH LINUX</title>
+    <meta name="description" content="Master homelab setup. Learn self-hosting, virtualization, containers, and building your own infrastructure.">
+    <meta name="keywords" content="homelab, self-hosting, home server, virtualization, Docker, Kubernetes, Proxmox, home automation">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        :root { --nav-color: #0097a7; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">HOMELAB MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>OWN YOUR<br>INFRASTRUCTURE</h1>
+        <p class="tagline">// Your data. Your services. Your hardware.</p>
+        
+        <div class="manifesto">
+            <p><strong>THE CLOUD IS JUST SOMEONE ELSE'S COMPUTER.</strong></p>
+            <p>Every service you use—Google Docs, Dropbox, Netflix, Spotify—is running on someone else's server, managed by someone else's rules, subject to someone else's whims. When they change terms, raise prices, or shut down, you lose everything. Homelab puts you back in control.</p>
+            <p><strong>LEARN BY DOING.</strong></p>
+            <p>Homelab is the ultimate learning environment. Want to understand Kubernetes? Run it locally. Want to learn networking? Build your own. Want to secure systems? Break them in your lab first. There's no replacement for hands-on experience.</p>
+            <p><strong>SELF-HOSTING IS RESISTANCE.</strong></p>
+            <p>Running your own services means you're not the product. Your photos stay on your NAS. Your notes live on your server. Your media is served by your hardware. You're not dependent on corporate goodwill for your digital life.</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to Homelab Mastery</h2>
+            <p>12 lessons. Complete homelab control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Homelab</h3>
+                <p class="lesson-desc">What is a homelab? Getting started. Setting goals.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Hardware Selection</h3>
+                <p class="lesson-desc">Choosing hardware. Budget builds. Enterprise gear.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Virtualization</h3>
+                <p class="lesson-desc">Proxmox, ESXi, KVM. Running multiple VMs.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Containerization</h3>
+                <p class="lesson-desc">Docker basics. Docker Compose. Portainer.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Networking Basics</h3>
+                <p class="lesson-desc">VLANs, subnets, DNS. Network design for homelab.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Storage Solutions</h3>
+                <p class="lesson-desc">NAS, RAID, storage pools. TrueNAS, OpenMediaVault.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Essential Services</h3>
+                <p class="lesson-desc">Services to self-host. Home Assistant, Plex, etc.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Remote Access</h3>
+                <p class="lesson-desc">VPN, reverse proxies, Tailscale. Access from anywhere.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Monitoring</h3>
+                <p class="lesson-desc">Grafana, Prometheus, Uptime Kuma. Know your systems.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Security Hardening</h3>
+                <p class="lesson-desc">Firewall, fail2ban, backups. Securing your lab.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Kubernetes at Home</h3>
+                <p class="lesson-desc">K3s, microk8s, cluster management. Advanced orchestration.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Homelab Documentation</h3>
+                <p class="lesson-desc">Wiki, diagrams, runbooks. Managing complexity.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section id="lesson1" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 01: Introduction to Homelab</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>What is a Homelab?</h3>
+            <p>A homelab is a personal computing environment—typically at home—where you run your own services, experiment with technology, and learn new skills. It's somewhere between a hobby and critical infrastructure.</p>
+            
+            <div class="warning-box">
+                <strong>⚡ START SMALL:</strong> Don't buy a rack full of servers day one. Start with a Raspberry Pi or an old laptop. Learn as you grow.
+            </div>
+        </div>
+
+        <div class="content-block">
+            <h3>Why Run a Homelab?</h3>
+            
+            <ul>
+                <li><strong>Learning:</strong> Hands-on experience with production tech</li>
+                <li><strong>Self-hosting:</strong> Own your data and services</li>
+                <li><strong>Cost savings:</strong> Replace subscriptions with owned hardware</li>
+                <li><strong>Privacy:</strong> Keep data on your hardware</li>
+                <li><strong>Control:</strong> No terms of service changes</li>
+                <li><strong>Fun:</strong> It's genuinely satisfying to run your own infrastructure</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Setting Goals</h3>
+            <p>Before buying gear, define what you want:</p>
+            
+            <ul>
+                <li><strong>Media server:</strong> Plex, Jellyfin, Emby</li>
+                <li><strong>Home automation:</strong> Home Assistant</li>
+                <li><strong>File storage:</strong> Nextcloud, NAS</li>
+                <li><strong>Development:</strong> CI/CD, git repos</li>
+                <li><strong>Learning:</strong> Kubernetes, networking</li>
+                <li><strong>Security camera:</strong> Frigate, ZoneMinder</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lessons" class="nav-button">← Back to Lessons</a>
+            <a href="#lesson2" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson2" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 02: Hardware Selection</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Budget Build ($100-300)</h3>
+            
+            <ul>
+                <li><strong>Raspberry Pi 4/5:</strong> $50-150, ARM, low power</li>
+                <li><strong>Old desktop PC:</strong> Often free from work/friends</li>
+                <li><strong>Intel NUC:</strong> $150-300 used, x86, efficient</li>
+                <li><strong>HP ProDesk/Genealogy:</strong> $100-200, enterprise-grade</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Mid-Range Build ($300-1000)</h3>
+            
+            <ul>
+                <li><strong>DIY Server:</strong> Custom build with Xeon/Celeron</li>
+                <li><strong>Refurbished enterprise:</strong> Dell PowerEdge, HP ProLiant</li>
+                <li><strong>Synology/Netgear:</strong> Pre-built NAS with expansion</li>
+                <li><strong>Multi-Pi cluster:</strong> Cluster of Raspberry Pis</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>High-End Build ($1000+)</h3>
+            
+            <ul>
+                <li><strong>Full-size rack server:</strong> 2U/4U with hot-swap</li>
+                <li><strong>Enterprise hardware:</strong> Full SAN, switches</li>
+                <li><strong>Ubiquiti UniFi:</strong> Professional networking gear</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Key Specs</h3>
+            
+            <ul>
+                <li><strong>RAM:</strong> More is better. 8GB minimum, 16GB+ for containers</li>
+                <li><strong>CPU:</strong> x86 preferred for virtualization. PassMark 5000+</li>
+                <li><strong>Storage:</strong> Start with 1-2TB, expand as needed</li>
+                <li><strong>Network:</strong> Gigabit minimum, 2.5Gb for NAS</li>
+                <li><strong>Power:</strong> Consider electricity costs. 24/7 = ~$10-20/month</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson1" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson3" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson3" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 03: Virtualization</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Why Virtualize?</h3>
+            <ul>
+                <li>Isolate services</li>
+                <li>Run different OSes on same hardware</li>
+                <li>Easy backup and recovery</li>
+                <li>Resource allocation</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Proxmox VE</h3>
+            <p>The homelab standard:</p>
+            
+            <ul>
+                <li>Debian-based, free</li>
+                <li>Full virtualization (KVM) + containers (LXC)</li>
+                <li>Web UI</li>
+                <li>Clustering support</li>
+            </ul>
+            
+            <pre class="code-block"># Install Proxmox:
+# Download ISO, boot from USB
+# Follow installer
+# Access via https://your-ip:8006</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Creating Your First VM</h3>
+            
+            <ol>
+                <li>Upload ISO to Proxmox storage</li>
+                <li>Create VM (Linux/Windows/Container)</li>
+                <li>Allocate CPU, RAM, disk</li>
+                <li>Start VM</li>
+                <li>Install OS</li>
+            </ol>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson2" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson4" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson4" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 04: Containerization</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Docker Basics</h3>
+            <pre class="code-block"># Install Docker
+curl -fsSL https://get.docker.com | sh
+
+# Run a container
+docker run -d --name nginx -p 80:80 nginx
+
+# List containers
+docker ps
+
+# Stop/Start
+docker stop nginx
+docker start nginx
+
+# View logs
+docker logs -f nginx</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Docker Compose</h3>
+            <pre class="code-block"># docker-compose.yml
+version: '3'
+services:
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:</pre>
+            
+            <pre class="code-block"># Run compose
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop
+docker-compose down</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Portainer</h3>
+            <pre class="code-block"># Install Portainer
+docker run -d -p 9000:9000 \
+    --name portainer \
+    --restart=unless-stopped \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v portainer_data:/data \
+    portainer/portainer-ce:latest</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson3" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson5" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson5" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 05: Networking Basics</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Network Segmentation</h3>
+            
+            <ul>
+                <li><strong>Default VLAN:</strong> Main network (devices)</li>
+                <li><strong>IoT VLAN:</strong> Smart devices (isolate from main)</li>
+                <li><strong>DMZ:</strong> Public-facing services</li>
+                <li><strong>Guest:</strong> Guest devices (no access to lab)</li>
+                <li><strong>Lab VLAN:</strong> Test/development</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>DNS Configuration</h3>
+            <pre class="code-block"># Pi-hole for local DNS
+# Services point to container IPs
+# Create A records in Pi-hole:
+#   homer Assistant -> 10.0.0.10
+#   plex -> 10.0.0.11
+#   nginx -> 10.0.0.12</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Reverse Proxy</h3>
+            <pre class="code-block"># Nginx Proxy Manager
+# docker-compose.yml
+version: '3'
+services:
+  nginx:
+    image: jc21/nginx-proxy-manager
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    restart: unless-stopped</pre>
+            
+            <p>Access via http://your-ip:81, then configure proxy hosts.</p>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson4" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson6" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson6" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 06: Storage Solutions</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Storage Options</h3>
+            
+            <ul>
+                <li><strong>Direct-attached:</strong> Disks in the server</li>
+                <li><strong>NAS:</strong> Network-attached storage</li>
+                <li><strong>SAN:</strong> Storage area network (advanced)</li>
+                <li><strong>Cloud:</strong> Backblaze, S3, etc.</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>TrueNAS Scale</h3>
+            
+            <ul>
+                <li>Free, open source</li>
+                <li>ZFS filesystem</li>
+                <li>Built-in virtualization</li>
+                <li>Apps (Docker)</li>
+                <li>Excellent for NAS use cases</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>OpenMediaVault</h3>
+            
+            <ul>
+                <li>Debian-based NAS</li>
+                <li>Simpler than TrueNAS</li>
+                <li>Plugin system</li>
+                <li>Good for basic NAS</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson5" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson7" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson7" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 07: Essential Services</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Media</h3>
+            <ul>
+                <li><strong>Jellyfin:</strong> Free media server</li>
+                <li><strong>Plex:</strong> Popular media server</li>
+                <li><strong>Sonarr/Radarr:</strong> Automated downloading</li>
+                <li><strong>qBittorrent:</strong> Torrent client</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Productivity</h3>
+            <ul>
+                <li><strong>Nextcloud:</strong> Google Drive alternative</li>
+                <li><strong>Paperless-NGX:</strong> Document management</li>
+                <li><strong>Wallabag:</strong> Read-it-later</li>
+                <li><strong>Bookstack:</strong> Wiki/documentation</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Home Automation</h3>
+            <ul>
+                <li><strong>Home Assistant:</strong> The standard</li>
+                <li><strong>ESPHome:</strong> DIY IoT devices</li>
+                <li><strong>Zigbee2MQTT:</strong> Zigbee bridge</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson6" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson8" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson8" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 08: Remote Access</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>VPN Access</h3>
+            
+            <ul>
+                <li><strong>WireGuard:</strong> Fast, modern (see WireGuard guide)</li>
+                <li><strong>Tailscale:</strong> WireGuard-based, easy setup</li>
+                <li><strong>OpenVPN:</strong> Classic, well-supported</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Tailscale</h3>
+            <pre class="code-block"># Install Tailscale
+curl -fsSL https://tailscale.com/install.sh | sh
+
+# Start Tailscale
+tailscale up
+
+# Now any device on your Tailscale network can access
+# services at their 100.x.x.x address</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Exposing Services Safely</h3>
+            
+            <ul>
+                <li><strong>Never expose Docker directly to internet</strong></li>
+                <li><strong>Use VPN for remote access</strong></li>
+                <li><strong>If must expose: use authentication</strong></li>
+                <li><strong>Cloudflare Tunnel is an option</strong></li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson7" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson9" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson9" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 09: Monitoring</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Monitoring Stack</h3>
+            
+            <ul>
+                <li><strong>Prometheus:</strong> Metrics collection</li>
+                <li><strong>Grafana:</strong> Visualization (see Grafana guide)</li>
+                <li><strong>Uptime Kuma:</strong> HTTP/port monitoring</li>
+                <li><strong>Glances:</strong> System monitoring</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Uptime Kuma</h3>
+            <pre class="code-block"># Docker Compose
+version: '3'
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "3001:3001"
+    restart: unless-stopped</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Node Exporter</h3>
+            <pre class="code-block"># Add to Prometheus for system metrics
+docker run -d \
+  --name node-exporter \
+  --restart unless-stopped \
+  -p 9100:9100 \
+  prom/node-exporter</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson8" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson10" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson10" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 10: Security Hardening</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Firewall Rules</h3>
+            <pre class="code-block"># UFW basics
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow ssh
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Fail2Ban</h3>
+            <pre class="code-block"># Install
+sudo apt install fail2ban
+
+# Enable for SSH
+# Edit /etc/fail2ban/jail.local
+[sshd]
+enabled = true
+port = ssh
+logpath = /var/log/auth.log
+maxretry = 3</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Security Checklist</h3>
+            
+            <ul>
+                <li>Change default passwords immediately</li>
+                <li>Enable firewall on all machines</li>
+                <li>Keep software updated</li>
+                <li>Use strong authentication</li>
+                <li>Regular backups</li>
+                <li>Don't expose management interfaces</li>
+                <li>Use VPN for remote access</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson9" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson11" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson11" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 11: Kubernetes at Home</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>K3s - Lightweight Kubernetes</h3>
+            <pre class="code-block"># Install K3s
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable=traefik" sh -
+
+# Check status
+kubectl get nodes
+kubectl get pods -A</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>MicroK8s</h3>
+            <pre class="code-block"># Install
+sudo snap install microk8s --classic
+
+# Enable addons
+microk8s enable dns dashboard storage
+
+# Use kubectl
+microk8s kubectl get nodes</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>When to Use K8s</h3>
+            <ul>
+                <li>Running many microservices</li>
+                <li>Learning Kubernetes</li>
+                <li>Want production-like experience</li>
+                <li>Overkill for 3-5 services</li>
+            </ul>
+            
+            <div class="warning-box">
+                <strong>⚡ START WITH DOCKER:</strong> Docker Compose is sufficient for most homelabs. Don't add Kubernetes complexity until you need it.
+            </div>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson10" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson12" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson12" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 12: Homelab Documentation</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Why Document?</h3>
+            <ul>
+                <li>Remember how things work</li>
+                <li>Recover after disasters</li>
+                <li>Share with family</li>
+                <li>Track changes</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>What to Document</h3>
+            
+            <ul>
+                <li><strong>Network diagram:</strong> IP addresses, VLANs, subnets</li>
+                <li><strong>Services:</strong> What's running where</li>
+                <li><strong>Credentials:</strong> Store securely (Bitwarden, 1Password)</li>
+                <li><strong>Backups:</strong> What's backed up, where</li>
+                <li><strong>Recovery procedures:</strong> How to restore each service</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Documentation Tools</h3>
+            
+            <ul>
+                <li><strong>Wiki.js:</strong> Self-hosted wiki</li>
+                <li><strong>Bookstack:</strong> Documentation platform</li>
+                <li><strong>Obsidian:</strong> Local-first knowledge base</li>
+                <li><strong>Draw.io:</strong> Network diagrams</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Conclusion</h3>
+            <p>You've completed the Homelab Mastery guide. You now know:</p>
+            
+            <ul>
+                <li>How to plan your homelab</li>
+                <li>Hardware selection for any budget</li>
+                <li>Virtualization with Proxmox</li>
+                <li>Containerization with Docker</li>
+                <li>Networking fundamentals</li>
+                <li>Storage solutions</li>
+                <li>Essential services to self-host</li>
+                <li>Remote access methods</li>
+                <li>Monitoring</li>
+                <li>Security hardening</li>
+                <li>Kubernetes basics</li>
+                <li>Documentation practices</li>
+            </ul>
+            
+            <p><strong>Start small, iterate, and enjoy the journey!</strong></p>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson11" class="nav-button">← Previous Lesson</a>
+            <a href="#lessons" class="nav-button">Back to Lessons ↑</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>// REBEL WITH LINUX - OWN YOUR INFRASTRUCTURE</p>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', function() {
+            var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            var scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-gpg.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPG - Encryption Mastery | REBEL WITH LINUX</title>
+    <meta name="description" content="Master GPG encryption. Learn key management, signing, encryption, and practical privacy.">
+    <meta name="keywords" content="GPG, PGP, encryption, privacy, security, GnuPG, cryptography, signing, key management">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        :root { --nav-color: #7d4698; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">GPG MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>ENCRYPTION<br>POWER</h1>
+        <p class="tagline">// Your keys. Your data. Your rules.</p>
+        
+        <div class="manifesto">
+            <p><strong>ENCRYPTION IS RESISTANCE.</strong></p>
+            <p>In a world where corporations and governments vie for access to your data, encryption is your shield. GPG (GNU Privacy Guard) is the gold standard for asymmetric encryption—a technology that gives you the power to communicate privately, sign documents cryptographically, and verify the authenticity of messages.</p>
+            <p><strong>NO MORE EXCUSES.</strong></p>
+            <p>"I have nothing to hide" is the argument of someone who doesn't understand privacy. Privacy isn't about hiding—it's about consent. You decide who sees your data. GPG makes that decision enforceable, even against sophisticated adversaries.</p>
+            <p><strong>LEARN THE TOOLS THAT MATTER.</strong></p>
+            <p>This guide covers everything from generating your first key pair to managing a web of trust. By the end, you'll encrypt emails, sign code commits, and verify signatures like a privacy professional.</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to Encryption Mastery</h2>
+            <p>12 lessons. Complete GPG control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to GPG</h3>
+                <p class="lesson-desc">What is GPG? Installing GnuPG and understanding cryptographic fundamentals.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Generating Keys</h3>
+                <p class="lesson-desc">Creating your first key pair. Algorithm choices and security considerations.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Key Management</h3>
+                <p class="lesson-desc">Listing, viewing, and managing your keys. Keyrings and key storage.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Encrypting Data</h3>
+                <p class="lesson-desc">Encrypting files and messages. Symmetric vs asymmetric encryption.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Decrypting Data</h3>
+                <p class="lesson-desc">Decrypting messages and files. Handling encrypted communications.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Digital Signatures</h3>
+                <p class="lesson-desc">Signing messages and files. Understanding signature types.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Verifying Signatures</h3>
+                <p class="lesson-desc">Verifying signatures. Trust models and signature verification.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Web of Trust</h3>
+                <p class="lesson-desc">Signing other keys. Keysigning parties and trust propagation.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Subkeys & Revocation</h3>
+                <p class="lesson-desc">Using subkeys for daily work. Creating and using revocation certificates.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Smart Cards</h3>
+                <p class="lesson-desc">Hardware tokens. YubiKey and OpenPGP cards for key protection.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Git Signing</h3>
+                <p class="lesson-desc">Signing Git commits and tags. Verified commits in GitHub/GitLab.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Email Encryption</h3>
+                <p class="lesson-desc">Setting up email with GPG. Thunderbird and webmail integration.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section id="lesson1" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 01: Introduction to GPG</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>What is GPG?</h3>
+            <p>GPG (GNU Privacy Guard, also called GnuPG or GPG) is a complete and free implementation of the OpenPGP standard. It allows you to encrypt and sign your data and communications, featuring a versatile key management system along with access modules for all kinds of public key directories.</p>
+            
+            <p>GPG is the backbone of private digital communication. It's used by journalists, activists, developers, and anyone who values their digital privacy. It's been battle-tested for over 20 years.</p>
+            
+            <div class="warning-box">
+                <strong>⚡ POWER MOVE:</strong> GPG is free software (GPL licensed). It's been audited, contributed to by security researchers worldwide, and is the closest thing to military-grade encryption you can use without special licenses.
+            </div>
+        </div>
+
+        <div class="content-block">
+            <h3>Symmetric vs Asymmetric Encryption</h3>
+            <p>Understanding the difference is crucial:</p>
+            
+            <h4>Symmetric Encryption</h4>
+            <p>Same key encrypts and decrypts. Like a physical lock with one key.</p>
+            <pre class="code-block"># Encrypt with password
+gpg --symmetric --armor message.txt
+
+# Decrypt with password
+gpg --decrypt message.txt.asc</pre>
+            
+            <h4>Asymmetric Encryption</h4>
+            <p>Two keys: public key encrypts, private key decrypts. Like a mailbox—anyone can drop mail in (encrypt with public key), but only the owner can retrieve it (decrypt with private key).</p>
+            <pre class="code-block"># Encrypt for recipient (using their public key)
+gpg --encrypt --armor --recipient alice@example.com message.txt
+
+# Decrypt (using your private key)
+gpg --decrypt message.txt.asc</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Installing GPG</h3>
+            
+            <h4>Linux</h4>
+            <pre class="code-block"># Debian/Ubuntu
+sudo apt install gnupg
+
+# Fedora
+sudo dnf install gnupg
+
+# Arch
+sudo pacman -S gnupg</pre>
+            
+            <h4>macOS</h4>
+            <pre class="code-block"># Via Homebrew
+brew install gnupg</pre>
+            
+            <h4>Windows</h4>
+            <pre class="code-block"># Download from https://www.gpg4win.org/</pre>
+            
+            <p>Verify your installation:</p>
+            <pre class="code-block">gpg --version</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Key Concepts</h3>
+            
+            <ul>
+                <li><strong>Private Key:</strong> Your secret key. NEVER share this. Used to decrypt and sign.</li>
+                <li><strong>Public Key:</strong> Share this freely. Others use it to encrypt messages for you.</li>
+                <li><strong>KeyID:</strong> Unique identifier for a key (e.g., 0x1234567890ABCDEF)</li>
+                <li><strong>Fingerprint:</strong> SHA-1 hash of the key. Most secure way to identify keys.</li>
+                <li><strong>Passphrase:</strong> Password protecting your private key.</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lessons" class="nav-button">← Back to Lessons</a>
+            <a href="#lesson2" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson2" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 02: Generating Keys</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Generating Your First Key Pair</h3>
+            <pre class="code-block">gpg --full-generate-key</pre>
+            
+            <p>You'll be prompted through an interactive wizard:</p>
+            
+            <ol>
+                <li><strong>Key type:</strong> RSA and RSA (default)</li>
+                <li><strong>Key size:</strong> 4096 (maximum security)</li>
+                <li><strong>Expiration:</strong> 1-2 years (you can extend later)</li>
+                <li><strong>Name:</strong> Your real name</li>
+                <li><strong>Email:</strong> Your email address</li>
+                <li><strong>Passphrase:</strong> Strong password to protect your private key</li>
+            </ol>
+            
+            <div class="warning-box">
+                <strong>⚡ CRITICAL:</strong> Use a strong passphrase! This is your last line of defense if your machine is compromised. Also, generate a revocation certificate NOW (we'll cover this later).
+            </div>
+        </div>
+
+        <div class="content-block">
+            <h3>Key Algorithm Choices</h3>
+            
+            <h4>RSA vs DSA/ElGamal</h4>
+            <ul>
+                <li><strong>RSA:</strong> Recommended. Works for both signing and encryption.</li>
+                <li><strong>DSA:</strong> Signing only (legacy).</li>
+                <li><strong>ElGamal:</strong> Encryption only (legacy).</li>
+            </ul>
+            
+            <h4>Key Sizes</h4>
+            <ul>
+                <li><strong>2048 bits:</strong> Minimum acceptable</li>
+                <li><strong>3072 bits:</strong> Good balance</li>
+                <li><strong>4096 bits:</strong> Maximum security (slower)</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Expiration</h3>
+            <p>Key expiration is a safety feature:</p>
+            
+            <ul>
+                <li><strong>Short expiration (1 year):</strong> Recommended for most users</li>
+                <li><strong>Longer (2-3 years):</strong> If you're lazy about key rotation</li>
+                <li><strong>Never:</strong> NOT recommended—you lose ability to force key retirement</li>
+            </ul>
+            
+            <p>You can always extend expiration later without regenerating keys.</p>
+        </div>
+
+        <div class="content-block">
+            <h3>Generating a Revocation Certificate</h3>
+            <p>Do this IMMEDIATELY after creating your key:</p>
+            
+            <pre class="code-block"># Replace with your key ID or email
+gpg --output revocation_cert.asc --gen-revoke your@email.com
+
+# Store this securely (USB drive in safe, print paper copy)
+# You need this if you:
+# - Lose your private key
+# - Forget your passphrase
+# - Want to retire the key</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson1" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson3" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson3" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 03: Key Management</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Listing Keys</h3>
+            
+            <pre class="code-block"># List your secret keys (private keys you own)
+gpg --list-secret-keys
+
+# List your public keys
+gpg --list-keys
+
+# List all keys with fingerprints
+gpg --fingerprint</pre>
+            
+            <p>Output shows KeyID, creation date, and User ID (name + email).</p>
+        </div>
+
+        <div class="content-block">
+            <h3>Exporting Keys</h3>
+            
+            <pre class="code-block"># Export your public key to share
+gpg --armor --export your@email.com > my_public_key.asc
+
+# Export secret key (backup)
+gpg --armor --export-secret-keys your@email.com > my_secret_key.asc
+
+# Export with specific key ID
+gpg --armor --export 0x1234567890ABCDEF > public_key.asc</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Importing Keys</h3>
+            
+            <pre class="code-block"># Import a public key
+gpg --import friend_public_key.asc
+
+# Import a secret key (for migration/backup)
+gpg --import my_secret_key.asc
+
+# Import from keyserver
+gpg --keyserver keyserver.ubuntu.com --search-keys friend@email.com
+gpg --keyserver keyserver.ubuntu.com --recv-keys 0x1234567890ABCDEF</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Key Servers</h3>
+            <p>Public keys are distributed via key servers:</p>
+            
+            <pre class="code-block"># Upload your public key
+gpg --keyserver keyserver.ubuntu.com --send-keys 0xYOURKEYID
+
+# Search for a key
+gpg --keyserver keyserver.ubuntu.com --search-keys "John Doe"
+
+# Refresh (download latest versions)
+gpg --refresh-keys</pre>
+            
+            <div class="warning-box">
+                <strong>⚡ NOTE:</strong> Keys uploaded to key servers CANNOT be deleted. They can only be revoked. Think before publishing.
+            </div>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson2" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson4" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson4" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 04: Encrypting Data</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Symmetric Encryption</h3>
+            <p>Encrypt with a password (no key pair needed):</p>
+            
+            <pre class="code-block"># Encrypt file
+gpg --symmetric --armor secret.txt
+
+# Output: secret.txt.asc
+
+# Or with specific algorithm
+gpg --symmetric --cipher-algo AES256 --armor secret.txt</pre>
+            
+            <p>The output is ASCII-armored (readable text), suitable for email.</p>
+        </div>
+
+        <div class="content-block">
+            <h3>Asymmetric Encryption</h3>
+            <p>Encrypt for a specific recipient (using their public key):</p>
+            
+            <pre class="code-block"># Encrypt for recipient
+gpg --encrypt --armor --recipient friend@example.com secret.txt
+
+# Encrypt for multiple recipients
+gpg --encrypt --armor \
+    --recipient alice@example.com \
+    --recipient bob@example.com \
+    secret.txt
+
+# Encrypt and sign (proves you sent it)
+gpg --encrypt --sign --armor --recipient friend@example.com secret.txt</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Encryption Options</h3>
+            
+            <pre class="code-block"># Compression (default - recommended)
+gpg --compress-keys ...   # Don't compress keys separately
+gpg --compress-sigs ...   # Don't compress signatures separately
+
+# Algorithm selection
+gpg --cipher-algo AES256 ...   # Strongest
+gpg --cipher-algo CAMELLIA256 ...
+
+# Batch encryption
+gPG --encrypt-files --recipient friend@email.com *.txt</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Encrypting Directories</h3>
+            <pre class="code-block"># Tar first, then encrypt
+tar czf - mydirectory/ | gpg --symmetric --armor -o mydirectory.tar.gz.asc
+
+# Or use tar with gpg
+tar -czf - mydirectory | gpg --encrypt --recipient friend@email.com -o mydirectory.tar.gz.gpg</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson3" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson5" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson5" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 05: Decrypting Data</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Basic Decryption</h3>
+            
+            <pre class="code-block"># Decrypt a file (will prompt for passphrase if needed)
+gpg --decrypt secret.txt.asc
+
+# Decrypt to specific file
+gpg --decrypt secret.txt.asc --output decrypted.txt
+
+# Decrypt symmetric-encrypted file
+gpg --decrypt secret.txt.asc</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Decryption in Practice</h3>
+            
+            <pre class="code-block"># Decrypt and view directly
+gpg --decrypt message.txt.asc 2>/dev/null | less
+
+# Decrypt tar archive
+gpg --decrypt backup.tar.gz.asc | tar tzf -
+
+# Decrypt and extract
+gpg --decrypt backup.tar.gz.asc | tar xzf -</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Agent & Caching</h3>
+            <p>gpg-agent caches your passphrase:</p>
+            
+            <pre class="code-block"># Default cache: 10 minutes
+# Configure in ~/.gnupg/gpg-agent.conf
+
+# Clear cache
+echo RELOADAGENT | gpg-connect-agent
+
+# View cache settings
+gpg-agent --daemon
+gpg-agent --use-standard-socket</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson4" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson6" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson6" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 06: Digital Signatures</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Why Sign?</h3>
+            <p>Digital signatures prove:</p>
+            <ul>
+                <li><strong>Authenticity:</strong> The message really came from you</li>
+                <li><strong>Integrity:</strong> The message wasn't modified</li>
+                <li><strong>Non-repudiation:</strong> You can't deny signing it</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Signing Files</h3>
+            
+            <pre class="code-block"># Create separate signature file
+gpg --sign document.txt
+# Output: document.txt.gpg (binary)
+
+# ASCII-armored signature
+gpg --armor --sign document.txt
+# Output: document.txt.asc
+
+# Clearsign (message + signature in one readable file)
+gpg --clearsign message.txt
+# Output: message.txt.asc
+
+# Detached signature (separate file)
+gpg --armor --detach-sign document.txt
+# Output: document.txt.sig</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Default Key Selection</h3>
+            <pre class="code-block"># Sign with specific key
+gpg --local-user 0xKEYID --sign document.txt
+
+# Set default key in ~/.gnupg/gpg.conf
+default-key 0xYOURKEYID
+
+# Or use GPG_KEY environment variable
+GPG_KEY=0xYOURKEYID gpg --sign document.txt</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson5" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson7" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson7" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 07: Verifying Signatures</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Verification Basics</h3>
+            
+            <pre class="code-block"># Verify signed file (includes original)
+gpg --verify document.txt.gpg
+
+# Verify clearsigned file
+gpg --verify message.txt.asc
+
+# Verify detached signature
+gpg --verify document.txt.sig document.txt</pre>
+            
+            <p>Good signature output:</p>
+            <pre class="code-block">gpg: Signature made Mon Jan 15 10:30:00 2024
+gpg:                using RSA key 0x1234567890ABCDEF
+gpg: Good signature from "John Doe <john@example.com>"</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Understanding Trust</h3>
+            <p>After verification, GPG tells you:</p>
+            <ul>
+                <li><strong>Good signature:</strong> Cryptographically valid, from the claimed key</li>
+                <li><strong>Bad signature:</strong> Data was modified or key is fake</li>
+                <li><strong>Valid but untrusted:</strong> Signature is valid but you haven't verified the key</li>
+            </ul>
+        </div>
+
+        <div name="content-block">
+            <h3>Practice: Verify Software Downloads</h3>
+            <pre class="code-block"># Download software + signature
+wget https://example.com/software.tar.gz
+wget https://example.com/software.tar.gz.sig
+
+# Import developer's key (do this once)
+gpg --keyserver keyserver.ubuntu.com --recv-keys 0xDEADBEEF
+
+# Verify
+gpg --verify software.tar.gz.sig software.tar.gz</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson6" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson8" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson8" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 08: Web of Trust</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Trust Model</h3>
+            <p>GPG uses a "web of trust" instead of central authorities:</p>
+            
+            <ul>
+                <li><strong>Ultimate:</strong> Your own keys (you trust yourself)</li>
+                <li><strong>Full trust:</strong> You trust this person to verify keys properly</li>
+                <li><strong>Marginal trust:</strong> You trust this person somewhat</li>
+                <li><strong>Untrusted:</strong> You don't trust this person's verifications</li>
+                <li><strong>Unknown:</strong> No trust assignment</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Signing Other Keys</h3>
+            
+            <pre class="code-block"># Sign someone's public key (after verifying their identity!)
+gpg --sign-key friend@example.com
+
+# Limited signature (won't be uploaded by default)
+gpg --sign-key --local-user 0xYOURKEYID friend@example.com
+
+# Export the signature to give to them
+gpg --export-options export-minimal --export friend@example.com > friend_key.asc</pre>
+            
+            <div class="warning-box">
+                <strong>⚡ CRITICAL:</strong> Only sign a key after you've verified the person's identity! Check their passport/ID. A signature means "I verified this is the real person."
+            </div>
+        </div>
+
+        <div class="content-block">
+            <h3>Keysigning Parties</h3>
+            <p>In-person events where people verify each other's identities and sign keys:</p>
+            
+            <ol>
+                <li>Generate your key and print the fingerprint</li>
+                <li>Bring ID (passport, driver's license)</li>
+                <li>Meet others, verify their identity</li>
+                <li>Sign each other's keys</li>
+                <li>Upload signatures to keyserver</li>
+            </ol>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson7" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson9" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson9" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 09: Subkeys & Revocation</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Why Subkeys?</h3>
+            <p>Subkeys separate your signing/encryption capabilities from your master key:</p>
+            
+            <ul>
+                <li>Use subkeys for daily work</li>
+                <li>Keep master key offline (or on USB)</li>
+                <li>If subkey is compromised, revoke only the subkey</li>
+                <li>Keep your identity intact</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Creating Subkeys</h3>
+            
+            <pre class="code-block"># Edit your key
+gpg --edit-key your@email.com
+
+# At gpg> prompt:
+gpg> addkey
+# Choose: RSA (sign only) or RSA (encrypt only)
+# Choose size: 4096
+# Set expiration
+# Save: save
+
+# List subkeys
+gpg> list</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Revocation Certificates</h3>
+            <p>You MUST create this when you create your key:</p>
+            
+            <pre class="code-block"># Create revocation certificate
+gpg --output revocation.asc --gen-revoke your@email.com
+
+# To use it later:
+gpg --import revocation.asc
+gpg --send-keys YOURKEYID</pre>
+            
+            <p>Reasons for revocation:</p>
+            <ul>
+                <li>Key compromised</li>
+                <li>Passphrase forgotten</li>
+                <li>Key superseded</li>
+                <li>No longer used</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson8" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson10" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson10" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 10: Smart Cards</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Hardware Tokens</h3>
+            <p>Smart cards/hardware tokens keep your private keys physically secure:</p>
+            
+            <ul>
+                <li><strong>YubiKey:</strong> Popular, multi-purpose</li>
+                <li><strong>OpenPGP Card:</strong> Dedicated GPG card</li>
+                <li><strong>Librem Key:</strong> Privacy-focused</li>
+            </ul>
+            
+            <p>Keys never leave the device. Even if your computer is compromised, attacker can't get your keys.</p>
+        </div>
+
+        <div class="content-block">
+            <h3>YubiKey Setup</h3>
+            
+            <pre class="code-block"># Install required software
+sudo apt install libusb-1.0-0 libpcsclite1 libccid pcscd
+
+# Check if YubiKey is detected
+gpg --card-status</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Generating Keys on Card</h3>
+            
+            <pre class="code-block">gpg --edit-card
+
+# At gpg> prompt:
+gpg> admin
+
+# Generate new key on card
+gpg> generate
+
+# Or move existing key to card
+gpg> key 1
+gpg> keytocard</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson9" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson11" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson11" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 11: Git Signing</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Why Sign Commits?</h3>
+            <p>Signed commits prove:</p>
+            <ul>
+                <li>You really authored the commit</li>
+                <li>Code wasn't tampered with</li>
+                <li>Verified badges on GitHub/GitLab</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Configure Git to Use GPG</h3>
+            
+            <pre class="code-block"># Tell Git your key
+git config --global user.signingkey 0xYOURKEYID
+
+# Default to signing commits
+git config --global commit.gpgsign true
+
+# Default to signing tags
+git config --global tag.gpgsign true
+
+# Use GPG program
+git config --global gpg.program gpg</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Signing in Practice</h3>
+            
+            <pre class="code-block"># Sign a commit
+git commit -S -m "My signed commit"
+
+# Sign a tag
+git tag -s v1.0 -m "My signed tag"
+
+# Push signed commits
+git push
+
+# On GitHub: Look for "Verified" badge</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Github/GitLab Integration</h3>
+            
+            <h4>GitHub</h4>
+            <ol>
+                <li>Add GPG key to GitHub: Settings > SSH and GPG keys > New GPG key</li>
+                <li>Export: gpg --armor --export your@email.com</li>
+                <li>Commits show "Verified" badge</li>
+            </ol>
+            
+            <h4>GitLab</h4>
+            <ol>
+                <li>Add GPG key to GitLab: Settings > GPG Keys</li>
+                <li>Export your public key</li>
+                <li>Paste and add</li>
+            </ol>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson10" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson12" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson12" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 12: Email Encryption</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Email Encryption Options</h3>
+            
+            <ul>
+                <li><strong>Thunderbird + Enigmail:</strong> Classic, well-supported</li>
+                <li><strong>Mailvelope:</strong> Webmail (Gmail, Outlook, etc.)</li>
+                <li><strong>ProtonMail:</strong> Built-in encryption</li>
+                <li><strong>FlowCrypt:</strong> Browser extension for Gmail</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Thunderbird Setup</h3>
+            
+            <ol>
+                <li>Download Thunderbird</li>
+                <li>Add your email account</li>
+                <li>Install Enigmail extension</li>
+                <li>Run Enigmail Setup Wizard</li>
+                <li>It will find or create your keys</li>
+            </ol>
+            
+            <pre class="code-block"># In Enigmail:
+# - OpenPGP > Key Management
+# - You can generate new keys or import existing
+# - Enable encryption by default in Preferences</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Mailvelope for Webmail</h3>
+            
+            <ol>
+                <li>Install Mailvelope browser extension</li>
+                <li>Click Mailvelope icon in email</li>
+                <li>Add your private key (or generate)</li>
+                <li>Import contacts' public keys</li>
+                <li>Encrypt/decrypt directly in webmail</li>
+            </ol>
+        </div>
+
+        <div class="content-block">
+            <h3>Key Distribution for Email</h3>
+            
+            <pre class="code-block"># Option 1: Keyserver
+gpg --keyserver keyserver.ubuntu.com --send-keys YOURKEY
+
+# Option 2: Attach to email signature
+# Add to email signature:
+# -----BEGIN PGP PUBLIC KEY BLOCK-----
+# [your public key]
+# -----END PGP PUBLIC KEY BLOCK-----
+
+# Option 3: Personal website
+# Host your key at https://yourdomain.com/key.asc</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Conclusion</h3>
+            <p>You've completed the GPG mastery guide. You now know how to:</p>
+            
+            <ul>
+                <li>Generate secure key pairs</li>
+                <li>Manage keys and keyrings</li>
+                <li>Encrypt and decrypt files</li>
+                <li>Sign and verify messages</li>
+                <li>Build and navigate the web of trust</li>
+                <li>Use subkeys for security</li>
+                <li>Protect keys with hardware tokens</li>
+                <li>Sign Git commits</li>
+                <li>Set up email encryption</li>
+            </ul>
+            
+            <p><strong>Remember:</strong></p>
+            <ul>
+                <li>NEVER share your private key</li>
+                <li>ALWAYS verify keys before signing</li>
+                <li>KEEP your revocation certificate safe</li>
+                <li>USE strong passphrases</li>
+                <li>BACKUP your keys securely</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson11" class="nav-button">← Previous Lesson</a>
+            <a href="#lessons" class="nav-button">Back to Lessons ↑</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>// REBEL WITH LINUX - ENCRYPT EVERYTHING</p>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', function() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+    </script>
+</body>
+</html>

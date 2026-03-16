@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-backups.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backups - Data Protection Mastery | REBEL WITH LINUX</title>
+    <meta name="description" content="Master backup strategies. Learn 3-2-1 rule, rsync, Borg, Restic, and disaster recovery.">
+    <meta name="keywords" content="backups, data protection, rsync, borg, restic, disaster recovery, backup strategy, raid">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <style>
+        :root { --nav-color: #2e7d32; }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">BACKUP MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>DATA<br>PROTECTION</h1>
+        <p class="tagline">// Sleep better. Restore easier.</p>
+        
+        <div class="manifesto">
+            <p><strong>DATA IS CHEAP. DATA LOSS IS EXPENSIVE.</strong></p>
+            <p>Every year, people lose irreplaceable photos, important documents, and years of work to hardware failures, theft, ransomware, or simple mistakes. The sad truth: most people don't back up until they've already lost data.</p>
+            <p><strong>BACKUP ONCE, RESTORE CONFIDENTLY.</strong></p>
+            <p>A proper backup strategy isn't about being paranoid—it's about being prepared. The 3-2-1 rule (3 copies, 2 media types, 1 offsite) has saved countless people from disaster. This guide will help you implement it.</p>
+            <p><strong>AUTOMATE OR FORGET.</strong></p>
+            <p>Manual backups don't work. You need automated systems that run reliably without your intervention. We'll cover tools and strategies that make backup as painless as possible.</p>
+        </div>
+
+        <a href="#lessons" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="lessons">
+        <div class="section-header">
+            <h2>// The Path to Backup Mastery</h2>
+            <p>12 lessons. Complete backup control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Backup Fundamentals</h3>
+                <p class="lesson-desc">The 3-2-1 rule. Types of backups. Full, incremental, differential.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Assessing Your Data</h3>
+                <p class="lesson-desc">What to back up. Prioritizing data by importance.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Local Backups with Rsync</h3>
+                <p class="lesson-desc">Rsync basics. Hard links. Local backup strategies.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Borg Backup</h3>
+                <p class="lesson-desc">Deduplication, compression, encryption. Borg basics and config.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Restic Backup</h3>
+                <p class="lesson-desc">Repository model. Retention policies. Multiple backends.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Offsite & Cloud Backups</h3>
+                <p class="lesson-desc">Backblaze, rsync.net, cloud sync. Getting data off-site.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">RAID vs Backups</h3>
+                <p class="lesson-desc">Understanding RAID levels. When RAID fails. RAID is not backup.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">System Imaging</h3>
+                <p class="lesson-desc">Full system backup. Clonezilla, Timeshift, system restore.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Database Backups</h3>
+                <p class="lesson-desc">MySQL, PostgreSQL, MongoDB. Point-in-time recovery.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Testing Restores</h3>
+                <p class="lesson-desc">Verifying backups work. Regular restore testing. Documentation.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Backup Monitoring</h3>
+                <p class="lesson-desc">Alerting on failures. Verification scripts. Status reporting.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Disaster Recovery</h3>
+                <p class="lesson-desc">Planning for the worst. DR procedures. Business continuity.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section id="lesson1" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 01: Backup Fundamentals</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>The 3-2-1 Rule</h3>
+            <p>The gold standard of backup strategy:</p>
+            
+            <ul>
+                <li><strong>3 copies</strong> of your data</li>
+                <li><strong>2 different media types</strong> (e.g., external drive + cloud)</li>
+                <li><strong>1 offsite copy</strong> (in a different physical location)</li>
+            </ul>
+            
+            <div class="warning-box">
+                <strong>⚡ POWER MOVE:</strong> If you have only one backup, you have zero backups. Single points of failure will fail.
+            </div>
+        </div>
+
+        <div class="content-block">
+            <h3>Types of Backups</h3>
+            
+            <ul>
+                <li><strong>Full:</strong> Complete copy of all data. Slowest to create, fastest to restore.</li>
+                <li><strong>Incremental:</strong> Only changes since last backup. Fastest to create, slowest to restore (need chain).</li>
+                <li><strong>Differential:</strong> Changes since last full backup. Balanced approach.</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Backup Rotation Schemes</h3>
+            
+            <ul>
+                <li><strong>Grandfather-Father-Son:</strong> Daily (son), weekly (father), monthly (grandfather)</li>
+                <li><strong>Tower of Hanoi:</strong> Complex rotation based on mathematical pattern</li>
+                <li><strong>Keep N Days:</strong> Keep daily for N days, then delete</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lessons" class="nav-button">← Back to Lessons</a>
+            <a href="#lesson2" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson2" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 02: Assessing Your Data</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>What to Back Up</h3>
+            <p>Categorize your data by importance:</p>
+            
+            <h4>Critical (Daily Backup)</h4>
+            <ul>
+                <li>Documents (work, personal)</li>
+                <li>Photos and videos</li>
+                <li>Source code</li>
+                <li>Financial records</li>
+                <li>Password databases</li>
+            </ul>
+            
+            <h4>Important (Weekly Backup)</h4>
+            <ul>
+                <li>Music collection</li>
+                <li>Downloads</li>
+                <li>Application data</li>
+            </ul>
+            
+            <h4>Replaceable (As Needed)</h4>
+            <ul>
+                <li>Applications (can reinstall)</li>
+                <li>Operating system files</li>
+                <li>Temporary files</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Calculate Your Data Footprint</h3>
+            <pre class="code-block"># Find largest directories
+du -sh /* 2>/dev/null | sort -hr | head -20
+
+# Find large files
+find /home -type f -size +100M -exec ls -lh {} \;
+
+# Count files by type
+find /home -type f | wc -l</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson1" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson3" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson3" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 03: Local Backups with Rsync</h2>
+            <span class="badge badge-beginner">Beginner</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Rsync Basics</h3>
+            <pre class="code-block"># Basic rsync syntax
+rsync -av /source/ /destination/
+
+# Key options:
+# -a: archive mode (preserves permissions, timestamps, etc.)
+# -v: verbose
+# -h: human-readable sizes
+# -n: dry run (don't actually copy)
+# --delete: delete files in dest that don't exist in source
+# --exclude: exclude patterns</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Hard Link Backups</h3>
+            <p>Use rsync with --link-dest for efficient versioning:</p>
+            
+            <pre class="code-block">#!/bin/bash
+# daily-backup.sh
+SOURCE="/home/"
+DEST="/backup/"
+LINK_DEST="$DEST/$(ls -td $DEST/backup-* | head -1)/"
+
+rsync -avh --delete \
+    --link-dest="$LINK_DEST" \
+    "$SOURCE" "$DEST/backup-$(date +%Y-%m-%d)/"</pre>
+            
+            <p>This creates daily snapshots that only store changed files. Unchanged files are hard-linked.</p>
+        </div>
+
+        <div class="content-block">
+            <h3>Simple Backup Script</h3>
+            <pre class="code-block">#!/bin/bash
+# backup-home.sh
+BACKUP_DIR="/media/backup/backup-$(date +%Y%m%d)"
+
+mkdir -p "$BACKUP_DIR"
+
+rsync -av \
+    --exclude='.cache' \
+    --exclude='.local/share/Trash' \
+    --delete \
+    /home/ "$BACKUP_DIR/"
+
+echo "Backup complete: $BACKUP_DIR"</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson2" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson4" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson4" class="lesson-content">
+        <div class="lesson-header">
+            <h2: LESSON 04: Borg Backup</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Why Borg?</h3>
+            <ul>
+                <li><strong>Deduplication:</strong> Only stores unique data chunks</li>
+                <li><strong>Compression:</strong> Built-in compression</li>
+                <li><strong>Encryption:</strong> Client-side encryption</li>
+                <li><strong>Backup mount:</strong> Mount backups as filesystems</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Installing Borg</h3>
+            <pre class="code-block"># Debian/Ubuntu
+sudo apt install borgbackup
+
+# macOS
+brew install borgbackup</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Borg Basic Usage</h3>
+            <pre class="code-block"># Initialize repository (with encryption)
+borg init --encryption=repokey /backup/borg-repo
+
+# Create backup
+borg create /backup/borg-repo::backup-{now} /home
+
+# List backups
+borg list /backup/borg-repo
+
+# Mount backup
+borg mount /backup/borg-repo::backup-2024-01-15 /mnt/restore
+
+# Restore
+borg extract /backup/borg-repo::backup-2024-01-15 --destination /restore</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Borg Automation</h3>
+            <pre class="code-block">#!/bin/bash
+# borg-backup.sh
+export BORG_PASSPHRASE='your-passphrase'
+
+borg create \
+    --compression lz4 \
+    --exclude '*/.cache' \
+    /backup/borg-repo::daily-{now} \
+    /home
+
+# Prune old backups
+borg prune \
+    --keep-daily=7 \
+    --keep-weekly=4 \
+    --keep-monthly=12 \
+    /backup/borg-repo</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson3" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson5" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson5" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 05: Restic Backup</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Why Restic?</h3>
+            <ul>
+                <li>Simple, clean CLI</li>
+                <li>Multiple backends (local, S3, B2, SFTP, etc.)</li>
+                <li>Encryption by default</li>
+                <li>Deduplication</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Restic Setup</h3>
+            <pre class="code-block"># Install
+sudo apt install restic
+
+# Initialize repository
+restic init --repo /backup/restic
+
+# Or with password file
+restic init --repo /backup/restic --password-file /etc/restic/password</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Restic Commands</h3>
+            <pre class="code-block"># Backup
+restic -r /backup/restic backup /home
+
+# List snapshots
+restic -r /backup/restic snapshots
+
+# Restore latest snapshot
+restic -r /backup/restic restore latest --target /restore
+
+# Check repository integrity
+restic -r /backup/restic check
+
+# Remove old snapshots
+restic -r /backup/restic forget --keep-daily 7 --keep-weekly 4 --prune</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Restic with Cloud Backends</h3>
+            <pre class="code-block"># Backblaze B2
+export B2_ACCOUNT_ID=your-id
+export B2_ACCOUNT_KEY=your-key
+restic -r b2:bucket-name:/path backup /home
+
+# S3
+restic -r s3:https://s3.amazonaws.com/bucket-name backup /home</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson4" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson6" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson6" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 06: Offsite & Cloud Backups</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Why Offsite Matters</h3>
+            <p>Local backups protect against:</p>
+            <ul>
+                <li>Hardware failure</li>
+                <li>Accidental deletion</li>
+                <li>Ransomware (if disconnected)</li>
+            </ul>
+            
+            <p>Offsite backups additionally protect against:</p>
+            <ul>
+                <li>Theft</li>
+                <li>Fire/flood/disaster</li>
+                <li>Building destruction</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Cloud Backup Services</h3>
+            
+            <ul>
+                <li><strong>Backblaze B2:</strong> $6/TB/month, excellent for backups</li>
+                <li><strong>rsync.net:</strong> rsync-friendly, good for Borg/Restic</li>
+                <li><strong>Wasabi:</strong> $6/TB/month, no egress fees</li>
+                <li><strong>AWS S3:</strong> More expensive, very reliable</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Encrypted Sync</h3>
+            <pre class="code-block"># rsync to remote (over SSH)
+rsync -avz -e ssh /local/backup/ user@remote:/backup/
+
+# Use rclone for cloud sync
+restic -r s3:backblaze:bucket-name backup /home
+
+# rclone sync
+rclone sync /local/ encrypted-remote:backup -v</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson5" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson7" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson7" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 07: RAID vs Backups</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Understanding RAID</h3>
+            <ul>
+                <li><strong>RAID 0:</strong> Striping (fast, no redundancy)</li>
+                <li><strong>RAID 1:</strong> Mirroring (exact copy)</li>
+                <li><strong>RAID 5:</strong> Striping + parity (1 drive failure tolerance)</li>
+                <li><strong>RAID 6:</strong> Double parity (2 drive failures)</li>
+                <li><strong>RAID 10:</strong> Mirrored + striped</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>RAID is NOT Backup</h3>
+            
+            <div class="warning-box">
+                <strong>⚡ CRITICAL:</strong> RAID protects against drive failure, but NOT against: accidental deletion, corruption, ransomware, theft, disaster.
+            </div>
+            
+            <ul>
+                <li>RAID 1: If you delete a file, it's gone on both drives instantly</li>
+                <li>RAID: Doesn't protect against controller failure</li>
+                <li>RAID: Doesn't help if malware encrypts your data</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>When to Use RAID</h3>
+            <ul>
+                <li>Uptime is critical (no rebuild time)</li>
+                <li>Large datasets with frequent reads</li>
+                <li>Combined with backups (RAID + backup = complete protection)</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson6" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson8" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson8" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 08: System Imaging</h2>
+            <span class="badge badge-intermediate">Intermediate</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>When to Image</h3>
+            <ul>
+                <li>After fresh OS installation</li>
+                <li>Before major system changes</li>
+                <li>After system is working perfectly</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Clonezilla</h3>
+            <pre class="code-block"># Clonezilla live or installed
+# Can clone:
+# - Disk to disk
+# - Partition to partition
+# - Disk to image
+# - Image to disk
+
+# Command line example:
+sudo clonezilla -c -e1 -j2 -md -r -fsck -p choose savedisk example_image sda</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Timeshift (Linux)</h3>
+            <pre class="code-block"># Install
+sudo apt install timeshift
+
+# Create snapshot via CLI
+sudo timeshift --create --comments "Before upgrade" --tags D
+
+# List snapshots
+sudo timeshift --list
+
+# Restore
+sudo timeshift --restore --snapshot '2024-01-15_10-00'</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson7" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson9" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson9" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 09: Database Backups</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>MySQL/MariaDB</h3>
+            <pre class="code-block"># Single database
+mysqldump -u root -p dbname > dbname.sql
+
+# All databases
+mysqldump -u root -p --all-databases > alldbs.sql
+
+# With compression
+mysqldump -u root -p dbname | gzip > dbname.sql.gz
+
+# Restore
+mysql -u root -p dbname < dbname.sql</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>PostgreSQL</h3>
+            <pre class="code-block"># Single database
+pg_dump -U postgres dbname > dbname.sql
+
+# All databases
+pg_dumpall -U postgres > all_databases.sql
+
+# Custom format (for point-in-time recovery)
+pg_dump -U postgres -Fc dbname > dbname.dump
+
+# Restore
+pg_restore -U postgres -d dbname dbname.dump</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>MongoDB</h3>
+            <pre class="code-block"># Single database
+mongodump --db dbname --out /backup/
+
+# With authentication
+mongodump --db dbname --out /backup/ -u user -p
+
+# Restore
+mongorestore /backup/</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson8" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson10" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson10" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 10: Testing Restores</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Why Testing Matters</h3>
+            <p>A backup you can't restore is useless. Test regularly:</p>
+            <ul>
+                <li>Verify backup integrity</li>
+                <li>Ensure you can actually restore</li>
+                <li>Know how long restore takes</li>
+                <li>Find problems before you need to restore</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>Verification Scripts</h3>
+            <pre class="code-block">#!/bin/bash
+# verify-backup.sh
+
+# Test Borg backup
+borg check /backup/borg-repo
+
+# Test Restic backup
+restic -r /backup/restic check
+
+# Test file backup
+rsync -avn --checksum /source/ /backup/test-restore/</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Document Your Restore Process</h3>
+            <ul>
+                <li>Write step-by-step restore instructions</li>
+                <li>Include all commands</li>
+                <li>Note any dependencies</li>
+                <li>Test periodically</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson9" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson11" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson11" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 11: Backup Monitoring</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Monitoring Basics</h3>
+            <pre class="code-block"># Check last backup time
+ls -la /backup/ | tail -5
+
+# Check backup size change
+du -sh /backup/*
+
+# Log backup completion
+echo "$(date): Backup complete" >> /var/log/backup.log</pre>
+        </div>
+
+        <div class="content-block">
+            <h3>Alerting on Failure</h3>
+            <pre class="code-block">#!/bin/bash
+# backup-with-alert.sh
+LOGFILE=/var/log/backup.log
+
+if borg create /backup/repo::backup-{now} /data 2>> $LOGFILE; then
+    echo "$(date): Backup succeeded" | tee -a $LOGFILE
+else
+    echo "$(date): Backup FAILED" | tee -a $LOGFILE
+    # Send alert
+    curl -s -X POST https://notify.example.com/webhook -d "message=Backup failed!"
+fi</pre>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson10" class="nav-button">← Previous Lesson</a>
+            <a href="#lesson12" class="nav-button">Next Lesson →</a>
+        </div>
+    </section>
+
+    <section id="lesson12" class="lesson-content">
+        <div class="lesson-header">
+            <h2>LESSON 12: Disaster Recovery</h2>
+            <span class="badge badge-advanced">Advanced</span>
+        </div>
+        
+        <div class="content-block">
+            <h3>Disaster Recovery Planning</h3>
+            <p>Ask yourself:</p>
+            <ul>
+                <li>What data can I not afford to lose?</li>
+                <li>How fast do I need to recover?</li>
+                <li>What disasters am I protecting against?</li>
+                <li>Do I have offsite backups?</li>
+            </ul>
+        </div>
+
+        <div class="content-block">
+            <h3>DR Scenarios</h3>
+            
+            <h4>Single File Loss</h4>
+            <p>Restore from latest backup. Time: Minutes.</p>
+            
+            <h4>Hard Drive Failure</h4>
+            <p>Replace drive, restore from backup. Time: Hours.</p>
+            
+            <h4>Ransomware</h4>
+            <p>Disconnect machine, clean install, restore from clean backup. Time: Days.</p>
+            
+            <h4>Building Destruction</h4>
+            <p>Restore from offsite cloud backup to new hardware. Time: Days to weeks.</p>
+        </div>
+
+        <div class="content-block">
+            <h3>Conclusion</h3>
+            <p>You've completed the Backup Mastery guide. You now know:</p>
+            
+            <ul>
+                <li>The 3-2-1 backup rule</li>
+                <li>Rsync for simple local backups</li>
+                <li>Borg and Restic for advanced deduplication</li>
+                <li>Cloud and offsite backup strategies</li>
+                <li>RAID vs backup differences</li>
+                <li>System imaging techniques</li>
+                <li>Database backup methods</li>
+                <li>How to test and monitor backups</li>
+                <li>Disaster recovery planning</li>
+            </ul>
+            
+            <p><strong>Remember:</strong></p>
+            <ul>
+                <li>Automate your backups</li>
+                <li>Test restores regularly</li>
+                <li>Keep an offsite copy</li>
+                <li>Document everything</li>
+            </ul>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="#lesson11" class="nav-button">← Previous Lesson</a>
+            <a href="#lessons" class="nav-button">Back to Lessons ↑</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>// REBEL WITH LINUX - PROTECT YOUR DATA</p>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', function() {
+            var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            var scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+    </script>
+</body>
+</html>
