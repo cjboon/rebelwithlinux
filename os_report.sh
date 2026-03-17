@@ -145,16 +145,30 @@ timestamp = sys.argv[4]
 with open(index_file, 'r') as f:
     content = f.read()
 
+# Extract Live Server Stats section if it exists (to preserve it)
+live_server_stats = ''
+if '<!-- Live Server Stats -->' in content:
+    match = re.search(r'(<!-- Live Server Stats -->.*?)(?=<!--|$)', content, re.DOTALL)
+    if match:
+        live_server_stats = match.group(1)
+
 # Replace the OS stats section (the one with "rebelled today")
-# Match from the stats section start to the Live Server Stats comment
-pattern = r'(<section id="stats"[^>]*>)' + r'.*?Last updated:.*?rebelled today.*?</section>'
-replacement = r'\1' + f'''
+# Match from the stats section start to just before Live Server Stats (or end of section)
+pattern = r'(<section id="stats"[^>]*>.*?)<!-- Live Server Stats -->'
+replacement = r'\1'
+content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+
+# Now replace the OS stats part
+pattern2 = r'(<section id="stats"[^>]*>)' + r'.*?rebelled today.*?</ul>'
+replacement2 = r'\1' + f'''
         <p style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 8px;">Last updated: {timestamp}</p>
         <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">{total} rebelled today.</h3>
-{report_html}
-    </section>'''
+{report_html}'''
+content = re.sub(pattern2, replacement2, content, flags=re.DOTALL)
 
-content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+# Re-insert Live Server Stats if it existed
+if live_server_stats:
+    content = content.replace('</ul>\n    </section>', f'</ul>\n    {live_server_stats}\n    </section>')
 
 with open(index_file, 'w') as f:
     f.write(content)

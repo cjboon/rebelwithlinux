@@ -97,32 +97,13 @@ try:
 except:
     location = os.environ.get('DEFAULT_LOCATION', 'Unknown')
 
-# Read current values from HTML and replace with new values
-# Replace Location in Stats section
-content = re.sub(r'(<div><strong>Location</strong><br>)[^<]+(</div>)', r'\1' + location + r'\2', content)
-
-uptime_match = re.search(r'>([^<]+uptime[^<]*)<', content, re.IGNORECASE)
-if uptime_match:
-    old_uptime = uptime_match.group(1)
-    content = content.replace(f'>{old_uptime}<', f'>{uptime}<', 1)
-
-load_match = re.search(r'>(\d+\.\d+)<', content)
-if load_match:
-    old_load = load_match.group(1)
-    content = content.replace(f'>{old_load}<', f'>{loadavg}<', 1)
-
-mem_match = re.search(r'>(\d+\.?\d*[GM]i?/\d+\.?\d*[GM]i?)<', content)
-if mem_match:
-    old_mem = mem_match.group(1)
-    content = content.replace(f'>{old_mem}<', f'>{memory}<', 1)
-
-disk_match = re.search(r'>(\d+\.?\d*[GM]?/\d+\.?\d*[GM]?)<', content)
-if disk_match:
-    old_disk = disk_match.group(1)
-    content = content.replace(f'>{old_disk}<', f'>{disk}<', 1)
-
-# Update process and CPU
-content = re.sub(r'>([^<]+)<br>\d+\.\d+% CPU', f'>{proc}<br>{cpu}% CPU', content)
+# Update server stats using class selectors
+content = re.sub(r'<span class="stat-location"[^>]*>[^<]*</span>', f'<span class="stat-location">{location}</span>', content)
+content = re.sub(r'<span class="stat-uptime"[^>]*>[^<]*</span>', f'<span class="stat-uptime">{uptime}</span>', content)
+content = re.sub(r'<span class="stat-load"[^>]*>[^<]*</span>', f'<span class="stat-load">{loadavg}</span>', content)
+content = re.sub(r'<span class="stat-memory"[^>]*>[^<]*</span>', f'<span class="stat-memory">{memory}</span>', content)
+content = re.sub(r'<span class="stat-disk"[^>]*>[^<]*</span>', f'<span class="stat-disk">{disk}</span>', content)
+content = re.sub(r'<span class="stat-proc"[^>]*>[^<]*</span>', f'<span class="stat-proc">{proc}<br>{cpu}% CPU</span>', content)
 
 with open(html_file, 'w') as f:
     f.write(content)
