@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-wireguard.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WireGuard - Fast, Modern VPN | REBEL WITH LINUX</title>
+    <meta name="description" content="Master WireGuard VPN. Learn about fast, modern VPN technology. Set up servers, clients, and secure your connections.">
+    <meta name="keywords" content="WireGuard, VPN, VPN setup, secure VPN, tunneling, network security, Linux VPN, peer to peer VPN">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        :root { --nav-color: #881391; }
+        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
+        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html#guides" style="color: inherit; text-decoration: none;">WIREGUARD MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>WIREGUARD<br>MASTERY</h1>
+        <p class="tagline">// Fast. Simple. Modern.</p>
+        
+        <div class="manifesto">
+            <p><strong>VPN FOR THE MODERN WORLD.</strong></p>
+            <p>WireGuard is a fast, modern VPN protocol that's simpler than IPsec and faster than OpenVPN. It uses cutting-edge cryptography and fits in a few thousand lines of code.</p>
+            <p><strong>SECURITY MEETS SIMPLICITY.</strong></p>
+            <p>Unlike legacy VPNs, WireGuard is designed for the modern internet. It's fast, easy to configure, and secure by default.</p>
+        </div>
+        
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// Your Training Path</h2>
+            <p>Click a lesson to begin</p>
+        </div>
+
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to WireGuard</h3>
+                <p class="lesson-desc">What is WireGuard? Why it's better than OpenVPN.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Installation</h3>
+                <p class="lesson-desc">Install WireGuard on Linux, macOS, Windows.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Server Setup</h3>
+                <p class="lesson-desc">Configure your WireGuard server.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Client Configuration</h3>
+                <p class="lesson-desc">Set up clients on any device.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Key Generation</h3>
+                <p class="lesson-desc">Generate public and private keys.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Mobile Clients</h3>
+                <p class="lesson-desc">WireGuard on iOS and Android.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Firewall Rules</h3>
+                <p class="lesson-desc">Secure your VPN with iptables/nftables.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Split Tunneling</h3>
+                <p class="lesson-desc">Route only specific traffic through VPN.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Multiple Peers</h3>
+                <p class="lesson-desc">Server with multiple clients.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Network Mesh</h3>
+                <p class="lesson-desc">Peer-to-peer WireGuard mesh networks.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Performance</h3>
+                <p class="lesson-desc">Tuning and optimization.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Troubleshooting</h3>
+                <p class="lesson-desc">Debug common WireGuard issues.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Lesson 1 -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: Introduction to WireGuard</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is WireGuard?</h3>
+                <p>WireGuard is a modern VPN protocol designed for simplicity and performance. It's cross-platform, open source, and uses state-of-the-art cryptography.</p>
+
+                <h3>Why WireGuard?</h3>
+                <ul>
+                    <li><strong>Fast:</strong> 3-4x faster than OpenVPN</li>
+                    <li><strong>Simple:</strong> ~4,000 lines of code</li>
+                    <li><strong>Secure:</strong> Modern cryptography (Curve25519, ChaCha20)</li>
+                    <li><strong>Cross-platform:</strong> Linux, Windows, macOS, iOS, Android</li>
+                </ul>
+
+                <h3>How It Works</h3>
+                <p>WireGuard creates a simple tunnel interface. Each peer has a public/private key pair. Peers authenticate using these keys—no certificates needed.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What makes WireGuard faster?</p>
+                        <input type="text" class="quiz-input" data-answer="simple code" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Simple code / less overhead</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: Installation</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Installing WireGuard</h3>
+                
+                <h3>Linux</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Ubuntu/Debian
+sudo apt install wireguard
+
+# Fedora
+sudo dnf install wireguard-tools
+
+# Arch
+sudo pacman -S wireguard-tools</pre>
+
+                <h3>macOS</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Using Homebrew
+brew install wireguard-tools
+
+# Or from App Store: WireGuard</pre>
+
+                <h3>Windows</h3>
+                <p>Download from wireguard.com/install</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What package do you install on Linux?</p>
+                        <input type="text" class="quiz-input" data-answer="wireguard-tools" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>wireguard-tools</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Server Setup</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Server Configuration</h3>
+                
+                <h3>Generate Keys</h3>
+                <pre style="background: wg genkey | tee privatekey | wg pubkey > publickey</pre>
+
+                <h3>Create Server Config</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># /etc/wireguard/wg0.conf
+[Interface]
+PrivateKey = SERVER_PRIVATE_KEY
+Address = 10.0.0.1/24
+ListenPort = 51820
+SaveConfig = true
+
+# Enable forwarding
+PostUp = iptables -A FORWARD -i %i -j ACCEPT
+PostUp = iptables -A FORWARD -o %i -j ACCEPT
+PostUp = iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+# Allow existing connections
+PostDown = iptables -D FORWARD -i %i -j ACCEPT
+PostDown = iptables -D FORWARD -o %i -j ACCEPT
+PostDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE</pre>
+
+                <h3>Start WireGuard</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Enable and start
+sudo systemctl enable wg-quick@wg0
+sudo systemctl start wg-quick@wg0
+
+# Check status
+sudo wg show</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is the default port?</p>
+                        <input type="text" class="quiz-input" data-answer="51820" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>51820</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: Client Configuration</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Client Setup</h3>
+                
+                <h3>Generate Client Keys</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">wg genkey
+# Output: CLIENT_PRIVATE_KEY
+
+echo "CLIENT_PRIVATE_KEY" | wg pubkey
+# Output: CLIENT_PUBLIC_KEY</pre>
+
+                <h3>Client Config</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># /etc/wireguard/wg0.conf (client)
+[Interface]
+PrivateKey = CLIENT_PRIVATE_KEY
+Address = 10.0.0.2/24
+DNS = 1.1.1.1
+
+[Peer]
+PublicKey = SERVER_PUBLIC_KEY
+Endpoint = server.example.com:51820
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25</pre>
+
+                <h3>Add Peer to Server</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">sudo wg set wg0 peer CLIENT_PUBLIC_KEY allowed-ips 10.0.0.2/32</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does PersistentKeepalive do?</p>
+                        <input type="text" class="quiz-input" data-answer="keeps connection alive" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Keeps NAT connection alive</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Key Generation</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Key Management</h3>
+                
+                <h3>Generating Keys</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Generate private key
+wg genkey
+
+# Generate private key and save
+wg genkey > private.key
+
+# Generate public key from private
+cat private.key | wg pubkey > public.key
+
+# One-liner
+wg genkey | tee private.key | wg pubkey > public.key</pre>
+
+                <h3>Pre-Shared Key (Optional)</h3>
+                <p>For extra security between peers:</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">wg genpsk</pre>
+
+                <h3>Security</h3>
+                <ul>
+                    <li>Keep private keys secret</li>
+                    <li>Public keys can be shared</li>
+                    <li>Use unique keys per peer</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What command generates a public key?</p>
+                        <input type="text" class="quiz-input" data-answer="wg pubkey" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>wg pubkey</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Mobile Clients</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Mobile Setup</h3>
+                
+                <h3>iOS</h3>
+                <ol>
+                    <li>Install WireGuard from App Store</li>
+                    <li>Create new tunnel</li>
+                    <li>Import config or generate keys</li>
+                </ol>
+
+                <h3>Android</h3>
+                <ol>
+                    <li>Install WireGuard from Play Store or F-Droid</li>
+                    <li>Create tunnel</li>
+                    <li>Scan QR code or import config</li>
+                </ol>
+
+                <h3>QR Code Config</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Generate QR code
+qrencode -t ansi < client.conf</pre>
+
+                <h3>On-Demand VPN</h3>
+                <p>Configure to auto-connect on WiFi/cellular.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you share config to mobile?</p>
+                        <input type="text" class="quiz-input" data-answer="qr code" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>QR code</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: Firewall Rules</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Securing WireGuard</h3>
+                
+                <h3>Basic Firewall Rules</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Allow WireGuard port
+sudo ufw allow 51820/udp
+
+# Forward traffic
+sudo ufw default FORWARD ACCEPT
+
+# Or more secure - only allow specific IPs
+sudo ufw allow from 10.0.0.0/24</pre>
+
+                <h3>ufw config</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># /etc/ufw/sysctl.conf
+net/ipv4/ip_forward=1
+net/ipv6/conf/all/forwarding=1</pre>
+
+                <h3>nftables</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># /etc/nftables.conf
+# Add to inet filter forward chain
+iif wg0 oif eth0 accept
+iif eth0 oif wg0 accept</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What port does WireGuard use?</p>
+                        <input type="text" class="quiz-input" data-answer="51820" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>51820/UDP</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Split Tunneling</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Selective Routing</h3>
+                
+                <h3>Full Tunnel vs Split Tunnel</h3>
+                <ul>
+                    <li><strong>Full:</strong> All traffic through VPN</li>
+                    <li><strong>Split:</strong> Only specific traffic through VPN</li>
+                </ul>
+
+                <h3>Split Tunnel Config</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Only route specific network through VPN
+[Peer]
+AllowedIPs = 10.0.0.0/24, 192.168.1.0/24
+
+# Route specific host
+AllowedIPs = 192.168.1.100/32</pre>
+
+                <h3>Use Cases</h3>
+                <ul>
+                    <li>Access home network</li>
+                    <li>Company network access</li>
+                    <li>Streaming (specific region)</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What controls what goes through VPN?</p>
+                        <input type="text" class="quiz-input" data-answer="allowedips" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>AllowedIPs</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Multiple Peers</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Server with Multiple Clients</h3>
+                
+                <h3>Adding Peers</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Add peer
+sudo wg set wg0 peer CLIENT_PUBLIC_KEY allowed-ips 10.0.0.3/32
+
+# Add multiple peers
+sudo wg set wg0 peer PEER1_PUBKEY allowed-ips 10.0.0.2/32
+sudo wg set wg0 peer PEER2_PUBKEY allowed-ips 10.0.0.3/32
+sudo wg set wg0 peer PEER3_PUBKEY allowed-ips 10.0.0.4/32</pre>
+
+                <h3>Config File Method</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># /etc/wireguard/wg0.conf
+[Interface]
+PrivateKey = SERVER_PRIVATE_KEY
+Address = 10.0.0.1/24
+ListenPort = 51820
+
+[Peer]
+PublicKey = CLIENT1_PUBLIC
+AllowedIPs = 10.0.0.2/32
+
+[Peer]
+PublicKey = CLIENT2_PUBLIC
+AllowedIPs = 10.0.0.3/32
+
+[Peer]
+PublicKey = CLIENT3_PUBLIC
+AllowedIPs = 10.0.0.4/32</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you add multiple clients?</p>
+                        <input type="text" class="quiz-input" data-answer="multiple peers" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Add multiple [Peer] sections</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: Network Mesh</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Peer-to-Peer WireGuard</h3>
+                
+                <h3>Mesh Network</h3>
+                <p>In a mesh, each peer connects directly to others—no central server.</p>
+
+                <h3>Example: 3-Peer Mesh</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Peer A config
+[Interface]
+PrivateKey = A_PRIVATE
+Address = 10.0.0.1/24
+
+[Peer]
+PublicKey = B_PUBLIC
+Endpoint = B.example.com:51820
+AllowedIPs = 10.0.0.2/32
+
+[Peer]
+PublicKey = C_PUBLIC
+Endpoint = C.example.com:51820
+AllowedIPs = 10.0.0.3/32</pre>
+
+                <h3>Tools</h3>
+                <ul>
+                    <li><strong>Netmaker:</strong> Managed mesh</li>
+                    <li><strong>WireGuard Easy:</strong> Simple UI</li>
+                    <li><strong>Headscale:</strong> Control server</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What connects peers directly?</p>
+                        <input type="text" class="quiz-input" data-answer="mesh" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Mesh network</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: Performance</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Optimization</h3>
+                
+                <h3>MTU Settings</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Reduce MTU for better performance
+[Interface]
+MTU = 1420</pre>
+
+                <h3>PersistentKeepalive</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Add to peer config
+PersistentKeepalive = 25</pre>
+
+                <h3>Performance Tips</h3>
+                <ul>
+                    <li>Use WireGuard kernel module (Linux 5.6+)</li>
+                    <li>Reduce MTU on slow connections</li>
+                    <li>Enable packet steering</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What improves slow connections?</p>
+                        <input type="text" class="quiz-input" data-answer="mtu" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Reducing MTU</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: Troubleshooting</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Debugging</h3>
+                
+                <h3>Check Status</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Show interface
+sudo wg show
+
+# Show interface with more detail
+sudo wg show wg0</pre>
+
+                <h3>Common Issues</h3>
+                <ul>
+                    <li><strong>No connection:</strong> Check firewall, keys, endpoint</li>
+                    <li><strong>Slow:</strong> Check MTU, network</li>
+                    <li><strong>DNS not working:</strong> Check DNS setting</li>
+                    <li><strong>Can't access internet:</strong> Check forwarding</li>
+                </ul>
+
+                <h3>Test Connectivity</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Ping through VPN
+ping 10.0.0.1
+
+# Check port
+nc -zvu server.example.com 51820
+
+# View logs
+sudo journalctl -u wg-quick@wg0 -f</pre>
+
+                <h3>Congratulations!</h3>
+                <p>You've completed the WireGuard Mastery guide. You now understand:</p>
+                <ul>
+                    <li>WireGuard fundamentals</li>
+                    <li>Installation on all platforms</li>
+                    <li>Server configuration</li>
+                    <li>Client setup</li>
+                    <li>Key generation</li>
+                    <li>Mobile clients</li>
+                    <li>Firewall rules</li>
+                    <li>Split tunneling</li>
+                    <li>Multiple peers</li>
+                    <li>Mesh networks</li>
+                    <li>Performance tuning</li>
+                    <li>Troubleshooting</li>
+                </ul>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why WireGuard</h2>
+            <p>WireGuard is the future of VPN. It's faster, simpler, and more secure than legacy VPN protocols.</p>
+            <p>Whether you need remote access, site-to-site VPN, or a mesh network, WireGuard handles it all with minimal configuration.</p>
+            <p><strong>Fast. Simple. Modern. Secure.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>WireGuard</h3>
+                <p>Official Website</p>
+                <a href="https://wireguard.com/" target="_blank">wireguard.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>Documentation</h3>
+                <p>Official Docs</p>
+                <a href="https://www.wireguard.com/quickstart/" target="_blank">wireguard.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>Installation</h3>
+                <p>Install Guides</p>
+                <a href="https://www.wireguard.com/install/" target="_blank">wireguard.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>WireGuard Easy</h3>
+                <p>Simple UI</p>
+                <a href="https://github.com/WeeJeMatt/wg-easy" target="_blank">GitHub</a>
+            </div>
+            <div class="resource-card">
+                <h3>Headscale</h3>
+                <p>Self-hosted WireGuard</p>
+                <a href="https://headscale.net/" target="_blank">headscale.net</a>
+            </div>
+            <div class="resource-card">
+                <h3>Netmaker</h3>
+                <p>WireGuard Mesh</p>
+                <a href="https://netmaker.io/" target="_blank">netmaker.io</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+    </footer>
+
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+</body>
+</html>

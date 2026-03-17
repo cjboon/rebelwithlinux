@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-pihole.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pi-hole - Network-Wide Ad Blocking | REBEL WITH LINUX</title>
+    <meta name="description" content="Master Pi-hole for network-wide ad blocking. Learn DNS, DHCP, blocklists, and privacy. Block ads on all your devices.">
+    <meta name="keywords" content="Pi-hole, ad blocking, DNS, DHCP, network, privacy, adblock, blocker, home network, router">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        :root { --nav-color: #960078; }
+        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
+        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html#guides" style="color: inherit; text-decoration: none;">PI-HOLE MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>PI-HOLE<br>MASTERY</h1>
+        <p class="tagline">// Block ads. Everywhere.</p>
+        
+        <div class="manifesto">
+            <p><strong>AD BLOCKING AT THE NETWORK LEVEL.</strong></p>
+            <p>Pi-hole acts as a DNS sinkhole—blocking ads and trackers before they reach your devices. No browser extensions, no per-device setup. One solution blocks ads on your entire network.</p>
+            <p><strong>PRIVACY FIRST.</strong></p>
+            <p>Pi-hole blocks known trackers and malicious domains. Your browsing stays faster and more private. See exactly what's being blocked with the built-in dashboard.</p>
+        </div>
+        
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// Your Training Path</h2>
+            <p>Click a lesson to begin</p>
+        </div>
+
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Pi-hole</h3>
+                <p class="lesson-desc">What is Pi-hole? How DNS blocking works.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Installation</h3>
+                <p class="lesson-desc">Install Pi-hole on Raspberry Pi, Docker, or VPS.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Initial Setup</h3>
+                <p class="lesson-desc">Configure DNS, set admin password, network setup.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Client Configuration</h3>
+                <p class="lesson-desc">Configure devices to use Pi-hole DNS.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Blocklists</h3>
+                <p class="lesson-desc">Add, remove, and manage blocklists.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Whitelisting</h3>
+                <p class="lesson-desc">Allow specific domains. Fix broken websites.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">DHCP Server</h3>
+                <p class="lesson-desc">Use Pi-hole as your DHCP server.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Groups & Clients</h3>
+                <p class="lesson-desc">Different blocking rules for different devices.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">FTLDNS</h3>
+                <p class="lesson-desc">Pi-hole's DNS engine. Performance tuning.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Pi-hole + Docker</h3>
+                <p class="lesson-desc">Run Pi-hole in containers. Compose files.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">VPN + Pi-hole</h3>
+                <p class="lesson-desc">Use Pi-hole remotely. WireGuard integration.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Troubleshooting</h3>
+                <p class="lesson-desc">Common issues. Debugging DNS problems.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Lesson 1 -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: Introduction to Pi-hole</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Pi-hole?</h3>
+                <p>Pi-hole is a DNS sinkhole that blocks ads and trackers at the network level. It works by intercepting DNS queries and returning 0.0.0.0 for blocked domains.</p>
+
+                <h3>How It Works</h3>
+                <ol>
+                    <li>Device requests DNS for "ad.com"</li>
+                    <li>Pi-hole checks blocklists</li>
+                    <li>If blocked, returns 0.0.0.0</li>
+                    <li>Device can't load the ad</li>
+                </ol>
+
+                <h3>Benefits</h3>
+                <ul>
+                    <li><strong>Network-wide:</strong> Blocks on all devices</li>
+                    <li><strong>No client software:</strong> Works on phones, TVs, etc.</li>
+                    <li><strong>Privacy:</strong> Blocks tracking domains</li>
+                    <li><strong>Statistics:</strong> See what's blocked</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does Pi-hole block at?</p>
+                        <input type="text" class="quiz-input" data-answer="dns" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>DNS level / network level</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: Installation</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Installation Options</h3>
+                
+                <h3>Raspberry Pi</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># One-line installer
+curl -sSL https://install.pi-hole.net | bash</pre>
+
+                <h3>Docker (Recommended)</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Run Pi-hole in Docker
+docker run -d \
+  --name pihole \
+  -e TZ=America/New_York \
+  -e WEBPASSWORD=yourpassword \
+  -p 53:53/tcp -p 53:53/udp \
+  -p 80:80 \
+  -p 443:443 \
+  -v pihole:/etc/pihole \
+  -v dnsmasq:/etc/dnsmasq.d \
+  --restart=unless-stopped \
+  pihole/pihole:latest</pre>
+
+                <h3>VPS/Cloud</h3>
+                <p>Run Pi-hole on any Linux server to block ads everywhere, even on the go.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What port does DNS use?</p>
+                        <input type="text" class="quiz-input" data-answer="53" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>53</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Initial Setup</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>After Installation</h3>
+                
+                <h3>Access Admin Interface</h3>
+                <p>Navigate to http://pi.hole or the IP address of your Pi-hole.</p>
+
+                <h3>Configure DNS</h3>
+                <p>Go to Settings → DNS and choose upstream DNS providers:</p>
+                <ul>
+                    <li>Google (8.8.8.8, 8.8.4.4)</li>
+                    <li>Cloudflare (1.1.1.1, 1.0.0.1)</li>
+                    <li>Quad9 (9.9.9.9)</li>
+                    <li>Custom</li>
+                </ul>
+
+                <h3>Interface Settings</h3>
+                <ul>
+                    <li>Listen on all interfaces</li>
+                    <li>Respond to queries</li>
+                    <li>Show options</li>
+                </ul>
+
+                <h3>Change Admin Password</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Change password
+pihole -a -p newpassword</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you access the admin interface?</p>
+                        <input type="text" class="quiz-input" data-answer="pi.hole" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>http://pi.hole or IP address</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: Client Configuration</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Configure Devices</h3>
+                
+                <h3>Router (Best Option)</h3>
+                <p>Set your router's DNS to Pi-hole IP. All devices use Pi-hole automatically.</p>
+
+                <h3>Device-Specific</h3>
+                <ul>
+                    <li><strong>Windows:</strong> Settings → Network → DNS</li>
+                    <li><strong>macOS:</strong> System Preferences → Network → DNS</li>
+                    <li><strong>Linux:</strong> /etc/resolv.conf or NetworkManager</li>
+                    <li><strong>iOS:</strong> Settings → Wi-Fi → DNS</li>
+                    <li><strong>Android:</strong> Settings → Network → Private DNS</li>
+                </ul>
+
+                <h3>Linux Configuration</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># /etc/systemd/resolved.conf
+[Resolve]
+DNS=192.168.1.100
+Domains=~</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Where is the best place to set DNS?</p>
+                        <input type="text" class="quiz-input" data-answer="router" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Router</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Blocklists</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Managing Blocklists</h3>
+                
+                <h3>Default Blocklists</h3>
+                <p>Pi-hole comes with curated blocklists. Go to Group Management → Blocklists to manage.</p>
+
+                <h3>Adding Blocklists</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Popular blocklists
+https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+https://adaway.org/hosts.txt
+https://v.firebog.net/hosts/AdguardDNS.txt
+https://v.firebog.net/hosts/Easyprivacy.txt</pre>
+
+                <h3>Update Blocklists</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Update gravity (blocklists)
+pihole -g</pre>
+
+                <h3>Blocklist Categories</h3>
+                <ul>
+                    <li><strong>Ads:</strong> Ad servers</li>
+                    <li><strong>Tracking:</strong> Analytics, telemetry</li>
+                    <li><strong>Malware:</strong> Known bad domains</li>
+                    <li><strong>Social:</strong> Social media widgets</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What command updates blocklists?</p>
+                        <input type="text" class="quiz-input" data-answer="pihole -g" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>pihole -g</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Whitelisting</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Fix Broken Sites</h3>
+                
+                <h3>When to Whitelist</h3>
+                <ul>
+                    <li>Site doesn't load correctly</li>
+                    <li>Login doesn't work</li>
+                    <li>Video won't play</li>
+                    <li>Specific domain is blocked</li>
+                </ul>
+
+                <h3>Whitelist via Admin</h3>
+                <ol>
+                    <li>Go to Whitelist</li>
+                    <li>Enter domain (e.g., example.com)</li>
+                    <li>Click Add</li>
+                    <li>Click Save</li>
+                </ol>
+
+                <h3>Whitelist Command</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Add to whitelist
+pihole -w example.com
+
+# Wildcard whitelist
+pihole -w -d example.com
+
+# Remove from whitelist
+pihole -w -r example.com</pre>
+
+                <h3>Regex Whitelisting</h3>
+                <p>Use regex for complex patterns:</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Regex whitelist example
+^.*\.googlesyndication\.com$</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What fixes broken websites?</p>
+                        <input type="text" class="quiz-input" data-answer="whitelist" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Whitelisting</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: DHCP Server</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Use Pi-hole for DHCP</h3>
+                
+                <h3>Why Use Pi-hole DHCP?</h3>
+                <ul>
+                    <li>Automatic device configuration</li>
+                    <li>Devices automatically use Pi-hole DNS</li>
+                    <li>No need to change each device</li>
+                </ul>
+
+                <h3>Enable DHCP</h3>
+                <ol>
+                    <li>Go to Settings → DHCP</li>
+                    <li>Enable DHCP server</li>
+                    <li>Set IP range (e.g., 192.168.1.100-200)</li>
+                    <li>Set router IP (gateway)</li>
+                    <li>Set local domain (e.g., local)</li>
+                    <li>Click Save</li>
+                </ol>
+
+                <h3>Disable Router DHCP</h3>
+                <p>Important: Disable DHCP on your router to avoid conflicts!</p>
+
+                <h3>Static DHCP Reservations</h3>
+                <p>Assign fixed IPs to specific devices by MAC address.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What must you disable on your router?</p>
+                        <input type="text" class="quiz-input" data-answer="dhcp" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>DHCP</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Groups & Clients</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Client-Specific Blocking</h3>
+                
+                <h3>Create Groups</h3>
+                <ol>
+                    <li>Go to Groups → Groups</li>
+                    <li>Add new group (e.g., "No Ads", "Unrestricted")</li>
+                    <li>Assign domains/blocklists to groups</li>
+                </ol>
+
+                <h3>Assign Clients to Groups</h3>
+                <ol>
+                    <li>Go to Groups → Clients</li>
+                    <li>Add client by IP or MAC</li>
+                    <li>Assign to group</li>
+                </ol>
+
+                <h3>Use Cases</h3>
+                <ul>
+                    <li><strong>Kids:</strong> Stricter blocking</li>
+                    <li><strong>Work PC:</strong> Less blocking</li>
+                    <li><strong>Smart TV:</strong> Custom allowlist</li>
+                    <li><strong>Guest network:</strong> More blocking</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What assigns devices to groups?</p>
+                        <input type="text" class="quiz-input" data-answer="clients" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Clients</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: FTLDNS</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Pi-hole's DNS Engine</h3>
+                
+                <h3>What is FTLDNS?</h3>
+                <p>FTLDNS (Faster Than Light DNS) is Pi-hole's DNS backend. It handles DNS queries with minimal overhead.</p>
+
+                <h3>Configuration</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># /etc/pihole/pihole-FTL.conf
+# DNS settings
+DNSMASQ_LISTENING=all
+RESOLVE_IPV6=yes
+
+# Logging
+LOG_QUERIES=yes
+QUERY_LOGGING=yes</pre>
+
+                <h3>Blocking Modes</h3>
+                <ul>
+                    <li><strong>NULL:</strong> Return 0.0.0.0 (fastest)</li>
+                    <li><strong>IP:</strong> Return NXDOMAIN (more accurate)</li>
+                    <li><strong>Domain:</strong> Return custom domain</li>
+                </ul>
+
+                <h3>Performance</h3>
+                <ul>
+                    <li>Pi-hole handles thousands of queries</li>
+                    <li>DNS caching improves speed</li>
+                    <li>Query logging can impact performance</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does FTLDNS stand for?</p>
+                        <input type="text" class="quiz-input" data-answer="faster than light" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Faster Than Light DNS</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: Pi-hole + Docker</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Docker Deployment</h3>
+                
+                <h3>Docker Compose</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">version: '3'
+services:
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80"
+      - "443:443"
+    environment:
+      TZ: America/New_York
+      WEBPASSWORD: yourpassword
+      DNS1: 1.1.1.1
+      DNS2: 8.8.8.8
+    volumes:
+      - ./pihole:/etc/pihole
+      - ./dnsmasq:/etc/dnsmasq.d
+    restart: unless-stopped</pre>
+
+                <h3>Running on Specific Network</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Create network
+docker network create pihole-net
+
+# Run with custom network
+docker run -d --network pihole-net \
+  --name pihole \
+  pihole/pihole:latest</pre>
+
+                <h3>Backup & Restore</h3>
+                <p>Mount volumes to preserve data between container updates.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What preserves Pi-hole data?</p>
+                        <input type="text" class="quiz-input" data-answer="volumes" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Volumes</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: VPN + Pi-hole</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Remote Pi-hole</h3>
+                
+                <h3>Use Cases</h3>
+                <ul>
+                    <li>Block ads on mobile data</li>
+                    <li>Use at coffee shops</li>
+                    <li>Protect on public WiFi</li>
+                </ul>
+
+                <h3>WireGuard + Pi-hole</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># In WireGuard config
+[Peer]
+# Mobile device
+AllowedIPs = 0.0.0.0/0, ::/0
+
+# In wg0.conf - route DNS through VPN
+PostUp = iptables -I FORWARD -i %i -j ACCEPT
+PostUp = iptables -I FORWARD -o %i -j ACCEPT
+PostUp = iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</pre>
+
+                <h3>Cloudflare WARP</h3>
+                <p>Alternative: Use 1.1.1.1 WARP app for easy encrypted DNS.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What VPN pairs well with Pi-hole?</p>
+                        <input type="text" class="quiz-input" data-answer="wireguard" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>WireGuard</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: Troubleshooting</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Common Issues</h3>
+                
+                <h3>DNS Not Resolving</h3>
+                <ul>
+                    <li>Check Pi-hole is running: pihole status</li>
+                    <li>Check upstream DNS: dig google.com @127.0.0.1</li>
+                    <li>Verify firewall: sudo ufw status</li>
+                </ul>
+
+                <h3>Pi-hole Not Blocking</h3>
+                <ul>
+                    <li>Verify device uses Pi-hole DNS</li>
+                    <li>Check blocklists: pihole -q domain.com</li>
+                    <li>Flush DNS cache on device</li>
+                </ul>
+
+                <h3>Debug Log</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Generate debug log
+pihole -d
+
+# View live logs
+tail -f /var/log/pihole.log</pre>
+
+                <h3>Reset Pi-hole</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Reconfigure
+pihole -r
+
+# Or completely reset
+pihole uninstall
+# Then reinstall</pre>
+
+                <h3>Congratulations!</h3>
+                <p>You've completed the Pi-hole Mastery guide. You now understand:</p>
+                <ul>
+                    <li>DNS-based ad blocking</li>
+                    <li>Installation methods</li>
+                    <li>Client configuration</li>
+                    <li>Blocklist management</li>
+                    <li>Whitelisting</li>
+                    <li>DHCP server</li>
+                    <li>Client groups</li>
+                    <li>FTLDNS</li>
+                    <li>Docker deployment</li>
+                    <li>VPN integration</li>
+                    <li>Troubleshooting</li>
+                </ul>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why Pi-hole</h2>
+            <p>Pi-hole is the ultimate network-wide ad blocker. Once configured at the router level, every device on your network benefits automatically.</p>
+            <p>It blocks ads, trackers, and malware at the DNS level—no per-device configuration needed.</p>
+            <p><strong>Block ads. Everywhere. Forever.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>Pi-hole Docs</h3>
+                <p>Official Documentation</p>
+                <a href="://docs.pi-hole.net/" target="_blank">docs.pi-hole.net</a>
+            </div>
+            <div class="resource-card">
+                <h3>Pi-hole</h3>
+                <p>Official Website</p>
+                <a href="https://pi-hole.net/" target="_blank">pi-hole.net</a>
+            </div>
+            <div class="resource-card">
+                <h3>Blocklists</h3>
+                <p>Additional Lists</p>
+                <a href="https://firebog.net/" target="_blank">firebog.net</a>
+            </div>
+            <div class="resource-card">
+                <h3>Reddit</h3>
+                <p>Community</p>
+                <a href="https://reddit.com/r/pihole/" target="_blank">r/pihole</a>
+            </div>
+            <div class="resource-card">
+                <h3>StevenBlack Hosts</h3>
+                <p>Popular Blocklist</p>
+                <a href="https://github.com/StevenBlack/hosts" target="_blank">GitHub</a>
+            </div>
+            <div class="resource-card">
+                <h3>AdGuard DNS</h3>
+                <p>Alternative Blocklists</p>
+                <a href="https://adguard-dns.io/" target="_blank">adguard-dns.io</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+    </footer>
+
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+</body>
+</html>

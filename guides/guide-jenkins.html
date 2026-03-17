@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-jenkins.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenkins - CI/CD Automation | REBEL WITH LINUX</title>
+    <meta name="description" content="Master Jenkins for CI/CD. Learn pipelines, automation, builds, deployments, and DevOps workflows. Automate your software delivery.">
+    <meta name="keywords" content="Jenkins, CI/CD, continuous integration, continuous delivery, pipelines, automation, DevOps, build automation, Jenkinsfile">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        :root { --nav-color: #D24939; }
+        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
+        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html#guides" style="color: inherit; text-decoration: none;">JENKINS MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>JENKINS<br>MASTERY</h1>
+        <p class="tagline">// Automate everything.</p>
+        
+        <div class="manifesto">
+            <p><strong>MANUAL BUILDS ARE FOR AMATEURS.</strong></p>
+            <p>Jenkins automates your software delivery pipeline. Every commit can trigger builds, tests, and deployments. Ship faster with confidence.</p>
+            <p><strong>CI/CD IS NOT OPTIONAL.</strong></p>
+            <p>In modern software development, continuous integration and delivery are essential. Jenkins is the open-source standard that powers thousands of deployments worldwide.</p>
+        </div>
+        
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// Your Training Path</h2>
+            <p>Click a lesson to begin</p>
+        </div>
+
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Jenkins</h3>
+                <p class="lesson-desc">What is CI/CD? Jenkins overview and installation.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">First Job</h3>
+                <p class="lesson-desc">Create your first Jenkins job. Build a simple project.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Source Control Integration</h3>
+                <p class="lesson-desc">Trigger builds from Git commits. Webhooks.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Build Triggers</h3>
+                <p class="lesson-desc">Poll SCM, timers, upstream jobs, and webhooks.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Pipelines</h3>
+                <p class="lesson-desc">Jenkinsfile, scripted vs declarative pipelines.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Automated Testing</h3>
+                <p class="lesson-desc">Run tests in pipeline. Test reporting.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Artifacts</h3>
+                <p class="lesson-desc">Store build outputs. Archive artifacts.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Parameters</h3>
+                <p class="lesson-desc">Parameterized builds. User inputs.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Distributed Builds</h3>
+                <p class="lesson-desc">Agents, nodes, and distributed execution.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Security</h3>
+                <p class="lesson-desc">User management, credentials, and permissions.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Plugins</h3>
+                <p class="lesson-desc">Extend Jenkins. Popular plugins.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Best Practices</h3>
+                <p class="lesson-desc">Pipeline patterns, scalability, and maintenance.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Lesson 1 -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: Introduction to Jenkins</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Jenkins?</h3>
+                <p>Jenkins is an open-source automation server for CI/CD. It automates building, testing, and deploying software.</p>
+
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Job:</strong> A task or workflow</li>
+                    <li><strong>Build:</strong> An execution of a job</li>
+                    <li><strong>Pipeline:</strong> A workflow defined as code</li>
+                    <li><strong>Agent:</strong> A machine that runs builds</li>
+                </ul>
+
+                <h3>Installing Jenkins</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Install Java
+sudo apt update
+sudo apt install openjdk-11-jdk
+
+# Add Jenkins repo
+wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo tee /etc/apt/trusted.gpg.d/jenkins.asc
+echo "deb https://pkg.jenkins.io/debian binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list
+sudo apt update
+sudo apt install jenkins
+
+# Start Jenkins
+sudo systemctl start jenkins
+sudo systemctl enable jenkins</pre>
+
+                <h3>First Access</h3>
+                <p>Navigate to http://localhost:8080 and use the initial admin password.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is Jenkins used for?</p>
+                        <input type="text" class="quiz-input" data-answer="ci cd" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>CI/CD / automation</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: First Job</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Creating Your First Job</h3>
+                
+                <ol>
+                    <li>Click "New Item"</li>
+                    <li>Enter job name</li>
+                    <li>Select "Freestyle project"</li>
+                    <li>Configure build steps</li>
+                    <li>Click "Save"</li>
+                </ol>
+
+                <h3>Build Steps</h3>
+                <ul>
+                    <li><strong>Execute shell:</strong> Run commands</li>
+                    <li><strong>Execute Windows batch:</strong> Run Windows commands</li>
+                    <li><strong>Invoke Ant:</strong> Run Ant builds</li>
+                    <li><strong>Invoke Gradle:</strong> Run Gradle builds</li>
+                </ul>
+
+                <h3>Example: Hello World</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Build step - Execute shell
+echo "Hello from Jenkins!"
+date
+whoami</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What type of project is simplest?</p>
+                        <input type="text" class="quiz-input" data-answer="freestyle" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Freestyle project</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Source Control Integration</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Connecting to Git</h3>
+                
+                <ol>
+                    <li>Edit your job</li>
+                    <li>Go to "Source Code Management"</li>
+                    <li>Select "Git"</li>
+                    <li>Enter repository URL</li>
+                    <li>Specify branches</li>
+                </ol>
+
+                <h3>Repository URL Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Public repo
+https://github.com/user/repo.git
+
+# Private repo (with credentials)
+git@github.com:user/repo.git
+
+# Specific branch
+*/main
+*/develop</pre>
+
+                <h3>Credentials</h3>
+                <ul>
+                    <li>Click "Add" in Credentials</li>
+                    <li>Select "Username with password"</li>
+                    <li>Enter GitHub username/token</li>
+                    <li>Use credentials in job</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Where do you configure Git in a job?</p>
+                        <input type="text" class="quiz-input" data-answer="source code management" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Source Code Management section</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: Build Triggers</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Trigger Types</h3>
+                
+                <h3>Poll SCM</h3>
+                <p>Check for changes at intervals:</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Check every 5 minutes
+H/5 * * * *
+
+# Check every 15 minutes
+H/15 * * * *</pre>
+
+                <h3>Build Periodically</h3>
+                <p>Schedule builds at specific times:</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Every day at midnight
+0 0 * * *
+
+# Every Monday at 6am
+0 6 * * 1</pre>
+
+                <h3>Trigger from GitHub</h3>
+                <ul>
+                    <li>Install GitHub plugin</li>
+                    <li>Enable "GitHub hook trigger for GITScm polling"</li>
+                    <li>Add webhook in GitHub settings</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How often does H/5 * * * * check?</p>
+                        <input type="text" class="quiz-input" data-answer="every 5 minutes" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Every 5 minutes</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Pipelines</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is a Pipeline?</h3>
+                <p>A pipeline is a workflow defined as code. It's versioned, reviewed, and more powerful than freestyle jobs.</p>
+
+                <h3>Declarative Pipeline</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">pipeline {
+    agent any
+    
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
+                sh 'make'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing...'
+                sh 'make test'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying...'
+            }
+        }
+    }
+}</pre>
+
+                <h3>Scripted Pipeline</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">node {
+    stage('Build') {
+        echo 'Building...'
+    }
+    stage('Test') {
+        echo 'Testing...'
+    }
+    stage('Deploy') {
+        echo 'Deploying...'
+    }
+}</pre>
+
+                <h3>Jenkinsfile</h3>
+                <p>Store your pipeline in a Jenkinsfile in your repository.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What file stores pipeline as code?</p>
+                        <input type="text" class="quiz-input" data-answer="jenkinsfile" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Jenkinsfile</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Automated Testing</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Running Tests in Pipeline</h3>
+                
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">pipeline {
+    agent any
+    stages {
+        stage('Test') {
+            steps {
+                sh 'npm test'
+            }
+            post {
+                always {
+                    junit 'reports/*.xml'
+                }
+            }
+        }
+    }
+}</pre>
+
+                <h3>Test Reports</h3>
+                <ul>
+                    <li><strong>JUnit:</strong> Java tests</li>
+                    <li><strong>Cobertura:</strong> Code coverage</li>
+                    <li><strong>HTML Publisher:</strong> Custom reports</li>
+                </ul>
+
+                <h3>Test Results in Pipeline</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">post {
+    always {
+        junit 'test-results/*.xml'
+    }
+    success {
+        echo 'Tests passed!'
+    }
+    failure {
+        echo 'Tests failed!'
+    }
+}</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What publishes JUnit test results?</p>
+                        <input type="text" class="quiz-input" data-answer="junit" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>junit step</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: Artifacts</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Artifacts?</h3>
+                <p>Artifacts are build outputs that are preserved after the build completes.</p>
+
+                <h3>Archive Artifacts</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                sh 'make'
+            }
+        }
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: 'build/**/*', fingerprint: true
+        }
+    }
+}</pre>
+
+                <h3>Stash and Unstash</h3>
+                <p>Transfer files between stages or agents:</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">stage('Build') {
+    steps {
+        stash name: 'my-artifacts', includes: 'dist/**'
+    }
+}
+
+stage('Deploy') {
+    steps {
+        unstash 'my-artifacts'
+    }
+}</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What step saves files between stages?</p>
+                        <input type="text" class="quiz-input" data-answer="stash" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>stash / unstash</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Parameters</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Parameterized Builds</h3>
+                <p>Let users provide input when triggering builds.</p>
+
+                <h3>Parameter Types</h3>
+                <ul>
+                    <li><strong>String:</strong> Text input</li>
+                    <li><strong>Choice:</strong> Dropdown</li>
+                    <li><strong>Boolean:</strong> Checkbox</li>
+                    <li><strong>Password:</strong> Secret input</li>
+                    <li><strong>File:</strong> File upload</li>
+                </ul>
+
+                <h3>Example: Choice Parameter</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">parameters {
+    choice(name: 'ENV', choices: ['dev', 'staging', 'prod'], description: 'Deploy environment')
+    string(name: 'VERSION', defaultValue: '1.0.0', description: 'Version to deploy')
+    booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Skip tests?')
+}</pre>
+
+                <h3>Using Parameters</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">steps {
+    sh "./deploy.sh -e ${params.ENV} -v ${params.VERSION}"
+}</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What parameter creates a dropdown?</p>
+                        <input type="text" class="quiz-input" data-answer="choice" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>choice</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Distributed Builds</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Jenkins Agents</h3>
+                <p>Scale your builds by adding more machines.</p>
+
+                <h3>Agent Types</h3>
+                <ul>
+                    <li><strong>Permanent:</strong> Always online</li>
+                    <li><strong>JNLP:</strong> Connect via JNLP protocol</li>
+                    <li><strong>SSH:</strong> Connect via SSH</li>
+                    <li><strong>Cloud:</strong> Dynamic agents (Kubernetes, AWS)</li>
+                </ul>
+
+                <h3>Adding an Agent via SSH</h3>
+                <ol>
+                    <li>Manage Jenkins → Manage Nodes</li>
+                    <li>New Node</li>
+                    <li>Enter name, select "Permanent Agent"</li>
+                    <li>Configure SSH connection</li>
+                    <li>Add credentials</li>
+                </ol>
+
+                <h3>Distribute Builds</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">pipeline {
+    agent none
+    
+    stages {
+        stage('Build on Linux') {
+            agent { label 'linux' }
+            steps {
+                echo 'Building on Linux'
+            }
+        }
+        stage('Build on Windows') {
+            agent { label 'windows' }
+            steps {
+                echo 'Building on Windows'
+            }
+        }
+    }
+}</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What runs builds on other machines?</p>
+                        <input type="text" class="quiz-input" data-answer="agents" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Agents / nodes</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: Security</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>User Management</h3>
+                
+                <h3>Matrix Authorization</h3>
+                <ul>
+                    <li>Overall: Administer, Read</li>
+                    <li>Job: Build, Configure, Delete</li>
+                    <li>Run: Update</li>
+                    <li>View: Configure</li>
+                </ul>
+
+                <h3>Credentials</h3>
+                <ul>
+                    <li>Manage Jenkins → Manage Credentials</li>
+                    <li>Add username/password</li>
+                    <li>Add SSH credentials</li>
+                    <li>Add secrets (API keys, tokens)</li>
+                </ul>
+
+                <h3>Secure Pipeline</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">pipeline {
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+        timeout(time: 1, unit: 'HOURS')
+    }
+    stages {
+        // your stages
+    }
+}</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Where are API keys stored?</p>
+                        <input type="text" class="quiz-input" data-answer="credentials" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Credentials</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: Plugins</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Extending Jenkins</h3>
+                <p>Plugins add functionality to Jenkins.</p>
+
+                <h3>Essential Plugins</h3>
+                <ul>
+                    <li><strong>Pipeline:</strong> Pipeline as code</li>
+                    <li><strong>Git:</strong> Git integration</li>
+                    <li><strong>GitHub:</strong> GitHub integration</li>
+                    <li><strong>Docker:</strong> Docker integration</li>
+                    <li><strong>Blue Ocean:</strong> Modern UI</li>
+                    <li><strong>Credentials:</strong> Secret management</li>
+                </ul>
+
+                <h3>Installing Plugins</h3>
+                <ol>
+                    <li>Manage Jenkins → Manage Plugins</li>
+                    <li>Available tab</li>
+                    <li>Search and install</li>
+                    <li>Restart Jenkins</li>
+                </ol>
+
+                <h3>Popular Plugin Pipelines</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">// Kubernetes
+podTemplate(...) {
+    node {
+        stage('Build') {
+            container('builder') {
+                sh 'make'
+            }
+        }
+    }
+}</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What adds Docker support?</p>
+                        <input type="text" class="quiz-input" data-answer="docker plugin" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Docker plugin</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: Best Practices</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Pipeline Best Practices</h3>
+                
+                <ul>
+                    <li><strong>Jenkinsfile:</strong> Store pipeline in version control</li>
+                    <li><strong>One stage per job:</strong> Keep pipelines focused</li>
+                    <li><strong>Fail fast:</strong> Fail early in the pipeline</li>
+                    <li><strong>Clean up:</strong> Archive artifacts, clean workspace</li>
+                </ul>
+
+                <h3>Scalability</h3>
+                <ul>
+                    <li>Use agents, not master</li>
+                    <li>Shared libraries for common code</li>
+                    <li>Cloud agents for burst capacity</li>
+                    <li>Pipeline templates</li>
+                </ul>
+
+                <h3>Maintenance</h3>
+                <ul>
+                    <li>Clean up old builds</li>
+                    <li>Update plugins regularly</li>
+                    <li>Backup configuration</li>
+                    <li>Monitor disk space</li>
+                </ul>
+
+                <h3>Congratulations!</h3>
+                <p>You've completed the Jenkins Mastery guide. You now understand:</p>
+                <ul>
+                    <li>Jenkins fundamentals</li>
+                    <li>Creating jobs</li>
+                    <li>Git integration</li>
+                    <li>Build triggers</li>
+                    <li>Pipelines</li>
+                    <li>Automated testing</li>
+                    <li>Artifacts</li>
+                    <li>Parameters</li>
+                    <li>Distributed builds</li>
+                    <li>Security</li>
+                    <li>Plugins</li>
+                    <li>Best practices</li>
+                </ul>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why Jenkins</h2>
+            <p>Jenkins is the most popular open-source automation server. It powers CI/CD at thousands of companies worldwide.</p>
+            <p>Whether you're a solo developer or part of a large team, Jenkins helps you ship faster with confidence.</p>
+            <p><strong>Automate everything. Ship faster.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>Jenkins Documentation</h3>
+                <p>Official Docs</p>
+                <a href="https://www.jenkins.io/doc/" target="_blank">jenkins.io</a>
+            </div>
+            <div class="resource-card">
+                <h3>Pipeline Guide</h3>
+                <p>Pipeline as Code</p>
+                <a href="https://www.jenkins.io/doc/book/pipeline/" target="_blank">jenkins.io/pipeline</a>
+            </div>
+            <div class="resource-card">
+                <h3>Blue Ocean</h3>
+                <p>Modern UI</p>
+                <a href="https://www.jenkins.io/projects/blueocean/" target="_blank">jenkins.io/blueocean</a>
+            </div>
+            <div class="resource-card">
+                <h3>Plugin Index</h3>
+                <p>Jenkins Plugins</p>
+                <a href="https://plugins.jenkins.io/" target="_blank">plugins.jenkins.io</a>
+            </div>
+            <div class="resource-card">
+                <h3>Jenkins.io</h3>
+                <p>Official Website</p>
+                <a href="https://www.jenkins.io/" target="_blank">jenkins.io</a>
+            </div>
+            <div class="resource-card">
+                <h3>Shared Libraries</h3>
+                <p>Reusable Pipeline Code</p>
+                <a href="https://www.jenkins.io/doc/book/pipeline/shared-libraries/" target="_blank">jenkins.io</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+    </footer>
+
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+</body>
+</html>

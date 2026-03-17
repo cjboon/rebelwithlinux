@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-homelab.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homelab - Build Your Own Infrastructure | REBEL WITH LINUX</title>
+    <meta name="description" content="Build your own homelab. Learn server hardware, virtualization, Docker, networking, and self-hosting. Run your own services at home.">
+    <meta name="keywords" content="homelab, self-hosting, home server, virtualization, Docker, Proxmox, network storage, home network, Pi, Raspberry Pi">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        :root { --nav-color: #00D4AA; }
+        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
+        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html#guides" style="color: inherit; text-decoration: none;">HOMELAB MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>HOMELAB<br>MASTERY</h1>
+        <p class="tagline">// Your home, your cloud.</p>
+        
+        <div class="manifesto">
+            <p><strong>STOP RENTING. START BUILDING.</strong></p>
+            <p>Why pay monthly for cloud services when you can run them at home? A homelab lets you host your own cloud storage, media server, password manager, VPN, and more.</p>
+            <p><strong>LEARN BY DOING.</strong></p>
+            <p>The best way to learn DevOps, networking, and system administration is by doing. Your homelab is a safe place to experiment, break things, and learn.</p>
+        </div>
+        
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// Your Training Path</h2>
+            <p>Click a lesson to begin</p>
+        </div>
+
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">What is a Homelab?</h3>
+                <p class="lesson-desc">Why build a homelab? Use cases and getting started.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Hardware Choices</h3>
+                <p class="lesson-desc">Raspberry Pi, old laptops, or dedicated servers.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Network Setup</h3>
+                <p class="lesson-desc">Router, VLANs, static IPs, and DNS.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Your First VM</h3>
+                <p class="lesson-desc">Install Proxmox or VirtualBox. Run your first virtual machine.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Docker Basics</h3>
+                <p class="lesson-desc">Containerize your services. Docker Compose.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Storage & Backups</h3>
+                <p class="lesson-desc">NAS, RAID, and backup strategies.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Media Server</h3>
+                <p class="lesson-desc">Plex, Jellyfin, Sonarr, Radarr. Build your streaming platform.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Self-Hosted Apps</h3>
+                <p class="lesson-desc">Home Assistant, Bitwarden, Nextcloud, and more.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Remote Access</h3>
+                <p class="lesson-desc">VPN, reverse proxy, and accessing your lab from anywhere.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Security</h3>
+                <p class="lesson-desc">Firewall, fail2ban, reverse proxy TLS, and hardening.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Monitoring</h3>
+                <p class="lesson-desc">Uptime Kuma, Grafana, and knowing when services go down.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Homelab in Production</h3>
+                <p class="lesson-desc">Power management, rack setup, and scaling up.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Lesson 1 -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: What is a Homelab?</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Why Build a Homelab?</h3>
+                <p>A homelab is a personal computing environment where you experiment with technology, host services, and learn new skills.</p>
+
+                <h3>Use Cases</h3>
+                <ul>
+                    <li><strong>Self-hosting:</strong> Run your own cloud storage, calendar, contacts</li>
+                    <li><strong>Media server:</strong> Stream your own content</li>
+                    <li><strong>Learning:</strong> Practice Linux, networking, DevOps</li>
+                    <li><strong>Home automation:</strong> Smart home control</li>
+                    <li><strong>Development:</strong> Test your code</li>
+                </ul>
+
+                <h3>What You'll Learn</h3>
+                <ul>
+                    <li>Linux system administration</li>
+                    <li>Networking (DNS, DHCP, VLANs)</li>
+                    <li>Virtualization and containers</li>
+                    <li>Security and hardening</li>
+                    <li>Networking and port forwarding</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is a primary benefit of a homelab?</p>
+                        <input type="text" class="quiz-input" data-answer="learning" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Learning / self-hosting</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: Hardware Choices</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Options for Every Budget</h3>
+                
+                <h3>Raspberry Pi ($35-150)</h3>
+                <ul>
+                    <li>Great for beginners</li>
+                    <li>Low power consumption</li>
+                    <li>Good for light services</li>
+                    <li>4GB+ RAM recommended</li>
+                </ul>
+
+                <h3>Old Laptop/Desktop ($0-100)</h3>
+                <ul>
+                    <li>Free if you have one</li>
+                    <li>More powerful than Pi</li>
+                    <li>More storage options</li>
+                    <li>Add more RAM/disk</li>
+                </ul>
+
+                <h3>Dedicated Server ($100-500)</h3>
+                <ul>
+                    <li>Enterprise-grade hardware</li>
+                    <li>More VMs/containers</li>
+                    <li>Better reliability</li>
+                    <li>Consider Dell OptiPlex, HP ProDesk</li>
+                </ul>
+
+                <h3>Minimum Recommendations</h3>
+                <ul>
+                    <li>4GB RAM (8GB+ recommended)</li>
+                    <li>Two CPU cores</li>
+                    <li>128GB+ storage</li>
+                    <li>Stable power</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What's the best starter hardware?</p>
+                        <input type="text" class="quiz-input" data-answer="raspberry pi" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Raspberry Pi / old laptop</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Network Setup</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Home Network Basics</h3>
+                
+                <h3>Static IPs</h3>
+                <p>Assign static IPs to your servers:</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Ubuntu/Debian - /etc/netplan/01-netcfg.yaml
+network:
+  version: 2
+  ethernets:
+    eth0:
+      addresses: [192.168.1.10/24]
+      gateway4: 192.168.1.1
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]</pre>
+
+                <h3>Local DNS (dnsmasq)</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># /etc/hosts or dnsmasq config
+192.168.1.10  nas.local
+192.168.1.11  pihole.local
+192.168.1.12  media.local</pre>
+
+                <h3>VLANs (Advanced)</h3>
+                <ul>
+                    <li>Separate IoT devices</li>
+                    <li>Guest networks</li>
+                    <li>Management network</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Why use static IPs?</p>
+                        <input type="text" class="quiz-input" data-answer="reliability" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Consistent/reliable addressing</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: Your First VM</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Virtualization Options</h3>
+                
+                <h3>Proxmox (Recommended)</h3>
+                <ul>
+                    <li>Type 1 hypervisor</li>
+                    <li>Web UI</li>
+                    <li>Container and VM support</li>
+                    <li>Free and open source</li>
+                </ul>
+
+                <h3>Installing Proxmox</h3>
+                <ol>
+                    <li>Download ISO from proxmox.com</li>
+                    <li>Write to USB</li>
+                    <li>Boot from USB</li>
+                    <li>Follow installer</li>
+                    <li>Access web UI at https://your-ip:8006</li>
+                </ol>
+
+                <h3>VirtualBox (Simple)</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Install VirtualBox
+sudo apt install virtualbox
+
+# Or download from virtualbox.org</pre>
+
+                <h3>Creating Your First VM</h3>
+                <ol>
+                    <li>Download Ubuntu Server ISO</li>
+                    <li>Create new VM in Proxmox/VirtualBox</li>
+                    <li>Assign CPU, RAM, storage</li>
+                    <li>Mount ISO and start</li>
+                    <li>Install OS</li>
+                </ol>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is Proxmox?</p>
+                        <input type="text" class="quiz-input" data-answer="hypervisor" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>A virtualization platform / hypervisor</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Docker Basics</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Why Docker?</h3>
+                <p>Docker packages applications with all dependencies. One command to run any service.</p>
+
+                <h3>Installing Docker</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Install Docker
+curl -fsSL https://get.docker.com | sh
+
+# Add user to docker group
+sudo usermod -aG docker $USER
+
+# Start Docker
+sudo systemctl start docker
+sudo systemctl enable docker</pre>
+
+                <h3>Running Your First Container</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Run nginx
+docker run -d -p 80:80 --name nginx nginx
+
+# Check status
+docker ps
+
+# Stop
+docker stop nginx
+
+# Remove
+docker rm nginx</pre>
+
+                <h3>Docker Compose</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># docker-compose.yml
+version: '3'
+services:
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What command runs a container?</p>
+                        <input type="text" class="quiz-input" data-answer="docker run" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>docker run</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Storage & Backups</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Storage Options</h3>
+                
+                <h3>Direct Attached</h3>
+                <ul>
+                    <li>Internal drives</li>
+                    <li>USB external drives</li>
+                    <li>Simple setup</li>
+                </ul>
+
+                <h3>Network Attached Storage (NAS)</h3>
+                <ul>
+                    <li>TrueNAS, OpenMediaVault</li>
+                    <li>Centralized storage</li>
+                    <li>RAID support</li>
+                </ul>
+
+                <h3>RAID Levels</h3>
+                <ul>
+                    <li><strong>RAID 0:</strong> Fast, no redundancy</li>
+                    <li><strong>RAID 1:</strong> Mirror (exact copy)</li>
+                    <li><strong>RAID 5:</strong> Parity (1 drive failure)</li>
+                    <li><strong>RAID 6:</strong> Double parity (2 failures)</li>
+                </ul>
+
+                <h3>Backup Strategy</h3>
+                <ul>
+                    <li>3-2-1 rule: 3 copies, 2 media, 1 offsite</li>
+                    <li>Use rsync for local backups</li>
+                    <li>Use Restic or Borg for encrypted backups</li>
+                    <li>Test restores regularly</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is the 3-2-1 backup rule?</p>
+                        <input type="text" class="quiz-input" data-answer="3 copies 2 media 1 offsite" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>3 copies, 2 media types, 1 offsite</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: Media Server</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Media Server Stack</h3>
+                
+                <h3>Jellyfin (Free)</h3>
+                <ul>
+                    <li>Free and open source</li>
+                    <li>Netflix-like interface</li>
+                    <li>Transcoding support</li>
+                </ul>
+
+                <h3>Plex (Commercial)</h3>
+                <ul>
+                    <li>Better transcoding</li>
+                    <li>Mobile app</li>
+                    <li>Free tier available</li>
+                </ul>
+
+                <h3>Media Management</h3>
+                <ul>
+                    <li><strong>Sonarr:</strong> TV series management</li>
+                    <li><strong>Radarr:</strong> Movie management</li>
+                    <li><strong>Bazarr:</strong> Subtitle management</li>
+                    <li><strong>qBittorrent:</strong> Download client</li>
+                </ul>
+
+                <h3>Docker Compose Example</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">version: '3'
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    network_mode: host
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - /mnt/media:/media</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What manages TV downloads?</p>
+                        <input type="text" class="quiz-input" data-answer="sonarr" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Sonarr</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Self-Hosted Apps</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Popular Self-Hosted Apps</h3>
+                
+                <h3>Home Assistant</h3>
+                <p>Smart home hub. Control all your IoT devices.</p>
+
+                <h3>Bitwarden</h3>
+                <p>Password manager. Host your own vault.</p>
+
+                <h3>Nextcloud</h3>
+                <p>Dropbox alternative. Files, calendar, contacts,办公.</p>
+
+                <h3>AdGuard Home</h3>
+                <p>Network-wide ad blocking. DNS-level filtering.</p>
+
+                <h3>Portainer</h3>
+                <p>Docker management UI.</p>
+
+                <h3>Useful Docker Stack</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">version: '3'
+services:
+  homeassistant:
+    image: homeassistant/home-assistant
+    network_mode: host
+    volumes:
+      - ./ha:/config
+
+  bitwarden:
+    image: vaultwarden/server
+    container_name: bitwarden
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./bw-data:/data</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is Bitwarden used for?</p>
+                        <input type="text" class="quiz-input" data-answer="passwords" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Password management</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Remote Access</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Accessing Your Lab</h3>
+                
+                <h3>VPN (Recommended)</h3>
+                <ul>
+                    <li>WireGuard</li>
+                    <li>OpenVPN</li>
+                    <li>Tailscale (easy setup)</li>
+                </ul>
+
+                <h3>WireGuard Setup</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Install WireGuard
+sudo apt install wireguard
+
+# Generate keys
+wg genkey | tee privatekey | wg pubkey > publickey
+
+# Configure /etc/wg0.conf
+[Interface]
+PrivateKey = &lt;your-private-key&gt;
+Address = 10.0.0.1/24
+
+[Peer]
+PublicKey = &lt;client-public-key&gt;
+AllowedIPs = 10.0.0.2/32</pre>
+
+                <h3>Reverse Proxy</h3>
+                <ul>
+                    <li>Nginx Proxy Manager</li>
+                    <li>Traefik</li>
+                    <li>Caddy</li>
+                </ul>
+
+                <h3>Access from Internet</h3>
+                <ul>
+                    <li>Port forwarding (less secure)</li>
+                    <li>Cloudflare Tunnel (secure)</li>
+                    <li>Tailscale (easiest)</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is the safest way to access from outside?</p>
+                        <input type="text" class="quiz-input" data-answer="vpn" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>VPN</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: Security</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Homelab Security</h3>
+                
+                <h3>Firewall</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># UFW basics
+sudo ufw enable
+sudo ufw allow ssh
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw default deny incoming</pre>
+
+                <h3>fail2ban</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Install
+sudo apt install fail2ban
+
+# Copy config
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+
+# Edit settings
+sudo nano /etc/fail2ban/jail.local</pre>
+
+                <h3>Reverse Proxy TLS</h3>
+                <ul>
+                    <li>Use Let's Encrypt</li>
+                    <li>Auto-renew certificates</li>
+                    <li>Always use HTTPS</li>
+                </ul>
+
+                <h3>Security Checklist</h3>
+                <ul>
+                    <li>Change default passwords</li>
+                    <li>Use strong passwords</li>
+                    <li>Enable 2FA where possible</li>
+                    <li>Keep software updated</li>
+                    <li>Use firewall</li>
+                    <li>Monitor logs</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What blocks brute force attacks?</p>
+                        <input type="text" class="quiz-input" data-answer="fail2ban" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>fail2ban</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: Monitoring</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Monitor Your Homelab</h3>
+                
+                <h3>Uptime Kuma</h3>
+                <p>Self-hosted status page and monitoring.</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Docker
+docker run -d --name uptime-kuma -p 3001:3001 -v ./uptime-kuma:/app/data louislam/uptime-kuma</pre>
+
+                <h3>Glances</h3>
+                <p>System monitoring.</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Install
+pip install glances
+
+# Run
+glances</pre>
+
+                <h3>Dashboard</h3>
+                <ul>
+                    <li>Grafana + Prometheus</li>
+                    <li>Check docker stats</li>
+                    <li>Monitor disk space</li>
+                    <li>Track bandwidth</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What checks if services are up?</p>
+                        <input type="text" class="quiz-input" data-answer="uptime kuma" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Uptime Kuma</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: Homelab in Production</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Going Production</h3>
+                
+                <h3>Power Management</h3>
+                <ul>
+                    <li>UPS (Uninterruptible Power Supply)</li>
+                    <li>Automatic shutdown on power loss</li>
+                    <li>Battery backup for router/modem</li>
+                </ul>
+
+                <h3>Rack Setup</h3>
+                <ul>
+                    <li>Wall-mounted rack</li>
+                    <li>Server rack</li>
+                    <li>Cabinet for clean setup</li>
+                    <li>Proper cable management</li>
+                </ul>
+
+                <h3>Cooling</h3>
+                <ul>
+                    <li>Case fans</li>
+                    <li>Room ventilation</li>
+                    <li>Temperature monitoring</li>
+                </ul>
+
+                <h3>Documentation</h3>
+                <ul>
+                    <li>Network diagram</li>
+                    <li>Service list</li>
+                    <li>Credentials (secure!)</li>
+                    <li>IP assignments</li>
+                </ul>
+
+                <h3>Congratulations!</h3>
+                <p>You've completed the Homelab Mastery guide. You now understand:</p>
+                <ul>
+                    <li>Homelab fundamentals</li>
+                    <li>Hardware selection</li>
+                    <li>Network configuration</li>
+                    <li>Virtualization</li>
+                    <li>Docker and containers</li>
+                    <li>Storage and backups</li>
+                    <li>Media servers</li>
+                    <li>Self-hosted applications</li>
+                    <li>Remote access</li>
+                    <li>Security hardening</li>
+                    <li>Monitoring</li>
+                    <li>Production setup</li>
+                </ul>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why a Homelab</h2>
+            <p>A homelab is more than just servers—it's a learning environment and a way to take back control of your data.</p>
+            <p>Instead of renting cloud services, run your own. You'll learn invaluable skills and have full control over your data.</p>
+            <p><strong>Your home, your cloud, your rules.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>Homelab Subreddit</h3>
+                <p>Community</p>
+                <a href="https://reddit.com/r/homelab" target="_blank">r/homelab</a>
+            </div>
+            <div class="resource-card">
+                <h3>Proxmox</h3>
+                <p>Virtualization Platform</p>
+                <a href="https://proxmox.com/" target="_blank">proxmox.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>Docker</h3>
+                <p>Container Platform</p>
+                <a href="https://docker.com/" target="_blank">docker.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>Awesome Selfhosted</h3>
+                <p>List of Apps</p>
+                <a href="https://github.com/awesome-selfhosted/awesome-selfhosted" target="_blank">GitHub</a>
+            </div>
+            <div class="resource-card">
+                <h3>LinuxServer.io</h3>
+                <p>Docker Images</p>
+                <a href="https://linuxserver.io/" target="_blank">linuxserver.io</a>
+            </div>
+            <div class="resource-card">
+                <h3>Spaceinvader One</h3>
+                <p>YouTube Tutorials</p>
+                <a href="https://youtube.com/channel/UC9x8V3RMf4LKOoS6w6xXbQw" target="_blank">YouTube</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+    </footer>
+
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+</body>
+</html>

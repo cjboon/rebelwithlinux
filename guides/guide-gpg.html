@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-gpg.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPG - Encryption & Digital Signatures | REBEL WITH LINUX</title>
+    <meta name="description" content="Master GPG encryption. Learn about public/private keys, signing, encrypting files and emails, and securing your communications.">
+    <meta name="keywords" content="GPG, GnuPG, encryption, public key, private key, signing, PGP, cryptography, security, privacy">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        :root { --nav-color: #A0C35A; }
+        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
+        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html#guides" style="color: inherit; text-decoration: none;">GPG MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>GPG<br>MASTERY</h1>
+        <p class="tagline">// Encrypt. Sign. Verify.</p>
+        
+        <div class="manifesto">
+            <p><strong>ENCRYPTION IS LIBERTY.</strong></p>
+            <p>In a world of surveillance and data breaches, encryption is your last line of defense. GPG (GNU Privacy Guard) gives you military-grade encryption for your files, emails, and communications.</p>
+            <p><strong>YOUR KEYS, YOUR DATA.</strong></p>
+            <p>With GPG, you control your encryption. No corporations, no backdoors. Only those with your private key can read your messages. That's real security.</p>
+        </div>
+        
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// Your Training Path</h2>
+            <p>Click a lesson to begin</p>
+        </div>
+
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to GPG</h3>
+                <p class="lesson-desc">What is GPG? Encryption basics and why it matters.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Generating Your Keys</h3>
+                <p class="lesson-desc">Create your first key pair. Master key and subkeys.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Managing Keys</h3>
+                <p class="lesson-desc">List, export, import, and revoke keys.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Encrypting Files</h3>
+                <p class="lesson-desc">Encrypt files for yourself or others using public keys.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Decrypting Files</h3>
+                <p class="lesson-desc">Decrypt files using your private key.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Digital Signatures</h3>
+                <p class="lesson-desc">Sign files to prove authenticity and integrity.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Verifying Signatures</h3>
+                <p class="lesson-desc">Verify signatures from others. Trust models.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Key Servers</h3>
+                <p class="lesson-desc">Publish your public key. Find others' keys.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Email Encryption</h3>
+                <p class="lesson-desc">Set up email encryption with GPG. Thunderbird, mutt.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Backing Up Keys</h3>
+                <p class="lesson-desc">Secure backup of keys. Paper backups. Revocation certificates.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Subkeys & Expiration</h3>
+                <p class="lesson-desc">Manage subkeys. Set expiration dates. Key rotation.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Advanced GPG</h3>
+                <p class="lesson-desc">Smartcards, YubiKey, Tor, and best practices.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Lesson 1 -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: Introduction to GPG</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is GPG?</h3>
+                <p>GPG (GNU Privacy Guard) is a free implementation of the OpenPGP standard. It's used for encrypting data and communications, signing messages, and verifying signatures.</p>
+
+                <h3>Why GPG Matters</h3>
+                <ul>
+                    <li><strong>Privacy:</strong> Encrypt files only you can read</li>
+                    <li><strong>Authentication:</strong> Prove you sent a message</li>
+                    <li><strong>Integrity:</strong> Verify messages weren't tampered</li>
+                    <li><strong>Decentralization:</strong> No central authority</li>
+                </ul>
+
+                <h3>Public Key Cryptography</h3>
+                <p>GPG uses asymmetric encryption:</p>
+                <ul>
+                    <li><strong>Public Key:</strong> Share freely. Others use it to encrypt messages for you.</li>
+                    <li><strong>Private Key:</strong> Keep secret. Only you can decrypt messages.</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does GPG stand for?</p>
+                        <input type="text" class="quiz-input" data-answer="gnu privacy guard" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>GNU Privacy Guard</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: Generating Your Keys</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Installing GPG</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Debian/Ubuntu
+sudo apt install gnupg
+
+# macOS
+brew install gnupg
+
+# Check version
+gpg --version</pre>
+
+                <h3>Generate a Key Pair</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Interactive key generation
+gpg --full-generate-key
+
+# Or use batch mode for scripting
+gpg --batch --gen-key <<EOF
+Key-Type: RSA
+Key-Length: 4096
+Subkey-Type: RSA
+Subkey-Length: 4096
+Expire-Date: 1y
+Name-Email: your@email.com
+Passphrase: your-secure-passphrase
+EOF</pre>
+
+                <h3>Key Types</h3>
+                <ul>
+                    <li><strong>RSA:</strong> Most compatible, up to 4096 bits</li>
+                    <li><strong>ECC:</strong> Smaller keys, modern, gaining support</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What should you never share?</p>
+                        <input type="text" class="quiz-input" data-answer="private key" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Your private key</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Managing Keys</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>List Your Keys</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># List secret keys
+gpg --list-secret-keys
+
+# List all keys
+gpg --list-keys
+
+# List keys with fingerprints
+gpg --fingerprint</pre>
+
+                <h3>Export Your Public Key</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Export public key to file
+gpg --armor --export your@email.com > public-key.asc
+
+# Export secret key (backup!)
+gpg --armor --export-secret-keys your@email.com > secret-key-backup.asc</pre>
+
+                <h3>Import Keys</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Import a public key
+gpg --import keyfile.asc
+
+# Import from keyserver
+gpg --keyserver keyserver.ubuntu.com --search-keys user@email.com</pre>
+
+                <h3>Delete Keys</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Delete public key
+gpg --delete-keys your@email.com
+
+# Delete secret key
+gpg --delete-secret-keys your@email.com</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What command lists your secret keys?</p>
+                        <input type="text" class="quiz-input" data-answer="list-secret-keys" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>gpg --list-secret-keys</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: Encrypting Files</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Encrypt for Yourself</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Encrypt a file (defaults to .gpg)
+gpg --encrypt myfile.txt
+
+# Encrypt with specific recipient
+gpg --encrypt --recipient your@email.com myfile.txt
+
+# Encrypt symmetrically (password only)
+gpg --symmetric myfile.txt
+
+# ASCII armored output (for email)
+gpg --armor --encrypt --recipient your@email.com myfile.txt</pre>
+
+                <h3>Encrypt for Multiple Recipients</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">gpg --encrypt \
+    --recipient alice@example.com \
+    --recipient bob@example.com \
+    myfile.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Which flag specifies the recipient?</p>
+                        <input type="text" class="quiz-input" data-answer="--recipient" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>--recipient or -r</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Decrypting Files</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Decrypt a File</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Decrypt to stdout (view content)
+gpg --decrypt secret.txt.gpg
+
+# Decrypt and save to file
+gpg --decrypt --output original.txt secret.txt.gpg
+
+# Decrypt (gpg automatically finds your private key)</pre>
+
+                <h3>Decrypt Symmetric Files</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># You'll be prompted for the passphrase
+gpg --decrypt secret.txt.gpg</pre>
+
+                <h3>Batch Decryption</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Decrypt all files in a directory
+for file in *.gpg; do
+    gpg --decrypt "$file" --output "${file%.gpg}"
+done</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What command decrypts a file?</p>
+                        <input type="text" class="quiz-input" data-answer="--decrypt" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>gpg --decrypt</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Digital Signatures</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Why Sign?</h3>
+                <p>Signing proves that:</p>
+                <ul>
+                    <li>The file came from you</li>
+                    <li>The file wasn't modified</li>
+                    <li>You genuinely sent a message</li>
+                </ul>
+
+                <h3>Sign a File</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Create detached signature
+gpg --sign myfile.txt
+
+# Detached signature (separate .sig file)
+gpg --armor --detach-sign myfile.txt
+
+# Clear signature (readable + signature)
+gpg --clearsign message.txt</pre>
+
+                <h3>Sign Without Encrypting</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Sign (can be read, proves it's from you)
+gpg --local-user your@email.com --sign document.pdf</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does signing prove?</p>
+                        <input type="text" class="quiz-input" data-answer="authenticity" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>That the file came from you / authenticity</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: Verifying Signatures</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Verify a Signature</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Verify a signed file
+gpg --verify signed-file.gpg
+
+# Verify and extract
+gpg --decrypt signed-file.txt.gpg
+
+# Verify detached signature
+gpg --verify file.sig file</pre>
+
+                <h3>Trust Models</h3>
+                <ul>
+                    <li><strong>Web of Trust:</strong> You trust keys signed by people you trust</li>
+                    <li><strong>Trust Levels:</strong> Unknown, None, Marginal, Fully, Ultimate</li>
+                </ul>
+
+                <h3>Set Trust</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Edit key trust
+gpg --edit-key user@email.com
+trust
+5  # Ultimate
+quit</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What command verifies a signature?</p>
+                        <input type="text" class="quiz-input" data-answer="--verify" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>gpg --verify</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Key Servers</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Key Servers?</h3>
+                <p>Key servers store and share public keys, making it easy for others to find your key and encrypt messages for you.</p>
+
+                <h3>Popular Key Servers</h3>
+                <ul>
+                    <li>keys.openpgp.org</li>
+                    <li>keyserver.ubuntu.com</li>
+                    <li>pgp.mit.edu</li>
+                </ul>
+
+                <h3>Publish Your Key</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Upload to keyserver
+gpg --keyserver keys.openpgp.org --send-keys your@email.com
+
+# Search for a key
+gpg --keyserver keys.openpgp.org --search-keys user@email.com
+
+# Import found key
+gpg --keyserver keys.openpgp.org --recv-keys KEYID</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What should you never upload to key servers?</p>
+                        <input type="text" class="quiz-input" data-answer="private key" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Your private key</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Email Encryption</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Why Email Encryption?</h3>
+                <p>Email is inherently insecure. GPG encrypts the content so only the recipient can read it.</p>
+
+                <h3>Thunderbird Setup</h3>
+                <ol>
+                    <li>Install Thunderbird</li>
+                    <li>Go to Settings → Account Settings → End-to-End Encryption</li>
+                    <li>Add your GPG key</li>
+                    <li>Enable encryption by default</li>
+                </ol>
+
+                <h3>GPGTools for macOS</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Install GPGTools
+brew install --cask gpgtools
+
+# This adds GPG support to Mail.app</pre>
+
+                <h3>Command Line Email</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Encrypt email body
+echo "Secret message" | gpg --armor --encrypt --recipient recipient@email.com
+
+# Use mutt with GPG
+# Add to ~/.muttrc:
+set pgp_use_gpg = yes</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does email GPG encryption protect?</p>
+                        <input type="text" class="quiz-input" data-answer="content" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>The email content (body)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: Backing Up Keys</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Why Backup?</h3>
+                <p>If you lose your private key, you can never decrypt your files. If someone gains your private key, they can impersonate you.</p>
+
+                <h3>Export Keys for Backup</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Export public key (safe to share)
+gpg --armor --export your@email.com > public-key.asc
+
+# Export secret key (KEEP SECURE!)
+gpg --armor --export-secret-keys your@email.com > secret-key.asc
+
+# Export subkeys only
+gpg --armor --export-secret-subkeys your@email.com > subkeys.asc</pre>
+
+                <h3>Paper Backup</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Print paper backup
+gpg --armor --export-secret-keys your@email.com | paperkey | a2ps | ps2pdf - > key.pdf
+
+# Or use QR codes
+# apt install qrencode
+gpg --armor --export your@email.com | qrencode -o key.png</pre>
+
+                <h3>Revocation Certificate</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Generate revocation certificate NOW
+gpg --output revocation-certificate.asc --gen-revoke your@email.com
+
+# Store this safely. Use it if key is compromised.</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. When should you create a revocation certificate?</p>
+                        <input type="text" class="quiz-input" data-answer="immediately" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Immediately after generating your key</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: Subkeys & Expiration</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Why Subkeys?</h3>
+                <ul>
+                    <li>Separate signing and encryption</li>
+                    <li>Revoke subkeys without replacing master key</li>
+                    <li>Use subkeys on daily devices</li>
+                </ul>
+
+                <h3>Create a Subkey</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Edit your key
+gpg --edit-key your@email.com
+
+addkey
+# Choose RSA (4096)
+# Set expiration
+# Save
+
+save</pre>
+
+                <h3>Set Expiration</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Edit key
+gpg --edit-key your@email.com
+
+# List keys
+list
+
+# Select subkey
+key 1
+
+# Set expiration
+expire
+
+# Save
+save</pre>
+
+                <h3>Key Rotation</h3>
+                <p>Best practice: Create new encryption subkeys yearly. Keep your master key safe.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is the benefit of subkeys?</p>
+                        <input type="text" class="quiz-input" data-answer="revoke without replacing master" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Can revoke without replacing master key</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: Advanced GPG</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Hardware Keys (Smartcards)</h3>
+                <p>Store your private key on a smartcard or YubiKey for maximum security.</p>
+                <ul>
+                    <li>Key never leaves the device</li>
+                    <li>Protected by PIN</li>
+                    <li>Works on any computer</li>
+                </ul>
+
+                <h3>YubiKey Setup</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Install yubikey-manager
+brew install yubikey-manager
+
+# Configure GPG on YubiKey
+ykman openpgp keys import</pre>
+
+                <h3>GPG with Tor</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Use keyserver through Tor
+gpg --keyserver hkps://keys.openpgp.org --search-keys user@email
+
+# Configure in ~/.gnupg/gpg.conf
+keyserver hkps://keys.openpgp.org</pre>
+
+                <h3>Best Practices</h3>
+                <ul>
+                    <li>Use 4096-bit RSA keys</li>
+                    <li>Set expiration (1-2 years)</li>
+                    <li>Never share private key</li>
+                    <li>Back up revocation certificate</li>
+                    <li>Use unique passphrases</li>
+                    <li>Consider hardware keys</li>
+                </ul>
+
+                <h3>Congratulations!</h3>
+                <p>You've completed the GPG Mastery guide. You now understand:</p>
+                <ul>
+                    <li>GPG fundamentals and cryptography</li>
+                    <li>Generating and managing keys</li>
+                    <li>Encrypting and decrypting files</li>
+                    <li>Digital signatures</li>
+                    <li>Verifying signatures</li>
+                    <li>Key servers and publishing</li>
+                    <li>Email encryption</li>
+                    <li>Backing up keys</li>
+                    <li>Subkeys and key rotation</li>
+                    <li>Hardware security</li>
+                </ul>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why GPG</h2>
+            <p>GPG is the gold standard for encryption. It's used by journalists, activists, developers, and anyone who values privacy.</p>
+            <p>Unlike proprietary encryption, GPG is open source and audited. Your keys are yours—there's no company that can hand them over to authorities.</p>
+            <p><strong>Encrypt. Sign. Verify. Own your data.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>GPG Documentation</h3>
+                <p>Official GPG Manual</p>
+                <a href="https://www.gnupg.org/documentation/" target="_blank">gnupg.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>OpenPGP Standard</h3>
+                <p>RFC 4880</p>
+                <a href="https://tools.ietf.org/html/rfc4880" target="_blank">RFC 4880</a>
+            </div>
+            <div class="resource-card">
+                <h3>Keys OpenPGP</h3>
+                <p>Key Server</p>
+                <a href="https://keys.openpgp.org/" target="_blank">keys.openpgp.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>GPGTools</h3>
+                <p>macOS GPG</p>
+                <a href="https://gpgtools.org/" target="_blank">gpgtools.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>Gpg4win</h3>
+                <p>Windows GPG</p>
+                <a href="https://www.gpg4win.org/" target="_blank">gpg4win.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>YubiKey</h3>
+                <p>Hardware Key</p>
+                <a href="https://www.yubico.com/" target="_blank">yubico.com</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+    </footer>
+
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+</body>
+</html>

@@ -13,20 +13,8 @@
     <link rel="stylesheet" href="../style.css">
     <style>
         :root { --nav-color: #ff9900; }
-        .lesson-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 2000; overflow-y: auto; }
-        .lesson-modal:target { display: block; }
         .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
         .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
-        .lesson-modal h2 { background: var(--nav-color); color: var(--black); padding: 20px 24px; margin: 0; }
-        .lesson-modal h3, .lesson-modal p, .lesson-modal ul, .lesson-modal ol { background: var(--white); max-width: 900px; margin: 20px auto; padding: 0 24px; color: var(--black); }
-        .lesson-modal ul, .lesson-modal ol { padding-left: 40px; }
-        .quiz-section { background: var(--white); max-width: 900px; margin: 20px auto; padding: 24px; color: var(--black); }
-        .quiz-question { margin-bottom: 16px; }
-        .quiz-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; font-family: inherit; }
-        .quiz-submit { background: var(--black); color: var(--white); padding: 8px 16px; border: none; cursor: pointer; font-family: inherit; }
-        .quiz-answers-reveal summary { cursor: pointer; color: var(--nav-color); }
-        .quiz-answers-display { margin-top: 12px; padding: 12px; background: #f5f5f5; }
-        .lesson-card { display: block; }
     </style>
 </head>
 <body class="guide-page">
@@ -216,6 +204,655 @@
                         </div>
                     </details>
                 </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: EC2 - Elastic Compute Cloud</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is EC2?</h3>
+                <p>Amazon EC2 provides resizable compute capacity in the cloud. It allows you to launch virtual servers (instances) on-demand.</p>
+
+                <h3>Instance Types</h3>
+                <ul>
+                    <li><strong>General Purpose (T3, M5):</strong> Balanced compute/memory</li>
+                    <li><strong>Compute Optimized (C5):</strong> High performance processors</li>
+                    <li><strong>Memory Optimized (R5, X1):</strong> Large datasets</li>
+                    <li><strong>GPU Instances (P3, G4):</strong> Machine learning, graphics</li>
+                </ul>
+
+                <h3>Launching an EC2 Instance</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Using AWS CLI
+aws ec2 run-instances \
+    --image-id ami-0c55b159cbfafe1f0 \
+    --instance-type t3.micro \
+    --key-name my-key-pair \
+    --security-group-ids sg-12345678 \
+    --subnet-id subnet-12345678</pre>
+
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>AMI:</strong> Amazon Machine Image (template for instances)</li>
+                    <li><strong>Instance Store:</strong> Temporary storage</li>
+                    <li><strong>EBS:</strong> Elastic Block Store (persistent storage)</li>
+                    <li><strong>Security Groups:</strong> Virtual firewall</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does EC2 stand for?</p>
+                        <input type="text" class="quiz-input" data-answer="elastic compute cloud" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Elastic Compute Cloud</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: S3 - Simple Storage Service</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is S3?</h3>
+                <p>Amazon S3 is object storage built to store and retrieve any amount of data from anywhere on the web.</p>
+
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Buckets:</strong> Containers for objects</li>
+                    <li><strong>Objects:</strong> Files stored in buckets</li>
+                    <li><strong>Keys:</strong> Unique identifier for each object</li>
+                    <li><strong>Regions:</strong> Geographic location of buckets</li>
+                </ul>
+
+                <h3>S3 Operations</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Create bucket
+aws s3 mb s3://my-bucket-name
+
+# Copy file to bucket
+aws s3 cp file.txt s3://my-bucket-name/
+
+# List bucket contents
+aws s3 ls s3://my-bucket-name/
+
+# Delete object
+aws s3 rm s3://my-bucket-name/file.txt</pre>
+
+                <h3>Storage Classes</h3>
+                <ul>
+                    <li><strong>S3 Standard:</strong> Frequent access</li>
+                    <li><strong>S3 IA:</strong> Infrequent access</li>
+                    <li><strong>S3 Glacier:</strong> Archival (cheap, slow retrieval)</li>
+                    <li><strong>S3 Intelligent:</strong> Auto-tiering</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is the container for objects in S3 called?</p>
+                        <input type="text" class="quiz-input" data-answer="bucket" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Bucket</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: VPC - Virtual Private Cloud</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is VPC?</h3>
+                <p>Amazon VPC lets you provision a logically isolated section of the AWS cloud where you can launch AWS resources in a virtual network.</p>
+
+                <h3>VPC Components</h3>
+                <ul>
+                    <li><strong>Subnets:</strong> Range of IP addresses in your VPC</li>
+                    <li><strong>Route Tables:</strong> Rules for directing traffic</li>
+                    <li><strong>Internet Gateway:</strong> Connects VPC to internet</li>
+                    <li><strong>NAT Gateway:</strong> Allows outbound internet access for private subnets</li>
+                </ul>
+
+                <h3>Creating a VPC</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Create VPC
+aws ec2 create-vpc --cidr-block 10.0.0.0/16
+
+# Create subnet
+aws ec2 create-subnet --vpc-id vpc-12345678 \
+    --cidr-block 10.0.1.0/24 --availability-zone us-east-1a
+
+# Create internet gateway
+aws ec2 create-internet-gateway
+
+# Attach IGW to VPC
+aws ec2 attach-internet-gateway --vpc-id vpc-12345678 \
+    --internet-gateway-id igw-12345678</pre>
+
+                <h3>Security Groups vs NACLs</h3>
+                <ul>
+                    <li><strong>Security Groups:</strong> Instance-level, stateful</li>
+                    <li><strong>Network ACLs:</strong> Subnet-level, stateless</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is stateful in AWS networking?</p>
+                        <input type="text" class="quiz-input" data-answer="security group" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Security Group</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: RDS - Relational Database Service</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is RDS?</h3>
+                <p>Amazon RDS makes it easy to set up, operate, and scale a relational database in the cloud.</p>
+
+                <h3>Supported Engines</h3>
+                <ul>
+                    <li><strong>PostgreSQL</strong></li>
+                    <li><strong>MySQL</strong></li>
+                    <li><strong>MariaDB</strong></li>
+                    <li><strong>Oracle</strong></li>
+                    <li><strong>SQL Server</strong></li>
+                </ul>
+
+                <h3>Creating an RDS Instance</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Create RDS instance
+aws rds create-db-instance \
+    --db-instance-identifier my-db \
+    --db-instance-class db.t3.micro \
+    --engine postgres \
+    --master-username admin \
+    --master-user-password mypassword \
+    --allocated-storage 20</pre>
+
+                <h3>High Availability Features</h3>
+                <ul>
+                    <li><strong>Multi-AZ:</strong> Automatic failover to standby</li>
+                    <li><strong>Read Replicas:</strong> Offload read traffic</li>
+                    <li><strong>Automated Backups:</strong> Point-in-time recovery</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What feature provides automatic failover?</p>
+                        <input type="text" class="quiz-input" data-answer="multi-az" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Multi-AZ</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Lambda - Serverless</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Lambda?</h3>
+                <p>AWS Lambda lets you run code without provisioning or managing servers. You pay only for the compute time you consume.</p>
+
+                <h3>How Lambda Works</h3>
+                <ol>
+                    <li>Upload your code (function)</li>
+                    <li>Set triggers (events)</li>
+                    <li>Lambda runs when triggered</li>
+                    <li>Pay per invocation and execution time</li>
+                </ol>
+
+                <h3>Creating a Lambda Function</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Create Lambda function
+aws lambda create-function \
+    --function-name my-function \
+    --runtime python3.9 \
+    --role arn:aws:iam::123456789:role/lambda-role \
+    --handler index.handler \
+    --zip-file fileb://function.zip</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you pay for Lambda?</p>
+                        <input type="text" class="quiz-input" data-answer="per invocation" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Per invocation and execution time</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: IAM - Identity & Access Management</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is IAM?</h3>
+                <p>IAM enables you to manage access to AWS services and resources securely.</p>
+
+                <h3>IAM Components</h3>
+                <ul>
+                    <li><strong>Users:</strong> Individual people or services</li>
+                    <li><strong>Groups:</strong> Collection of users with shared permissions</li>
+                    <li><strong>Roles:</strong> Temporary permissions for entities</li>
+                    <li><strong>Policies:</strong> JSON documents defining permissions</li>
+                </ul>
+
+                <h3>Creating a User and Policy</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Create user
+aws iam create-user --user-name developer
+
+# Create access key
+aws iam create-access-key --user-name developer
+
+# Attach policy
+aws iam attach-user-policy \
+    --user-name developer \
+    --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess</pre>
+
+                <h3>Best Practices</h3>
+                <ul>
+                    <li>Enable MFA for all users</li>
+                    <li>Use least privilege principle</li>
+                    <li>Use IAM roles instead of access keys</li>
+                    <li>Rotate credentials regularly</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What principle should you follow when assigning permissions?</p>
+                        <input type="text" class="quiz-input" data-answer="least privilege" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Least Privilege</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: CloudFormation - Infrastructure as Code</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is CloudFormation?</h3>
+                <p>CloudFormation lets you model and provision your AWS resources using templates.</p>
+
+                <h3>Template Structure</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">AWSTemplateFormatVersion: '2010-09-09'
+Description: Simple EC2 Instance
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0c55b159cbfafe1f0
+      InstanceType: t3.micro
+      Tags:
+        - Key: Name
+          Value: MyInstance</pre>
+
+                <h3>Stack Operations</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Create stack
+aws cloudformation create-stack \
+    --stack-name my-stack \
+    --template-body file://template.yaml
+
+# Update stack
+aws cloudformation update-stack \
+    --stack-name my-stack \
+    --template-body file://template.yaml
+
+# Delete stack
+aws cloudformation delete-stack --stack-name my-stack</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What format are CloudFormation templates written in?</p>
+                        <input type="text" class="quiz-input" data-answer="yaml" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>YAML or JSON</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Route 53 - DNS</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Route 53?</h3>
+                <p>Amazon Route 53 is a scalable DNS web service that routes users to your applications.</p>
+
+                <h3>Record Types</h3>
+                <ul>
+                    <li><strong>A:</strong> Maps domain to IPv4</li>
+                    <li><strong>AAAA:</strong> Maps domain to IPv6</li>
+                    <li><strong>CNAME:</strong> Alias to another domain</li>
+                    <li><strong>MX:</strong> Mail server</li>
+                </ul>
+
+                <h3>Creating Records</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Create A record
+aws route53 change-resource-record-sets \
+    --hosted-zone-id Z1234567890 \
+    --change-batch file://record.json</pre>
+
+                <h3>Routing Policies</h3>
+                <ul>
+                    <li><strong>Simple:</strong> Single resource</li>
+                    <li><strong>Weighted:</strong> Traffic split across resources</li>
+                    <li><strong>Latency:</strong> Lowest latency route</li>
+                    <li><strong>Failover:</strong> Primary/secondary</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Which record type maps to an IPv4 address?</p>
+                        <input type="text" class="quiz-input" data-answer="a" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>A record</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: CloudWatch - Monitoring</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is CloudWatch?</h3>
+                <p>Amazon CloudWatch provides monitoring and observability for AWS resources and applications.</p>
+
+                <h3>CloudWatch Features</h3>
+                <ul>
+                    <li><strong>Metrics:</strong> Performance data</li>
+                    <li><strong>Alerts:</strong> Trigger actions on thresholds</li>
+                    <li><strong>Logs:</strong> Centralized log management</li>
+                    <li><strong>Dashboards:</strong> Visualize metrics</li>
+                </ul>
+
+                <h3>Creating an Alarm</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Create alarm
+aws cloudwatch put-metric-alarm \
+    --alarm-name high-cpu \
+    --metric-name CPUUtilization \
+    --namespace AWS/EC2 \
+    --statistic Average \
+    --period 300 \
+    --threshold 80 \
+    --comparison-operator GreaterThanThreshold \
+    --evaluation-periods 2</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What triggers actions based on thresholds?</p>
+                        <input type="text" class="quiz-input" data-answer="alarm" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Alarm</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: Security & Compliance</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>AWS Security Layers</h3>
+                <ul>
+                    <li><strong>Network Security:</strong> VPC, Security Groups, NACLs</li>
+                    <li><strong>Data Encryption:</strong> KMS, SSL/TLS</li>
+                    <li><strong>Identity:</strong> IAM, MFA</li>
+                    <li><strong>Compliance:</strong> Shared responsibility model</li>
+                </ul>
+
+                <h3>Key Security Services</h3>
+                <ul>
+                    <li><strong>KMS:</strong> Key Management Service for encryption</li>
+                    <li><strong>WAF:</strong> Web Application Firewall</li>
+                    <li><strong>Shield:</strong> DDoS protection</li>
+                    <li><strong>GuardDuty:</strong> Threat detection</li>
+                </ul>
+
+                <h3>Security Best Practices</h3>
+                <ul>
+                    <li>Enable VPC flow logs</li>
+                    <li>Use IAM roles, not access keys</li>
+                    <li>Enable CloudTrail audit logging</li>
+                    <li>Encrypt data at rest and in transit</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What service manages encryption keys?</p>
+                        <input type="text" class="quiz-input" data-answer="kms" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>KMS (Key Management Service)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: Production Architecture</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Well-Architected Framework</h3>
+                <ul>
+                    <li><strong>Operational Excellence:</strong> Run and monitor systems</li>
+                    <li><strong>Security:</strong> Protect data and systems</li>
+                    <li><strong>Reliability:</strong> Recover from failures</li>
+                    <li><strong>Performance Efficiency:</strong> Use resources efficiently</li>
+                    <li><strong>Cost Optimization:</strong> Minimize costs</li>
+                </ul>
+
+                <h3>High Availability Design</h3>
+                <ul>
+                    <li>Use multiple Availability Zones</li>
+                    <li>Implement auto-scaling</li>
+                    <li>Use load balancers</li>
+                    <li>Enable database multi-AZ</li>
+                </ul>
+
+                <h3>Auto Scaling</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Create launch template
+aws ec2 create-launch-template \
+    --launch-template-name my-template \
+    --version-description version1 \
+    --launch-template-data file://lt-data.json
+
+# Create auto scaling group
+aws autoscaling create-auto-scaling-group \
+    --auto-scaling-group-name my-asg \
+    --launch-template LaunchTemplateId=lt-12345678 \
+    --min-size 2 \
+    --max-size 10 \
+    --desired-capacity 3 \
+    --vpc-zone-identifier subnet-12345678</pre>
+
+                <h3>Congratulations!</h3>
+                <p>You've completed the AWS Mastery guide. You now understand:</p>
+                <ul>
+                    <li>Cloud computing fundamentals</li>
+                    <li>EC2 compute instances</li>
+                    <li>S3 object storage</li>
+                    <li>VPC networking</li>
+                    <li>RDS databases</li>
+                    <li>Lambda serverless</li>
+                    <li>IAM security</li>
+                    <li>CloudFormation IaC</li>
+                    <li>Route 53 DNS</li>
+                    <li>CloudWatch monitoring</li>
+                    <li>Security best practices</li>
+                    <li>Production architecture</li>
+                </ul>
 
                 <div class="lesson-nav">
                     <a href="#guides">← Back to Lessons</a>

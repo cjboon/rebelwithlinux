@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-grafana.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafana - Metrics & Visualization | REBEL WITH LINUX</title>
+    <meta name="description" content="Master Grafana for monitoring and observability. Learn dashboards, panels, data sources, alerts, and visualization best practices.">
+    <meta name="keywords" content="Grafana, monitoring, dashboards, metrics, visualization, Prometheus, InfluxDB, alerts, observability, time series">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        :root { --nav-color: #F79C25; }
+        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
+        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html#guides" style="color: inherit; text-decoration: none;">GRAFANA MASTERY</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>GRAFANA<br>MASTERY</h1>
+        <p class="tagline">// See everything. Know everything.</p>
+        
+        <div class="manifesto">
+            <p><strong>DATA WITHOUT VISUALIZATION IS JUST NOISE.</strong></p>
+            <p>Grafana transforms your metrics into beautiful, actionable dashboards. Watch your systems in real-time, spot anomalies, and make data-driven decisions.</p>
+            <p><strong>ONE DASHBOARD TO RULE THEM ALL.</strong></p>
+            <p>From server metrics to application performance, from IoT sensors to financial data—Grafana connects to virtually any data source and makes sense of it all.</p>
+        </div>
+        
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// Your Training Path</h2>
+            <p>Click a lesson to begin</p>
+        </div>
+
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Grafana</h3>
+                <p class="lesson-desc">What is Grafana? Installation and first login.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Data Sources</h3>
+                <p class="lesson-desc">Connect to Prometheus, InfluxDB, MySQL, and more.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Your First Dashboard</h3>
+                <p class="lesson-desc">Create panels, add queries, and organize dashboards.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Visualization Types</h3>
+                <p class="lesson-desc">Graph, stat, gauge, table, heatmap, and more.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Queries & Variables</h3>
+                <p class="lesson-desc">Template variables, filters, and dynamic dashboards.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Alerts & Notifications</h3>
+                <p class="lesson-desc">Set up alerts and send notifications via email, Slack, PagerDuty.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Prometheus & Grafana</h3>
+                <p class="lesson-desc">Query PromQL, explore metrics, and build custom dashboards.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Annotations</h3>
+                <p class="lesson-desc">Mark events on graphs. Correlate metrics with incidents.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Plugins & Transformations</h3>
+                <p class="lesson-desc">Extend Grafana. Transform data for complex visualizations.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">User Management</h3>
+                <p class="lesson-desc">Teams, permissions, organization, and authentication.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Provisioning</h3>
+                <p class="lesson-desc">Configure Grafana as code. Dashboards, datasources, and alerts.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Best Practices</h3>
+                <p class="lesson-desc">Performance, security, and dashboard design patterns.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Lesson 1 -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: Introduction to Grafana</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Grafana?</h3>
+                <p>Grafana is an open-source platform for monitoring and observability. It connects to multiple data sources and creates interactive, beautiful dashboards.</p>
+
+                <h3>Key Features</h3>
+                <ul>
+                    <li><strong>Visualizations:</strong> Graphs, tables, heatmaps, and more</li>
+                    <li><strong>Alerts:</strong> Notify when metrics cross thresholds</li>
+                    <li><strong>Templating:</strong> Dynamic, reusable dashboards</li>
+                    <li><strong>Plugins:</strong> Extend with additional data sources</li>
+                </ul>
+
+                <h3>Installing Grafana</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Debian/Ubuntu
+sudo apt-get install -y apt-transport-https software-properties-common
+wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+sudo apt-get update && sudo apt-get install grafana
+
+# Start service
+sudo systemctl start grafana-server
+sudo systemctl enable grafana-server</pre>
+
+                <h3>First Login</h3>
+                <p>Navigate to http://localhost:3000 and login with admin/admin.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is Grafana used for?</p>
+                        <input type="text" class="quiz-input" data-answer="monitoring" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Monitoring and visualization / dashboards</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: Data Sources</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Supported Data Sources</h3>
+                <ul>
+                    <li><strong>Prometheus:</strong> Metrics and alerts</li>
+                    <li><strong>InfluxDB:</strong> Time series data</li>
+                    <li><strong>MySQL/PostgreSQL:</strong> SQL databases</li>
+                    <li><strong>Graphite:</strong> Metrics</li>
+                    <li><strong>Elasticsearch:</strong> Logs and metrics</li>
+                </ul>
+
+                <h3>Adding a Data Source</h3>
+                <ol>
+                    <li>Click Configuration (gear icon) → Data Sources</li>
+                    <li>Click "Add data source"</li>
+                    <li>Select your data source type</li>
+                    <li>Configure connection details</li>
+                    <li>Click "Save & Test"</li>
+                </ol>
+
+                <h3>Prometheus Example</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># In Grafana:
+URL: http://localhost:9090
+Access: Server (default)
+Auth: None (for local)
+
+# Click Save & Test</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Where do you add data sources in Grafana?</p>
+                        <input type="text" class="quiz-input" data-answer="configuration" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Configuration → Data Sources</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Your First Dashboard</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Creating a Dashboard</h3>
+                <ol>
+                    <li>Click "+" icon → Dashboard</li>
+                    <li>Click "Add new panel"</li>
+                    <li>Select your data source</li>
+                    <li>Write a query</li>
+                    <li>Configure panel options</li>
+                    <li>Click "Save" (Ctrl+S)</li>
+                </ol>
+
+                <h3>A Simple Query</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># For Prometheus:
+up
+
+# This returns 1 if target is up, 0 if down</pre>
+
+                <h3>Panel Editor</h3>
+                <ul>
+                    <li><strong>Queries tab:</strong> Write data queries</li>
+                    <li><strong>Visualization:</strong> Choose graph type</li>
+                    <li><strong>Panel options:</strong> Title, description</li>
+                    <li><strong>Field:</strong> Units, decimals</li>
+                    <li><strong>Alert:</strong> Create alerts</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What query returns the uptime status in Prometheus?</p>
+                        <input type="text" class="quiz-input" data-answer="up" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>up</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: Visualization Types</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Graph Panel</h3>
+                <p>Time series visualization. Best for metrics over time.</p>
+                <ul>
+                    <li>Lines, bars, or points</li>
+                    <li>Multiple series</li>
+                    <li>Time range selection</li>
+                </ul>
+
+                <h3>Stat Panel</h3>
+                <p>Single big number with optional sparkline.</p>
+
+                <h3>Gauge Panel</h3>
+                <p>Display current value on a gauge. Good for thresholds.</p>
+
+                <h3>Table Panel</h3>
+                <p>Tabular data. Transform query results.</p>
+
+                <h3>Heatmap</h3>
+                <p>Visualize density. Great for frequency data.</p>
+
+                <h3>Logs Panel</h3>
+                <p>Display log entries. Filter and search.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Which panel is best for single values?</p>
+                        <input type="text" class="quiz-input" data-answer="stat" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Stat panel</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Queries & Variables</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Template Variables</h3>
+                <p>Variables make dashboards dynamic and reusable.</p>
+
+                <h3>Creating Variables</h3>
+                <ol>
+                    <li>Dashboard settings (gear icon)</li>
+                    <li>Variables → Add variable</li>
+                    <li>Configure name, query, and options</li>
+                </ol>
+
+                <h3>Example Variable</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Query:
+label_values(up, job)
+
+# This creates a dropdown of all job labels</pre>
+
+                <h3>Using Variables in Queries</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Use $variable in queries:
+up{job="$job"}
+
+# Or multi-select:
+up{job=~"$job"}</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What makes dashboards dynamic?</p>
+                        <input type="text" class="quiz-input" data-answer="variables" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Variables / template variables</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Alerts & Notifications</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Creating Alerts</h3>
+                <ol>
+                    <li>Edit a panel</li>
+                    <li>Go to "Alert" section</li>
+                    <li>Click "Create Alert"</li>
+                    <li>Configure conditions</li>
+                    <li>Set evaluation interval</li>
+                </ol>
+
+                <h3>Alert Conditions</h3>
+                <ul>
+                    <li><strong>OF:</strong> Query results</li>
+                    <li><strong>IS BELOW/Above:</strong> Threshold</li>
+                    <li><strong>FOR:</strong> Duration to trigger</li>
+                </ul>
+
+                <h3>Notification Channels</h3>
+                <ul>
+                    <li><strong>Email:</strong> Simple notifications</li>
+                    <li><strong>Slack:</strong> Team notifications</li>
+                    <li><strong>PagerDuty:</strong> Incident management</li>
+                    <li><strong>Webhook:</strong> Custom integrations</li>
+                    <li><strong>Telegram:</strong> Bot notifications</li>
+                </ul>
+
+                <h3>Configuring Slack</h3>
+                <ol>
+                    <li>Configuration → Notification channels</li>
+                    <li>Add Slack</li>
+                    <li>Provide Slack webhook URL</li>
+                    <li>Select default channels</li>
+                </ol>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Where do you configure notification channels?</p>
+                        <input type="text" class="quiz-input" data-answer="configuration" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Configuration → Notification channels</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: Prometheus & Grafana</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>PromQL Basics</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># All metrics
+up
+
+# With label filter
+up{job="node"}
+
+# Rate (per second)
+rate(http_requests_total[5m])
+
+# Sum by label
+sum by (job) (up)
+
+# Histogram quantile
+histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))</pre>
+
+                <h3>Useful Prometheus Queries</h3>
+                <ul>
+                    <li><strong>CPU usage:</strong> 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)</li>
+                    <li><strong>Memory usage:</strong> (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100</li>
+                    <li><strong>Disk usage:</strong> (node_filesystem_size_bytes{mountpoint="/"} - node_filesystem_avail_bytes{mountpoint="/"}) / node_filesystem_size_bytes{mountpoint="/"} * 100</li>
+                </ul>
+
+                <h3>Grafana Explore</h3>
+                <p>Use Explore (compass icon) to query data without creating dashboards.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What language does Prometheus use?</p>
+                        <input type="text" class="quiz-input" data-answer="promql" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>PromQL</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Annotations</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Annotations?</h3>
+                <p>Annotations mark events on your graphs. They're perfect for showing deployments, incidents, or changes.</p>
+
+                <h3>Adding Annotations</h3>
+                <ol>
+                    <li>Click on a graph</li>
+                    <li>Click "Add annotation"</li>
+                    <li>Enter title and text</li>
+                    <li>Optionally set tags</li>
+                </ol>
+
+                <h3>Custom Data Source Annotations</h3>
+                <p>Query annotations from your data source:</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Example query for annotations
+SELECT time, title, text FROM events WHERE $__timeFilter(time)</pre>
+
+                <h3>Use Cases</h3>
+                <ul>
+                    <li>Deployments</li>
+                    <li>Incidents</li>
+                    <li>Config changes</li>
+                    <li>Maintenance windows</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What are annotations used for?</p>
+                        <input type="text" class="quiz-input" data-answer="marking events" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Marking events on graphs</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Plugins & Transformations</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Installing Plugins</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Install via CLI
+grafana-cli plugins install <plugin-id>
+
+# Or via UI
+# Configuration → Plugins → Install</pre>
+
+                <h3>Popular Plugins</h3>
+                <ul>
+                    <li><strong>Worldmap Panel:</strong> Geographic visualization</li>
+                    <li><strong>Clock Panel:</strong> Time display</li>
+                    <li><strong>Polystat:</strong> Status at a glance</li>
+                    <li><strong>Apache ECharts:</strong> Advanced charting</li>
+                </ul>
+
+                <h3>Transformations</h3>
+                <p>Transform data before visualization:</p>
+                <ul>
+                    <li><strong>Reduce:</strong> Aggregate rows</li>
+                    <li><strong>Filter by name:</strong> Include/exclude fields</li>
+                    <li><strong>Organize fields:</strong> Rename, hide, reorder</li>
+                    <li><strong>Outer join:</strong> Merge series</li>
+                    <li><strong>Calculate fields:</strong> Math operations</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you install plugins?</p>
+                        <input type="text" class="quiz-input" data-answer="grafana-cli" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>grafana-cli or UI</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: User Management</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Users & Permissions</h3>
+                <ul>
+                    <li><strong>Admin:</strong> Full access</li>
+                    <li><strong>Editor:</strong> Can edit dashboards</li>
+                    <li><strong>Viewer:</strong> View only</li>
+                </ul>
+
+                <h3>Organizations</h3>
+                <p>Separate teams or environments:</p>
+                <ul>
+                    <li>Each org has own data sources</li>
+                    <li>Users belong to orgs</li>
+                    <li>Switch org in user menu</li>
+                </ul>
+
+                <h3>Teams</h3>
+                <ol>
+                    <li>Configuration → Teams</li>
+                    <li>Create team</li>
+                    <li>Add members</li>
+                    <li>Set team permissions</li>
+                </ol>
+
+                <h3>SSO Integration</h3>
+                <ul>
+                    <li>OAuth (GitHub, Google, etc.)</li>
+                    <li>LDAP/Active Directory</li>
+                    <li>SAML</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What permission can edit dashboards?</p>
+                        <input type="text" class="quiz-input" data-answer="editor" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Editor</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: Provisioning</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Provisioning?</h3>
+                <p>Configure Grafana as code. No manual setup needed.</p>
+
+                <h3>Provisioned Files</h3>
+                <ul>
+                    <li><strong>datasources/</strong> Data source configs</li>
+                    <li><strong>dashboards/</strong> Dashboard definitions</li>
+                    <li><strong>notifiers/</strong> Notification channels</li>
+                </ul>
+
+                <h3>Example Datasource Config</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># /etc/grafana/provisioning/datasources/prometheus.yml
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://localhost:9090
+    isDefault: true</pre>
+
+                <h3>Dashboard Provisioning</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># /etc/grafana/provisioning/dashboards/default.yml
+apiVersion: 1
+
+providers:
+  - name: 'Default'
+    folder: 'Dashboards'
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What folder contains datasource configs?</p>
+                        <input type="text" class="quiz-input" data-answer="datasources" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>datasources/</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: Best Practices</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Dashboard Design</h3>
+                <ul>
+                    <li>Start with high-level overview</li>
+                    <li>Drill down with detail dashboards</li>
+                    <li>Use consistent naming</li>
+                    <li>Add descriptions to panels</li>
+                </ul>
+
+                <h3>Performance Tips</h3>
+                <ul>
+                    <li>Reduce query frequency</li>
+                    <li>Use recording rules for complex queries</li>
+                    <li>Limit time range by default</li>
+                    <li>Disable unused panels</li>
+                </ul>
+
+                <h3>Security</h3>
+                <ul>
+                    <li>Use HTTPS in production</li>
+                    <li>Enable authentication</li>
+                    <li>Restrict data source access</li>
+                    <li>Rotate API keys</li>
+                </ul>
+
+                <h3>Alert Best Practices</h3>
+                <ul>
+                    <li>Alert on symptoms, not causes</li>
+                    <li>Set reasonable thresholds</li>
+                    <li>Avoid alert storms</li>
+                    <li>Include runbook links</li>
+                </ul>
+
+                <h3>Congratulations!</h3>
+                <p>You've completed the Grafana Mastery guide. You now understand:</p>
+                <ul>
+                    <li>Grafana fundamentals</li>
+                    <li>Data source configuration</li>
+                    <li>Dashboard creation</li>
+                    <li>Visualization types</li>
+                    <li>Variables and templating</li>
+                    <li>Alerts and notifications</li>
+                    <li>Prometheus queries</li>
+                    <li>Annotations</li>
+                    <li>Plugins and transformations</li>
+                    <li>User management</li>
+                    <li>Provisioning</li>
+                    <li>Best practices</li>
+                </ul>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why Grafana</h2>
+            <p>Grafana is the open-source standard for observability. From startups to Fortune 500 companies, teams use Grafana to understand their systems.</p>
+            <p>Whether you're monitoring servers, applications, or business metrics, Grafana makes data actionable.</p>
+            <p><strong>See everything. Know everything.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>Grafana Documentation</h3>
+                <p>Official Docs</p>
+                <a href="https://grafana.com/docs/" target="_blank">grafana.com/docs</a>
+            </div>
+            <div class="resource-card">
+                <h3>Prometheus</h3>
+                <p>Metrics Database</p>
+                <a href="https://prometheus.io/" target="_blank">prometheus.io</a>
+            </div>
+            <div class="resource-card">
+                <h3>Grafana Labs</h3>
+                <p>Official Website</p>
+                <a href="https://grafana.com/" target="_blank">grafana.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>Dashboards Gallery</h3>
+                <p>Community Dashboards</p>
+                <a href="https://grafana.com/grafana/dashboards/" target="_blank">dashboards</a>
+            </div>
+            <div class="resource-card">
+                <h3>Plugin Directory</h3>
+                <p>Grafana Plugins</p>
+                <a href="https://grafana.com/plugins/" target="_blank">grafana.com/plugins</a>
+            </div>
+            <div class="resource-card">
+                <h3>PromQL Reference</h3>
+                <p>Query Language</p>
+                <a href="https://prometheus.io/docs/prometheus/latest/querying/basics/" target="_blank">prometheus.io</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+    </footer>
+
+    <script>
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+</body>
+</html>
