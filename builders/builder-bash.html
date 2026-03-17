@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BASH BUILDER - Learn Basic Commands</title>
+    <title>Bash Builder - Bash Basics</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,7 +25,7 @@
         
         .header h1 {
             font-size: 28px;
-            color: #4e9a06;
+            color: #4eaa25;
             margin-bottom: 8px;
             letter-spacing: 2px;
         }
@@ -45,7 +45,7 @@
         .stat { text-align: center; }
         .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; }
         .stat-value { font-size: 24px; font-weight: bold; color: #58a6ff; }
-        .stat-value.score { color: #4e9a06; }
+        .stat-value.score { color: #4eaa25; }
         
         .game-container {
             background: var(--beige);
@@ -61,7 +61,7 @@
         
         .level-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
         .level-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--charcoal); }
-        .level-dot.completed { background: #4e9a06; }
+        .level-dot.completed { background: #4eaa25; }
         .level-dot.current { background: #58a6ff; }
         
         .question-box {
@@ -69,7 +69,7 @@
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 25px;
-            border-left: 4px solid #4e9a06;
+            border-left: 4px solid #4eaa25;
         }
         
         .question-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
@@ -102,7 +102,7 @@
             color: var(--black);
         }
         
-        .letter-slot.filled { border-style: solid; border-color: #4e9a06; }
+        .letter-slot.filled { border-style: solid; border-color: #4eaa25; }
         .letter-slot.correct { border-color: #3fb950; background: rgba(63, 185, 80, 0.1); }
         .letter-slot.incorrect { border-color: #f85149; background: rgba(248, 81, 73, 0.1); }
         
@@ -111,15 +111,15 @@
         .letter-tile {
             width: 46px;
             height: 46px;
-            background: linear-gradient(135deg, #4e9a06, #3d7a05);
-            background-color: #4e9a06;
+            background: linear-gradient(135deg, #4eaa25, #3d8a1e);
+            background-color: #4eaa25;
             border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
             font-weight: bold;
-            color: white;
+            color: var(--white);
             cursor: grab;
             transition: all 0.2s ease;
             user-select: none;
@@ -128,7 +128,7 @@
         }
         
         .letter-tile:active { cursor: grabbing; }
-        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(78, 154, 6, 0.3); }
+        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(78, 170, 37, 0.3); }
         .letter-tile.dragging { opacity: 0.5; }
         
         .actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
@@ -177,7 +177,7 @@
             max-width: 400px;
         }
         
-        .modal-content h2 { color: #4e9a06; margin-bottom: 20px; }
+        .modal-content h2 { color: #4eaa25; margin-bottom: 20px; }
         .modal-content p { color: var(--charcoal); margin-bottom: 25px; }
         
         .back-link { display: inline-block; margin-top: 20px; color: #58a6ff; text-decoration: none; font-size: 14px; }
@@ -196,7 +196,7 @@
             .game-container { padding: 15px; }
             .level-indicator { gap: 5px; }
             .level-dot { width: 20px; height: 20px; }
-            .letter-slot, .letter-tile { width: 35px; height: 35px; font-size: 12px; }
+            .letter-slot, .letter-tile { width: 38px; height: 38px; font-size: 12px; }
             .modal-content { padding: 20px; margin: 10px; }
             .modal-content h2 { font-size: 18px; }
         }
@@ -204,8 +204,8 @@
 </head>
 <body>
     <div class="header">
-        <h1>BASH BUILDER</h1>
-        <p>Drag & drop to learn basic bash commands</p>
+        <h1>💻 BASH BUILDER</h1>
+        <p>Drag & drop to learn Bash commands</p>
     </div>
     
     <div class="stats-bar">
@@ -241,7 +241,7 @@
     
     <div class="completion-modal" id="completionModal">
         <div class="modal-content">
-            <h2>Level Complete!</h2>
+            <h2>🎉 Level Complete!</h2>
             <p>You scored <span id="finalScore">0</span> points!</p>
             <button class="btn btn-primary" onclick="nextLevel()">Next Level</button>
         </div>
@@ -251,16 +251,16 @@
 
     <script>
         const levels = [{ questions: [
-            { answer: "ECHO", hint: "Print to screen", code: "Output text" },
-            { answer: "READ", hint: "Get user input", code: "Read from terminal" },
-            { answer: "CD", hint: "Change directory", code: "Navigate folders" },
-            { answer: "LS", hint: "List files", code: "Show directory" },
-            { answer: "PWD", hint: "Print working dir", code: "Show current path" },
-            { answer: "MKDIR", hint: "Make directory", code: "Create folder" },
-            { answer: "RM", hint: "Remove file", code: "Delete file" },
-            { answer: "CP", hint: "Copy file", code: "Duplicate file" },
-            { answer: "MV", hint: "Move file", code: "Rename/move" },
-            { answer: "CAT", hint: "Show file", code: "Print contents" }
+            { answer: "ls", hint: "List directory contents", code: "Show files and folders" },
+            { answer: "cd", hint: "Change directory", code: "Navigate between folders" },
+            { answer: "pwd", hint: "Print working directory", code: "Show current location" },
+            { answer: "mkdir", hint: "Make directory", code: "Create a new folder" },
+            { answer: "rm", hint: "Remove", code: "Delete files" },
+            { answer: "cp", hint: "Copy", code: "Duplicate files" },
+            { answer: "mv", hint: "Move", code: "Rename or relocate files" },
+            { answer: "cat", hint: "Concatenate", code: "Display file contents" },
+            { answer: "grep", hint: "Global regular expression", code: "Search within files" },
+            { answer: "chmod", hint: "Change mode", code: "Modify file permissions" }
         ]}];
         
         let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
@@ -360,6 +360,17 @@
             draggedOriginalIndex = parseInt(e.target.dataset.originalIndex);
             e.target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
+            const canvas = document.createElement('canvas');
+            canvas.width = 46; canvas.height = 46;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#4eaa25';
+            ctx.fillRect(0, 0, 46, 46);
+            ctx.fillStyle = 'var(--white)';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.target.textContent, 23, 23);
+            e.dataTransfer.setDragImage(canvas, 23, 23);
         }
         
         function handleDragEnd(e) { e.target.classList.remove('dragging'); }
@@ -391,7 +402,7 @@
                 document.getElementById('streak').textContent = streak;
                 slots.forEach(slot => slot.classList.add('correct'));
                 document.getElementById('feedback').className = 'feedback success';
-                document.getElementById('feedback').textContent = 'Correct!';
+                document.getElementById('feedback').textContent = '✓ Correct!';
                 setTimeout(() => {
                     currentQuestion++;
                     if (currentQuestion >= levels[currentLevel].questions.length) showCompletion();
@@ -402,7 +413,7 @@
                 document.getElementById('streak').textContent = streak;
                 slots.forEach(slot => slot.classList.add('incorrect'));
                 document.getElementById('feedback').className = 'feedback error';
-                document.getElementById('feedback').textContent = 'Try again!';
+                document.getElementById('feedback').textContent = '✗ Try again!';
             }
         }
         
@@ -427,7 +438,7 @@
                 }
             }
         });
-        
+
         initLevel();
 
         const savedTheme = localStorage.getItem('theme');

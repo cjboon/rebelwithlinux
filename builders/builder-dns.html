@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DNS Builder - Learn DNS Records</title>
+    <title>DNS Builder - Learn DNS Basics</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,7 +25,7 @@
         
         .header h1 {
             font-size: 28px;
-            color: #ff6b35;
+            color: #6f42c1;
             margin-bottom: 8px;
             letter-spacing: 2px;
         }
@@ -45,7 +45,7 @@
         .stat { text-align: center; }
         .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; }
         .stat-value { font-size: 24px; font-weight: bold; color: #58a6ff; }
-        .stat-value.score { color: #ff6b35; }
+        .stat-value.score { color: #6f42c1; }
         
         .game-container {
             background: var(--beige);
@@ -61,7 +61,7 @@
         
         .level-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
         .level-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--charcoal); }
-        .level-dot.completed { background: #ff6b35; }
+        .level-dot.completed { background: #6f42c1; }
         .level-dot.current { background: #58a6ff; }
         
         .question-box {
@@ -69,7 +69,7 @@
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 25px;
-            border-left: 4px solid #ff6b35;
+            border-left: 4px solid #6f42c1;
         }
         
         .question-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
@@ -102,7 +102,7 @@
             color: var(--black);
         }
         
-        .letter-slot.filled { border-style: solid; border-color: #ff6b35; }
+        .letter-slot.filled { border-style: solid; border-color: #6f42c1; }
         .letter-slot.correct { border-color: #3fb950; background: rgba(63, 185, 80, 0.1); }
         .letter-slot.incorrect { border-color: #f85149; background: rgba(248, 81, 73, 0.1); }
         
@@ -111,15 +111,15 @@
         .letter-tile {
             width: 46px;
             height: 46px;
-            background: linear-gradient(135deg, #ff6b35, #e55a2b);
-            background-color: #ff6b35;
+            background: linear-gradient(135deg, #6f42c1, #5a32a3);
+            background-color: #6f42c1;
             border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
             font-weight: bold;
-            color: white;
+            color: var(--white);
             cursor: grab;
             transition: all 0.2s ease;
             user-select: none;
@@ -128,7 +128,7 @@
         }
         
         .letter-tile:active { cursor: grabbing; }
-        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3); }
+        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(111, 66, 193, 0.3); }
         .letter-tile.dragging { opacity: 0.5; }
         
         .actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
@@ -177,7 +177,7 @@
             max-width: 400px;
         }
         
-        .modal-content h2 { color: #ff6b35; margin-bottom: 20px; }
+        .modal-content h2 { color: #6f42c1; margin-bottom: 20px; }
         .modal-content p { color: var(--charcoal); margin-bottom: 25px; }
         
         .back-link { display: inline-block; margin-top: 20px; color: #58a6ff; text-decoration: none; font-size: 14px; }
@@ -185,27 +185,49 @@
         
         .progress-info { margin-top: 20px; text-align: center; color: var(--charcoal); font-size: 13px; }
         
+        /* Mobile optimizations */
         @media (max-width: 600px) {
             body { padding: 10px; }
             .header { padding: 15px; margin-bottom: 15px; }
             .header h1 { font-size: 20px; }
             .header p { font-size: 12px; }
-            .stats-bar { flex-wrap: wrap; gap: 15px; padding: 10px 15px; }
+            .stats-bar {
+                flex-wrap: wrap;
+                gap: 15px;
+                padding: 10px 15px;
+            }
             .stat-value { font-size: 18px; }
             .stat-label { font-size: 10px; }
             .game-container { padding: 15px; }
             .level-indicator { gap: 5px; }
             .level-dot { width: 20px; height: 20px; }
-            .letter-slot, .letter-tile { width: 35px; height: 35px; font-size: 12px; }
+            .challenge-text { font-size: 14px; padding: 10px; }
+            .preview-area { padding: 10px; }
+            .preview-frame { min-height: 150px; }
+            .code-input { 
+                font-size: 14px; 
+                padding: 10px;
+            }
+            .submit-btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
             .modal-content { padding: 20px; margin: 10px; }
             .modal-content h2 { font-size: 18px; }
+        }
+        
+        @media (max-width: 400px) {
+            .header h1 { font-size: 16px; }
+            .stats-bar { gap: 10px; }
+            .stat-value { font-size: 16px; }
+            .preview-frame { min-height: 100px; }
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>🌐 DNS BUILDER</h1>
-        <p>Drag & drop to learn DNS record types</p>
+        <p>Drag & drop to learn DNS basics</p>
     </div>
     
     <div class="stats-bar">
@@ -244,6 +266,8 @@
             <h2>🎉 Level Complete!</h2>
             <p>You scored <span id="finalScore">0</span> points!</p>
             <button class="btn btn-primary" onclick="nextLevel()">Next Level</button>
+            <br><br>
+            <a href="builder-main.html" class="back-link">&lt;&lt; back to builder games</a>
         </div>
     </div>
     
@@ -251,16 +275,16 @@
 
     <script>
         const levels = [{ questions: [
-            { answer: "A", hint: "IPv4 address record", code: "Maps hostname to IPv4 address" },
-            { answer: "AAAA", hint: "IPv6 address record", code: "Maps hostname to IPv6 address" },
-            { answer: "CNAME", hint: "Canonical name", code: "Creates alias for hostname" },
-            { answer: "MX", hint: "Mail exchange", code: "Specifies mail servers" },
-            { answer: "TXT", hint: "Text record", code: "Holds text information" },
-            { answer: "NS", hint: "Name server", code: "Delegates DNS zone" },
-            { answer: "SOA", hint: "Start of authority", code: "Zone's authoritative info" },
-            { answer: "PTR", hint: "Pointer record", code: "Reverse DNS lookup" },
-            { answer: "HTTP", hint: "Web protocol", code: "Not a DNS record, but related" },
-            { answer: "HTTPS", hint: "Secure web protocol", code: "HTTP over TLS" }
+            { answer: "a", hint: "IPv4 address record", code: "Maps domain to IPv4 address" },
+            { answer: "aaaa", hint: "IPv6 address record", code: "Maps domain to IPv6 address" },
+            { answer: "cname", hint: "Canonical name record", code: "Creates an alias for a domain" },
+            { answer: "mx", hint: "Mail exchange record", code: "Specifies mail servers" },
+            { answer: "ns", hint: "Name server record", code: "Delegates a DNS zone" },
+            { answer: "txt", hint: "Text record", code: "Holds arbitrary text data" },
+            { answer: "soa", hint: "Start of authority record", code: "Contains zone admin info" },
+            { answer: "ptr", hint: "Pointer record", code: "Reverse DNS lookup" },
+            { answer: "domain", hint: "Hierarchical name space", code: "example.com is a DNS ___" },
+            { answer: "zone", hint: "DNS database portion", code: "A DNS ___ is a contiguous portion of namespace" }
         ]}];
         
         let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
@@ -360,6 +384,17 @@
             draggedOriginalIndex = parseInt(e.target.dataset.originalIndex);
             e.target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
+            const canvas = document.createElement('canvas');
+            canvas.width = 46; canvas.height = 46;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#6f42c1';
+            ctx.fillRect(0, 0, 46, 46);
+            ctx.fillStyle = 'var(--white)';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.target.textContent, 23, 23);
+            e.dataTransfer.setDragImage(canvas, 23, 23);
         }
         
         function handleDragEnd(e) { e.target.classList.remove('dragging'); }
@@ -413,8 +448,10 @@
         document.addEventListener('keydown', function(e) {
             const key = e.key.toLowerCase();
             if (key.length === 1 && key >= 'a' && key <= 'z') {
+                // Find first empty slot
                 const emptyIndex = placedLetters.indexOf(null);
                 if (emptyIndex !== -1) {
+                    // Find the letter in the pool
                     const poolItems = document.querySelectorAll('.letter-tile');
                     for (let item of poolItems) {
                         if (item.textContent.toLowerCase() === key) {
@@ -428,7 +465,7 @@
                 }
             }
         });
-        
+
         initLevel();
 
         const savedTheme = localStorage.getItem('theme');

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Networking Builder L3 - Learn Advanced Networking</title>
+    <title>Networking Builder 3 - Advanced Networking</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,7 +25,7 @@
         
         .header h1 {
             font-size: 28px;
-            color: #4a90d9;
+            color: #0077b5;
             margin-bottom: 8px;
             letter-spacing: 2px;
         }
@@ -44,8 +44,8 @@
         
         .stat { text-align: center; }
         .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; }
-        .stat-value { font-size: 24px; font-weight: bold; color: #4a90d9; }
-        .stat-value.score { color: #4a90d9; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #58a6ff; }
+        .stat-value.score { color: #0077b5; }
         
         .game-container {
             background: var(--beige);
@@ -61,15 +61,15 @@
         
         .level-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
         .level-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--charcoal); }
-        .level-dot.completed { background: #4a90d9; }
-        .level-dot.current { background: #4a90d9; }
+        .level-dot.completed { background: #0077b5; }
+        .level-dot.current { background: #58a6ff; }
         
         .question-box {
             background: var(--white);
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 25px;
-            border-left: 4px solid #4a90d9;
+            border-left: 4px solid #0077b5;
         }
         
         .question-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
@@ -102,7 +102,7 @@
             color: var(--black);
         }
         
-        .letter-slot.filled { border-style: solid; border-color: #4a90d9; }
+        .letter-slot.filled { border-style: solid; border-color: #0077b5; }
         .letter-slot.correct { border-color: #3fb950; background: rgba(63, 185, 80, 0.1); }
         .letter-slot.incorrect { border-color: #f85149; background: rgba(248, 81, 73, 0.1); }
         
@@ -111,15 +111,15 @@
         .letter-tile {
             width: 46px;
             height: 46px;
-            background: linear-gradient(135deg, #4a90d9, #3a7bc8);
-            background-color: #4a90d9;
+            background: linear-gradient(135deg, #0077b5, #005a8c);
+            background-color: #0077b5;
             border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
             font-weight: bold;
-            color: white;
+            color: var(--white);
             cursor: grab;
             transition: all 0.2s ease;
             user-select: none;
@@ -128,7 +128,7 @@
         }
         
         .letter-tile:active { cursor: grabbing; }
-        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(74, 144, 217, 0.3); }
+        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0, 119, 181, 0.3); }
         .letter-tile.dragging { opacity: 0.5; }
         
         .actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
@@ -177,7 +177,7 @@
             max-width: 400px;
         }
         
-        .modal-content h2 { color: #4a90d9; margin-bottom: 20px; }
+        .modal-content h2 { color: #0077b5; margin-bottom: 20px; }
         .modal-content p { color: var(--charcoal); margin-bottom: 25px; }
         
         .back-link { display: inline-block; margin-top: 20px; color: #58a6ff; text-decoration: none; font-size: 14px; }
@@ -196,7 +196,7 @@
             .game-container { padding: 15px; }
             .level-indicator { gap: 5px; }
             .level-dot { width: 20px; height: 20px; }
-            .letter-slot, .letter-tile { width: 35px; height: 35px; font-size: 12px; }
+            .letter-slot, .letter-tile { width: 38px; height: 38px; font-size: 12px; }
             .modal-content { padding: 20px; margin: 10px; }
             .modal-content h2 { font-size: 18px; }
         }
@@ -204,12 +204,12 @@
 </head>
 <body>
     <div class="header">
-        <h1>🌐 NETWORKING BUILDER L3</h1>
-        <p>Drag & drop to learn advanced networking</p>
+        <h1>🚀 NETWORKING BUILDER 3</h1>
+        <p>Advanced Networking Concepts</p>
     </div>
     
     <div class="stats-bar">
-        <div class="stat"><div class="stat-label">Level</div><div class="stat-value" id="levelNum">3</div></div>
+        <div class="stat"><div class="stat-label">Level</div><div class="stat-value" id="levelNum">1</div></div>
         <div class="stat"><div class="stat-label">Score</div><div class="stat-value score" id="score">0</div></div>
         <div class="stat"><div class="stat-label">Streak</div><div class="stat-value" id="streak">0</div></div>
     </div>
@@ -241,9 +241,9 @@
     
     <div class="completion-modal" id="completionModal">
         <div class="modal-content">
-            <h2>🎉 Level Complete!</h2>
+            <h2>🎉 All Levels Complete!</h2>
             <p>You scored <span id="finalScore">0</span> points!</p>
-            <button class="btn btn-primary" onclick="nextLevel()">Back to Home</button>
+            <button class="btn btn-primary" onclick="goBack()">Back to Builders</button>
         </div>
     </div>
     
@@ -251,16 +251,16 @@
 
     <script>
         const levels = [{ questions: [
-            { answer: "BGP", hint: "Border Gateway", code: "Internet routing" },
-            { answer: "OSPF", hint: "Link state", code: "Internal routing" },
-            { answer: "FIREWALL", hint: "Packet filter", code: "Security boundary" },
-            { answer: "LOADBAL", hint: "Distribute traffic", code: "Traffic distribution" },
-            { answer: "VPN", hint: "Virtual private network", code: "Encrypted tunnel" },
-            { answer: "TUNNEL", hint: "Encapsulation", code: "Create tunnel" },
-            { answer: "MTU", hint: "Max packet size", code: "Transmission unit" },
-            { answer: "LATENCY", hint: "Delay", code: "Response time" },
-            { answer: "THROUGHPUT", hint: "Data rate", code: "Transfer speed" },
-            { answer: "JITTER", hint: "Delay variation", code: "Unstable latency" }
+            { answer: "bgp", hint: "Border Gateway Protocol", code: "Internet routing protocol" },
+            { answer: "ospf", hint: "Open Shortest Path First", code: "Link-state routing protocol" },
+            { answer: "mpls", hint: "Multi-Protocol Label Switching", code: "High-speed data transmission" },
+            { answer: "vpn", hint: "Virtual Private Network", code: "Encrypted tunnel over internet" },
+            { answer: "ipv6", hint: "Internet Protocol v6", code: "Next-generation IP addresses" },
+            { answer: "qos", hint: "Quality of Service", code: "Prioritize network traffic" },
+            { answer: "snmp", hint: "Simple Network Management Protocol", code: "Monitor network devices" },
+            { answer: "tcpdump", hint: "Packet analyzer", code: "Capture network packets" },
+            { answer: "wireshark", hint: "Network protocol analyzer", code: "Analyze network traffic" },
+            { answer: "traceroute", hint: "Trace packet path", code: "Track route packets take" }
         ]}];
         
         let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
@@ -360,6 +360,17 @@
             draggedOriginalIndex = parseInt(e.target.dataset.originalIndex);
             e.target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
+            const canvas = document.createElement('canvas');
+            canvas.width = 46; canvas.height = 46;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#0077b5';
+            ctx.fillRect(0, 0, 46, 46);
+            ctx.fillStyle = 'var(--white)';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.target.textContent, 23, 23);
+            e.dataTransfer.setDragImage(canvas, 23, 23);
         }
         
         function handleDragEnd(e) { e.target.classList.remove('dragging'); }
@@ -407,7 +418,7 @@
         }
         
         function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
-        function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = '../index.html'; }
+        function goBack() { document.getElementById('completionModal').classList.remove('active'); window.location.href = 'builder-main.html'; }
         
         document.addEventListener('keydown', function(e) {
             const key = e.key.toLowerCase();
@@ -427,7 +438,7 @@
                 }
             }
         });
-        
+
         initLevel();
 
         const savedTheme = localStorage.getItem('theme');

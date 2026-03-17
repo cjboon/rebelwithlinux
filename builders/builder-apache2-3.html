@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apache Builder L3 - Learn Apache Web Server</title>
+    <title>Apache2 Builder Level 3 - Learn Apache Commands</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -111,7 +111,7 @@
         .letter-tile {
             width: 46px;
             height: 46px;
-            background: linear-gradient(135deg, #d22128, #b31d22);
+            background: linear-gradient(135deg, #d22128, #b31c22);
             background-color: #d22128;
             border-radius: 0;
             display: flex;
@@ -119,7 +119,7 @@
             justify-content: center;
             font-size: 14px;
             font-weight: bold;
-            color: white;
+            color: var(--white);
             cursor: grab;
             transition: all 0.2s ease;
             user-select: none;
@@ -196,16 +196,21 @@
             .game-container { padding: 15px; }
             .level-indicator { gap: 5px; }
             .level-dot { width: 20px; height: 20px; }
-            .letter-slot, .letter-tile { width: 35px; height: 35px; font-size: 12px; }
             .modal-content { padding: 20px; margin: 10px; }
             .modal-content h2 { font-size: 18px; }
+        }
+        
+        @media (max-width: 400px) {
+            .header h1 { font-size: 16px; }
+            .stats-bar { gap: 10px; }
+            .stat-value { font-size: 16px; }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>APACHE BUILDER L3</h1>
-        <p>Drag & drop to learn Apache advanced topics</p>
+        <h1>🪶 APACHE2 BUILDER</h1>
+        <p>Drag & drop to learn Apache commands</p>
     </div>
     
     <div class="stats-bar">
@@ -241,26 +246,26 @@
     
     <div class="completion-modal" id="completionModal">
         <div class="modal-content">
-            <h2>Level Complete!</h2>
+            <h2>🎉 Level Complete!</h2>
             <p>You scored <span id="finalScore">0</span> points!</p>
-            <button class="btn btn-primary" onclick="nextLevel()">Back to Home</button>
+            <button class="btn btn-primary" onclick="nextLevel()">Back to Menu</button>
         </div>
     </div>
     
-    <a href="builder-apache2-2.html" class="back-link">&lt;&lt; back to Level 2</a>
+    <a href="builder-main.html" class="back-link">&lt;&lt; back to builder games</a>
 
     <script>
         const levels = [{ questions: [
-            { answer: "MODSEC", hint: "WAF module", code: "Security rules" },
-            { answer: "WORKER", hint: "Process model", code: "Multi-processing" },
-            { answer: "MPM", hint: "Multi-processing", code: "Process manager" },
-            { answer: "CGID", hint: "CGI script", code: "Dynamic content" },
-            { answer: "FCGI", hint: "FastCGI", code: "Persistent CGI" },
-            { answer: "PROXYFC", hint: "PHP handler", code: "App server" },
-            { answer: "AWSTATS", hint: "Log analyzer", code: "Statistics" },
-            { answer: "BALANCER", hint: "Load balance", code: "Clustering" },
-            { answer: "STATUS", hint: "Server info", code: "Monitoring page" },
-            { answer: "SERVER", hint: "Server info", code: "Admin page" }
+            { answer: "mpm", hint: "Multi-processing", code: "MPM module" },
+            { answer: "worker", hint: "Threaded MPM", code: "Worker MPM" },
+            { answer: "prefork", hint: "Process MPM", code: "Prefork MPM" },
+            { answer: "event", hint: "Async MPM", code: "Event MPM" },
+            { answer: "alias", hint: "URL mapping", code: "mod_alias" },
+            { answer: "cgi", hint: "CGI script", code: "Common Gateway" },
+            { answer: "fcgi", hint: "FastCGI", code: "Fast CGI process" },
+            { answer: "dir", hint: "Directory config", code: "mod_dir" },
+            { answer: "mime", hint: "File types", code: "mod_mime" },
+            { answer: "vhost", hint: "Virtual host", code: "Virtual host config" }
         ]}];
         
         let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
@@ -360,6 +365,17 @@
             draggedOriginalIndex = parseInt(e.target.dataset.originalIndex);
             e.target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
+            const canvas = document.createElement('canvas');
+            canvas.width = 46; canvas.height = 46;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#d22128';
+            ctx.fillRect(0, 0, 46, 46);
+            ctx.fillStyle = 'var(--white)';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.target.textContent, 23, 23);
+            e.dataTransfer.setDragImage(canvas, 23, 23);
         }
         
         function handleDragEnd(e) { e.target.classList.remove('dragging'); }
@@ -391,7 +407,7 @@
                 document.getElementById('streak').textContent = streak;
                 slots.forEach(slot => slot.classList.add('correct'));
                 document.getElementById('feedback').className = 'feedback success';
-                document.getElementById('feedback').textContent = 'Correct!';
+                document.getElementById('feedback').textContent = '✓ Correct!';
                 setTimeout(() => {
                     currentQuestion++;
                     if (currentQuestion >= levels[currentLevel].questions.length) showCompletion();
@@ -402,12 +418,12 @@
                 document.getElementById('streak').textContent = streak;
                 slots.forEach(slot => slot.classList.add('incorrect'));
                 document.getElementById('feedback').className = 'feedback error';
-                document.getElementById('feedback').textContent = 'Try again!';
+                document.getElementById('feedback').textContent = '✗ Try again!';
             }
         }
         
         function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
-        function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = '../index.html'; }
+        function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = 'builder-main.html'; }
         
         document.addEventListener('keydown', function(e) {
             const key = e.key.toLowerCase();
@@ -427,7 +443,7 @@
                 }
             }
         });
-        
+
         initLevel();
 
         const savedTheme = localStorage.getItem('theme');

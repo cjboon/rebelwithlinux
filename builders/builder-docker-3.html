@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docker Builder L3 - Learn Docker Commands</title>
+    <title>Docker Builder 3 - Advanced Docker</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -111,7 +111,7 @@
         .letter-tile {
             width: 46px;
             height: 46px;
-            background: linear-gradient(135deg, #2496ed, #1a7ed8);
+            background: linear-gradient(135deg, #2496ed, #1a7acc);
             background-color: #2496ed;
             border-radius: 0;
             display: flex;
@@ -119,7 +119,7 @@
             justify-content: center;
             font-size: 14px;
             font-weight: bold;
-            color: white;
+            color: var(--white);
             cursor: grab;
             transition: all 0.2s ease;
             user-select: none;
@@ -196,7 +196,7 @@
             .game-container { padding: 15px; }
             .level-indicator { gap: 5px; }
             .level-dot { width: 20px; height: 20px; }
-            .letter-slot, .letter-tile { width: 35px; height: 35px; font-size: 12px; }
+            .letter-slot, .letter-tile { width: 38px; height: 38px; font-size: 12px; }
             .modal-content { padding: 20px; margin: 10px; }
             .modal-content h2 { font-size: 18px; }
         }
@@ -204,8 +204,8 @@
 </head>
 <body>
     <div class="header">
-        <h1>🐳 DOCKER BUILDER L3</h1>
-        <p>Drag & drop to learn Docker commands</p>
+        <h1>🚀 DOCKER BUILDER 3</h1>
+        <p>Advanced Docker Concepts</p>
     </div>
     
     <div class="stats-bar">
@@ -241,26 +241,26 @@
     
     <div class="completion-modal" id="completionModal">
         <div class="modal-content">
-            <h2>🎉 Level Complete!</h2>
+            <h2>🎉 All Levels Complete!</h2>
             <p>You scored <span id="finalScore">0</span> points!</p>
-            <button class="btn btn-primary" onclick="nextLevel()">Finish</button>
+            <button class="btn btn-primary" onclick="goBack()">Back to Builders</button>
         </div>
     </div>
     
-    <a href="builder-docker-2.html" class="back-link">&lt;&lt; back to Level 2</a>
+    <a href="builder-main.html" class="back-link">&lt;&lt; back to builder games</a>
 
     <script>
         const levels = [{ questions: [
-            { answer: "SWARM", hint: "Cluster mode", code: "Docker clustering" },
-            { answer: "STACK", hint: "Deploy stack", code: "Multi-service deploy" },
-            { answer: "SERVICE", hint: "Managed container", code: "Replicated containers" },
-            { answer: "SECRET", hint: "Sensitive data", code: "Secure storage" },
-            { answer: "CONFIG", hint: "Configuration", code: "App settings" },
-            { answer: "NODE", hint: "Swarm member", code: "Cluster participant" },
-            { answer: "MANAGER", hint: "Swarm leader", code: "Cluster control" },
-            { answer: "WORKER", hint: "Swarm node", code: "Execute tasks" },
-            { answer: "DRAIN", hint: "Remove node", code: "Evacuate node" },
-            { answer: "PRUNE", hint: "Cleanup", code: "Remove unused" }
+            { answer: "kubernetes", hint: "Container orchestration", code: "K8s - manage containers at scale" },
+            { answer: "helm", hint: "Package manager", code: "Manage Kubernetes apps" },
+            { answer: "config", hint: "Configuration", code: "Set container config" },
+            { answer: "secret", hint: "Sensitive data", code: "Store secrets securely" },
+            { answer: "service", hint: "Network service", code: "Expose container network" },
+            { answer: "deploy", hint: "Deployment", code: "Deploy application" },
+            { answer: "scale", hint: "Scale containers", code: "Adjust container count" },
+            { answer: "健康检查", hint: "Health check", code: "Container health monitoring" },
+            { answer: "restart", hint: "Restart policy", code: "Auto-restart failed container" },
+            { answer: "prune", hint: "Cleanup", code: "Remove unused data" }
         ]}];
         
         let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
@@ -360,6 +360,17 @@
             draggedOriginalIndex = parseInt(e.target.dataset.originalIndex);
             e.target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
+            const canvas = document.createElement('canvas');
+            canvas.width = 46; canvas.height = 46;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#2496ed';
+            ctx.fillRect(0, 0, 46, 46);
+            ctx.fillStyle = 'var(--white)';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.target.textContent, 23, 23);
+            e.dataTransfer.setDragImage(canvas, 23, 23);
         }
         
         function handleDragEnd(e) { e.target.classList.remove('dragging'); }
@@ -407,7 +418,7 @@
         }
         
         function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
-        function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = '../index.html'; }
+        function goBack() { document.getElementById('completionModal').classList.remove('active'); window.location.href = 'builder-main.html'; }
         
         document.addEventListener('keydown', function(e) {
             const key = e.key.toLowerCase();
@@ -427,7 +438,7 @@
                 }
             }
         });
-        
+
         initLevel();
 
         const savedTheme = localStorage.getItem('theme');

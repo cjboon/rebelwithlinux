@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIM Builder L3 - Learn Vim Commands</title>
+    <title>Vim Builder Level 3 - Learn Vim Commands</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,7 +25,7 @@
         
         .header h1 {
             font-size: 28px;
-            color: #01986f;
+            color: #019833;
             margin-bottom: 8px;
             letter-spacing: 2px;
         }
@@ -45,7 +45,7 @@
         .stat { text-align: center; }
         .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; }
         .stat-value { font-size: 24px; font-weight: bold; color: #58a6ff; }
-        .stat-value.score { color: #01986f; }
+        .stat-value.score { color: #019833; }
         
         .game-container {
             background: var(--beige);
@@ -61,7 +61,7 @@
         
         .level-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
         .level-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--charcoal); }
-        .level-dot.completed { background: #01986f; }
+        .level-dot.completed { background: #019833; }
         .level-dot.current { background: #58a6ff; }
         
         .question-box {
@@ -69,7 +69,7 @@
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 25px;
-            border-left: 4px solid #01986f;
+            border-left: 4px solid #019833;
         }
         
         .question-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
@@ -102,7 +102,7 @@
             color: var(--black);
         }
         
-        .letter-slot.filled { border-style: solid; border-color: #01986f; }
+        .letter-slot.filled { border-style: solid; border-color: #019833; }
         .letter-slot.correct { border-color: #3fb950; background: rgba(63, 185, 80, 0.1); }
         .letter-slot.incorrect { border-color: #f85149; background: rgba(248, 81, 73, 0.1); }
         
@@ -111,15 +111,15 @@
         .letter-tile {
             width: 46px;
             height: 46px;
-            background: linear-gradient(135deg, #01986f, #017a5a);
-            background-color: #01986f;
+            background: linear-gradient(135deg, #019833, #017a2b);
+            background-color: #019833;
             border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
             font-weight: bold;
-            color: white;
+            color: var(--white);
             cursor: grab;
             transition: all 0.2s ease;
             user-select: none;
@@ -128,7 +128,7 @@
         }
         
         .letter-tile:active { cursor: grabbing; }
-        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(1, 152, 111, 0.3); }
+        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(1, 152, 51, 0.3); }
         .letter-tile.dragging { opacity: 0.5; }
         
         .actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
@@ -177,7 +177,7 @@
             max-width: 400px;
         }
         
-        .modal-content h2 { color: #01986f; margin-bottom: 20px; }
+        .modal-content h2 { color: #019833; margin-bottom: 20px; }
         .modal-content p { color: var(--charcoal); margin-bottom: 25px; }
         
         .back-link { display: inline-block; margin-top: 20px; color: #58a6ff; text-decoration: none; font-size: 14px; }
@@ -196,20 +196,25 @@
             .game-container { padding: 15px; }
             .level-indicator { gap: 5px; }
             .level-dot { width: 20px; height: 20px; }
-            .letter-slot, .letter-tile { width: 35px; height: 35px; font-size: 12px; }
             .modal-content { padding: 20px; margin: 10px; }
             .modal-content h2 { font-size: 18px; }
+        }
+        
+        @media (max-width: 400px) {
+            .header h1 { font-size: 16px; }
+            .stats-bar { gap: 10px; }
+            .stat-value { font-size: 16px; }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>📝 VIM BUILDER L3</h1>
-        <p>Drag & drop to learn vim commands</p>
+        <h1>📝 VIM BUILDER</h1>
+        <p>Drag & drop to learn Vim commands</p>
     </div>
     
     <div class="stats-bar">
-        <div class="stat"><div class="stat-label">Level</div><div class="stat-value" id="levelNum">1</div></div>
+        <div class="stat"><div class="stat-label">Level</div><div class="stat-value" id="levelNum">3</div></div>
         <div class="stat"><div class="stat-label">Score</div><div class="stat-value score" id="score">0</div></div>
         <div class="stat"><div class="stat-label">Streak</div><div class="stat-value" id="streak">0</div></div>
     </div>
@@ -243,7 +248,7 @@
         <div class="modal-content">
             <h2>🎉 Level Complete!</h2>
             <p>You scored <span id="finalScore">0</span> points!</p>
-            <button class="btn btn-primary" onclick="nextLevel()">Next Level</button>
+            <button class="btn btn-primary" onclick="nextLevel()">Back to Menu</button>
         </div>
     </div>
     
@@ -251,16 +256,16 @@
 
     <script>
         const levels = [{ questions: [
-            { answer: "NOREMAP", hint: "Custom mapping", code: "Create shortcut" },
-            { answer: "PLUGIN", hint: "Extension", code: "Add functionality" },
-            { answer: "MACRO", hint: "Recorded actions", code: "Replay commands" },
-            { answer: "REGISTER", hint: "Storage area", code: "Buffer storage" },
-            { answer: "FOLD", hint: "Hide code", code: "Collapse section" },
-            { answer: "DIFF", hint: "Compare files", code: "Show differences" },
-            { answer: "GITGUTTER", hint: "Git integration", code: "Show changes" },
-            { answer: "NERDTREE", hint: "File explorer", code: "Directory tree" },
-            { answer: "FZF", hint: "Fuzzy finder", code: "Quick search" },
-            { answer: "COCCINELLE", hint: "Refactoring", code: "Code search-replace" }
+            { answer: ":%s", hint: "Substitute all", code: "Replace all occurrences" },
+            { answer: "ctrl", hint: "Control key", code: "Control key combo" },
+            { answer: "v", hint: "Visual mode", code: "Enter visual mode" },
+            { answer: "V", hint: "Visual line", code: "Visual line mode" },
+            { answer: "y", hint: "Yank/copy", code: "Yank selected text" },
+            { answer: "d", hint: "Delete", code: "Delete selected" },
+            { answer: "c", hint: "Change", code: "Change text" },
+            { answer: "gg", hint: "Go top", code: "Go to first line" },
+            { answer: "dd", hint: "Delete line", code: "Delete current line" },
+            { answer: "quit", hint: "Exit Vim", code: "Close file" }
         ]}];
         
         let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
@@ -360,6 +365,17 @@
             draggedOriginalIndex = parseInt(e.target.dataset.originalIndex);
             e.target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
+            const canvas = document.createElement('canvas');
+            canvas.width = 46; canvas.height = 46;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#019833';
+            ctx.fillRect(0, 0, 46, 46);
+            ctx.fillStyle = 'var(--white)';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.target.textContent, 23, 23);
+            e.dataTransfer.setDragImage(canvas, 23, 23);
         }
         
         function handleDragEnd(e) { e.target.classList.remove('dragging'); }
@@ -407,7 +423,7 @@
         }
         
         function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
-        function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = '../index.html'; }
+        function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = 'builder-main.html'; }
         
         document.addEventListener('keydown', function(e) {
             const key = e.key.toLowerCase();
@@ -427,7 +443,7 @@
                 }
             }
         });
-        
+
         initLevel();
 
         const savedTheme = localStorage.getItem('theme');

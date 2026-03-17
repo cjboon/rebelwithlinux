@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hardening Builder - Learn System Hardening</title>
+    <title>Hardening Builder - System Hardening Basics</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,7 +25,7 @@
         
         .header h1 {
             font-size: 28px;
-            color: #ff6b35;
+            color: #d73a49;
             margin-bottom: 8px;
             letter-spacing: 2px;
         }
@@ -45,7 +45,7 @@
         .stat { text-align: center; }
         .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; }
         .stat-value { font-size: 24px; font-weight: bold; color: #58a6ff; }
-        .stat-value.score { color: #ff6b35; }
+        .stat-value.score { color: #d73a49; }
         
         .game-container {
             background: var(--beige);
@@ -61,7 +61,7 @@
         
         .level-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
         .level-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--charcoal); }
-        .level-dot.completed { background: #ff6b35; }
+        .level-dot.completed { background: #d73a49; }
         .level-dot.current { background: #58a6ff; }
         
         .question-box {
@@ -69,7 +69,7 @@
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 25px;
-            border-left: 4px solid #ff6b35;
+            border-left: 4px solid #d73a49;
         }
         
         .question-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
@@ -102,7 +102,7 @@
             color: var(--black);
         }
         
-        .letter-slot.filled { border-style: solid; border-color: #ff6b35; }
+        .letter-slot.filled { border-style: solid; border-color: #d73a49; }
         .letter-slot.correct { border-color: #3fb950; background: rgba(63, 185, 80, 0.1); }
         .letter-slot.incorrect { border-color: #f85149; background: rgba(248, 81, 73, 0.1); }
         
@@ -111,15 +111,15 @@
         .letter-tile {
             width: 46px;
             height: 46px;
-            background: linear-gradient(135deg, #ff6b35, #e55a2b);
-            background-color: #ff6b35;
+            background: linear-gradient(135deg, #d73a49, #b7313c);
+            background-color: #d73a49;
             border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
             font-weight: bold;
-            color: white;
+            color: var(--white);
             cursor: grab;
             transition: all 0.2s ease;
             user-select: none;
@@ -128,7 +128,7 @@
         }
         
         .letter-tile:active { cursor: grabbing; }
-        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3); }
+        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(215, 58, 73, 0.3); }
         .letter-tile.dragging { opacity: 0.5; }
         
         .actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
@@ -177,7 +177,7 @@
             max-width: 400px;
         }
         
-        .modal-content h2 { color: #ff6b35; margin-bottom: 20px; }
+        .modal-content h2 { color: #d73a49; margin-bottom: 20px; }
         .modal-content p { color: var(--charcoal); margin-bottom: 25px; }
         
         .back-link { display: inline-block; margin-top: 20px; color: #58a6ff; text-decoration: none; font-size: 14px; }
@@ -196,7 +196,7 @@
             .game-container { padding: 15px; }
             .level-indicator { gap: 5px; }
             .level-dot { width: 20px; height: 20px; }
-            .letter-slot, .letter-tile { width: 35px; height: 35px; font-size: 12px; }
+            .letter-slot, .letter-tile { width: 38px; height: 38px; font-size: 12px; }
             .modal-content { padding: 20px; margin: 10px; }
             .modal-content h2 { font-size: 18px; }
         }
@@ -204,7 +204,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>🛡️ HARDENING BUILDER</h1>
+        <h1>🔒 HARDENING BUILDER</h1>
         <p>Drag & drop to learn system hardening</p>
     </div>
     
@@ -251,16 +251,16 @@
 
     <script>
         const levels = [{ questions: [
-            { answer: "UFW", hint: "Firewall", code: "Uncomplicated Firewall" },
-            { answer: "SSH", hint: "Secure shell", code: "Remote access" },
-            { answer: "KEY", hint: "SSH key", code: "Passwordless login" },
-            { answer: "FAIL2BAN", hint: "Block attackers", code: "Ban suspicious IPs" },
-            { answer: "ROOT", hint: "Superuser", code: "Admin account" },
-            { answer: "SUDO", hint: "Root access", code: "Elevated privileges" },
-            { answer: "PASS", hint: "Password policy", code: "Strong passwords" },
-            { answer: "UPDATE", hint: "Patch system", code: "Security updates" },
-            { answer: "PORTS", hint: "Network ports", code: "Open services" },
-            { answer: "FIREWALL", hint: "Network filter", code: "Block traffic" }
+            { answer: "ufw", hint: "Uncomplicated Firewall", code: "Simple firewall management tool" },
+            { answer: "ssh", hint: "Secure Shell", code: "Encrypted remote access" },
+            { answer: "sudo", hint: "Superuser do", code: "Execute commands as root" },
+            { answer: "passwd", hint: "Password utility", code: "Change user passwords" },
+            { answer: "useradd", hint: "Add user", code: "Create new user accounts" },
+            { answer: "chmod", hint: "Change mode", code: "Modify file permissions" },
+            { answer: "chown", hint: "Change owner", code: "Change file ownership" },
+            { answer: "selinux", hint: "Security Enhanced Linux", code: "Kernel security module" },
+            { answer: "fail2ban", hint: "Ban intruders", code: "Block malicious login attempts" },
+            { answer: "audit", hint: "System auditing", code: "Track system events" }
         ]}];
         
         let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
@@ -360,6 +360,17 @@
             draggedOriginalIndex = parseInt(e.target.dataset.originalIndex);
             e.target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
+            const canvas = document.createElement('canvas');
+            canvas.width = 46; canvas.height = 46;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#d73a49';
+            ctx.fillRect(0, 0, 46, 46);
+            ctx.fillStyle = 'var(--white)';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.target.textContent, 23, 23);
+            e.dataTransfer.setDragImage(canvas, 23, 23);
         }
         
         function handleDragEnd(e) { e.target.classList.remove('dragging'); }
@@ -427,7 +438,7 @@
                 }
             }
         });
-        
+
         initLevel();
 
         const savedTheme = localStorage.getItem('theme');

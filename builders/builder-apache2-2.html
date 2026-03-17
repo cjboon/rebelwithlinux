@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apache Builder L2 - Learn Apache Web Server</title>
+    <title>Apache2 Builder Level 2 - Learn Apache Commands</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -111,7 +111,7 @@
         .letter-tile {
             width: 46px;
             height: 46px;
-            background: linear-gradient(135deg, #d22128, #b31d22);
+            background: linear-gradient(135deg, #d22128, #b31c22);
             background-color: #d22128;
             border-radius: 0;
             display: flex;
@@ -119,7 +119,7 @@
             justify-content: center;
             font-size: 14px;
             font-weight: bold;
-            color: white;
+            color: var(--white);
             cursor: grab;
             transition: all 0.2s ease;
             user-select: none;
@@ -196,16 +196,21 @@
             .game-container { padding: 15px; }
             .level-indicator { gap: 5px; }
             .level-dot { width: 20px; height: 20px; }
-            .letter-slot, .letter-tile { width: 35px; height: 35px; font-size: 12px; }
             .modal-content { padding: 20px; margin: 10px; }
             .modal-content h2 { font-size: 18px; }
+        }
+        
+        @media (max-width: 400px) {
+            .header h1 { font-size: 16px; }
+            .stats-bar { gap: 10px; }
+            .stat-value { font-size: 16px; }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>APACHE BUILDER L2</h1>
-        <p>Drag & drop to learn Apache SSL & security</p>
+        <h1>🪶 APACHE2 BUILDER</h1>
+        <p>Drag & drop to learn Apache commands</p>
     </div>
     
     <div class="stats-bar">
@@ -241,26 +246,26 @@
     
     <div class="completion-modal" id="completionModal">
         <div class="modal-content">
-            <h2>Level Complete!</h2>
+            <h2>🎉 Level Complete!</h2>
             <p>You scored <span id="finalScore">0</span> points!</p>
             <button class="btn btn-primary" onclick="nextLevel()">Next Level</button>
         </div>
     </div>
     
-    <a href="builder-apache2.html" class="back-link">&lt;&lt; back to Level 1</a>
+    <a href="builder-main.html" class="back-link">&lt;&lt; back to builder games</a>
 
     <script>
         const levels = [{ questions: [
-            { answer: "SSL", hint: "Encryption", code: "HTTPS support" },
-            { answer: "CERT", hint: "Certificate", code: "TLS certificate" },
-            { answer: "KEY", hint: "Private key", code: "Decryption key" },
-            { answer: "CHAIN", hint: "CA bundle", code: "Certificate chain" },
-            { answer: "HSTS", hint: "Force HTTPS", code: "Strict transport" },
-            { answer: "PROXY", hint: "Pass requests", code: "Forward to backend" },
-            { answer: "PASS", hint: "Auth password", code: "Basic auth" },
-            { answer: "LIMIT", hint: "Restrict access", code: "IP restrictions" },
-            { answer: "HEADER", hint: "Set headers", code: "Response headers" },
-            { answer: "COMPRESS", hint: "Gzip", code: "Reduce size" }
+            { answer: "systemctl", hint: "Service manager", code: "Control systemd service" },
+            { answer: "service", hint: "Runlevel", code: "SysV init script" },
+            { answer: "a2ensite", hint: "Enable site", code: "Enable virtual host" },
+            { answer: "a2dissite", hint: "Disable site", code: "Disable virtual host" },
+            { answer: "a2enmod", hint: "Enable module", code: "Enable Apache module" },
+            { answer: "a2dismod", hint: "Disable module", code: "Disable Apache module" },
+            { answer: "htaccess", hint: "Dir config", code: "Directory config file" },
+            { answer: "htpasswd", hint: "Password file", code: "Create password file" },
+            { answer: "rewrite", hint: "URL rewrite", code: "mod_rewrite module" },
+            { answer: "proxy", hint: "Proxy module", code: "mod_proxy module" }
         ]}];
         
         let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
@@ -360,6 +365,17 @@
             draggedOriginalIndex = parseInt(e.target.dataset.originalIndex);
             e.target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
+            const canvas = document.createElement('canvas');
+            canvas.width = 46; canvas.height = 46;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#d22128';
+            ctx.fillRect(0, 0, 46, 46);
+            ctx.fillStyle = 'var(--white)';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.target.textContent, 23, 23);
+            e.dataTransfer.setDragImage(canvas, 23, 23);
         }
         
         function handleDragEnd(e) { e.target.classList.remove('dragging'); }
@@ -391,7 +407,7 @@
                 document.getElementById('streak').textContent = streak;
                 slots.forEach(slot => slot.classList.add('correct'));
                 document.getElementById('feedback').className = 'feedback success';
-                document.getElementById('feedback').textContent = 'Correct!';
+                document.getElementById('feedback').textContent = '✓ Correct!';
                 setTimeout(() => {
                     currentQuestion++;
                     if (currentQuestion >= levels[currentLevel].questions.length) showCompletion();
@@ -402,7 +418,7 @@
                 document.getElementById('streak').textContent = streak;
                 slots.forEach(slot => slot.classList.add('incorrect'));
                 document.getElementById('feedback').className = 'feedback error';
-                document.getElementById('feedback').textContent = 'Try again!';
+                document.getElementById('feedback').textContent = '✗ Try again!';
             }
         }
         
@@ -427,7 +443,7 @@
                 }
             }
         });
-        
+
         initLevel();
 
         const savedTheme = localStorage.getItem('theme');

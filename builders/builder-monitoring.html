@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Builder - Learn System Monitoring</title>
+    <title>Monitoring Builder - Learn Monitoring Tools</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,7 +25,7 @@
         
         .header h1 {
             font-size: 28px;
-            color: #e535ab;
+            color: #e6522c;
             margin-bottom: 8px;
             letter-spacing: 2px;
         }
@@ -45,7 +45,7 @@
         .stat { text-align: center; }
         .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; }
         .stat-value { font-size: 24px; font-weight: bold; color: #58a6ff; }
-        .stat-value.score { color: #e535ab; }
+        .stat-value.score { color: #e6522c; }
         
         .game-container {
             background: var(--beige);
@@ -61,7 +61,7 @@
         
         .level-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
         .level-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--charcoal); }
-        .level-dot.completed { background: #e535ab; }
+        .level-dot.completed { background: #e6522c; }
         .level-dot.current { background: #58a6ff; }
         
         .question-box {
@@ -69,7 +69,7 @@
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 25px;
-            border-left: 4px solid #e535ab;
+            border-left: 4px solid #e6522c;
         }
         
         .question-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
@@ -102,7 +102,7 @@
             color: var(--black);
         }
         
-        .letter-slot.filled { border-style: solid; border-color: #e535ab; }
+        .letter-slot.filled { border-style: solid; border-color: #e6522c; }
         .letter-slot.correct { border-color: #3fb950; background: rgba(63, 185, 80, 0.1); }
         .letter-slot.incorrect { border-color: #f85149; background: rgba(248, 81, 73, 0.1); }
         
@@ -111,15 +111,15 @@
         .letter-tile {
             width: 46px;
             height: 46px;
-            background: linear-gradient(135deg, #e535ab, #c42e96);
-            background-color: #e535ab;
+            background: linear-gradient(135deg, #e6522c, #c44625);
+            background-color: #e6522c;
             border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
             font-weight: bold;
-            color: white;
+            color: var(--white);
             cursor: grab;
             transition: all 0.2s ease;
             user-select: none;
@@ -128,7 +128,7 @@
         }
         
         .letter-tile:active { cursor: grabbing; }
-        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(229, 53, 171, 0.3); }
+        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(230, 82, 44, 0.3); }
         .letter-tile.dragging { opacity: 0.5; }
         
         .actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
@@ -177,7 +177,7 @@
             max-width: 400px;
         }
         
-        .modal-content h2 { color: #e535ab; margin-bottom: 20px; }
+        .modal-content h2 { color: #e6522c; margin-bottom: 20px; }
         .modal-content p { color: var(--charcoal); margin-bottom: 25px; }
         
         .back-link { display: inline-block; margin-top: 20px; color: #58a6ff; text-decoration: none; font-size: 14px; }
@@ -196,16 +196,21 @@
             .game-container { padding: 15px; }
             .level-indicator { gap: 5px; }
             .level-dot { width: 20px; height: 20px; }
-            .letter-slot, .letter-tile { width: 35px; height: 35px; font-size: 12px; }
             .modal-content { padding: 20px; margin: 10px; }
             .modal-content h2 { font-size: 18px; }
+        }
+        
+        @media (max-width: 400px) {
+            .header h1 { font-size: 16px; }
+            .stats-bar { gap: 10px; }
+            .stat-value { font-size: 16px; }
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>📊 MONITORING BUILDER</h1>
-        <p>Drag & drop to learn monitoring commands</p>
+        <p>Drag & drop to learn monitoring tools</p>
     </div>
     
     <div class="stats-bar">
@@ -251,16 +256,16 @@
 
     <script>
         const levels = [{ questions: [
-            { answer: "TOP", hint: "View processes", code: "Show running processes" },
-            { answer: "PS", hint: "Process status", code: "List processes" },
-            { answer: "FREE", hint: "Memory usage", code: "Check RAM usage" },
-            { answer: "DF", hint: "Disk free", code: "Show disk space" },
-            { answer: "DU", hint: "Disk usage", code: "Check folder size" },
-            { answer: "UP", hint: "Uptime command", code: "System uptime" },
-            { answer: "W", hint: "Who is online", code: "Show logged users" },
-            { answer: "NET", hint: "Network stats", code: "Network interface stats" },
-            { answer: "VM", hint: "Memory stats", code: "Virtual memory info" },
-            { answer: "IO", hint: "I/O stats", code: "Disk I/O monitoring" }
+            { answer: "cpu", hint: "Processor", code: "Central processing unit" },
+            { answer: "ram", hint: "Memory", code: "Random access memory" },
+            { answer: "disk", hint: "Storage", code: "Disk usage" },
+            { answer: "network", hint: "Network traffic", code: "Network monitoring" },
+            { answer: "load", hint: "System load", code: "Load average" },
+            { answer: "process", hint: "Running process", code: "Process monitoring" },
+            { answer: "alert", hint: "Notification", code: "Alert system" },
+            { answer: "metric", hint: "Measurement", code: "Performance metric" },
+            { answer: "log", hint: "Event log", code: "System log" },
+            { answer: "uptime", hint: "System availability", code: "Time running" }
         ]}];
         
         let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
@@ -360,6 +365,17 @@
             draggedOriginalIndex = parseInt(e.target.dataset.originalIndex);
             e.target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
+            const canvas = document.createElement('canvas');
+            canvas.width = 46; canvas.height = 46;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#e6522c';
+            ctx.fillRect(0, 0, 46, 46);
+            ctx.fillStyle = 'var(--white)';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.target.textContent, 23, 23);
+            e.dataTransfer.setDragImage(canvas, 23, 23);
         }
         
         function handleDragEnd(e) { e.target.classList.remove('dragging'); }
@@ -409,7 +425,6 @@
         function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
         function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = 'builder-monitoring-2.html'; }
         
-        // Keyboard support
         document.addEventListener('keydown', function(e) {
             const key = e.key.toLowerCase();
             if (key.length === 1 && key >= 'a' && key <= 'z') {
@@ -428,7 +443,7 @@
                 }
             }
         });
-        
+
         initLevel();
 
         const savedTheme = localStorage.getItem('theme');

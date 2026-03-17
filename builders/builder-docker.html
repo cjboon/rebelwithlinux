@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docker Builder - Learn Docker Commands</title>
+    <title>Docker Builder - Docker Basics</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -111,7 +111,7 @@
         .letter-tile {
             width: 46px;
             height: 46px;
-            background: linear-gradient(135deg, #2496ed, #1a7ed8);
+            background: linear-gradient(135deg, #2496ed, #1a7acc);
             background-color: #2496ed;
             border-radius: 0;
             display: flex;
@@ -119,7 +119,7 @@
             justify-content: center;
             font-size: 14px;
             font-weight: bold;
-            color: white;
+            color: var(--white);
             cursor: grab;
             transition: all 0.2s ease;
             user-select: none;
@@ -196,7 +196,7 @@
             .game-container { padding: 15px; }
             .level-indicator { gap: 5px; }
             .level-dot { width: 20px; height: 20px; }
-            .letter-slot, .letter-tile { width: 35px; height: 35px; font-size: 12px; }
+            .letter-slot, .letter-tile { width: 38px; height: 38px; font-size: 12px; }
             .modal-content { padding: 20px; margin: 10px; }
             .modal-content h2 { font-size: 18px; }
         }
@@ -205,7 +205,7 @@
 <body>
     <div class="header">
         <h1>🐳 DOCKER BUILDER</h1>
-        <p>Drag & drop to learn Docker commands</p>
+        <p>Drag & drop to learn Docker basics</p>
     </div>
     
     <div class="stats-bar">
@@ -251,16 +251,16 @@
 
     <script>
         const levels = [{ questions: [
-            { answer: "RUN", hint: "Execute command", code: "Run in image" },
-            { answer: "BUILD", hint: "Create image", code: "Build from Dockerfile" },
-            { answer: "PULL", hint: "Download image", code: "Get from registry" },
-            { answer: "PUSH", hint: "Upload image", code: "Send to registry" },
-            { answer: "START", hint: "Begin container", code: "Launch container" },
-            { answer: "STOP", hint: "End container", code: "Halt container" },
-            { answer: "RM", hint: "Remove container", code: "Delete container" },
-            { answer: "RMI", hint: "Remove image", code: "Delete image" },
-            { answer: "PS", hint: "List containers", code: "Show running" },
-            { answer: "IMAGES", hint: "List images", code: "Show available" }
+            { answer: "run", hint: "Run a container", code: "Start a new container" },
+            { answer: "ps", hint: "List containers", code: "Show running containers" },
+            { answer: "stop", hint: "Stop a container", code: "Halt a running container" },
+            { answer: "rm", hint: "Remove container", code: "Delete a container" },
+            { answer: "logs", hint: "View container logs", code: "Check container output" },
+            { answer: "exec", hint: "Execute command in container", code: "Run command inside container" },
+            { answer: "pull", hint: "Download image", code: "Get Docker image from registry" },
+            { answer: "images", hint: "List images", code: "Show downloaded images" },
+            { answer: "build", hint: "Build image", code: "Create image from Dockerfile" },
+            { answer: "tag", hint: "Tag an image", code: "Add label to an image" }
         ]}];
         
         let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
@@ -360,6 +360,17 @@
             draggedOriginalIndex = parseInt(e.target.dataset.originalIndex);
             e.target.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
+            const canvas = document.createElement('canvas');
+            canvas.width = 46; canvas.height = 46;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#2496ed';
+            ctx.fillRect(0, 0, 46, 46);
+            ctx.fillStyle = 'var(--white)';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.target.textContent, 23, 23);
+            e.dataTransfer.setDragImage(canvas, 23, 23);
         }
         
         function handleDragEnd(e) { e.target.classList.remove('dragging'); }
@@ -427,7 +438,7 @@
                 }
             }
         });
-        
+
         initLevel();
 
         const savedTheme = localStorage.getItem('theme');
