@@ -13,20 +13,8 @@
     <link rel="stylesheet" href="../style.css">
     <style>
         :root { --nav-color: #e38c00; }
-        .lesson-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 2000; overflow-y: auto; }
-        .lesson-modal:target { display: block; }
         .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
         .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
-        .lesson-modal h2 { background: var(--nav-color); color: var(--black); padding: 20px 24px; margin: 0; }
-        .lesson-modal h3, .lesson-modal p, .lesson-modal ul, .lesson-modal ol { background: var(--white); max-width: 900px; margin: 20px auto; padding: 0 24px; color: var(--black); }
-        .lesson-modal ul, .lesson-modal ol { padding-left: 40px; }
-        .quiz-section { background: var(--white); max-width: 900px; margin: 20px auto; padding: 24px; color: var(--black); }
-        .quiz-question { margin-bottom: 16px; }
-        .quiz-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; font-family: inherit; }
-        .quiz-submit { background: var(--black); color: var(--white); padding: 8px 16px; border: none; cursor: pointer; font-family: inherit; }
-        .quiz-answers-reveal summary { cursor: pointer; color: var(--nav-color); }
-        .quiz-answers-display { margin-top: 12px; padding: 12px; background: #f5f5f5; }
-        .lesson-card { display: block; }
     </style>
 </head>
 <body class="guide-page">
@@ -216,6 +204,542 @@
             </div>
         </div>
     </section>
+
+    <!-- Lesson 1 -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: Introduction to SQL</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is SQL?</h3>
+                <p>SQL (Structured Query Language) is the standard language for managing and manipulating relational databases. It allows you to create, read, update, and delete data, as well as manage database structure.</p>
+
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Database:</strong> A structured collection of data</li>
+                    <li><strong>Table:</strong> A collection of related data in rows and columns</li>
+                    <li><strong>Row:</strong> A single record in a table</li>
+                    <li><strong>Column:</strong> A field in a table</li>
+                    <li><strong>Primary Key:</strong> Unique identifier for each row</li>
+                </ul>
+
+                <h3>Your First Query</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Select all columns from a table
+SELECT * FROM users;
+
+-- Select specific columns
+SELECT name, email FROM users;</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does SQL stand for?</p>
+                        <input type="text" class="quiz-input" data-answer="structured query language" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Structured Query Language</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: SELECT & Filtering</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>The SELECT Statement</h3>
+                <p>SELECT is used to retrieve data from a database. You can filter, sort, and limit results.</p>
+
+                <h3>WHERE Clause</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Filter by condition
+SELECT * FROM users WHERE age >= 18;
+
+-- Multiple conditions
+SELECT * FROM users WHERE country = 'USA' AND age > 21;
+
+-- OR condition
+SELECT * FROM products WHERE price < 10 OR price > 100;</pre>
+
+                <h3>ORDER BY</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Sort ascending (default)
+SELECT * FROM users ORDER BY name;
+
+-- Sort descending
+SELECT * FROM users ORDER BY created_at DESC;
+
+-- Sort by multiple columns
+SELECT * FROM users ORDER BY country ASC, name ASC;</pre>
+
+                <h3>LIMIT</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Get top 10 results
+SELECT * FROM users ORDER BY score DESC LIMIT 10;</pre>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Data Types & Tables</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Common Data Types</h3>
+                <ul>
+                    <li><strong>INT/INTEGER:</strong> Whole numbers</li>
+                    <li><strong>VARCHAR(n):</strong> Variable-length string</li>
+                    <li><strong>TEXT:</strong> Long text</li>
+                    <li><strong>DECIMAL(p,s):</strong> Exact numeric</li>
+                    <li><strong>DATE:</strong> Date (YYYY-MM-DD)</li>
+                    <li><strong>TIMESTAMP:</strong> Date and time</li>
+                    <li><strong>BOOLEAN:</strong> True/False</li>
+                </ul>
+
+                <h3>CREATE TABLE</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    age INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</pre>
+
+                <h3>ALTER TABLE</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Add a column
+ALTER TABLE users ADD COLUMN phone VARCHAR(20);
+
+-- Drop a column
+ALTER TABLE users DROP COLUMN phone;
+
+-- Modify a column
+ALTER TABLE users MODIFY COLUMN age INT NOT NULL;</pre>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: INSERT, UPDATE, DELETE</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>INSERT - Adding Data</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Insert a single row
+INSERT INTO users (name, email, age) 
+VALUES ('Alice', 'alice@example.com', 25);
+
+-- Insert multiple rows
+INSERT INTO users (name, email) VALUES 
+  ('Bob', 'bob@example.com'),
+  ('Charlie', 'charlie@example.com');</pre>
+
+                <h3>UPDATE - Modifying Data</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Update with condition
+UPDATE users SET age = 26 WHERE name = 'Alice';
+
+-- Update multiple columns
+UPDATE users SET age = 27, city = 'NYC' WHERE id = 1;</pre>
+
+                <h3>DELETE - Removing Data</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Delete with condition
+DELETE FROM users WHERE id = 5;
+
+-- Delete all rows (use with caution!)
+DELETE FROM users;</pre>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Joins</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Joins?</h3>
+                <p>Joins combine data from multiple tables based on related columns.</p>
+
+                <h3>INNER JOIN</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">SELECT users.name, orders.total
+FROM users
+INNER JOIN orders ON users.id = orders.user_id;</pre>
+
+                <h3>LEFT JOIN</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Includes all users, even without orders
+SELECT users.name, orders.total
+FROM users
+LEFT JOIN orders ON users.id = orders.user_id;</pre>
+
+                <h3>Multiple Joins</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">SELECT users.name, products.name AS product, orders.quantity
+FROM users
+JOIN orders ON users.id = orders.user_id
+JOIN products ON orders.product_id = products.id;</pre>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Aggregations</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Aggregate Functions</h3>
+                <ul>
+                    <li><strong>COUNT():</strong> Count rows</li>
+                    <li><strong>SUM():</strong> Sum values</li>
+                    <li><strong>AVG():</strong> Average value</li>
+                    <li><strong>MIN():</strong> Minimum value</li>
+                    <li><strong>MAX():</strong> Maximum value</li>
+                </ul>
+
+                <h3>COUNT Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Count all rows
+SELECT COUNT(*) FROM users;
+
+-- Count non-null values
+SELECT COUNT(email) FROM users;</pre>
+
+                <h3>GROUP BY</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Count users per country
+SELECT country, COUNT(*) as user_count
+FROM users
+GROUP BY country;</pre>
+
+                <h3>HAVING</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Filter after grouping
+SELECT country, COUNT(*) as user_count
+FROM users
+GROUP BY country
+HAVING user_count > 10;</pre>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: Subqueries</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Subqueries?</h3>
+                <p>A subquery is a query nested inside another query. They allow you to use results from one query in another.</p>
+
+                <h3>Subquery in WHERE</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Find users who ordered more than average
+SELECT name FROM users
+WHERE id IN (SELECT user_id FROM orders 
+             GROUP BY user_id 
+             HAVING SUM(total) > (SELECT AVG(order_total) FROM (SELECT SUM(total) as order_total FROM orders GROUP BY user_id) AS avg_order));</pre>
+
+                <h3>Subquery in FROM</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Use subquery as a table
+SELECT country, avg_age FROM (
+    SELECT country, AVG(age) as avg_age
+    FROM users
+    GROUP BY country
+) AS country_stats
+WHERE avg_age > 30;</pre>
+
+                <h3>Correlated Subqueries</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Find each user's latest order
+SELECT * FROM orders o1
+WHERE order_date = (
+    SELECT MAX(order_date) 
+    FROM orders o2 
+    WHERE o1.user_id = o2.user_id
+);</pre>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Indexes & Performance</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Indexes?</h3>
+                <p>Indexes are data structures that improve query speed. Think of them like a book index - they help you find information faster.</p>
+
+                <h3>CREATE INDEX</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Single column index
+CREATE INDEX idx_users_email ON users(email);
+
+-- Composite index
+CREATE INDEX idx_orders_user_date ON orders(user_id, order_date);
+
+-- Unique index
+CREATE UNIQUE INDEX idx_users_phone ON users(phone);</pre>
+
+                <h3>When to Index</h3>
+                <ul>
+                    <li>Columns used in WHERE clauses</li>
+                    <li>Columns used in JOIN conditions</li>
+                    <li>Columns used in ORDER BY</li>
+                    <li>High-cardinality columns (many unique values)</li>
+                </ul>
+
+                <h3>EXPLAIN</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- See how a query executes
+EXPLAIN SELECT * FROM users WHERE email = 'alice@example.com';</pre>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Database Design</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Normalization</h3>
+                <p>Normalization organizes data to reduce redundancy and improve integrity.</p>
+
+                <h3>First Normal Form (1NF)</h3>
+                <ul>
+                    <li>Each column contains atomic values</li>
+                    <li>Each column contains values of a single type</li>
+                    <li>Each row is unique</li>
+                </ul>
+
+                <h3>Second Normal Form (2NF)</h3>
+                <ul>
+                    <li>Must be in 1NF</li>
+                    <li>No partial dependencies (non-key columns depend on entire primary key)</li>
+                </ul>
+
+                <h3>Third Normal Form (3NF)</h3>
+                <ul>
+                    <li>Must be in 2NF</li>
+                    <li>No transitive dependencies (non-key columns depend only on the primary key)</li>
+                </ul>
+
+                <h3>Example: Denormalized vs Normalized</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Bad: Repeating data
+orders(order_id, customer_name, customer_email, product, price)
+
+-- Good: Normalized
+customers(customer_id, name, email)
+products(product_id, name, price)
+orders(order_id, customer_id, product_id)</pre>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: Constraints & Keys</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Types of Constraints</h3>
+                <ul>
+                    <li><strong>PRIMARY KEY:</strong> Unique identifier, cannot be NULL</li>
+                    <li><strong>FOREIGN KEY:</strong> References another table's PRIMARY KEY</li>
+                    <li><strong>UNIQUE:</strong> All values must be different</li>
+                    <li><strong>NOT NULL:</strong> Column must have a value</li>
+                    <li><strong>CHECK:</strong> Values must meet a condition</li>
+                    <li><strong>DEFAULT:</strong> Value if none provided</li>
+                </ul>
+
+                <h3>PRIMARY KEY</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">CREATE TABLE users (
+    id INT PRIMARY KEY,
+    name VARCHAR(100)
+);</pre>
+
+                <h3>FOREIGN KEY</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">CREATE TABLE orders (
+    id INT PRIMARY KEY,
+    user_id INT,
+    total DECIMAL(10,2),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);</pre>
+
+                <h3>CHECK Constraint</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">CREATE TABLE products (
+    id INT PRIMARY KEY,
+    price DECIMAL(10,2) CHECK (price > 0),
+    quantity INT CHECK (quantity >= 0)
+);</pre>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: Transactions</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>ACID Properties</h3>
+                <ul>
+                    <li><strong>Atomicity:</strong> All succeed or all fail</li>
+                    <li><strong>Consistency:</strong> Data stays valid</li>
+                    <li><strong>Isolation:</strong> Concurrent transactions don't interfere</li>
+                    <li><strong>Durability:</strong> Committed data is saved</li>
+                </ul>
+
+                <h3>Transaction Commands</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Start transaction
+BEGIN TRANSACTION;
+
+-- Make changes
+UPDATE accounts SET balance = balance - 100 WHERE user_id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE user_id = 2;
+
+-- Save changes
+COMMIT;
+
+-- Or undo changes
+ROLLBACK;</pre>
+
+                <h3>Savepoints</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">BEGIN;
+UPDATE users SET name = 'Alice' WHERE id = 1;
+SAVEPOINT sp1;
+
+UPDATE users SET name = 'Bob' WHERE id = 2;
+ROLLBACK TO SAVEPOINT sp1;
+
+COMMIT;</pre>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: Views & Stored Procedures</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Views</h3>
+                <p>A virtual table based on a query. Views simplify complex queries and restrict access to data.</p>
+
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Create view
+CREATE VIEW active_users AS
+SELECT name, email FROM users WHERE active = 1;
+
+-- Use view like a table
+SELECT * FROM active_users;
+
+-- Drop view
+DROP VIEW active_users;</pre>
+
+                <h3>Stored Procedures</h3>
+                <p>Precompiled SQL code that can be executed as a single unit.</p>
+
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-- Create procedure (MySQL)
+DELIMITER //
+CREATE PROCEDURE get_user_orders(IN user_id INT)
+BEGIN
+    SELECT * FROM orders WHERE user_id = user_id;
+END //
+DELIMITER ;
+
+-- Call procedure
+CALL get_user_orders(1);</pre>
+
+                <h3>Congratulations!</h3>
+                <p>You've completed the SQL Mastery guide. You now understand:</p>
+                <ul>
+                    <li>Basic queries with SELECT</li>
+                    <li>Filtering with WHERE</li>
+                    <li>Creating and modifying tables</li>
+                    <li>Data manipulation (INSERT, UPDATE, DELETE)</li>
+                    <li>Joining tables</li>
+                    <li>Aggregations and grouping</li>
+                    <li>Subqueries</li>
+                    <li>Indexes and performance</li>
+                    <li>Database design and normalization</li>
+                    <li>Constraints and keys</li>
+                    <li>Transactions</li>
+                    <li>Views and stored procedures</li>
+                </ul>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <div class="copyleft">⟲</div>
