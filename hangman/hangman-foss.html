@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/hangman/hangman-typescript.html" />
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/hangman/hangman-foss.html" />
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hangman: TypeScript - Rebel with Linux</title>
+    <title>Hangman: FOSS - Rebel with Linux</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,7 +20,7 @@
             align-items: center;
             padding: 20px;
         }
-        h1 { margin-bottom: 10px; font-size: 1.8rem; color: #3178C6; }
+        h1 { margin-bottom: 10px; font-size: 1.8rem; color: var(--black); }
         .subtitle { margin-bottom: 20px; color: var(--charcoal); }
         
         .definition-label {
@@ -116,7 +116,6 @@
         
         .guess-input:focus {
             outline: none;
-            border-bottom-color: var(--charcoal);
         }
         
         .guessed-char {
@@ -163,30 +162,51 @@
             color: #cc0000;
         }
         
-        .back-link {
-            margin-top: 30px;
-        }
-        .back-link a {
-            color: var(--charcoal);
-            text-decoration: none;
-        }
-        .back-link a:hover { text-decoration: underline; }
-
-        /* Mobile optimizations */
         @media (max-width: 500px) {
-            body { padding: 10px; padding-bottom: 100px; font-size: 14px; }
+            body {
+                padding: 10px;
+                padding-bottom: 100px;
+                font-size: 14px;
+            }
             h1 { font-size: 1.4rem; }
             .subtitle { font-size: 0.9rem; margin-bottom: 10px; }
-            .game-container { flex-wrap: wrap; flex-direction: column; align-items: center; }
-            canvas { width: 150px; height: 188px; }
-            .word-display { font-size: 1.2rem; }
-            .letter-slot { width: 14px; }
-            .guess-input { width: 100%; max-width: 200px; padding: 15px; font-size: 1.2rem; text-align: center; }
-            .stats { gap: 15px; flex-wrap: wrap; justify-content: center; }
+            .game-container {
+                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: center;
+            }
+            canvas {
+                width: 150px;
+                height: 188px;
+            }
+            .word-display {
+                font-size: 1.2rem;
+            }
+            .letter-slot {
+                width: 14px;
+            }
+            .guess-input {
+                width: 100%;
+                max-width: 200px;
+                padding: 15px;
+                font-size: 1.2rem;
+                text-align: center;
+            }
+            .stats {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
             .stat-value { font-size: 1.2rem; }
-            .guessed-chars { flex-wrap: wrap; justify-content: center; }
-            .guessed-char { padding: 8px 12px; font-size: 1rem; }
-            .message { 
+            .guessed-chars {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .guessed-char {
+                padding: 8px 12px;
+                font-size: 1rem;
+            }
+            .message {
                 position: fixed;
                 bottom: 0;
                 left: 0;
@@ -197,17 +217,25 @@
                 box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             }
         }
+        
         @media (max-width: 400px) {
-            canvas { width: 120px; height: 150px; }
-            .word-display { font-size: 1rem; }
-            .letter-slot { width: 11px; }
+            canvas {
+                width: 120px;
+                height: 150px;
+            }
+            .word-display {
+                font-size: 1rem;
+            }
+            .letter-slot {
+                width: 11px;
+            }
             h1 { font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
-    <h1>HANGMAN: TYPESCRIPT</h1>
-    <p class="subtitle">Learn TypeScript terms</p>
+    <h1>HANGMAN: FOSS</h1>
+    <p class="subtitle">Guess the FOSS term from its definition</p>
     <p class="difficulty" id="difficultyDisplay" style="color: var(--charcoal); margin-bottom: 10px;">Difficulty: Easy</p>
     
     <div class="game-container">
@@ -256,42 +284,41 @@
     <script>
         const commands = {
             easy: [
-                { command: 'type', definition: 'Define a type alias' },
-                { command: 'string', definition: 'Text data type' },
-                { command: 'number', definition: 'Numeric data type' },
-                { command: 'boolean', definition: 'True or false type' },
-                { command: 'array', definition: 'List of values' },
-                { command: 'enum', definition: 'Set of named constants' },
-                { command: 'any', definition: 'Any data type' },
-                { command: 'void', definition: 'No return value' },
-                { command: 'null', definition: 'Null value' },
-                { command: 'never', definition: 'Never returns type' }
+                { command: 'linux', definition: 'The open source kernel that powers most servers and Android' },
+                { command: 'git', definition: 'Distributed version control system created by Linus Torvalds' },
+                { command: 'python', definition: 'A popular high-level programming language' },
+                { command: 'firefox', definition: 'The open source web browser from Mozilla' },
+                { command: 'apache', definition: 'The most widely used open source web server' },
+                { command: 'mysql', definition: 'The world\'s most popular open source database' },
+                { command: 'java', definition: 'A programming language owned by Oracle (open source since 2007)' },
+                { command: 'node', definition: 'JavaScript runtime built on Chrome\'s V8 engine' }
             ],
             medium: [
-                { command: 'interface', definition: 'Define object shape' },
-                { command: 'generic', definition: 'Parameterized types' },
-                { command: 'union', definition: 'Multiple possible types' },
-                { command: 'readonly', definition: 'Immutable property' },
-                { command: 'namespace', definition: 'Organize code' },
-                { command: 'module', definition: 'Code organization' },
-                { command: 'declare', definition: 'Type without implementation' },
-                { command: 'abstract', definition: 'Base class without instance' },
-                { command: 'export', definition: 'Make available externally' },
-                { command: 'import', definition: 'Bring in external code' },
-                { command: 'private', definition: 'Class-only access' }
+                { command: 'opensource', definition: 'Software where the source code is publicly available' },
+                { command: 'freesoftware', definition: 'Software that respects users\' freedom to run, study, modify' },
+                { command: 'copyleft', definition: 'A license requirement that derivative works must remain free' },
+                { command: ' permissive', definition: 'A license with minimal restrictions on reuse (MIT, BSD)' },
+                { command: 'contributor', definition: 'Someone who submits code or documentation to a project' },
+                { command: 'maintainer', definition: 'A person responsible for managing a project\'s releases' },
+                { command: 'fork', definition: 'An independent copy of a project that may diverge from the original' },
+                { command: 'merge', definition: 'Combining changes from one branch into another' },
+                { command: 'pull request', definition: 'A proposed change submitted for review and inclusion' },
+                { command: 'issue', definition: 'A bug report or feature request on a project tracker' },
+                { command: 'repository', definition: 'A storage location for code and its version history' }
             ],
             hard: [
-                { command: 'keyof', definition: 'Get keys as type' },
-                { command: 'infer', definition: 'Extract type from expression' },
-                { command: 'partial', definition: 'All properties optional' },
-                { command: 'required', definition: 'All properties required' },
-                { command: 'pick', definition: 'Select specific properties' },
-                { command: 'omit', definition: 'Exclude specific properties' },
-                { command: 'record', definition: 'Construct object type' },
-                { command: 'mapped', definition: 'Transform types' },
-                { command: 'conditional', definition: 'Type based on condition' },
-                { command: 'asserts', definition: 'Type assertion function' },
-                { command: 'utility', definition: 'Built-in type helpers' }
+                { command: 'gpl', definition: 'GNU General Public License - the most popular copyleft license' },
+                { command: 'agpl', definition: 'Affero GPL - extends GPL to cover network use' },
+                { command: 'lgpl', definition: 'Lesser GPL - allows linking to proprietary software' },
+                { command: 'bsd', definition: 'Berkeley Software Distribution - a permissive license' },
+                { command: 'mit', definition: 'Massachusetts Institute of Technology - a simple permissive license' },
+                { command: 'apache two', definition: 'Apache License 2.0 - permissive with patent rights' },
+                { command: 'coc', definition: 'Code of Conduct - rules for contributor behavior' },
+                { command: 'cla', definition: 'Contributor License Agreement - legal agreement for contributions' },
+                { command: 'dco', definition: 'Developer Certificate of Origin - certifies origin of code' },
+                { command: 'semver', definition: 'Semantic Versioning - version numbering scheme' },
+                { command: 'changelog', definition: 'A record of all notable changes to a project' },
+                { question: 'readme', definition: 'The first file users see explaining a project' }
             ]
         };
 
@@ -389,13 +416,11 @@
             ctx.lineWidth = 3;
             ctx.font = '16px Courier New';
             
-            // Base
             ctx.beginPath();
             ctx.moveTo(20, 380);
             ctx.lineTo(280, 380);
             ctx.stroke();
             
-            // Pole
             ctx.beginPath();
             ctx.moveTo(60, 380);
             ctx.lineTo(60, 20);
@@ -403,9 +428,7 @@
             ctx.lineTo(180, 60);
             ctx.stroke();
             
-            // Head
             if (wrongCount >= 1) {
-                // Fill head with blue when dead, otherwise white
                 if (wrongCount >= 8) {
                     ctx.fillStyle = faceFillColor;
                     ctx.beginPath();
@@ -420,9 +443,7 @@
                 ctx.strokeStyle = '#333';
                 ctx.lineWidth = 3;
                 
-                // Eyes change at different stages
                 if (wrongCount >= 8) {
-                    // X eyes at death
                     ctx.strokeStyle = eyeMouthColor;
                     ctx.beginPath();
                     ctx.moveTo(158, 82 + droopAmount); ctx.lineTo(172, 98 + droopAmount);
@@ -433,20 +454,17 @@
                     ctx.moveTo(202, 82 + droopAmount); ctx.lineTo(188, 98 + droopAmount);
                     ctx.stroke();
                     
-                    // Upside-down half circle (frown) at death
                     ctx.fillStyle = eyeMouthColor;
                     ctx.beginPath();
                     ctx.arc(180, 125 + droopAmount, 10, Math.PI, Math.PI * 2);
                     ctx.fill();
                 } else {
-                    // Normal eyes
                     ctx.fillStyle = eyeMouthColor;
                     ctx.beginPath();
                     ctx.arc(165, 90 + droopAmount, 5, 0, Math.PI * 2);
                     ctx.arc(195, 90 + droopAmount, 5, 0, Math.PI * 2);
                     ctx.fill();
                     
-                    // Mouth - smile to frown
                     ctx.strokeStyle = eyeMouthColor;
                     ctx.lineWidth = 2;
                     let progress = (wrongCount - 1) / 5;
@@ -460,7 +478,6 @@
                 }
             }
             
-            // Body
             if (wrongCount >= 2) {
                 ctx.strokeStyle = '#333';
                 ctx.beginPath();
@@ -469,14 +486,12 @@
                 ctx.stroke();
             }
             
-            // Left arm
             if (wrongCount >= 3) {
                 ctx.strokeStyle = '#333';
                 ctx.beginPath();
                 ctx.moveTo(180, 160);
                 let armX = 140, armY = 200;
                 if (wrongCount >= 8 && isDead && limbsLimp) {
-                    // Arms hang straight down due to gravity
                     armX = 170;
                     armY = 240;
                 } else if (wrongCount >= 8 && isDead && window.twitchLimb === 'leftArm') {
@@ -487,14 +502,12 @@
                 ctx.stroke();
             }
             
-            // Right arm
             if (wrongCount >= 4) {
                 ctx.strokeStyle = '#333';
                 ctx.beginPath();
                 ctx.moveTo(180, 160);
                 let armX = 220, armY = 200;
                 if (wrongCount >= 8 && isDead && limbsLimp) {
-                    // Arms hang straight down due to gravity
                     armX = 190;
                     armY = 240;
                 } else if (wrongCount >= 8 && isDead && window.twitchLimb === 'rightArm') {
@@ -505,14 +518,12 @@
                 ctx.stroke();
             }
             
-            // Left leg
             if (wrongCount >= 5) {
                 ctx.strokeStyle = '#333';
                 ctx.beginPath();
                 ctx.moveTo(180, 240);
                 let legX = 140;
                 if (wrongCount >= 8 && isDead && limbsLimp) {
-                    // Legs hang straight down due to gravity
                     legX = 170;
                 } else if (wrongCount >= 8 && isDead && window.twitchLimb === 'leftLeg') {
                     legX = 140 + (Math.random() - 0.5) * 20;
@@ -521,14 +532,12 @@
                 ctx.stroke();
             }
             
-            // Right leg
             if (wrongCount >= 6) {
                 ctx.strokeStyle = '#333';
                 ctx.beginPath();
                 ctx.moveTo(180, 240);
                 let legX = 220;
                 if (wrongCount >= 8 && isDead && limbsLimp) {
-                    // Legs hang straight down due to gravity
                     legX = 190;
                 } else if (wrongCount >= 8 && isDead && window.twitchLimb === 'rightLeg') {
                     legX = 220 + (Math.random() - 0.5) * 20;
@@ -537,14 +546,12 @@
                 ctx.stroke();
             }
             
-            // Death - start twitching and face color animation
             if (wrongCount >= 8 && !isDead) {
                 isDead = true;
                 window.twitchLimb = null;
                 startTwitching();
             }
             
-            // Continue animating face color when dead
             if (isDead) {
                 requestAnimationFrame(drawHangman);
             }
@@ -553,7 +560,6 @@
         function startTwitching() {
             const limbs = ['leftArm', 'rightArm', 'leftLeg', 'rightLeg'];
             
-            // Stop twitching after 60 seconds - limbs go limp
             setTimeout(() => {
                 limbsLimp = true;
                 if (twitchTimeout) {
@@ -567,17 +573,14 @@
             const twitch = () => {
                 if (!isDead) return;
                 
-                // Pick a random limb
                 window.twitchLimb = limbs[Math.floor(Math.random() * limbs.length)];
                 drawHangman();
                 
-                // Reset after short delay
                 setTimeout(() => {
                     window.twitchLimb = null;
                     drawHangman();
                 }, 150);
                 
-                // Schedule next twitch
                 const nextTwitch = 1000 + Math.random() * 1000;
                 twitchTimeout = setTimeout(twitch, nextTwitch);
             };
@@ -586,7 +589,6 @@
         }
 
         function updateDisplay() {
-            // Find definition from current difficulty level
             let def = '';
             const currentCommands = commands[currentDifficulty];
             const found = currentCommands.find(c => c.command.toLowerCase() === currentWord);
@@ -617,7 +619,6 @@
                 wordDisplayEl.appendChild(slot);
             }
             
-            // Show guessed letters in order (left to right)
             guessedCharsEl.innerHTML = '';
             for (const char of guessedLetters) {
                 const span = document.createElement('span');
@@ -656,14 +657,11 @@
 
         function checkWinLoss() {
             if (wrongCount >= maxWrong) {
-                // Reset streak on loss
                 difficultyStreak = 0;
-                showMessage('lose', `Game over! The command was: ${currentWord}`);
+                showMessage('lose', `Game over! The term was: ${currentWord}`);
             } else if (currentWord.split('').every(c => guessedLetters.includes(c))) {
-                // Correct! Increase difficulty streak
                 difficultyStreak++;
                 
-                // Check if we should advance difficulty
                 let advanceMessage = '';
                 if (difficultyStreak >= minStreakForAdvance) {
                     const currentIndex = difficultyLevels.indexOf(currentDifficulty);
@@ -675,18 +673,20 @@
                     }
                 }
                 
-                showMessage('win', `Correct! The command was: ${currentWord}${advanceMessage}`);
+                showMessage('win', `Correct! The term was: ${currentWord}${advanceMessage}`);
             }
         }
 
         function showMessage(type, text) {
             messageBox.className = 'message ' + type;
-            messageBox.innerHTML = `<div>${text}</div><button id="playAgainBtn" onclick="newGame()">Play Again</button>`;
+            messageBox.innerHTML = `<div>${text}</div><button id="playAgainBtn" tabindex="-1" onclick="newGame()">Play Again</button>`;
             messageBox.style.display = 'block';
-            document.getElementById('playAgainBtn').focus();
+            
+            if (window.innerWidth > 500) {
+                document.getElementById('playAgainBtn').focus();
+            }
         }
 
-        // Type letters directly without pressing Enter (desktop)
         guessInput.addEventListener('keydown', (e) => {
             const key = e.key.toLowerCase();
             if (key.length === 1 && /[a-z0-9_\- ]/.test(key)) {
@@ -695,19 +695,17 @@
             }
         });
         
-        // Mobile: also listen for input changes
         guessInput.addEventListener('input', (e) => {
             const value = e.target.value.toLowerCase();
             if (value.length > 0) {
                 const lastChar = value[value.length - 1];
                 if (/[a-z0-9_\- ]/.test(lastChar)) {
                     makeGuess(lastChar);
-                    e.target.value = ''; // Clear after guess
+                    e.target.value = '';
                 }
             }
         });
         
-        // Also allow submitting with Enter key
         guessInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();

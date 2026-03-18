@@ -161,19 +161,19 @@
         }
         
         .message {
-            padding: 15px;
             margin-top: 15px;
-            border-radius: 8px;
+            padding: 15px;
             text-align: center;
             font-weight: bold;
+            background: var(--white);
         }
         
-        .message.success {
+        .message.win {
             background: var(--white);
             color: #00aa00;
         }
         
-        .message.error {
+        .message.lose {
             background: var(--white);
             color: #cc0000;
         }
@@ -503,15 +503,23 @@
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             const startColor = isDark ? '#000' : '#fff';
             let faceFillColor = startColor;
+            let eyeMouthColor = isDark ? '#fff' : '#000';
             let droopAmount = 0;
             if (isDead) {
                 deathTime += 16;
                 const maxTime = 60000;
                 const progress = Math.min(deathTime / maxTime, 1);
-                const r = Math.floor(startColor === '#fff' ? 255 - (255 - 153) * progress : 0 + (153 * progress));
-                const g = Math.floor(startColor === '#fff' ? 255 - (255 - 204) * progress : 0 + (204 * progress));
-                const b = 255;
+                // Face inverts
+                const r = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
+                const g = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
+                const b = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
                 faceFillColor = `rgb(${r},${g},${b})`;
+                // Eyes/mouth invert faster
+                const emProgress = Math.min(deathTime / 20000, 1);
+                const emR = Math.floor(eyeMouthColor === '#fff' ? 255 - 255 * emProgress : 0 + 255 * emProgress);
+                const emG = Math.floor(eyeMouthColor === '#fff' ? 255 - 255 * emProgress : 0 + 255 * emProgress);
+                const emB = Math.floor(eyeMouthColor === '#fff' ? 255 - 255 * emProgress : 0 + 255 * emProgress);
+                eyeMouthColor = `rgb(${emR},${emG},${emB})`;
                 if (deathTime > 45000) {
                     droopAmount = ((deathTime - 45000) / 15000) * 5;
                     if (droopAmount > 5) droopAmount = 5;
@@ -545,7 +553,7 @@
                     const eyeOffsetX = droopAmount * 0.3;
                     const eyeOffsetY = droopAmount;
                     const eyeY = 85 + eyeOffsetY;
-                    ctx.fillStyle = '#333';
+                    ctx.fillStyle = eyeMouthColor;
                     
                     ctx.beginPath();
                     ctx.arc(170 + eyeOffsetX, eyeY, 4, 0, Math.PI * 2);
@@ -572,6 +580,7 @@
                     } else {
                         ctx.arc(180, mouthY, 15, 0, Math.PI);
                     }
+                    ctx.strokeStyle = eyeMouthColor;
                     ctx.stroke();
                 }
             }
@@ -709,14 +718,14 @@
                     }
                 }
                 
-                showMessage('success', 'You won! +' + (10 + bonus) + ' points');
+                showMessage('win', 'You won! +' + (10 + bonus) + ' points');
             }
             
             if (wrongCount >= maxWrong && !isDead) {
                 isDead = true;
                 streak = 0;
                 
-                showMessage('dead', 'Game Over! The word was: ' + currentWord);
+                showMessage('lose', 'Game Over! The word was: ' + currentWord);
                 
                 const slots = document.querySelectorAll('.letter-slot');
                 slots.forEach(slot => {

@@ -428,15 +428,23 @@
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             const startColor = isDark ? '#000' : '#fff';
             let faceFillColor = startColor;
+            let eyeMouthColor = isDark ? '#fff' : '#000';
             let droopAmount = 0;
             if (isDead) {
                 deathTime += 16;
                 const maxTime = 60000;
                 const progress = Math.min(deathTime / maxTime, 1);
-                
-                const startRGB = isDark ? {r:0,g:0,b:0} : {r:255,g:255,b:255};
-                const endRGB = {r:100,g:149,b:237};
-                faceFillColor = `rgb(${Math.round(startRGB.r + (endRGB.r - startRGB.r) * progress)}, ${Math.round(startRGB.g + (endRGB.g - startRGB.g) * progress)}, ${Math.round(startRGB.b + (endRGB.b - startRGB.b) * progress)})`;
+                // Face inverts
+                const r = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
+                const g = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
+                const b = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
+                faceFillColor = `rgb(${r},${g},${b})`;
+                // Eyes/mouth invert faster
+                const emProgress = Math.min(deathTime / 20000, 1);
+                const emR = Math.floor(eyeMouthColor === '#fff' ? 255 - 255 * emProgress : 0 + 255 * emProgress);
+                const emG = Math.floor(eyeMouthColor === '#fff' ? 255 - 255 * emProgress : 0 + 255 * emProgress);
+                const emB = Math.floor(eyeMouthColor === '#fff' ? 255 - 255 * emProgress : 0 + 255 * emProgress);
+                eyeMouthColor = `rgb(${emR},${emG},${emB})`;
                 
                 droopAmount = Math.min(progress * 20, 20);
             }
@@ -653,6 +661,12 @@
                 }
             }
         });
+
+        // Apply saved theme on page load
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
 
         init();
     </script>

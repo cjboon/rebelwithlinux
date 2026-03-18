@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/hangman/hangman-typescript.html" />
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/hangman/hangman-monero.html" />
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hangman: TypeScript - Rebel with Linux</title>
+    <title>Hangman: Monero - Rebel with Linux</title>
     <link rel="stylesheet" href="../style.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,7 +20,7 @@
             align-items: center;
             padding: 20px;
         }
-        h1 { margin-bottom: 10px; font-size: 1.8rem; color: #3178C6; }
+        h1 { margin-bottom: 10px; font-size: 1.8rem; color: var(--black); }
         .subtitle { margin-bottom: 20px; color: var(--charcoal); }
         
         .definition-label {
@@ -116,7 +116,6 @@
         
         .guess-input:focus {
             outline: none;
-            border-bottom-color: var(--charcoal);
         }
         
         .guessed-char {
@@ -163,30 +162,52 @@
             color: #cc0000;
         }
         
-        .back-link {
-            margin-top: 30px;
-        }
-        .back-link a {
-            color: var(--charcoal);
-            text-decoration: none;
-        }
-        .back-link a:hover { text-decoration: underline; }
-
         /* Mobile optimizations */
         @media (max-width: 500px) {
-            body { padding: 10px; padding-bottom: 100px; font-size: 14px; }
+            body {
+                padding: 10px;
+                padding-bottom: 100px;
+                font-size: 14px;
+            }
             h1 { font-size: 1.4rem; }
             .subtitle { font-size: 0.9rem; margin-bottom: 10px; }
-            .game-container { flex-wrap: wrap; flex-direction: column; align-items: center; }
-            canvas { width: 150px; height: 188px; }
-            .word-display { font-size: 1.2rem; }
-            .letter-slot { width: 14px; }
-            .guess-input { width: 100%; max-width: 200px; padding: 15px; font-size: 1.2rem; text-align: center; }
-            .stats { gap: 15px; flex-wrap: wrap; justify-content: center; }
+            .game-container {
+                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: center;
+            }
+            canvas {
+                width: 150px;
+                height: 188px;
+            }
+            .word-display {
+                font-size: 1.2rem;
+            }
+            .letter-slot {
+                width: 14px;
+            }
+            .guess-input {
+                width: 100%;
+                max-width: 200px;
+                padding: 15px;
+                font-size: 1.2rem;
+                text-align: center;
+            }
+            .stats {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
             .stat-value { font-size: 1.2rem; }
-            .guessed-chars { flex-wrap: wrap; justify-content: center; }
-            .guessed-char { padding: 8px 12px; font-size: 1rem; }
-            .message { 
+            .guessed-chars {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .guessed-char {
+                padding: 8px 12px;
+                font-size: 1rem;
+            }
+            .message {
                 position: fixed;
                 bottom: 0;
                 left: 0;
@@ -197,17 +218,26 @@
                 box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             }
         }
+        
+        /* Extra small screens */
         @media (max-width: 400px) {
-            canvas { width: 120px; height: 150px; }
-            .word-display { font-size: 1rem; }
-            .letter-slot { width: 11px; }
+            canvas {
+                width: 120px;
+                height: 150px;
+            }
+            .word-display {
+                font-size: 1rem;
+            }
+            .letter-slot {
+                width: 11px;
+            }
             h1 { font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
-    <h1>HANGMAN: TYPESCRIPT</h1>
-    <p class="subtitle">Learn TypeScript terms</p>
+    <h1>HANGMAN: MONERO</h1>
+    <p class="subtitle">Guess the Monero term from its definition</p>
     <p class="difficulty" id="difficultyDisplay" style="color: var(--charcoal); margin-bottom: 10px;">Difficulty: Easy</p>
     
     <div class="game-container">
@@ -256,42 +286,40 @@
     <script>
         const commands = {
             easy: [
-                { command: 'type', definition: 'Define a type alias' },
-                { command: 'string', definition: 'Text data type' },
-                { command: 'number', definition: 'Numeric data type' },
-                { command: 'boolean', definition: 'True or false type' },
-                { command: 'array', definition: 'List of values' },
-                { command: 'enum', definition: 'Set of named constants' },
-                { command: 'any', definition: 'Any data type' },
-                { command: 'void', definition: 'No return value' },
-                { command: 'null', definition: 'Null value' },
-                { command: 'never', definition: 'Never returns type' }
+                { command: 'xmr', definition: 'The ticker symbol for Monero cryptocurrency' },
+                { command: 'wallet', definition: 'Software that stores your Monero keys and allows sending/receiving XMR' },
+                { command: 'seed', definition: 'A 25-word phrase that backup and restores your wallet' },
+                { command: 'node', definition: 'A computer that validates transactions on the Monero network' },
+                { command: 'mixin', definition: 'The number of other transactions your coins are mixed with' },
+                { command: 'txid', definition: 'Transaction ID - a unique identifier for a Monero transfer' },
+                { command: 'address', definition: 'A long string starting with 4 that receives Monero payments' },
+                { command: 'fee', definition: 'The small amount paid to miners for processing a transaction' },
+                { command: 'cryptonight', definition: 'The PoW algorithm Monero originally used for mining' }
             ],
             medium: [
-                { command: 'interface', definition: 'Define object shape' },
-                { command: 'generic', definition: 'Parameterized types' },
-                { command: 'union', definition: 'Multiple possible types' },
-                { command: 'readonly', definition: 'Immutable property' },
-                { command: 'namespace', definition: 'Organize code' },
-                { command: 'module', definition: 'Code organization' },
-                { command: 'declare', definition: 'Type without implementation' },
-                { command: 'abstract', definition: 'Base class without instance' },
-                { command: 'export', definition: 'Make available externally' },
-                { command: 'import', definition: 'Bring in external code' },
-                { command: 'private', definition: 'Class-only access' }
+                { command: 'ringct', definition: 'Ring Confidential Transactions - hides transaction amounts' },
+                { command: 'viewkey', definition: 'A private key that allows others to see incoming transactions' },
+                { command: 'spendkey', definition: 'The private key used to spend your Monero' },
+                { command: 'kovri', definition: 'Monero project for anonymous routing over I2P' },
+                { command: 'cryptocur', definition: 'Digital currency that uses cryptography for security' },
+                { command: 'blocksize', definition: 'The maximum amount of data allowed in a single blockchain block' },
+                { command: 'tail emission', definition: 'A perpetual block reward that never decreases to 0' },
+                { command: 'dynamic block', definition: 'Monero\'s blocksize that adjusts based on demand' },
+                { command: 'randomx', definition: 'The PoW algorithm that replaced Cryptonight in 2019' },
+                { command: 'stealth address', definition: 'One-time addresses that protect recipient privacy' },
+                { command: 'moneropedia', definition: 'Monero\'s community-maintained documentation resource' }
             ],
             hard: [
-                { command: 'keyof', definition: 'Get keys as type' },
-                { command: 'infer', definition: 'Extract type from expression' },
-                { command: 'partial', definition: 'All properties optional' },
-                { command: 'required', definition: 'All properties required' },
-                { command: 'pick', definition: 'Select specific properties' },
-                { command: 'omit', definition: 'Exclude specific properties' },
-                { command: 'record', definition: 'Construct object type' },
-                { command: 'mapped', definition: 'Transform types' },
-                { command: 'conditional', definition: 'Type based on condition' },
-                { command: 'asserts', definition: 'Type assertion function' },
-                { command: 'utility', definition: 'Built-in type helpers' }
+                { command: 'ring signature', definition: 'A cryptographic method that hides the signer among decoys' },
+                { command: 'bulletproofs', definition: 'A cryptographic proof that greatly reduced transaction size' },
+                { command: 'pedersen commit', definition: 'Commitment scheme that hides values while allowing verification' },
+                { command: 'clsag', definition: 'Compact Linkable Spontaneous Anonymous Group signature' },
+                { command: 'lns', definition: 'Monero\'s planned integrated name service system' },
+                { command: 'seraphis', definition: 'The next-generation privacy protocol that replaces RingCT' },
+                { command: 'fluffyblocks', definition: 'A mining optimization that propagates transactions faster' },
+                { command: 'dandelion++', definition: 'Protocol that obscures the origin IP of transactions' },
+                { command: 'churning', definition: 'Sending coins to yourself to increase privacy set' },
+                { command: 'asynchronous bc', definition: 'Blockchain where nodes can join/leave without coordination' }
             ]
         };
 
@@ -359,6 +387,7 @@
         function drawHangman() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
+            // Calculate face fill color based on death time (60 seconds to turn fully blue)
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             const startColor = isDark ? '#000' : '#fff';
             let faceFillColor = startColor;
@@ -658,7 +687,7 @@
             if (wrongCount >= maxWrong) {
                 // Reset streak on loss
                 difficultyStreak = 0;
-                showMessage('lose', `Game over! The command was: ${currentWord}`);
+                showMessage('lose', `Game over! The term was: ${currentWord}`);
             } else if (currentWord.split('').every(c => guessedLetters.includes(c))) {
                 // Correct! Increase difficulty streak
                 difficultyStreak++;
@@ -675,15 +704,18 @@
                     }
                 }
                 
-                showMessage('win', `Correct! The command was: ${currentWord}${advanceMessage}`);
+                showMessage('win', `Correct! The term was: ${currentWord}${advanceMessage}`);
             }
         }
 
         function showMessage(type, text) {
             messageBox.className = 'message ' + type;
-            messageBox.innerHTML = `<div>${text}</div><button id="playAgainBtn" onclick="newGame()">Play Again</button>`;
+            messageBox.innerHTML = `<div>${text}</div><button id="playAgainBtn" tabindex="-1" onclick="newGame()">Play Again</button>`;
             messageBox.style.display = 'block';
-            document.getElementById('playAgainBtn').focus();
+            
+            if (window.innerWidth > 500) {
+                document.getElementById('playAgainBtn').focus();
+            }
         }
 
         // Type letters directly without pressing Enter (desktop)
@@ -719,6 +751,7 @@
             }
         });
 
+        // Apply saved theme on page load
         const savedTheme = localStorage.getItem('theme');
         if (!savedTheme || savedTheme === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');

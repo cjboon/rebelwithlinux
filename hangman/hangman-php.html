@@ -35,9 +35,23 @@
         .stat { text-align: center; }
         .stat-value { font-size: 1.5rem; font-weight: bold; color: #777bb4; }
         .stat-label { font-size: 0.75rem; color: var(--charcoal); }
-        .message { margin-top: 20px; padding: 20px; border-radius: 8px; text-align: center; }
-        .message.win { background: rgba(0, 255, 0, 0.1); border: 2px solid green; }
-        .message.lose { background: rgba(255, 0, 0, 0.1); border: 2px solid red; }
+        .message {
+            margin-top: 15px;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            background: var(--white);
+        }
+        
+        .message.win {
+            background: var(--white);
+            color: #00aa00;
+        }
+        
+        .message.lose {
+            background: var(--white);
+            color: #cc0000;
+        }
         .message button { margin-top: 15px; padding: 10px 20px; font-size: 1rem; cursor: pointer; background: #777bb4; color: white; border: none; border-radius: 6px; }
         .back-link { margin-top: 20px; }
         .back-link a { color: #58a6ff; text-decoration: none; }
@@ -185,6 +199,21 @@
         
         function drawHangman() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const startColor = isDark ? '#000' : '#fff';
+            let faceFillColor = startColor;
+            let eyeMouthColor = isDark ? '#fff' : '#000';
+            
+            // When game is lost, invert face and eyes/mouth
+            if (wrongCount >= 6) {
+                const r = startColor === '#fff' ? 0 : 255;
+                const g = startColor === '#fff' ? 0 : 255;
+                const b = startColor === '#fff' ? 0 : 255;
+                faceFillColor = `rgb(${r},${g},${b})`;
+                eyeMouthColor = isDark ? '#000' : '#fff';
+            }
+            
             ctx.strokeStyle = '#333';
             ctx.lineWidth = 3;
             
@@ -202,6 +231,28 @@
             if (wrongCount >= 1) {
                 ctx.beginPath();
                 ctx.arc(180, 100, 40, 0, Math.PI * 2);
+                ctx.fillStyle = faceFillColor;
+                ctx.fill();
+                ctx.stroke();
+                
+                // Eyes
+                ctx.fillStyle = eyeMouthColor;
+                ctx.beginPath();
+                ctx.arc(165, 90, 5, 0, Math.PI * 2);
+                ctx.arc(195, 90, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Mouth
+                ctx.strokeStyle = eyeMouthColor;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                if (wrongCount >= 6) {
+                    // Frown when dead
+                    ctx.arc(180, 125, 10, Math.PI, Math.PI * 2);
+                } else {
+                    // Smile
+                    ctx.arc(180, 115, 10, 0, Math.PI);
+                }
                 ctx.stroke();
             }
             

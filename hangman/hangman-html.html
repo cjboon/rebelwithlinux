@@ -388,17 +388,23 @@
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             const startColor = isDark ? '#000' : '#fff';
             let faceFillColor = startColor;
+            let eyeMouthColor = isDark ? '#fff' : '#000';
             let droopAmount = 0;
             if (isDead) {
-                deathTime += 16; // ~60fps
-                const maxTime = 60000; // 60 seconds to turn fully blue
+                deathTime += 16;
+                const maxTime = 60000;
                 const progress = Math.min(deathTime / maxTime, 1);
-                // Interpolate from start color to #99ccff (light blue)
-                const r = Math.floor(startColor === '#fff' ? 255 - (255 - 153) * progress : 0 + (153 * progress));
-                const g = Math.floor(startColor === '#fff' ? 255 - (255 - 204) * progress : 0 + (204 * progress));
-                const b = 255;
+                // Face inverts (black→white in dark, white→black in light)
+                const r = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
+                const g = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
+                const b = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
                 faceFillColor = `rgb(${r},${g},${b})`;
-                // Droop eyes and mouth after 45 seconds, max 5 pixels
+                // Eyes/mouth turn opposite faster (in 20 seconds instead of 60)
+                const emProgress = Math.min(deathTime / 20000, 1);
+                const emR = Math.floor(eyeMouthColor === '#fff' ? 255 - 255 * emProgress : 0 + 255 * emProgress);
+                const emG = Math.floor(eyeMouthColor === '#fff' ? 255 - 255 * emProgress : 0 + 255 * emProgress);
+                const emB = Math.floor(eyeMouthColor === '#fff' ? 255 - 255 * emProgress : 0 + 255 * emProgress);
+                eyeMouthColor = `rgb(${emR},${emG},${emB})`;
                 if (deathTime > 45000) {
                     droopAmount = ((deathTime - 45000) / 15000) * 5;
                     if (droopAmount > 5) droopAmount = 5;
@@ -443,7 +449,7 @@
                 // Eyes change at different stages
                 if (wrongCount >= 8) {
                     // X eyes at death
-                    ctx.strokeStyle = '#333';
+                    ctx.strokeStyle = eyeMouthColor;
                     ctx.beginPath();
                     ctx.moveTo(158, 82 + droopAmount); ctx.lineTo(172, 98 + droopAmount);
                     ctx.moveTo(172, 82 + droopAmount); ctx.lineTo(158, 98 + droopAmount);
@@ -453,21 +459,21 @@
                     ctx.moveTo(202, 82 + droopAmount); ctx.lineTo(188, 98 + droopAmount);
                     ctx.stroke();
                     
-                    // Black circle mouth at death
-                    ctx.fillStyle = '#333';
+                    // Upside-down half circle (frown) at death
+                    ctx.fillStyle = eyeMouthColor;
                     ctx.beginPath();
-                    ctx.arc(180, 125 + droopAmount, 10, 0, Math.PI * 2);
+                    ctx.arc(180, 125 + droopAmount, 10, Math.PI, Math.PI * 2);
                     ctx.fill();
                 } else {
                     // Normal eyes
-                    ctx.fillStyle = '#333';
+                    ctx.fillStyle = eyeMouthColor;
                     ctx.beginPath();
                     ctx.arc(165, 90 + droopAmount, 5, 0, Math.PI * 2);
                     ctx.arc(195, 90 + droopAmount, 5, 0, Math.PI * 2);
                     ctx.fill();
                     
                     // Mouth - smile to frown
-                    ctx.strokeStyle = '#333';
+                    ctx.strokeStyle = eyeMouthColor;
                     ctx.lineWidth = 2;
                     let progress = (wrongCount - 1) / 5;
                     let curveY = 115 + droopAmount;
