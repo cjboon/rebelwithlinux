@@ -8,10 +8,11 @@ $pdo = getDB();
 try {
     // Count completed items from progress table as XP (each completed item = 100 XP)
     $stmt = $pdo->prepare("
-        SELECT u.email, COALESCE(COUNT(p.id) * 100, 0) as xp 
+        SELECT u.username, COALESCE(COUNT(p.id) * 100, 0) as xp 
         FROM users u 
         LEFT JOIN progress p ON u.id = p.user_id AND p.completed = 1
-        GROUP BY u.id, u.email 
+        WHERE u.username IS NOT NULL
+        GROUP BY u.id, u.username 
         ORDER BY xp DESC 
         LIMIT 10
     ");

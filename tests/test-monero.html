@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-monero.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monero Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container {
+            padding: 32px 32px;
+            background: var(--white);
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 80vh;
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .test-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2rem;
+            margin-bottom: 4px;
+        }
+        
+        .test-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--light-gray);
+            border-radius: 4px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--charcoal);
+            transition: width 0.3s ease;
+        }
+        
+        .question-container {
+            display: none;
+        }
+        
+        .question-container.active {
+            display: block;
+        }
+        
+        .question-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.25rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .answers-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .answer-btn {
+            padding: 16px 20px;
+            border: 2px solid var(--charcoal);
+            background: transparent;
+            color: var(--charcoal);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .answer-btn:hover {
+            background: var(--light-gray);
+        }
+        
+        .answer-btn.correct {
+            background: #22c55e !important;
+            border-color: #22c55e !important;
+            color: white !important;
+        }
+        
+        .answer-btn.incorrect {
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+            color: white !important;
+        }
+        
+        .answer-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .result-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .result-screen.active {
+            display: block;
+        }
+        
+        .result-icon {
+            font-size: 5rem;
+            margin-bottom: 24px;
+        }
+        
+        .result-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        
+        .result-score {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.25rem;
+            color: var(--charcoal);
+            margin-bottom: 32px;
+        }
+        
+        .result-details {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+            margin-bottom: 32px;
+        }
+        
+        .retry-btn {
+            padding: 16px 32px;
+            background: var(--charcoal);
+            color: var(--white);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .retry-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 24px;
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: var(--white);
+            gap: 8px;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            white-space: nowrap;
+            color: var(--charcoal);
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .theme-toggle-label {
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+        
+        .theme-toggle-icon.sun {
+            display: none;
+        }
+        
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) {
+            display: none;
+        }
+        
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun {
+            display: inline;
+        }
+        
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) {
+            display: none;
+        }
+        
+        [data-theme="dark"] .theme-toggle-icon.sun {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">
+                REBEL WITH LINUX
+            </a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="../account.html" id="loginLink" class="auth-link" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" class="auth-link" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// MONERO TEST</h1>
+            <p>Prove your Monero mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value" id="questionNum">1</div>
+                    <div class="stat-label">Question</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="streakNum">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="scoreNum">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="levelNum">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div id="questionsContainer"></div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What does Monero (XMR) prioritize above all else?", a: ["Privacy", "Speed", "Scalability", "Low fees"], correct: 0 },
+            { q: "What is the Monero daemon called?", a: ["monerod", "monero-daemon", "xmr daemon", "monero-node"], correct: 0 },
+            { q: "What is the CLI wallet command for Monero?", a: ["monero-wallet-cli", "monero-wallet", "xmr-wallet", "monero-cli"], correct: 0 },
+            { q: "What does XMR stand for?", a: ["Monero", "eXchange MOnero R3", "Extended Monetary Reserve", "XMR is just the symbol"], correct: 0 },
+            { q: "Which command generates a new Monero wallet?", a: ["generate", "new_wallet", "create", "make"], correct: 0 },
+            { q: "What is a view key in Monero?", a: ["Allows viewing transactions only", "Is your private key", "Is the seed phrase", "Is your public address"], correct: 0 },
+            { q: "What protects Monero transaction amounts?", a: ["RingCT", "Encryption", "Stealth addresses", "CryptoNote"], correct: 0 },
+            { q: "How many decimals does Monero have?", a: ["12", "8", "6", "10"], correct: 0 },
+            { q: "What is the ticker symbol for Monero?", a: ["XMR", "MON", "XMO", "MRO"], correct: 0 },
+            { q: "What algorithm does Monero use for mining?", a: ["RandomX", "SHA-256", "Ethash", "Scrypt"], correct: 0 },
+            { q: "What is a stealth address?", a: ["One-time address for each transaction", "Hidden blockchain", "Private wallet", "Mining address"], correct: 0 },
+            { q: "What command checks your balance?", a: ["balance", "show", "check", "info"], correct: 0 },
+            { q: "What is the RPC port for Monero daemon?", a: ["18081", "18080", "18089", "18077"], correct: 0 },
+            { q: "What protects sender privacy in Monero?", a: ["Ring signatures", "Encryption", "Stealth addresses", "Private keys"], correct: 0 },
+            { q: "What command transfers Monero?", a: ["transfer", "send", "pay", "tx"], correct: 0 },
+            { q: "What is the seed phrase length for Monero?", a: ["25 words", "12 words", "24 words", "16 words"], correct: 0 },
+            { q: "What is Monero's block reward called?", a: ["Reward", "Base reward", "Mining reward", "Block subsidy"], correct: 0 },
+            { q: "What network type is Monero?", a: ["Public blockchain", "Private chain", "Permissioned", "Consortium"], correct: 0 },
+            { q: "What protects transaction sender identity?", a: ["Ring signatures", "Encryption", "Masking", "Hiding"], correct: 0 },
+            { q: "What is a monero address starting with?", a: ["4", "X", "0x", "M"], correct: 0 },
+            { q: "What command restores a wallet from seed?", a: ["seed_restore", "restore", "import", "recover"], correct: 0 },
+            { q: "What is Bulletproofs in Monero?", a: ["Range proofs for hidden amounts", "Transaction signing", "Address encryption", "Network protocol"], correct: 0 },
+            { q: "What is the GUI wallet called?", a: ["monero-wallet-gui", "monero-gui", "xmr-gui", "monero-gui-wallet"], correct: 0 },
+            { q: "What command shows wallet info?", a: ["address", "info", "wallet_info", "show_address"], correct: 0 },
+            { q: "What isfluff in Monero?", a: ["Decoy selection algorithm", "Encryption method", "Mining software", "Wallet type"], correct: 0 },
+            { q: "What is the mining pool port typically?", a: ["3333", "8080", "443", "22"], correct: 0 },
+            { q: "What is kovri in Monero?", a: ["I2P router implementation", "Wallet backup", "Mining software", "Exchange tool"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the minimum ring size in Monero?", a: ["11", "5", "3", "7"], correct: 0 },
+            { q: "What cryptographic primitive does Monero use?", a: ["Ed25519", "ECDSA", "RSA", "BLS"], correct: 0 },
+            { q: "What is Dandelion++ used for?", a: ["Transaction broadcasting", "Wallet encryption", "Mining", "Address generation"], correct: 0 },
+            { q: "What is the purpose of subaddresses?", a: ["Receive without linking", "Backup", "Mining", "Trading"], correct: 0 },
+            { q: "What does CLSAG stand for?", a: ["Concise Linkable Spontaneous Anonymous Group", "Crypto Light Signature", "Confidential Ledger", "Chain Link"], correct: 0 },
+            { q: "What is the block time for Monero?", a: ["2 minutes", "10 minutes", "5 minutes", "1 minute"], correct: 0 },
+            { q: "What is a memory pool in Monero?", a: ["Transaction pool", "Wallet storage", "Blockchain backup", "Mining cache"], correct: 0 },
+            { q: "What command exports keys?", a: ["export_keys", "dump_keys", "show_keys", "get_keys"], correct: 0 },
+            { q: "What is RingCT?", a: ["Confidential Transactions", "Remote Node", "RandomX", "Remote Verification"], correct: 0 },
+            { q: "What is the tail emission?", a: ["Fixed block reward forever", "Variable emission", "Mining end", "Supply cap"], correct: 0 },
+            { q: "What protects the wallet database?", a: ["AES encryption", "Password hash", "Seed", "Private key"], correct: 0 },
+            { q: "What is an integrated address?", a: ["Payment ID combined with address", "Multi-sig", "Hardware wallet", "Exchange address"], correct: 0 },
+            { q: "What command resyncs the wallet?", a: ["rescan_spent", "rescan", "sync", "refresh"], correct: 0 },
+            { q: "What is the wallet cache file?", a: [".keys", "wallet.cache", "wallet.db", ".lock"], correct: 0 },
+            { q: "What is LNMSG used for?", a: ["Lightweight messaging", "Wallet sync", "Mining protocol", "Node discovery"], correct: 0 },
+            { q: "What is the purpose of Tor/I2P integration?", a: ["Network-level privacy", "Faster sync", "Mining", "Backup"], correct: 0 },
+            { q: "What is the default fee per kb?", a: ["0.000002 XMR", "0.00001 XMR", "0.0001 XMR", "0.001 XMR"], correct: 0 },
+            { q: "What is multisig in Monero?", a: ["Multiple signatures", "Multi-wallet", "Multi-chain", "Multi-node"], correct: 0 },
+            { q: "What command creates multisig?", a: ["create_multisig", "multisig new", "make_multisig", "new_multisig"], correct: 0 },
+            { q: "What is Triptych?", a: ["Linkable ring signature scheme", "Encryption", "Mining algorithm", "Wallet type"], correct: 0 },
+            { q: "What does wallet synchronize do?", a: ["Scans blockchain for transactions", "Downloads blockchain", "Encrypts data", "Updates software"], correct: 0 },
+            { q: "What is the view tag in Monero?", a: ["Quick tx detection", "Transaction ID", "Block marker", "Address type"], correct: 0 },
+            { q: "What is the block reward at block 0?", a: ["~17.5 XMR", "1 XMR", "10 XMR", "100 XMR"], correct: 0 },
+            { q: "What is spendkey?", a: ["Private key for spending", "Public address", "View key", "Seed"], correct: 0 },
+            { q: "What isCryptoNote?", a: ["Protocol specification", "Encryption method", "Wallet type", "Mining algo"], correct: 0 },
+            { q: "What command shows peer list?", a: ["peers", "show_peers", "connection", "net"], correct: 0 },
+            { q: "What is the daemon RPC port for testnet?", a: ["28081", "18081", "38081", "48081"], correct: 0 },
+            { q: "What is Seraphis?", a: ["Next-gen privacy protocol", "Mining algo", "Wallet backup", "Node software"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is the asymptotic complexity of verification?", a: ["O(n) per input", "O(log n)", "O(n²)", "O(1)"], correct: 0 },
+            { q: "What is the MLSAG formula?", a: ["Multilayer Spontaneous Anonymous Group", "Multi Layer Security", "Mining Link Signature", "Master Local Signing"], correct: 0 },
+            { q: "What is the commitment scheme used?", a: ["Pedersen", "RSA", "ElGamal", "Hash-based"], correct: 0 },
+            { q: "What is the security assumption?", a: ["Discrete logarithm", "RSA assumption", "Hash collision", "P=NP"], correct: 0 },
+            { q: "What is Seraphis anonymity set growth?", a: ["Square root", "Linear", "Logarithmic", "Constant"], correct: 0 },
+            { q: "What is the Borromean signature?", a: ["Three-party ring signature", "Two-party", "Single-party", "Multi-party"], correct: 0 },
+            { q: "What is dual-key commitment?", a: ["Separate for amount and owner", "Two private keys", "View and spend", "Transaction keys"], correct: 0 },
+            { q: "What is the ecdhInfo used for?", a: ["Transaction amount derivation", "Address encryption", "Key exchange", "Signature"], correct: 0 },
+            { q: "What is the stealth address generation?", a: ["Public key + random scalar", "Hash of private key", "Random number", "Deterministic"], correct: 0 },
+            { q: "What is the MLSAG verification complexity?", a: ["O(n×m)", "O(n+m)", "O(n)", "O(1)"], correct: 0 },
+            { q: "What is the commitment mask?", a: ["Blinding factor for amount", "Random byte", "Transaction ID", "Signature component"], correct: 0 },
+            { q: "What is Bulletproofs+?", a: ["Compressed range proof", "Signature scheme", "Encryption", "Key exchange"], correct: 0 },
+            { q: "What is the hash used in ring signatures?", a: ["Keccak", "SHA-256", "SHA-3", "BLAKE2b"], correct: 0 },
+            { q: "What is the base point for Ed25519?", a: ["Generator point", "Hash of 9", "Curve constant", "Random point"], correct: 0 },
+            { q: "What is the key image formula?", a: ["Hp(P) × x", "x × P", "Hash(x)", "P × G"], correct: 0 },
+            { q: "What is the pseudorandom function?", a: ["Hash-based", "AES", "RSA", "ChaCha"], correct: 0 },
+            { q: "What is the range proof size with Bulletproofs?", a: ["~2.5KB", "10KB", "50KB", "100KB"], correct: 0 },
+            { q: "What is the tx_extra field used for?", a: ["Additional data", "Signatures only", "Fees", "Timestamps"], correct: 0 },
+            { q: "What is the MLSAG requirement?", a: ["All ring members share same public key", "Unique keys", "Sequential keys", "No requirement"], correct: 0 },
+            { q: "What is slip-0014?", a: ["HD wallet derivation path", "Encryption standard", "Address format", "Key hierarchy"], correct: 0 },
+            { q: "What is the stealth address math?", a: ["Hs(rA)G + B", "r × A", "Hash(A)", "A + B"], correct: 0 },
+            { q: "What is the one-time key formula?", a: ["P + Hs(rA)G", "P × r", "rP", "Hash(P)"], correct: 0 },
+            { q: "What is the view key derivation?", a: ["aG", "a × B", "Hs(a)", "Hash(aG)"], correct: 0 },
+            { q: "What is the spend key derivation?", a: ["sG", "s × G", "Hs(s)", "Hash(sG)"], correct: 0 },
+            { q: "What is the MLSAG signature tuple?", a: ["({L,R},I,z)", "(c,s)", "(P,k)", "(x,L)"], correct: 0 },
+            { q: "What is the amount commitment?", a: ["C = aG + bH", "C = a × b", "C = Hash(a)", "C = a + b"], correct: 0 },
+            { q: "What is the Borromean property?", a: ["Linkable across rings", "Unlinkable", "Aggregatable", "Linear"], correct: 0 },
+            { q: "What is the fee calculation formula?", a: ["base_fee × size", "Fixed", "Dynamic", "Priority-based"], correct: 0 },
+            { q: "What is the RCTTypeFull?", a: ["Full ringct with proofs", "Simple", "Bulletproof", "No"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            const q = currentQuestions[currentQuestionIndex];
+            
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})"> ${answer}</button>`
+            ).join('');
+            
+            qDiv.innerHTML = `
+                <div class="question-text">${q.q}</div>
+                <div class="answers-grid">${answersHtml}</div>
+            `;
+            
+            container.appendChild(qDiv);
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            const total = currentQuestions.length;
+            const progress = ((currentQuestionIndex) / total) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correct) {
+                    btn.classList.add('correct');
+                }
+            });
+            
+            totalAnswered++;
+            
+            if (index === q.correct) {
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+                consecutiveCorrect++;
+                score += difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : 30;
+                
+                if (currentLevel === 1 && consecutiveCorrect >= 7) {
+                    currentLevel = 2;
+                    difficulty = 'medium';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...mediumQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else if (currentLevel === 2 && consecutiveCorrect >= 7) {
+                    currentLevel = 3;
+                    difficulty = 'hard';
+                    consecutiveCorrect = 0;
+                    currentQuestions = shuffle([...hardQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+                    currentQuestionIndex = 0;
+                } else {
+                    currentQuestionIndex++;
+                }
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 1200);
+            } else {
+                buttons[index].classList.add('incorrect');
+                streak = 0;
+                consecutiveCorrect = 0;
+                currentQuestionIndex++;
+                
+                setTimeout(() => {
+                    if (currentQuestionIndex < currentQuestions.length) {
+                        renderQuestion();
+                    } else {
+                        showResult();
+                    }
+                }, 2000);
+                return;
+            }
+        }
+
+        function showResult() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            const resultScreen = document.getElementById('resultScreen');
+            resultScreen.classList.add('active');
+            
+            const pass = score >= 100;
+            document.getElementById('resultIcon').textContent = pass ? '✓' : '✗';
+            document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL';
+            document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score}`;
+            document.getElementById('resultDetails').innerHTML = `
+                Questions answered: ${totalAnswered}<br>
+                Best streak: ${maxStreak}<br>
+                Highest level reached: ${currentLevel}
+            `;
+            
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (!savedTheme || savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeToggle').checked = true;
+            }
+            initTest();
+        });
+    </script>
+
+    <a class="back-to-top" href="#" onclick="restartTest(); return false;" aria-label="Restart test">↺</a>
+
+    <footer>
+        <div class="copyleft">⟲</div>
+        <p>COPYRIGHT © 2026 — NO RIGHTS RESERVED</p>
+        <p><a href="../site-map.html">All pages</a></p>
+    </footer>
+</body>
+</html>

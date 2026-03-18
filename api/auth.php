@@ -102,6 +102,19 @@ if ($method === 'GET') {
 function register() {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
+    $username = trim($_POST['username'] ?? '');
+
+    if (strlen($username) < 3) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Username must be at least 3 characters']);
+        return;
+    }
+
+    if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Username can only contain letters, numbers, and underscores']);
+        return;
+    }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         http_response_code(400);
@@ -117,6 +130,15 @@ function register() {
 
     try {
         $pdo = getDB();
+        
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        if ($stmt->fetch()) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Username already taken']);
+            return;
+        }
+
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
 
@@ -128,12 +150,19 @@ function register() {
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         $theme = 'dark';
-        $stmt = $pdo->prepare("INSERT INTO users (email, password, theme) VALUES (?, ?, ?)");
-        $stmt->execute([$email, $hashedPassword, $theme]);
+        
+        try {
+            $stmt = $pdo->prepare("INSERT INTO users (username, email, password, theme) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$username, $email, $hashedPassword, $theme]);
+        } catch (Exception $e) {
+            $stmt = $pdo->prepare("INSERT INTO users (email, password, theme) VALUES (?, ?, ?)");
+            $stmt->execute([$email, $hashedPassword, $theme]);
+        }
 
         $_SESSION['user_id'] = $pdo->lastInsertId();
         $_SESSION['email'] = $email;
-        echo json_encode(['success' => true, 'email' => $email, 'theme' => $theme]);
+        $_SESSION['username'] = $username;
+        echo json_encode(['success' => true, 'email' => $email, 'username' => $username, 'theme' => $theme]);
     } catch (Exception $e) {
         error_log("Register error: " . $e->getMessage());
         http_response_code(500);

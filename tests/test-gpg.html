@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-gpg.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPG Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+    </nav>
+    <div class="test-container">
+        <div class="test-header"><h1>// GPG TEST</h1><p>Prove your GPG mastery</p></div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const easyQuestions = [
+            { q: "What does GPG stand for?", a: ["GNU Privacy Guard", "General Public Guard", "Global Privacy Group", "Great Privacy Tool"], correct: 0 },
+            { q: "What is the command to generate a GPG key?", a: ["gpg --full-generate-key", "gpg --create-key", "gpg --new-key", "gpg --init"], correct: 0 },
+            { q: "What type of encryption does GPG typically use for messages?", a: ["Asymmetric", "Symmetric", "Hash", "Steganography"], correct: 0 },
+            { q: "What is a public key?", a: ["Shared encryption key", "Private decryption key", "Signature key", "Hash key"], correct: 0 },
+            { q: "What is a private key?", a: ["Kept secret for decryption", "Shared publicly", "Used for verification", "Written in config"], correct: 0 },
+            { q: "What command lists your GPG keys?", a: ["gpg --list-keys", "gpg --show-keys", "gpg --keys", "gpg --list"], correct: 0 },
+            { q: "What is the command to encrypt a file?", a: ["gpg -e file", "gpg -c file", "gpg -d file", "gpg -s file"], correct: 0 },
+            { q: "What command decrypts a file?", a: ["gpg -d file", "gpg -e file", "gpg -c file", "gpg -r file"], correct: 0 },
+            { q: "What does symmetric encryption use?", a: ["Single shared password", "Key pair", "Hash function", "Digital signature"], correct: 0 },
+            { q: "What is the keyring?", a: ["Collection of keys", "Encrypted file", "Password manager", "Backup location"], correct: 0 },
+            { q: "What command exports your public key?", a: ["gpg --export -a", "gpg --import", "gpg --delete", "gpg --sign"], correct: 0 },
+            { q: "What is a keyserver?", a: ["Public key repository", "Encryption server", "Backup system", "Key generator"], correct: 0 },
+            { q: "What command imports a GPG key?", a: ["gpg --import keyfile", "gpg --export keyfile", "gpg --add keyfile", "gpg --receive keyfile"], correct: 0 },
+            { q: "What is a fingerprint?", a: ["Unique key identifier", "Password hash", "Encryption algorithm", "File checksum"], correct: 0 },
+            { q: "What command shows key fingerprint?", a: ["gpg --fingerprint", "gpg --print", "gpg --show", "gpg --info"], correct: 0 },
+            { q: "What is key signing?", a: ["Validate key ownership", "Delete key", "Copy key", "Encrypt key"], correct: 0 },
+            { q: "What does signing a message prove?", a: ["Authenticity and integrity", "Encryption", "Compression", "Timestamp"], correct: 0 },
+            { q: "What command signs a file?", a: ["gpg -s file", "gpg -e file", "gpg -c file", "gpg -d file"], correct: 0 },
+            { q: "What is a detached signature?", a: ["Separate .sig file", "Embedded in file", "Encrypted signature", "Hash signature"], correct: 0 },
+            { q: "What command verifies a signature?", a: ["gpg --verify file.sig", "gpg -v file", "gpg -c file", "gpg -d file"], correct: 0 },
+            { q: "What is the default keyring location?", a: ["~/.gnupg/", "/etc/gpg/", "~/.keys/", "/gpg/"], correct: 0 },
+            { q: "What is a subkey?", a: ["Secondary key for specific use", "Main key", "Backup key", "Expired key"], correct: 0 },
+            { q: "What does --armor do?", a: ["Creates ASCII output", "Encrypts file", "Adds signature", "Deletes key"], correct: 0 },
+            { q: "What file extension is ASCII-armored GPG?", a: [".asc", ".gpg", ".key", ".pgp"], correct: 0 },
+            { q: "What is key expiry?", a: ["Time limit on key validity", "Password timeout", "Encryption limit", "Signature validity"], correct: 0 },
+            { q: "What command sets key expiry?", a: ["gpg --edit-key key expire", "gpg --set-expire", "gpg --timeout", "gpg --expire"], correct: 0 },
+            { q: "What is a revocation certificate?", a: ["Declares key invalid", "Backup key", "New key", "Signature key"], correct: 0 },
+            { q: "What command generates revocation cert?", a: ["gpg --gen-revoke", "gpg --revoke", "gpg --create-revoke", "gpg --invalidate"], correct: 0 },
+            { q: "What is the web of trust?", a: ["Key authentication chain", "Encrypted network", "Key server network", "Password system"], correct: 0 },
+            { q: "What does ultimate trust mean?", a: ["You own the key", "Keyserver trust", "Expired trust", "No trust"], correct: 0 },
+            { q: "What command edits a key?", a: ["gpg --edit-key", "gpg --modify", "gpg --change", "gpg --update"], correct: 0 }
+        ];
+        const mediumQuestions = [
+            { q: "What algorithm does GPG use for asymmetric encryption?", a: ["RSA, ElGamal, ECC", "AES only", "DES only", "Blowfish only"], correct: 0 },
+            { q: "What is the default RSA key size?", a: ["2048 bits", "1024 bits", "4096 bits", "512 bits"], correct: 0 },
+            { q: "What command creates RSA 4096 key?", a: ["gpg --full-gen-key (select 4096)", "gpg --rsa 4096", "gpg --new-key rsa4096", "gpg --keysize 4096"], correct: 0 },
+            { q: "What is ECC in GPG?", a: ["Elliptic Curve Cryptography", "Extended Crypto Code", "Encryption Certificate", "Error Correction"], correct: 0 },
+            { q: "What is Ed25519?", a: ["Modern elliptic curve", "Hash algorithm", "Compression method", "Signature only curve"], correct: 0 },
+            { q: "What does gpg-agent do?", a: ["Manages cached passphrases", "Generates keys", "Signs files", "Imports keys"], correct: 0 },
+            { q: "What is the gpg.conf file?", a: ["GPG configuration options", "Key storage", "Keyring backup", "Trust database"], correct: 0 },
+            { q: "What option enables weak algorithms?", a: ["--allow-weak-keyalgorithms", "--weak", "--insecure", "--legacy"], correct: 0 },
+            { q: "What is a密钥 passphrase?", a: ["Protects private key", "Encrypts public key", "Identifies user", "Signs commits"], correct: 0 },
+            { q: "What command encrypts for specific recipient?", a: ["gpg -e -r recipient file", "gpg -e file recipient", "gpg --encrypt recipient file", "gpg encrypt --to recipient"], correct: 0 },
+            { q: "What is symmetric-only encryption?", a: ["Password-based encryption", "Uses recipient key", "Uses both keys", "No encryption"], correct: 0 },
+            { q: "What command does symmetric encryption?", a: ["gpg -c file", "gpg -e file", "gpg -s file", "gpg --symmetric file"], correct: 0 },
+            { q: "What is key translation?", a: ["Convert between formats", "Change algorithm", "Update expiry", "Sign key"], correct: 0 },
+            { q: "What command exports secret key?", a: ["gpg --export-secret-keys", "gpg --export-private", "gpg --backup-key", "gpg --save-key"], correct: 0 },
+            { q: "Why export secret keys?", a: ["Backup or transfer", "Share publicly", "Sign others", "Upload to server"], correct: 0 },
+            { q: "What is key escrow?", a: ["Third-party key backup", "Key sharing", "Key deletion", "Key expiration"], correct: 0 },
+            { q: "What is paperkey?", a: ["Printable key backup", "Digital key", "Encrypted key", "Public key only"], correct: 0 },
+            { q: "What does --try-secret-key do?", a: ["Try specific key for decryption", "Guess password", "Force algorithm", "Skip verification"], correct: 0 },
+            { q: "What is dirmngr?", a: ["Keyserver client daemon", "Directory manager", "Key generator", "Encryption daemon"], correct: 0 },
+            { q: "What command searches keyserver?", a: ["gpg --search-keys keyword", "gpg --find-key", "gpg --lookup", "gpg --server-search"], correct: 0 },
+            { q: "What is the WKD protocol?", a: ["Web Key Directory", "Wide Key Data", "Wiki Key Distribution", "Wrapped Key Download"], correct: 0 },
+            { q: "What command uses WKD?", a: ["gpg --locate-keys", "gpg --search", "gpg --fetch", "gpg --wkd"], correct: 0 },
+            { q: "What is tofu trust?", a: ["Trust based on key history", "Trust from signatures", "Keyserver trust", "No trust"], correct: 0 },
+            { q: "What is the tofu policy setting?", a: ["tofu policy auto", "tofu trust auto", "trust policy", "policy tofu"], correct: 0 },
+            { q: "What is a cleartext signature?", a: ["Embedded in readable text", "Encrypted signature", "Detached signature", "Binary signature"], correct: 0 },
+            { q: "What command creates cleartext sig?", a: ["gpg --clearsign file", "gpg -s --text file", "gpg --sign-text file", "gpg -st file"], correct: 0 },
+            { q: "What is compression in GPG?", a: ["ZIP, ZLIB, BZIP2", "RSA encryption", "Key derivation", "Hashing"], correct: 0 },
+            { q: "What is the default compression?", a: ["ZLIB", "ZIP", "BZIP2", "None"], correct: 0 },
+            { q: "What command specifies compression?", a: ["--compress-keys", "--compression-algo", "--compress", "--zip-algo"], correct: 0 },
+            { q: "What is an integrity check in GPG?", a: ["Protected by modification detection", "Password check", "Key verification", "Signature check"], correct: 0 }
+        ];
+        const hardQuestions = [
+            { q: "What is the mathematical trapdoor in RSA?", a: ["Factoring large numbers", "Discrete logarithm", "Hash collision", "Elliptic curve"], correct: 0 },
+            { q: "What key size provides ~128-bit security?", a: ["3072-bit RSA", "2048-bit RSA", "1024-bit RSA", "4096-bit RSA"], correct: 0 },
+            { q: "What is the生日攻击?", a: ["Collision probability after ~2^n/2 attempts", "Birthday encryption", "Random attack", "Password attack"], correct: 0 },
+            { q: "What is forward secrecy?", a: ["Compromised key doesn't expose past sessions", "Future key compromise", "Past key compromise", "No key compromise"], correct: 0 },
+            { q: "How does GPG provide forward secrecy?", a: ["Ephemeral session keys", "Permanent keys", "Key rotation", "Hash chains"], correct: 0 },
+            { q: "What is DH key exchange?", a: ["Generate shared secret over insecure channel", "Encrypt with hash", "Sign key", "Derive password"], correct: 0 },
+            { q: "What is ECIES?", a: ["Elliptic Curve Integrated Encryption Scheme", "Extended Internet Encryption Standard", "Elliptical Curve Information Exchange", "External Certificate Import"], correct: 0 },
+            { q: "What does --show-session-key reveal?", a: ["Displays session key for debugging", "Exposes private key", "Shows all keys", "Reveals password"], correct: 0 },
+            { q: "What is the crypt(3) function?", a: ["Password hashing function", "Encryption function", "Key derivation", "Hash algorithm"], correct: 0 },
+            { q: "What are S2K functions in GPG?", a: ["String-to-Key key derivation", "Secret Key Knowledge", "Symmetric Key Operation", "Standard Key Output"], correct: 0 },
+            { q: "What is the Simple S2K?", a: ["Hash password repeatedly", "Single hash", "No hashing", "Random salt"], correct: 0 },
+            { q: "What is Salted S2K?", a: ["Uses random salt + iteration", "Fast hash only", "No salt", "Single iteration"], correct: 0 },
+            { q: "What is Iterated Salted S2K?", a: ["Multiple rounds of hashing", "Single hash", "No salt", "Random salt only"], correct: 0 },
+            { q: "What does --s2k-digest-algo specify?", a: ["Hash for key derivation", "Message hash", "Signature hash", "Compression hash"], correct: 0 },
+            { q: "What is a AEAD encryption mode?", a: ["Authenticated Encryption with Associated Data", "Advanced Encryption Algorithm", "Alternative Encryption", "Asymmetric Encryption"], correct: 0 },
+            { q: "What is EAX mode in GPG?", a: ["Encrypt-Then-MAC with CCM", "Password mode", "Stream mode", "Block mode"], correct: 0 },
+            { q: "What is OCB mode?", a: ["Offset Codebook mode", "One-Key CBC", "Output Block Cipher", "Ordered Cipher Block"], correct: 0 },
+            { q: "What is MDC in OpenPGP?", a: ["Modification Detection Code", "Message Digest Code", "MAC Digest", "Key Check"], correct: 0 },
+            { q: "What does a MDC protect against?", a: ["Ciphertext tampering", "Password guessing", "Key recovery", "Signature forgery"], correct: 0 },
+            { q: "What is the purpose of SEIPD?", a: ["Symmetrically Encrypted with Integrity Protection", "Session Encryption", "Public Key", "Signature Encapsulation"], correct: 0 },
+            { q: "What is a literal data packet?", a: ["Contains actual file data", "Encrypted metadata", "Signature packet", "Key packet"], correct: 0 },
+            { q: "What is the new format packet?", a: ["OpenPGP RFC 4880 packet", "Old format", "Compressed format", "Signature only"], correct: 0 },
+            { q: "What is the trust signature packet?", a: ["Certifies key trust level", "Key expiration", "Signature trust", "Owner trust"], correct: 0 },
+            { q: "What is a notation data signature?", a: ["User-defined metadata in signature", "Signature timestamp", "Key fingerprint", "Hash value"], correct: 0 },
+            { q: "What does --attribute-policy do?", a: ["Controls attribute usage", "Sets attributes", "Removes attributes", "Encrypts attributes"], correct: 0 },
+            { q: "What is the primary UID?", a: ["Main user ID designation", "First UID only", "Verified UID", "Encrypted UID"], correct: 0 },
+            { q: "What command makes UID primary?", a: ["gpg --edit-key uid primary", "gpg --set-primary", "gpg --make-primary", "gpg --primary-uid"], correct: 0 },
+            { q: "What is key invalidation?", a: ["Permanent key revocation", "Temporary hold", "Expiration extension", "Trust change"], correct: 0 },
+            { q: "What is a designated revoker?", a: ["Can revoke on owner's behalf", "Main revoker", "Backup revoker", "Keyserver revoker"], correct: 0 },
+            { q: "What command designates revoker?", a: ["gpg --edit-key addrevoker", "gpg --set-revoker", "gpg --add-revoke", "gpg --revoker add"], correct: 0 }
+        ];
+        let currentQuestions=[],currentQuestionIndex=0,score=0,streak=0,maxStreak=0,difficulty='easy',currentLevel=1,consecutiveCorrect=0,totalAnswered=0;
+        function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+        function shuffleAnswers(q){let a=[...q.a],c=a[q.correct],s=shuffle(a);return{...q,a:s,correct:s.indexOf(c)}}
+        function initTest(){difficulty='easy';currentLevel=1;consecutiveCorrect=0;currentQuestions=shuffle([...easyQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0;score=0;streak=0;maxStreak=0;totalAnswered=0;document.getElementById('resultScreen').classList.remove('active');document.getElementById('quiz').style.display='block';renderQuestion()}
+        function renderQuestion(){let c=document.getElementById('questionsContainer');c.innerHTML='';let q=currentQuestions[currentQuestionIndex],d=document.createElement('div');d.className='question-container active';d.innerHTML=`<div class="question-text">${q.q}</div><div class="answers-grid">${q.a.map((a,i)=>`<button class="answer-btn" onclick="selectAnswer(${i})"> ${a}</button>`).join('')}</div>`;c.appendChild(d);updateUI()}
+        function updateUI(){let t=currentQuestions.length,p=(currentQuestionIndex/t)*100;document.getElementById('progressFill').style.width=p+'%';document.getElementById('questionNum').textContent=currentQuestionIndex+1;document.getElementById('streakNum').textContent=streak;document.getElementById('scoreNum').textContent=score;document.getElementById('levelNum').textContent=currentLevel}
+        function selectAnswer(i){let q=currentQuestions[currentQuestionIndex],b=document.querySelectorAll('.answer-btn');b.forEach((btn,j)=>{btn.disabled=true;if(j===q.correct)btn.classList.add('correct')});totalAnswered++;if(i===q.correct){streak++;if(streak>maxStreak)maxStreak=streak;consecutiveCorrect++;score+=difficulty==='easy'?10:difficulty==='medium'?20:30;if(currentLevel===1&&consecutiveCorrect>=7){currentLevel=2;difficulty='medium';consecutiveCorrect=0;currentQuestions=shuffle([...mediumQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0}else if(currentLevel===2&&consecutiveCorrect>=7){currentLevel=3;difficulty='hard';consecutiveCorrect=0;currentQuestions=shuffle([...hardQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0}else currentQuestionIndex++;setTimeout(()=>{currentQuestionIndex<currentQuestions.length?renderQuestion():showResult()},1200)}else{b[i].classList.add('incorrect');streak=0;consecutiveCorrect=0;currentQuestionIndex++;setTimeout(()=>{currentQuestionIndex<currentQuestions.length?renderQuestion():showResult()},2000);return}}
+        function showResult(){document.getElementById('questionsContainer').innerHTML='';let p=score>=100;document.getElementById('resultScreen').classList.add('active');document.getElementById('resultIcon').textContent=p?'✓':'✗';document.getElementById('resultText').textContent=p?'PASS':'FAIL';document.getElementById('resultText').className='result-text '+(p?'pass':'fail');document.getElementById('resultScore').textContent=`Score: ${score}`;document.getElementById('resultDetails').innerHTML=`Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`;document.getElementById('progressFill').style.width='100%'}
+        function restartTest(){initTest()}
+        document.addEventListener('DOMContentLoaded',function(){let s=localStorage.getItem('theme');if(s==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('themeToggle').checked=true}initTest()});
+    </script>
+</body>
+</html>

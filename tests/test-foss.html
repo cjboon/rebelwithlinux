@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-foss.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOSS & Privacy Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container {
+            padding: 32px 32px;
+            background: var(--white);
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 80vh;
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .test-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2rem;
+            margin-bottom: 4px;
+        }
+        
+        .test-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--light-gray);
+            border-radius: 4px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--charcoal);
+            transition: width 0.3s ease;
+        }
+        
+        .question-container {
+            display: none;
+        }
+        
+        .question-container.active {
+            display: block;
+        }
+        
+        .question-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.25rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .answers-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .answer-btn {
+            padding: 16px 20px;
+            border: 2px solid var(--charcoal);
+            background: transparent;
+            color: var(--charcoal);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .answer-btn:hover {
+            background: var(--light-gray);
+        }
+        
+        .answer-btn.correct {
+            background: #22c55e !important;
+            border-color: #22c55e !important;
+            color: white !important;
+        }
+        
+        .answer-btn.incorrect {
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+            color: white !important;
+        }
+        
+        .answer-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .result-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .result-screen.active {
+            display: block;
+        }
+        
+        .result-icon {
+            font-size: 5rem;
+            margin-bottom: 24px;
+        }
+        
+        .result-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        
+        .result-score {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.25rem;
+            color: var(--charcoal);
+            margin-bottom: 32px;
+        }
+        
+        .result-details {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+            margin-bottom: 32px;
+        }
+        
+        .retry-btn {
+            padding: 16px 32px;
+            background: var(--charcoal);
+            color: var(--white);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .retry-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 24px;
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: var(--white);
+            gap: 8px;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            white-space: nowrap;
+            color: var(--charcoal);
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .theme-toggle-label {
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+        
+        .theme-toggle-icon.sun {
+            display: none;
+        }
+        
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) {
+            display: none;
+        }
+        
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun {
+            display: inline;
+        }
+        
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) {
+            display: none;
+        }
+        
+        [data-theme="dark"] .theme-toggle-icon.sun {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">
+                REBEL WITH LINUX
+            </a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="../account.html" id="loginLink" class="auth-link" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" class="auth-link" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// FOSS & PRIVACY TEST</h1>
+            <p>Master free software and privacy</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value" id="questionNum">1</div>
+                    <div class="stat-label">Question</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="streakNum">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="scoreNum">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="levelNum">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div id="questionsContainer"></div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What does FOSS stand for?", a: ["Free and Open Source Software", "Fast Online Security System", "File Output Storage Solution", "Functional Operating System"], correct: 0 },
+            { q: "What are the four freedoms of free software?", a: ["Use, study, modify, redistribute", "Download, install, run, delete", "Read, write, execute, own", "Create, copy, share, sell"], correct: 0 },
+            { q: "What license allows proprietary use?", a: ["MIT", "GPL", "AGPL", "LGPL"], correct: 0 },
+            { q: "What is open source software?", a: ["Source code anyone can view and modify", "Free to download software", "Cloud-based applications", "Software with no license"], correct: 0 },
+            { q: "What is the difference between free and open source?", a: ["Free refers to freedom, not price", "They mean the same thing", "Open source is always free", "Free software is obsolete"], correct: 0 },
+            { q: "What does VPN stand for?", a: ["Virtual Private Network", "Very Private Network", "Visual Personal Network", "Verified Private Network"], correct: 0 },
+            { q: "What does Tor browser protect?", a: ["Your anonymity online", "Your computer from viruses", "Your passwords", "Your bandwidth"], correct: 0 },
+            { q: "What is end-to-end encryption?", a: ["Only sender and recipient can read messages", "Encrypted storage", "Password protection", "Secure deletion"], correct: 0 },
+            { q: "What is a password manager?", a: ["Tool to store passwords securely", "Browser feature", "Email service", "Antivirus software"], correct: 0 },
+            { q: "What is two-factor authentication (2FA)?", a: ["Using two methods to verify identity", "Two passwords", "Double encryption", "Two accounts"], correct: 0 },
+            { q: "What is metadata?", a: ["Data about data", "Hidden files", "Encrypted data", "Deleted data"], correct: 0 },
+            { q: "What is a firewall?", a: ["Filters network traffic", "Stores passwords", "Encrypts files", "Backs up data"], correct: 0 },
+            { q: "What is the purpose of HTTPS?", a: ["Secure web communication", "Faster loading", "Better SEO", "Offline access"], correct: 0 },
+            { q: "What is a privacy policy?", a: ["Document explaining data usage", "Terms of service", "License agreement", "Security certificate"], correct: 0 },
+            { q: "What is cookie tracking?", a: ["Websites following user activity", "Baking cookies", "Password storage", "Data deletion"], correct: 0 },
+            { q: "What is a VPN kill switch?", a: ["Blocks internet if VPN disconnects", "Starts VPN automatically", "Changes VPN servers", "Tests VPN speed"], correct: 0 },
+            { q: "What does DNS stand for?", a: ["Domain Name System", "Digital Network Security", "Data Network Service", "Dynamic Name Server"], correct: 0 },
+            { q: "What is a DNS leak?", a: ["VPN failing to hide DNS queries", "Slow internet", "Website error", "Password breach"], correct: 0 },
+            { q: "What is signal protocol used for?", a: ["End-to-end encryption in messaging", "Video calls", "File sharing", "Email"], correct: 0 },
+            { q: "What is a hardware wallet?", a: ["Physical device for crypto storage", "Computer case", "USB drive", "Password notebook"], correct: 0 },
+            { q: "What is the dark web?", a: ["Unindexed websites requiring special software", "Private network", "Incognito mode", "VPN network"], correct: 0 },
+            { q: "What is PGP encryption?", a: ["Pretty Good Privacy for email", "Photo editing software", "Password generator", "Virus scanner"], correct: 0 },
+            { q: "What is a vulnerability?", a: ["Security weakness in software", "Strong password", "Encrypted file", "Firewall"], correct: 0 },
+            { q: "What is social engineering?", a: ["Manipulating people to reveal secrets", "Online messaging", "Social media", "Community building"], correct: 0 },
+            { q: "What is phishing?", a: ["Fake messages stealing credentials", "Internet search", "File sharing", "Email marketing"], correct: 0 },
+            { q: "What is malware?", a: ["Malicious software", "Email client", "File manager", "Web browser"], correct: 0 },
+            { q: "What is ransomware?", a: ["Encrypts files for payment", "Free software", "Password tool", "Network scanner"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the Copyleft principle?", a: ["Derivative works must use same license", "No copying allowed", "Free distribution only", "Public domain only"], correct: 0 },
+            { q: "What is the GPLv3 license known for?", a: ["Strong copyleft, tivoization protection", "Minimal restrictions", "Proprietary use only", "No derivatives allowed"], correct: 0 },
+            { q: "What is the MIT license characterized by?", a: ["Permissive, minimal restrictions", "Strong copyleft", "No commercial use", "Share-alike only"], correct: 0 },
+            { q: "What is the difference between GPLv2 and GPLv3?", a: ["v3 adds tivoization protection", "v2 is newer", "v3 removes freedoms", "v2 is commercial"], correct: 0 },
+            { q: "What is the Apache license?", a: ["Permissive with patent rights", "Strong copyleft", "No modifications", "Personal use only"], correct: 0 },
+            { q: "What is Creative Commons (CC)?", a: ["Licenses for creative works", "Programming license", "Security protocol", "Network type"], correct: 0 },
+            { q: "What does AGPL mean?", a: ["Affero GPL - network use requires source", "Advanced GPL", "Anti GPL", "Alternate GPL"], correct: 0 },
+            { q: "What is the principle of least privilege?", a: ["Only minimum access needed for tasks", "Maximum permissions always", "Admin for everything", "Root access only"], correct: 0 },
+            { q: "What is defense in depth?", a: ["Multiple layers of security", "Single firewall only", "One strong password", "Single encryption"], correct: 0 },
+            { q: "What is a threat model?", a: ["Analysis of potential attackers and risks", "Firewall configuration", "Password policy", "Network diagram"], correct: 0 },
+            { q: "What is zero-knowledge proof?", a: ["Prove something without revealing info", "No password needed", "Single sign-on", "Anonymous browsing"], correct: 0 },
+            { q: "What is Perfect Forward Secrecy?", a: ["Each session has unique encryption keys", "One key forever", "No encryption", "Slow encryption"], correct: 0 },
+            { q: "What is onion routing?", a: ["Layers of encryption through relays", "LAN connection", "VPN protocol", "Direct connection"], correct: 0 },
+            { q: "What is a bridge in Tor?", a: ["Unlisted relay to evade blocking", "Connection to ISP", "Firewall type", "VPN server"], correct: 0 },
+            { q: "What is Plausible Deniability?", a: ["Deniable encryption existence", "Impossible to crack", "No encryption", "Single password"], correct: 0 },
+            { q: "What is steganography?", a: ["Hiding data within other data", "Password storage", "Encryption method", "File compression"], correct: 0 },
+            { q: "What is air-gapped computer?", a: ["Not connected to any network", "Wireless computer", "Fast computer", "Secure website"], correct: 0 },
+            { q: "What is cold storage in crypto?", a: ["Offline wallet storage", "Refrigerated mining", "Cooled servers", "Winter hosting"], correct: 0 },
+            { q: "What is a brain wallet?", a: ["Memorized seed phrase", "Online wallet", "Hardware wallet", "Exchange account"], correct: 0 },
+            { q: "What is multi-signature wallet?", a: ["Requires multiple keys to spend", "One password only", "Shared account", "Paper wallet"], correct: 0 },
+            { q: "What is a entropy in security?", a: ["Randomness for cryptographic keys", "Network speed", "Password length", "Encryption speed"], correct: 0 },
+            { q: "What is a salt in password hashing?", a: ["Random data added before hashing", "Password prefix", "Encryption key", "Hash algorithm"], correct: 0 },
+            { q: "What is key stretching?", a: ["Making passwords harder to crack", "Longer keys", "Multiple keys", "Key storage"], correct: 0 },
+            { q: "What is a saltine challenge?", a: ["Deniable encryption test", "Password strength", "Network test", "Encryption speed"], correct: 0 },
+            { q: "What is cold boot attack?", a: ["Extracting RAM contents on reboot", "Boot sector virus", "Startup password", "Bootloader crack"], correct: 0 },
+            { q: "What is Evil Maid attack?", a: ["Physical access while unattended", "Email hack", "Malware", "Network attack"], correct: 0 },
+            { q: "What is Rubber Hose Cryptanalysis?", a: ["Coercion to reveal passwords", "Hose encryption", "Physical security", "Password guessing"], correct: 0 },
+            { q: "What is OPSEC?", a: ["Operational Security", "Open Source", "Online Privacy", "Optical Security"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is the purpose of a nonce in cryptography?", a: ["Ensures uniqueness of encryption", "Stores passwords", "Compresses data", "Verifies identity"], correct: 0 },
+            { q: "What is a side-channel attack?", a: ["Exploits physical properties of hardware", "Network intrusion", "Phishing", "Brute force"], correct: 0 },
+            { q: "What is timing attack?", a: ["Analyzes execution time differences", "Clock manipulation", "Time-based virus", "Scheduler exploit"], correct: 0 },
+            { q: "What is Differential Power Analysis?", a: ["Monitors power consumption", "Network analysis", "Disk analysis", "Memory analysis"], correct: 0 },
+            { q: "What is a cold boot attack mitigation?", a: ["Encrypt RAM, boot from trusted medium", "Turn off computer", "Use strong password", "Disable USB"], correct: 0 },
+            { q: "What is TPM used for?", a: ["Hardware security module", "Temporary password manager", "Traffic monitoring", "Time protection"], correct: 0 },
+            { q: "What is Secure Boot?", a: ["Verifies boot software integrity", "Encrypted boot", "Remote boot", "Multi-boot"], correct: 0 },
+            { q: "What is Full Disk Encryption (FDE)?", a: ["Encrypts entire storage device", "File encryption only", "Network encryption", "Email encryption"], correct: 0 },
+            { q: "What is LUKS?", a: ["Linux Unified Key Setup for disk encryption", "User key system", "Login utility", "Lock utility"], correct: 0 },
+            { q: "What is Veracrypt?", a: ["Open source disk encryption software", "Version control", "Virtual machine", "Video codec"], correct: 0 },
+            { q: "What is a YubiKey?", a: ["Hardware authentication token", "Password manager", "Encryption key", "USB drive"], correct: 0 },
+            { q: "What is U2F/FIDO2?", a: ["Universal 2nd Factor authentication", "File transfer protocol", "Email protocol", "Firewall type"], correct: 0 },
+            { q: "What is a HSM?", a: ["Hardware Security Module", "Hash System Manager", "Hyper Secure Mode", "Host System Monitor"], correct: 0 },
+            { q: "What is certificate pinning?", a: ["Validates specific certificate for connection", "Pins files together", "Password storage", "Network logging"], correct: 0 },
+            { q: "What is OCSP stapling?", a: ["Validates certificate status efficiently", "Stapling documents", "Network optimization", "Email protocol"], correct: 0 },
+            { q: "What is a CSP?", a: ["Content Security Policy for web", "Certificate Service Provider", "Central Security Portal", "Cloud Service Platform"], correct: 0 },
+            { q: "What is CORS?", a: ["Controls web resource access", "Cross-origin resource sharing", "Certificate origin", "Connection protocol"], correct: 0 },
+            { q: "What is SQL injection?", a: ["Malicious database queries", "Email spam", "Network flood", "Password crack"], correct: 0 },
+            { q: "What is XSS?", a: ["Injecting scripts into web pages", "Cross-site scripting", "Extra secure socket", "Extended storage system"], correct: 0 },
+            { q: "What is CSRF?", a: ["Forcing unwanted actions on authenticated user", "Cross-site request forgery", "Central server request", "Computer system resource"], correct: 0 },
+            { q: "What is a buffer overflow?", a: ["Memory corruption through excess data", "Too many buffers", "Network overflow", "Storage overflow"], correct: 0 },
+            { q: "What is ASLR?", a: ["Randomizes memory addresses", "Anti-script language", "Address space layout", "Active server list"], correct: 0 },
+            { q: "What is DEP/NX?", a: ["Prevents execution of code in data areas", "Data execution prevention", "Disk error protection", "Denial prevention"], correct: 0 },
+            { q: "What is a ROP chain?", a: ["Return-oriented programming exploit", "Ring operation", "Read-only protocol", "Remote object"], correct: 0 },
+            { q: "What is Spectre/Meltdown?", a: ["CPU speculative execution vulnerabilities", "Hardware malware", "Encryption flaws", "Network bugs"], correct: 0 },
+            { q: "What is a format string vulnerability?", a: ["Exploits format function input", "String formatting", "Text encoding", "File naming"], correct: 0 },
+            { q: "What is privilege escalation?", a: ["Gaining higher access rights", "Elevator security", "Moving up floors", "Priority increase"], correct: 0 },
+            { q: "What is a rootkit?", a: ["Hides malicious software presence", "Root access", "Kit for roots", "Garden tool"], correct: 0 },
+            { q: "What is keylogger?", a: ["Records keystrokes secretly", "Musical instrument", "Password list", "Encryption key"], correct: 0 },
+            { q: "What is a botnet?", a: ["Network of compromised computers", "Robot network", "Better net", "Binary network"], correct: 0 },
+            { q: "What is DDoS?", a: ["Distributed Denial of Service attack", "Direct denial", "Data denial", "Dense denial"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let level = 1;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function selectQuestions() {
+            let easy = shuffle([...easyQuestions]).slice(0, 10);
+            let medium = shuffle([...mediumQuestions]).slice(0, 8);
+            let hard = shuffle([...hardQuestions]).slice(0, 6);
+            currentQuestions = [...easy, ...medium, ...hard];
+            currentQuestions = shuffle(currentQuestions);
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            currentQuestions.forEach((q, index) => {
+                const div = document.createElement('div');
+                div.className = 'question-container' + (index === 0 ? ' active' : '');
+                div.id = 'q' + index;
+                
+                const answers = [...q.a].map((answer, i) => {
+                    return `<button class="answer-btn" onclick="checkAnswer(${index}, ${i})">${answer}</button>`;
+                }).join('');
+                
+                div.innerHTML = `
+                    <div class="question-text">${q.q}</div>
+                    <div class="answers-grid">${answers}</div>
+                `;
+                container.appendChild(div);
+            });
+            
+            updateStats();
+        }
+
+        function checkAnswer(qIndex, aIndex) {
+            const q = currentQuestions[qIndex];
+            const buttons = document.querySelectorAll('#q' + qIndex + ' .answer-btn');
+            
+            buttons.forEach(btn => btn.disabled = true);
+            
+            if (aIndex === q.correct) {
+                buttons[aIndex].classList.add('correct');
+                score += 10 + (streak * 2);
+                streak++;
+            } else {
+                buttons[aIndex].classList.add('incorrect');
+                buttons[q.correct].classList.add('correct');
+                streak = 0;
+            }
+            
+            level = Math.floor(score / 100) + 1;
+            updateStats();
+            
+            setTimeout(() => {
+                document.getElementById('q' + qIndex).classList.remove('active');
+                if (qIndex < currentQuestions.length - 1) {
+                    document.getElementById('q' + (qIndex + 1)).classList.add('active');
+                    currentIndex = qIndex + 1;
+                } else {
+                    showResults();
+                }
+            }, 1200);
+        }
+
+        function updateStats() {
+            document.getElementById('questionNum').textContent = currentIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = level;
+            document.getElementById('progressFill').style.width = ((currentIndex + 1) / currentQuestions.length * 100) + '%';
+        }
+
+        function showResults() {
+            const container = document.getElementById('questionsContainer');
+            container.style.display = 'none';
+            document.getElementById('resultScreen').classList.add('active');
+            
+            const passed = score >= 150;
+            document.getElementById('resultIcon').textContent = passed ? '🎉' : '💪';
+            document.getElementById('resultText').textContent = passed ? 'PASSED!' : 'KEEP LEARNING';
+            document.getElementById('resultText').className = 'result-text ' + (passed ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = 'Score: ' + score + ' | Level: ' + level;
+            document.getElementById('resultDetails').textContent = 
+                'You completed the FOSS & Privacy test! ' +
+                (passed ? 'You have demonstrated strong knowledge in free software and privacy.' : 'Keep studying and try again!');
+        }
+
+        function restartTest() {
+            currentIndex = 0;
+            score = 0;
+            streak = 0;
+            level = 1;
+            selectQuestions();
+            renderQuestion();
+            document.getElementById('questionsContainer').style.display = 'block';
+            document.getElementById('resultScreen').classList.remove('active');
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeToggle').checked = savedTheme === 'dark';
+
+        selectQuestions();
+        renderQuestion();
+    </script>
+</body>
+</html>
