@@ -11,12 +11,27 @@
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="../fonts.css">
     <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.checked = (savedTheme === 'dark' || !savedTheme);
+            }
+        });
+    </script>
+
     <script src="../terminal-select.js"></script>
 </head>
 <body class="guide-page">
     <div id="close" class="nav-close-target" aria-hidden="true"></div>
     <nav>
-        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
         <div class="nav-left">
             <div class="nav-title">
                 <a href="../index.html" style="color: inherit; text-decoration: none;">PYTHON MASTERY</a>

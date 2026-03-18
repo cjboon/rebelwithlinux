@@ -11,6 +11,21 @@
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="../fonts.css">
     <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.checked = (savedTheme === 'dark' || !savedTheme);
+            }
+        });
+    </script>
+
     <style>
         :root { --nav-color: #ee0000; }
         .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
@@ -20,7 +35,7 @@
 <body class="guide-page">
     <div id="close" class="nav-close-target" aria-hidden="true"></div>
     <nav>
-        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
         <div class="nav-left">
             <div class="nav-title">
                 <a href="../index.html#guides" style="color: inherit; text-decoration: none;">ANSIBLE MASTERY</a>

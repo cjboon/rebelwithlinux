@@ -16,6 +16,8 @@
         const savedTheme = localStorage.getItem('theme');
         if (!savedTheme || savedTheme === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
         }
     </script>
     <script src="../terminal-select.js"></script>
@@ -24,10 +26,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             const savedTheme = localStorage.getItem('theme');
             const toggle = document.getElementById('themeToggle');
-            if (toggle && savedTheme === 'dark') {
-                toggle.checked = true;
+            if (toggle) {
+                toggle.checked = (savedTheme === 'dark' || !savedTheme);
             }
         });
+    </script>
     <script>
         // Theme toggle functionality - defined early
         function toggleThemeLinux(e) {
@@ -53,7 +56,7 @@
 <body class="guide-page">
     <div id="close" class="nav-close-target" aria-hidden="true"></div>
     <nav>
-        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
         <div class="nav-left">
             <div class="nav-title">
                 <a href="../index.html" style="color: inherit; text-decoration: none;">LINUX MASTERY</a>
@@ -2707,6 +2710,9 @@ PasswordAuthentication no</span>
         // Set initial state on page load
         const savedTheme = localStorage.getItem('theme');
         if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
             document.getElementById('themeToggle').checked = true;
             document.documentElement.setAttribute('data-theme', 'dark');
             const toggle = document.getElementById('themeToggle');

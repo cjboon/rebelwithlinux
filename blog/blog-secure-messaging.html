@@ -23,8 +23,9 @@
         }
         document.addEventListener('DOMContentLoaded', function() {
             const toggle = document.getElementById('themeToggle');
-            if (toggle && savedTheme === 'dark') {
-                toggle.checked = true;
+            if (toggle) {
+                const saved = localStorage.getItem('theme');
+                toggle.checked = (saved === 'dark' || !saved);
             }
         });
     </script>
@@ -59,7 +60,7 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <nav>
-        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
         <div class="nav-left">
             <div class="nav-title">
                 <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
