@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-typescript.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeScript Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+    </nav>
+    <div class="test-container">
+        <div class="test-header"><h1>// TYPESCRIPT TEST</h1><p>Prove your TypeScript mastery</p></div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const easyQuestions = [
+            { q: "How do you declare a typed variable in TypeScript?", a: ["let name: string", "var name: string", "const name: string", "All of above"], correct: 3 },
+            { q: "What is the TypeScript file extension?", a: [".ts", ".tsx", ".js", ".tscript"], correct: 0 },
+            { q: "How do you define an array of strings?", a: ["string[]", "Array<string>", "Both a and b", "[string]"], correct: 2 },
+            { q: "What does 'any' type mean?", a: ["Any type allowed", "Unknown type", "No type checking", "All of above"], correct: 3 },
+            { q: "How do you define an object type?", a: ["{ name: string }", "object: { name }", "Object type", "dict name"], correct: 0 },
+            { q: "What is an interface in TypeScript?", a: ["Defines object shape", "Creates class", "Imports module", "Type alias"], correct: 0 },
+            { q: "How do you make a property optional?", a: ["name?: string", "name: string?", "optional name: string", "?name: string"], correct: 0 },
+            { q: "What does 'void' mean?", a: ["No return value", "Empty object", "Null", "Undefined"], correct: 0 },
+            { q: "How do you define a function return type?", a: ["function fn(): string", "function fn: string", "returns string", "string fn()"], correct: 0 },
+            { q: "What is 'never' type?", a: ["Function never returns", "Always throws", "Both a and b", "Empty type"], correct: 2 },
+            { q: "How do you create a type alias?", a: ["type Name = string", "alias Name = string", "typedef Name string", "Name = string"], correct: 0 },
+            { q: "What is union type?", a: ["Multiple possible types", "Combined types", "Any type", "Array types"], correct: 0 },
+            { q: "How do you check for null?", a: ["if (value !== null)", "if (value)", "if (!null)", "null check"], correct: 0 },
+            { q: "What does 'as' do in TypeScript?", a: ["Type assertion", "Type conversion", "Both a and b", "Type guard"], correct: 2 },
+            { q: "How do you define a tuple?", a: ["[string, number]", "tuple(string, number)", "(string, number)", "Array<string, number>"], correct: 0 },
+            { q: "What is 'enum'?", a: ["Named constants", "Type of object", "Collection", "Array"], correct: 0 },
+            { q: "How do you declare a constant in TypeScript?", a: ["const x = 5", "let const x = 5", "constant x = 5", "var x = 5"], correct: 0 },
+            { q: "What does 'readonly' do?", a: ["Cannot be modified", "Can only read", "Read-only property", "All of above"], correct: 3 },
+            { q: "How do you define a class in TypeScript?", a: ["class Person {}", "class: Person", "new Person", "define class Person"], correct: 0 },
+            { q: "What is constructor parameter property?", a: ["Shorthand property declaration", "Creates constructor", "Defines class", "Initializes class"], correct: 0 },
+            { q: "How do you extend a class?", a: ["class Child extends Parent", "class Child: Parent", "class Child inherits Parent", "extends Child Parent"], correct: 0 },
+            { q: "What does 'super()' do?", a: ["Calls parent constructor", "Creates super", "Extends class", "Imports parent"], correct: 0 },
+            { q: "How do you define an abstract class?", a: ["abstract class X", "class X abstract", "virtual class X", "class X extends"], correct: 0 },
+            { q: "What is method overloading?", a: ["Multiple signatures", "Override method", "Extend method", "Copy method"], correct: 0 },
+            { q: "How do you implement an interface?", a: ["class X implements I", "class X: I", "class X extends I", "class X -> I"], correct: 0 },
+            { q: "What is 'private' visibility?", a: ["Only accessible in class", "Hidden everywhere", "Not visible", "Class scope only"], correct: 3 },
+            { q: "How do you define a getter?", a: ["get name(): string", "function get name()", "name getter()", "getter name()"], correct: 0 },
+            { q: "What does 'protected' mean?", a: ["Accessible in class and subclass", "Private to class", "Hidden", "Public"], correct: 0 },
+            { q: "How do you create a static member?", a: ["static property", "class.property", "Both a and b", "member static"], correct: 2 },
+            { q: "What is 'namespace'?", a: ["Groups code", "Creates module", "Defines scope", "All of above"], correct: 3 },
+            { q: "How do you import a type only?", a: ["import type { X }", "import { type X }", "Both a and b", "import T from X"], correct: 2 },
+            { q: "What is 'export type'?", a: ["Exports type only", "Exports value", "Exports module", "Exports interface"], correct: 0 },
+            { q: "How do you compile TypeScript?", a: ["tsc file.ts", "tsc file", "typescript file", "compile file.ts"], correct: 0 },
+            { q: "What is 'tsconfig.json'?", a: ["TypeScript config", "Compiler options", "Both a and b", "Project file"], correct: 2 },
+            { q: "What does 'strict' option do?", a: ["Enables strict checking", "Strict mode", "All strict flags", "Type safety"], correct: 2 },
+            { q: "How do you enable ES6 in TS?", a: ["target: ES6", "es6: true", "module: ES6", "compile: ES6"], correct: 0 },
+            { q: "What is JSX in TypeScript?", a: ["React syntax extension", "Template syntax", "HTML in JS", "XML-like"], correct: 0 },
+            { q: "How do you define a generic function?", a: ["function fn<T>(x: T): T", "function<T> fn(x)", "generic fn(x)", "function fn<T>"], correct: 0 },
+            { q: "What is type inference?", a: ["TS infers type automatically", "Manual typing", "Type guessing", "Auto-detect"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is a generic type parameter?", a: ["Placeholder for actual type", "Dynamic type", "Variable type", "Any type"], correct: 0 },
+            { q: "How do you constrain a generic?", a: ["<T extends Type>", "<T : Type>", "generic T extends Type", "constrain T"], correct: 0 },
+            { q: "What is 'keyof' operator?", a: ["Gets keys of type", "Creates keys", "Type keys", "Object keys"], correct: 0 },
+            { q: "How do you get property type?", a: ["T[K]", "T.key", "T[K] type", "PropertyType<T, K>"], correct: 0 },
+            { q: "What is mapped type?", a: ["Transforms properties", "Creates new type", "Maps to types", "Property map"], correct: 0 },
+            { q: "How do you make all properties optional?", a: ["Partial<T>", "Optional<T>", "T?", "MakeOptional<T>"], correct: 0 },
+            { q: "What does 'Required<T>' do?", a: ["Makes properties required", "Removes optional", "Forces all props", "Required type"], correct: 0 },
+            { q: "How do you make readonly properties?", a: ["Readonly<T>", "readonly<T>", "const<T>", "Frozen<T>"], correct: 0 },
+            { q: "What is 'Pick' utility type?", a: ["Selects specific properties", "Creates subset", "Both a and b", "Picks keys"], correct: 2 },
+            { q: "How do you omit properties?", a: ["Omit<T, K>", "Exclude<T, K>", "Remove<T, K>", "Skip<T, K>"], correct: 0 },
+            { q: "What is 'Exclude' type?", a: ["Excludes type from union", "Removes type", "Hides type", "Filters union"], correct: 0 },
+            { q: "How do you extract return type?", a: ["ReturnType<fn>", "ReturnOf<fn>", "fn.return", "typeof fn"], correct: 0 },
+            { q: "What is 'Parameters' type?", a: ["Gets parameter types", "Function params", "Args type", "Param types"], correct: 0 },
+            { q: "How do you create a decorator?", a: ["@decorator", "decorator()", "@decorator()", "function decorator"], correct: 2 },
+            { q: "What does '@readonly' decorator do?", a: ["Makes property readonly", "Sets getter only", "Prevents mutation", "All of above"], correct: 3 },
+            { q: "How do you chain decorators?", a: ["@first @second", "@first() @second()", "Both valid", "Cannot chain"], correct: 2 },
+            { q: "What is 'namespace' vs 'module'?", a: ["Same thing", "Internal vs external", "Different syntax", "No difference"], correct: 1 },
+            { q: "How do you declare a global variable?", a: ["declare var x: number", "global x", "var global.x", "window.x"], correct: 0 },
+            { q: "What is 'declare' used for?", a: ["Type only, no implementation", "Creates types", "Defines shape", "All of above"], correct: 3 },
+            { q: "How do you add types to plain object?", a: ["declare const obj: Type", "obj as Type", "Type(obj)", "Both a and b"], correct: 1 },
+            { q: "What is 'moduleResolution'?", a: ["How modules are found", "Node vs classic", "Module strategy", "Import paths"], correct: 3 },
+            { q: "How do you use path aliases?", a: ["paths in tsconfig", "alias package", "Both a and b", "No support"], correct: 2 },
+            { q: "What is 'esModuleInterop'?", a: ["CommonJS interop", "Import style", "Export compat", "All of above"], correct: 3 },
+            { q: "How do you handle async/await types?", a: ["Promise<T>", "Async<T>", "Await<T>", "Future<T>"], correct: 0 },
+            { q: "What is 'unknown' type?", a: ["Type-safe any", "Any value", "Must check before use", "All of above"], correct: 3 },
+            { q: "How do you narrow unknown type?", a: ["typeof checks", "instanceof", "type guards", "All of above"], correct: 3 },
+            { q: "What is type guard?", a: ["Narrows type in condition", "Checks type", "Validates type", "Type predicate"], correct: 0 },
+            { q: "How do you create type predicate?", a: ["x is Type", "x: Type", "typeof x === Type", "instanceof Type"], correct: 0 },
+            { q: "What is 'infer' in generics?", a: ["Infers type from expression", "Declares type variable", "Creates type", "Infers automatically"], correct: 0 },
+            { q: "How do you use conditional types?", a: ["T extends U ? X : Y", "if T extends U", "T ? X : Y", "when T extends U"], correct: 0 },
+            { q: "What is 'never' in conditional type?", a: ["Excludes branch", "Unreachable", "Both a and b", "Error type"], correct: 2 },
+            { q: "How do you create branded type?", a: ["type Brand<T, B>", "interface with property", "Both a and b", "No support"], correct: 2 },
+            { q: "What is 'this' parameter in methods?", a: ["Type-safe this", "Current instance", "Context type", "All of above"], correct: 3 },
+            { q: "How do you type event handlers?", a: ["(e: Event) => void", "EventHandler", "onEvent", "handle event"], correct: 0 },
+            { q: "What is 'satisfies' operator?", a: ["Validates type without changing", "Type check", "Type assertion", "Assignment"], correct: 0 },
+            { q: "How do you use 'as const'?", a: ["Makes literal readonly", "Const assertion", "Both a and b", "Constant type"], correct: 2 },
+            { q: "What is template literal types?", a: ["String type construction", "Template strings", "Type from string", "All of above"], correct: 3 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is declaration merging?", a: ["Same name merges declarations", "Combines types", "Extends interfaces", "All of above"], correct: 3 },
+            { q: "How do you merge interfaces?", a: ["Same name, multiple files", "extend keyword", "merge keyword", "No merging"], correct: 0 },
+            { q: "What is module augmentation?", a: ["Add to existing module", "Extend module", "Both a and b", "No support"], correct: 2 },
+            { q: "How do you add to global type?", a: ["declare global {}", "global augmentation", "Both a and b", "No way"], correct: 2 },
+            { q: "What is 'symbol' type?", a: ["Unique primitive", "Creates symbol", "Key type", "Unique key"], correct: 0 },
+            { q: "How do you use 'unique symbol'?", a: ["const s: unique symbol", "symbol unique", "new Symbol()", "unique symbol"], correct: 0 },
+            { q: "What is 'bigint' type?", a: ["Large integer support", "Big number", "Number type", "Integer"], correct: 0 },
+            { q: "How do you type a class constructor?", a: ["new (...args: any) => T", "Constructor<T>", "Both a and b", "Cannot type"], correct: 2 },
+            { q: "What is 'ThisType' utility?", a: ["Types this in object", "Method this", "Context type", "All of above"], correct: 3 },
+            { q: "How do you type 'call' method?", a: ["apply(thisArg, args)", "call(thisArg, ...args)", "Both valid", "Cannot type"], correct: 1 },
+            { q: "What is polymorphic 'this'?", a: ["Returns derived type", "Chainable methods", "Fluent API", "All of above"], correct: 3 },
+            { q: "How do you type mixins?", a: ["Function taking class", "Class extension pattern", "Both a and b", "Not possible"], correct: 2 },
+            { q: "What is 'instanceType'?", a: ["Gets instance type from class", "Type of instance", "Class instance", "Object type"], correct: 0 },
+            { q: "How do you create recursive type?", a: ["type Tree = { value: T, children: Tree[] }", "Recursive definition", "Self-reference", "All of above"], correct: 3 },
+            { q: "What is 'infer' in conditional type?", a: ["Extracts type part", "Declares type variable", "Both a and b", "Not possible"], correct: 2 },
+            { q: "How do you get promise resolve type?", a: ["PromiseValue<T>", "Awaited<T>", "Both available", "Cannot extract"], correct: 1 },
+            { q: "What is 'OmitThisParameter'?", a: ["Removes this parameter", "Types this", "Function this", "Parameter type"], correct: 0 },
+            { q: "How do you type variadic functions?", a: ["...args: any[]", "Rest parameters", "Both a and b", "Cannot type"], correct: 2 },
+            { q: "What is 'Flatten' utility type?", a: ["Flattens union/array", "Reduces types", "Simple type", "Not standard"], correct: 3 },
+            { q: "How do you create discriminated union?", a: ["Add common literal property", "Type with kind", "Both a and b", "No support"], correct: 2 },
+            { q: "What is 'Exclude<any, any>' result?", a: ["never", "any", "unknown", "Empty type"], correct: 0 },
+            { q: "How do you test type equality?", a: ["Cannot at runtime", "conditional types", "Both a and b", "TypeScript supports"], correct: 2 },
+            { q: "What is 'intrinsic' string manipulation?", a: ["Built-in string types", "Uppercase, Lowercase", "Template literal", "All of above"], correct: 3 },
+            { q: "How do you use 'Uppercase'?", a: ["Uppercase<string>", "string to upper", "Capitalize", "Upper type"], correct: 0 },
+            { q: "What is 'Capitalize' type?", a: ["First char uppercase", "Makes capital", "Title case", "First letter"], correct: 0 },
+            { q: "How do you type React component?", a: ["React.FC<Props>", "Function component", "Both a and b", "No types"], correct: 2 },
+            { q: "What is 'ReactNode'?", a: ["React child content", "JSX element", "Component children", "All of above"], correct: 3 },
+            { q: "How do you type useState?", a: ["useState<T>()", "State<T>", "useState<T>(initial)", "Generic hook"], correct: 0 },
+            { q: "What is 'VFC' in React types?", a: ["Void Function Component", "Void FC", "No children FC", "Function component"], correct: 2 },
+            { q: "How do you type useRef?", a: ["useRef<T>(null)", "MutableRefObject<T>", "Both a and b", "No typing"], correct: 2 },
+            { q: "What is 'JSX.Element'?", a: ["JSX node type", "React element", "HTML element", "Component"], correct: 0 },
+            { q: "How do you type forwardRef?", a: ["forwardRef<T, P>((props, ref) => )", "Ref forwarding", "Both a and b", "Not possible"], correct: 1 },
+            { q: "What is 'ComponentProps'?", a: ["Gets component prop types", "Props type", "Extracts props", "All of above"], correct: 3 },
+            { q: "How do you create strict null check?", a: ["strictNullChecks: true", "No null values", "Non-null assertion", "All of above"], correct: 3 },
+            { q: "What is 'noImplicitAny'?", a: ["Error on implicit any", "Strict types", "Type required", "All of above"], correct: 3 },
+            { q: "How do you type callback in options?", a: ["onComplete: () => void", "callback: Function", "Both a and b", "Cannot type"], correct: 2 },
+            { q: "What is 'Overwrite' utility?", a: ["Replace type properties", "Override type", "Modify type", "Not built-in"], correct: 0 },
+            { q: "How do you type dynamic keys?", a: ["Record<K, T>", "{[key: string]: T}", "Map<K, T>", "All above"], correct: 3 },
+            { q: "What is 'Mapped type' with as?", a: ["Remap keys with as", "Transform keys", "Rename keys", "All of above"], correct: 3 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            const q = currentQuestions[currentQuestionIndex];
+            
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            
+            qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`;
+            
+            container.appendChild(qDiv);
+            updateStats();
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            buttons.forEach(btn => btn.disabled = true);
+            
+            if (index === q.correct) {
+                buttons[index].classList.add('correct');
+                score += 10 + (streak * 2);
+                streak++;
+                consecutiveCorrect++;
+                if (streak > maxStreak) maxStreak = streak;
+            } else {
+                buttons[index].classList.add('incorrect');
+                buttons[q.correct].classList.add('correct');
+                streak = 0;
+                consecutiveCorrect = 0;
+            }
+            
+            totalAnswered++;
+            
+            if (consecutiveCorrect >= 3 && difficulty === 'easy') {
+                difficulty = 'medium';
+                currentLevel = 2;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            } else if (consecutiveCorrect >= 3 && difficulty === 'medium') {
+                difficulty = 'hard';
+                currentLevel = 3;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            }
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex >= currentQuestions.length) {
+                    showResults();
+                } else {
+                    renderQuestion();
+                }
+            }, 1500);
+        }
+
+        function loadNextDifficulty() {
+            let newQuestions;
+            if (difficulty === 'medium') {
+                newQuestions = shuffle([...mediumQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            } else if (difficulty === 'hard') {
+                newQuestions = shuffle([...hardQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            }
+            currentQuestions = [...currentQuestions, ...newQuestions];
+        }
+
+        function updateStats() {
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+            
+            const progress = (currentQuestionIndex / currentQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('resultScreen').classList.add('active');
+            
+            const percentage = (score / (currentQuestions.length * 10)) * 100;
+            const passed = percentage >= 50;
+            
+            document.getElementById('resultIcon').textContent = passed ? '🏆' : '📚';
+            document.getElementById('resultText').textContent = passed ? 'PASSED!' : 'KEEP LEARNING';
+            document.getElementById('resultText').className = 'result-text ' + (passed ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score} | Max Streak: ${maxStreak}`;
+            document.getElementById('resultDetails').textContent = passed ? 'You have mastered TypeScript!' : 'Review the TypeScript guide and try again.';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        initTest();
+    </script>
+</body>
+</html>

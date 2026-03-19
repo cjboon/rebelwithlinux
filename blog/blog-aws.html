@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-aws.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Getting Started with AWS - REBEL WITH LINUX</title>
+    <meta name="description" content="Learn Amazon Web Services from the command line. Cover EC2, S3, IAM, and more.">
+    <meta name="keywords" content="AWS, Amazon Web Services, cloud, EC2, S3, IAM, cloud computing">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Getting Started with AWS">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-aws.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-aws.html">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                const saved = localStorage.getItem('theme');
+                toggle.checked = (saved === 'dark' || !saved);
+            }
+        });
+    </script>
+
+    <style>
+        .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
+        .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .blog-header p { font-family: 'IBM Plex Mono', monospace; color: var(--gray); }
+        .blog-nav { display: flex; justify-content: center; gap: 32px; padding: 16px; background: var(--black); border-bottom: 1px solid var(--charcoal); }
+        .blog-nav a { color: var(--white); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+        .blog-nav a:hover { color: var(--gray); }
+        .blog-content { max-width: 800px; margin: 0 auto; padding: 48px 32px; font-family: 'IBM Plex Mono', monospace; line-height: 1.8; }
+        .blog-content h2 { font-size: 1.5rem; margin: 32px 0 16px; border-bottom: 2px solid var(--black); padding-bottom: 8px; }
+        .blog-content h3 { font-size: 1.2rem; margin: 24px 0 12px; }
+        .blog-content p { margin-bottom: 16px; }
+        .blog-content code { background: var(--light-gray); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+        .blog-content pre { background: var(--black); color: var(--white); padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; }
+        .blog-content pre code { background: none; padding: 0; }
+        .blog-content ul, .blog-content ol { margin: 16px 0 16px 32px; }
+        .blog-content li { margin-bottom: 8px; }
+        .blog-content a { color: var(--black); }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../search.html">SEARCH</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="blog-header">
+        <h1>Getting Started with AWS</h1>
+        <p>March 19, 2026 • AWS • 12 min read</p>
+    </div>
+    
+    <nav class="blog-nav">
+        <a href="../index.html">← Home</a>
+        <a href="../index.html#blog">All Posts</a>
+    </nav>
+
+    <article class="blog-content">
+        <p>Amazon Web Services (AWS) is the leading cloud platform. This guide covers the essentials: EC2, S3, IAM, and VPC. You'll be deploying to the cloud in no time.</p>
+
+        <h2>What is AWS?</h2>
+        <p>AWS provides on-demand cloud computing resources. Pay for what you use. No upfront hardware costs. Global infrastructure with data centers worldwide.</p>
+
+        <h2>Setting Up AWS CLI</h2>
+        <p>The AWS Command Line Interface lets you manage AWS services from your terminal.</p>
+        <pre><code>sudo apt update
+sudo apt install awscli
+aws --version</code></pre>
+
+        <h2>Configuring AWS Access</h2>
+        <p>Create an IAM user and configure your credentials:</p>
+        <pre><code>aws configure
+AWS Access Key ID [None]: your-access-key
+AWS Secret Access Key [None]: your-secret-key
+Default region name [None]: us-east-1
+Default output format [None]: json</code></pre>
+
+        <h2>EC2 - Elastic Compute Cloud</h2>
+        <p>EC2 provides virtual servers in the cloud. Launch, manage, and scale instances programmatically.</p>
+
+        <h3>Launch an Instance</h3>
+        <pre><code>aws ec2 run-instances \
+    --image-id ami-0c55b159cbfafe1f0 \
+    --instance-type t2.micro \
+    --key-name my-key-pair \
+    --security-group-ids sg-12345678</code></pre>
+
+        <h3>List Instances</h3>
+        <pre><code>aws ec2 describe-instances</code></pre>
+
+        <h3>Stop an Instance</h3>
+        <pre><code>aws ec2 stop-instances --instance-id i-1234567890abcdef0</code></pre>
+
+        <h3>Terminate an Instance</h3>
+        <pre><code>aws ec2 terminate-instances --instance-id i-1234567890abcdef0</code></pre>
+
+        <h2>S3 - Simple Storage Service</h2>
+        <p>S3 provides object storage. Store files, backups, and static websites.</p>
+
+        <h3>Create a Bucket</h3>
+        <pre><code>aws s3 mb s3://my-unique-bucket-name</code></pre>
+
+        <h3>Upload a File</h3>
+        <pre><code>aws s3 cp myfile.txt s3://my-bucket/</code></pre>
+
+        <h3>List Bucket Contents</h3>
+        <pre><code>aws s3 ls s3://my-bucket/</code></pre>
+
+        <h3>Download a File</h3>
+        <pre><code>aws s3 cp s3://my-bucket/myfile.txt ./</code></pre>
+
+        <h3>Delete a Bucket</h3>
+        <pre><code>aws s3 rb s3://my-bucket --force</code></pre>
+
+        <h2>IAM - Identity and Access Management</h2>
+        <p>IAM manages who can access your AWS resources. Always follow the principle of least privilege.</p>
+
+        <h3>Create an IAM User</h3>
+        <pre><code>aws iam create-user --user-name developer</code></pre>
+
+        <h3>Create Access Keys</h3>
+        <pre><code>aws iam create-access-key --user-name developer</code></pre>
+
+        <h3>Attach a Policy</h3>
+        <pre><code>aws iam attach-user-policy \
+    --user-name developer \
+    --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess</code></pre>
+
+        <h2>VPC - Virtual Private Cloud</h2>
+        <p>VPC lets you launch AWS resources in an isolated virtual network.</p>
+
+        <h3>Create a VPC</h3>
+        <pre><code>aws ec2 create-vpc --cidr-block 10.0.0.0/16</code></pre>
+
+        <h3>Create a Subnet</h3>
+        <pre><code>aws ec2 create-subnet \
+    --vpc-id vpc-12345678 \
+    --cidr-block 10.0.1.0/24 \
+    --availability-zone us-east-1a</code></pre>
+
+        <h2>Essential Services Overview</h2>
+        <ul>
+            <li><strong>RDS</strong> - Managed relational databases (MySQL, PostgreSQL, Oracle)</li>
+            <li><strong>Lambda</strong> - Serverless functions</li>
+            <li><strong>CloudFront</strong> - Content delivery network</li>
+            <li><strong>Route 53</strong> - DNS service</li>
+            <li><strong>ELB</strong> - Load balancers</li>
+        </ul>
+
+        <h2>Cleaning Up</h2>
+        <p>Always terminate unused instances and delete unused resources to avoid charges:</p>
+        <pre><code>aws ec2 terminate-instances --instance-id i-1234567890abcdef0
+aws s3 rb s3://my-bucket --force</code></pre>
+
+        <p>You're now ready to start deploying to AWS!</p>
+    </article>
+
+    <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+        <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+        <div id="comments-list" style="margin-bottom: 32px;"></div>
+        <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+            <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+            <div style="display: grid; gap: 16px;">
+                <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                <button onclick="submitComment('blog-aws')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+            </div>
+        </div>
+    </section>
+    <script src="../js/comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-aws');
+        });
+    </script>
+</body>
+</html>

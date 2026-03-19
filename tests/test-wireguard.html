@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-wireguard.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WireGuard Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+    </nav>
+    <div class="test-container">
+        <div class="test-header"><h1>// WIREGUARD TEST</h1><p>Prove your WireGuard VPN mastery</p></div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const easyQuestions = [
+            { q: "What is WireGuard?", a: ["Modern VPN protocol", "Firewall software", "Web server", "Programming language"], correct: 0 },
+            { q: "What protocol does WireGuard use?", a: ["UDP", "TCP", "HTTP", "FTP"], correct: 0 },
+            { q: "How many lines of code is WireGuard?", a: ["~4000", "~100000", "~50000", "~1000"], correct: 0 },
+            { q: "What encryption does WireGuard use?", a: ["ChaCha20-Poly1305", "AES-256", "DES", "3DES"], correct: 0 },
+            { q: "What is a WireGuard 'Peer'?", a: ["Remote VPN client/server", "Network adapter", "Firewall rule", "IP address"], correct: 0 },
+            { q: "What is the default WireGuard port?", a: ["51820", "443", "80", "22"], correct: 0 },
+            { q: "How do you generate WireGuard keys?", a: ["wg genkey", "wg create", "wg new", "wg make"], correct: 0 },
+            { q: "What is a 'PrivateKey' in WireGuard?", a: ["Secret key kept locally", "Public address", "Server key", "User password"], correct: 0 },
+            { q: "What is a 'PublicKey' in WireGuard?", a: ["Shared with peers", "Secret password", "Network address", "Server name"], correct: 0 },
+            { q: "What is 'Endpoint' in WireGuard config?", a: ["Remote peer address:port", "Local IP", "Network name", "Firewall"], correct: 0 },
+            { q: "What is 'AllowedIPs' in WireGuard?", a: ["Networks to route through VPN", "Permitted users", "IP addresses", "Ports"], correct: 0 },
+            { q: "How do you start WireGuard?", a: ["wg-quick up wg0", "wireguard start", "wg start", "vpn start"], correct: 0 },
+            { q: "How do you stop WireGuard?", a: ["wg-quick down wg0", "wireguard stop", "wg stop", "vpn stop"], correct: 0 },
+            { q: "Where is WireGuard config stored?", a: ["/etc/wireguard/", "/etc/vpn/", "/etc/network/", "/etc/openvpn/"], correct: 0 },
+            { q: "What is 'PersistentKeepalive' used for?", a: ["Keep NAT mappings alive", "Keep connection", "Ping peer", "Heartbeat"], correct: 0 },
+            { q: "What does 'wg show' display?", a: ["Current WireGuard status", "Config file", "Logs", "Statistics"], correct: 0 },
+            { q: "Is WireGuard faster than OpenVPN?", a: ["Yes, significantly", "No, slower", "Same speed", "Depends on hardware"], correct: 0 },
+            { q: "What type of VPN is WireGuard?", a: ["Site-to-site and remote access", "Remote only", "Site-to-site only", "Client only"], correct: 0 },
+            { q: "Does WireGuard support IPv6?", a: ["Yes", "No", "Only with config", "Beta only"], correct: 0 },
+            { q: "What is 'PostUp' in WireGuard?", a: ["Command after interface up", "Startup script", "Network script", "Init command"], correct: 0 },
+            { q: "What is 'PreDown'?", a: ["Command before interface down", "Shutdown script", "Exit command", "Cleanup script"], correct: 0 },
+            { q: "How do you get public key from private key?", a: ["wg pubkey", "wg keypub", "wg public", "wg key"], correct: 0 },
+            { q: "What is a 'wg0' interface?", a: ["Default WireGuard interface name", "WireGuard port", "VPN protocol", "Network name"], correct: 0 },
+            { q: "Does WireGuard use certificates?", a: ["No, uses key pairs", "Yes", "Optional", "Legacy mode"], correct: 0 },
+            { q: "What is 'Table' in WireGuard config?", a: ["Routing table to use", "Config table", "IP table", "Network table"], correct: 0 },
+            { q: "What is 'SaveConfig'?", a: ["Save runtime state to config", "Keep config", "Backup config", "Export config"], correct: 0 },
+            { q: "How do you list all peers?", a: ["wg show", "wg peers", "wg list", "wg all"], correct: 0 },
+            { q: "What is 'MTU' in WireGuard?", a: ["Maximum Transmission Unit", "Main Tunnel Area", "Multiple Tunnel Access", "Max Transfer Rate"], correct: 0 },
+            { q: "Is WireGuard open source?", a: ["Yes", "No", "Partially", "Under review"], correct: 0 },
+            { q: "What kernel is WireGuard in?", a: ["Linux 5.6+", "Windows kernel", "BSD", "macOS"], correct: 0 },
+            { q: "How do you install WireGuard on Ubuntu?", a: ["apt install wireguard", "yum install wireguard", "pacman -S wireguard", "All of above"], correct: 3 },
+            { q: "What is 'DNS' in WireGuard config?", a: ["DNS servers to use", "Domain name", "Network DNS", "Server DNS"], correct: 0 },
+            { q: "What is 'FwMark' used for?", a: ["Firewall mark for routing", "Forward mark", "Packet mark", "Network mark"], correct: 0 },
+            { q: "Can WireGuard work through NAT?", a: ["Yes, with keepalive", "No", "Only with port forward", "Limited"], correct: 0 },
+            { q: "What is the WireGuard logo color?", a: ["Orange and white", "Blue", "Green", "Red"], correct: 0 },
+            { q: "Who created WireGuard?", a: ["Jason Donenfeld", "Linus Torvalds", "Richard Stallman", "Bradley Kuhn"], correct: 0 },
+            { q: "Is WireGuard in the Linux kernel?", a: ["Yes, since 5.6", "No, needs module", "Optional", "Upcoming"], correct: 0 },
+            { q: "What is 'ListenPort'?", a: ["Port to listen for peers", "Server port", "Client port", "UDP port"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "How do you set up a point-to-point VPN with WireGuard?", a: ["Configure both as peers", "Use server mode", "Use client mode", "Not possible"], correct: 0 },
+            { q: "What is the difference between WireGuard and OpenVPN?", a: ["Code size, speed, crypto", "Protocol only", "License only", "No difference"], correct: 0 },
+            { q: "How do you route all traffic through WireGuard?", a: ["AllowedIPs = 0.0.0.0/0", "RouteAll = true", "FullTunnel = yes", "All traffic = true"], correct: 0 },
+            { q: "What is a 'road warrior' setup?", a: ["Mobile client connecting to server", "Server-to-server", "Site-to-site", "Peer-to-peer"], correct: 0 },
+            { q: "How do you configure multiple peers?", a: ["Multiple [Peer] sections", "Comma-separated", "Multiple config files", "Not supported"], correct: 0 },
+            { q: "What is 'NAT traversal' in WireGuard?", a: ["Works automatically", "Needs config", "Not supported", "Requires extra software"], correct: 0 },
+            { q: "How do you add a peer without restarting?", a: ["wg addconf", "wg add peer", "wg set", "wg update"], correct: 0 },
+            { q: "What is the 'wireguard-tools' package?", a: ["CLI utilities for WireGuard", "GUI tools", "Server package", "Client package"], correct: 0 },
+            { q: "How do you check if WireGuard module is loaded?", a: ["lsmod | grep wireguard", "modprobe wireguard", "Both a and b", "Not needed in kernel"], correct: 2 },
+            { q: "What is 'split tunneling' in VPN?", a: ["Only some traffic goes through VPN", "All traffic through VPN", "No tunneling", "Tunnel split"], correct: 0 },
+            { q: "How do you allow only specific traffic through VPN?", a: ["Specific AllowedIPs", "Route filter", "Firewall rules", "All of above"], correct: 3 },
+            { q: "What is 'masquerade' in WireGuard?", a: ["SNAT for outgoing traffic", "Hide peers", "Hide server", "Network mode"], correct: 0 },
+            { q: "How do you configure WireGuard with ufw?", a: ["ufw allow 51820/udp", "ufw allow wireguard", "Both a and b", "Not needed"], correct: 2 },
+            { q: "What is 'PacketDrop' used for?", a: ["Drop packets without response", "Block traffic", "Rate limit", "Filter"], correct: 0 },
+            { q: "How do you log WireGuard activity?", a: ["dmesg | grep wireguard", "journalctl -u wg-quick", "Both a and b", "No logging"], correct: 2 },
+            { q: "What is 'MobileConfig'?", a: ["iOS WireGuard profile", "Mobile config", "Phone setup", "iPhone profile"], correct: 0 },
+            { q: "How do you convert OpenVPN config to WireGuard?", a: ["Not directly possible", "Use converter tool", "Manual conversion", "Import config"], correct: 1 },
+            { q: "What is 'Curve25519' in WireGuard?", a: ["Key exchange algorithm", "Encryption cipher", "Hash function", "Signature algo"], correct: 0 },
+            { q: "How do you verify WireGuard handshake?", a: ["wg show wg0 handshake", "wg handshake", "wg status", "wg details"], correct: 0 },
+            { q: "What is 'last handshake' in wg show?", a: ["Time since peer connection", "Peer uptime", "Connection time", "Data received"], correct: 0 },
+            { q: "How do you limit peer bandwidth?", a: ["Not built-in, use tc", "bwlimit option", "rate limit", "throttle"], correct: 0 },
+            { q: "What is 'transfer' in wg show?", a: ["Data sent/received", "Bandwidth used", "Traffic stats", "All of above"], correct: 3 },
+            { q: "How do you debug WireGuard issues?", a: ["ip link show wg0", "wg show", "dmesg", "All of above"], correct: 3 },
+            { q: "What is 'wg-gen-gui'?", a: ["Web UI for WireGuard", "GUI config tool", "Both a and b", "Not real"], correct: 2 },
+            { q: "Can WireGuard tunnel IPv4 and IPv6?", a: ["Yes, simultaneously", "Only IPv4", "Only IPv6", "No"], correct: 0 },
+            { q: "What is 'peer allowed IPs' behavior?", a: ["Route traffic to those IPs through tunnel", "Allow peer", "Block peer", "Connect peer"], correct: 0 },
+            { q: "How do you make WireGuard start on boot?", a: ["systemctl enable wg-quick@wg0", "Enable wireguard", "Both a and b", "Auto-start not needed"], correct: 2 },
+            { q: "What is the difference between wg and wg-quick?", a: ["wg=low-level, wg-quick=wrapper", "Same thing", "wg=server, wg-quick=client", "No difference"], correct: 0 },
+            { q: "How do you backup WireGuard config?", a: ["Copy /etc/wireguard/", "Export keys", "Both a and b", "No backup needed"], correct: 2 },
+            { q: "What is 'silent peer'?", a: ["Peer without endpoint", "Inactive peer", "Hidden peer", "No traffic peer"], correct: 0 },
+            { q: "How do you connect to dynamic IP peer?", a: ["Use DNS or service", "Not possible", "Static IP required", "Use hostname"], correct: 0 },
+            { q: "What is 'ip link add dev wg0 type wireguard'?", a: ["Create wireguard interface", "Add IP", "Set up tunnel", "Initialize"], correct: 0 },
+            { q: "How do you set peer preshared key?", a: ["PresharedKey = base64", "SharedKey", "PreKey", "PSK option"], correct: 0 },
+            { q: "What is 'replace peers' option?", a: ["Replace peer list on set", "Swap peers", "Change peers", "Peer replacement"], correct: 0 },
+            { q: "How do you restart WireGuard interface?", a: ["wg-quick down wg0 && wg-quick up wg0", "wg restart", "systemctl restart wg", "All of above"], correct: 0 },
+            { q: "What is 'Counter' in wg show?", a: ["Packets transmitted", "Byte counter", "Session packets", "Peer packets"], correct: 0 },
+            { q: "How do WireGuard keys work with DNS?", a: ["No DNS in WireGuard spec", "Can specify DNS in config", "Uses system DNS", "All of above"], correct: 1 },
+            { q: "What is 'internal IP' in WireGuard?", a: ["Virtual IP assigned to peer", "Real IP", "Public IP", "Server IP"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "How do you set up WireGuard site-to-site VPN?", a: ["Configure both sites as peers", "Use server mode", "Use client mode", "Bridge networks"], correct: 0 },
+            { q: "What is 'layer 2' vs 'layer 3' WireGuard?", a: ["TAP vs TUN mode", "Network layers", "Different protocols", "Performance"], correct: 0 },
+            { q: "How do you bridge WireGuard with LAN?", a: ["Use brctl or nmcli", "Bridge interface", "Both a and b", "Not possible"], correct: 2 },
+            { q: "What is 'kernel module' vs 'userspace' WireGuard?", a: ["Performance difference", "In-kernel faster", "Both work", "All of above"], correct: 3 },
+            { q: "How do you configure WireGuard with NetworkManager?", a: ["nmcli connection import", "GUI config", "Both a and b", "Not supported"], correct: 2 },
+            { q: "What is 'WireGuard performance' compared to IPsec?", a: ["Faster in most cases", "Slower", "Same", "Depends on hardware"], correct: 0 },
+            { q: "How do you do 'failover' with multiple WireGuard peers?", a: ["Multiple peers, use metric", "Script failover", "Both a and b", "Not built-in"], correct: 2 },
+            { q: "What is 'stunnel' with WireGuard?", a: ["TCP tunnel over WireGuard", "SSL wrapper", "Connection proxy", "All of above"], correct: 0 },
+            { q: "How do you expose local services through WireGuard?", a: ["Use PostUp/PostDown", "Port forwarding", "Both a and b", "Not possible"], correct: 2 },
+            { q: "What is 'reverse proxy' with WireGuard?", a: ["Not directly, use nginx", "Built-in feature", "Tunnel proxy", "All of above"], correct: 0 },
+            { q: "How do you monitor WireGuard with Prometheus?", a: ["wg-exporter", "Prometheus wg adapter", "Custom script", "Not possible"], correct: 1 },
+            { q: "What is 'WireGuard on Android' setup?", a: ["F-Droid app or Play Store", "Manual config", "Root required", "Not supported"], correct: 0 },
+            { q: "How do you use WireGuard with iOS?", a: ["App Store app or WireGuard app", "Profile import", "Manual config", "All of above"], correct: 3 },
+            { q: "What is 'wg-bench'?", a: ["WireGuard benchmark tool", "Performance test", "Both a and b", "Not real"], correct: 2 },
+            { q: "How do you integrate WireGuard with Docker?", a: ["Docker plugin or container", "Network driver", "Both a and b", "Not supported"], correct: 2 },
+            { q: "What is 'wg-easy'?", a: ["Docker-based WireGuard UI", "Easy setup", "Web interface", "All of above"], correct: 3 },
+            { q: "How do you configure WireGuard with firewalld?", a: ["firewall-cmd --add-port", "Rich rules", "Both a and b", "Not needed"], correct: 2 },
+            { q: "What is 'WireGuard + iptables' routing?", a: ["NAT, forward rules", "PostUp scripts", "Both a and b", "Not needed"], correct: 2 },
+            { q: "How do you do 'hairpinning' with WireGuard?", a: ["NAT loopback", "Not supported", "Requires config", "Special setup"], correct: 0 },
+            { q: "What is 'policy routing' with WireGuard?", a: ["Use ip rule", "Table priorities", "Both a and b", "Not needed"], correct: 2 },
+            { q: "How do you secure WireGuard further?", a: ["Firewall, fail2ban", "Key rotation", "IP allowlist", "All of above"], correct: 3 },
+            { q: "What is 'wg-mesh' or 'mesh VPN' with WireGuard?", a: ["Full mesh topology", "Manual peer config", "Mesh script", "Not native"], correct: 2 },
+            { q: "How do you handle 'split DNS' with WireGuard?", a: ["Use resolvconf options", "Per-app VPN config", "Both a and b", "Not supported"], correct: 2 },
+            { q: "What is 'confik' for WireGuard?", a: ["Configuration management", "Central config", "Deploy tool", "Not real"], correct: 0 },
+            { q: "How do you do 'WireGuard on embedded devices'?", a: ["Build from source", "OpenWrt package", "Both a and b", "Not supported"], correct: 2 },
+            { q: "What is 'wireguard-roaming'?", a: ["Keep connection while moving", "Mobile support", "Both a and b", "Not real"], correct: 2 },
+            { q: "How do you troubleshoot 'handshake timeout'?", a: ["Check firewall, NAT, keepalive", "Verify keys", "Both a and b", "No fix"], correct: 2 },
+            { q: "What is 'wg-http-api'?", a: ["REST API for WireGuard", "Management API", "Both a and b", "Not real"], correct: 2 },
+            { q: "How do you wireguard with 'cloud-init'?", a: ["User-data script", "Network config", "Both a and b", "Not supported"], correct: 2 },
+            { q: "What is 'netfilter' integration?", a: ["Kernel hooks", "Firewall", "NAT", "All of above"], correct: 3 },
+            { q: "How do you migrate from OpenVPN to WireGuard?", a: ["Plan, test, migrate peers", "Convert config", "Both a and b", "No migration"], correct: 0 },
+            { q: "What are WireGuard 'future features'?", a: ["Signal, more platforms", "Performance improvements", "New crypto", "All planned"], correct: 3 },
+            { q: "How do you do 'high availability' with WireGuard?", a: ["Multiple servers, floating IP", "Load balancer", "Both a and b", "Not possible"], correct: 2 },
+            { q: "What is 'wg-inotify'?", a: ["Watch config changes", "Real-time updates", "Auto-reload", "Not real"], correct: 0 },
+            { q: "How do you secure keys at rest?", a: ["Use hardware tokens", "Encrypted storage", "Key management", "All of above"], correct: 3 },
+            { q: "What is 'post-quantum' WireGuard?", a: ["Future quantum resistance", "Under development", "Hybrid mode", "Not available yet"], correct: 3 },
+            { q: "How do you audit WireGuard traffic?", a: ["tcpdump, wireshark", "Logging", "Monitoring", "All of above"], correct: 3 },
+            { q: "What is 'WireGuard + Tor' setup?", a: ["Tunnel Tor over WireGuard", "Onion service", "Both a and b", "Not recommended"], correct: 2 },
+            { q: "How do you use WireGuard in enterprise?", a: ["PKI integration", "Management platform", "SSO", "All of above"], correct: 3 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            const q = currentQuestions[currentQuestionIndex];
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`;
+            container.appendChild(qDiv);
+            updateStats();
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(btn => btn.disabled = true);
+            
+            if (index === q.correct) {
+                buttons[index].classList.add('correct');
+                score += 10 + (streak * 2);
+                streak++;
+                consecutiveCorrect++;
+                if (streak > maxStreak) maxStreak = streak;
+            } else {
+                buttons[index].classList.add('incorrect');
+                buttons[q.correct].classList.add('correct');
+                streak = 0;
+                consecutiveCorrect = 0;
+            }
+            
+            totalAnswered++;
+            
+            if (consecutiveCorrect >= 3 && difficulty === 'easy') {
+                difficulty = 'medium';
+                currentLevel = 2;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            } else if (consecutiveCorrect >= 3 && difficulty === 'medium') {
+                difficulty = 'hard';
+                currentLevel = 3;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            }
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex >= currentQuestions.length) {
+                    showResults();
+                } else {
+                    renderQuestion();
+                }
+            }, 1500);
+        }
+
+        function loadNextDifficulty() {
+            let newQuestions;
+            if (difficulty === 'medium') {
+                newQuestions = shuffle([...mediumQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            } else if (difficulty === 'hard') {
+                newQuestions = shuffle([...hardQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            }
+            currentQuestions = [...currentQuestions, ...newQuestions];
+        }
+
+        function updateStats() {
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+            const progress = (currentQuestionIndex / currentQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('resultScreen').classList.add('active');
+            const percentage = (score / (currentQuestions.length * 10)) * 100;
+            const passed = percentage >= 50;
+            document.getElementById('resultIcon').textContent = passed ? '🏆' : '📚';
+            document.getElementById('resultText').textContent = passed ? 'PASSED!' : 'KEEP LEARNING';
+            document.getElementById('resultText').className = 'result-text ' + (passed ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score} | Max Streak: ${maxStreak}`;
+            document.getElementById('resultDetails').textContent = passed ? 'You have mastered WireGuard!' : 'Review the WireGuard guide and try again.';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        initTest();
+    </script>
+</body>
+</html>

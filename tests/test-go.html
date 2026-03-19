@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-go.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container {
+            padding: 32px 32px;
+            background: var(--white);
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 80vh;
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .test-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2rem;
+            margin-bottom: 4px;
+        }
+        
+        .test-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--light-gray);
+            border-radius: 4px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--charcoal);
+            transition: width 0.3s ease;
+        }
+        
+        .question-container {
+            display: none;
+        }
+        
+        .question-container.active {
+            display: block;
+        }
+        
+        .question-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.25rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .answers-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .answer-btn {
+            padding: 16px 20px;
+            border: 2px solid var(--charcoal);
+            background: transparent;
+            color: var(--charcoal);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .answer-btn:hover {
+            background: var(--light-gray);
+        }
+        
+        .answer-btn.correct {
+            background: #22c55e !important;
+            border-color: #22c55e !important;
+            color: white !important;
+        }
+        
+        .answer-btn.incorrect {
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+            color: white !important;
+        }
+        
+        .answer-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .result-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .result-screen.active {
+            display: block;
+        }
+        
+        .result-icon {
+            font-size: 5rem;
+            margin-bottom: 24px;
+        }
+        
+        .result-text {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        
+        .result-score {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.25rem;
+            color: var(--charcoal);
+            margin-bottom: 32px;
+        }
+        
+        .result-details {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+            margin-bottom: 32px;
+        }
+        
+        .retry-btn {
+            padding: 16px 32px;
+            background: var(--charcoal);
+            color: var(--white);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .retry-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 24px;
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--charcoal);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        
+        nav {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: var(--white);
+            gap: 8px;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            white-space: nowrap;
+            color: var(--charcoal);
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .theme-toggle-label {
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+        
+        .theme-toggle-icon.sun {
+            display: none;
+        }
+        
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) {
+            display: none;
+        }
+        
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun {
+            display: inline;
+        }
+        
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) {
+            display: none;
+        }
+        
+        [data-theme="dark"] .theme-toggle-icon.sun {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">
+                REBEL WITH LINUX
+            </a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../search.html" style="color: var(--charcoal);">SEARCH</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="../account.html" id="loginLink" class="auth-link"  style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// GO TEST</h1>
+            <p>Prove your Go mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value" id="questionNum">1</div>
+                    <div class="stat-label">Question</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="streakNum">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="scoreNum">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="levelNum">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div id="questionsContainer"></div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "How do you declare a variable in Go?", a: ["var name string", "let name string", "name := string", "string name"], correct: 0 },
+            { q: "What is the zero value of an integer in Go?", a: ["0", "null", "undefined", "-1"], correct: 0 },
+            { q: "How do you create a slice in Go?", a: ["make([]int, 5)", "newSlice()", "[]int{}", "slice.new()"], correct: 0 },
+            { q: "What does 'go' keyword do in Go?", a: ["Starts a goroutine", "Declares a variable", "Creates a function", "Imports a package"], correct: 0 },
+            { q: "How do you import multiple packages in Go?", a: ["import (\"fmt\" \"os\")", "import fmt, os", "import {fmt, os}", "include fmt, os"], correct: 0 },
+            { q: "What is a goroutine?", a: ["Lightweight thread", "A type of variable", "A package name", "A data structure"], correct: 0 },
+            { q: "How do you print to console in Go?", a: ["fmt.Println()", "print()", "console.log()", "echo()"], correct: 0 },
+            { q: "What is the zero value of a string in Go?", a: ["\"\"", "null", "undefined", "empty"], correct: 0 },
+            { q: "How do you declare a constant in Go?", a: ["const name = value", "constant name = value", "let const name = value", "final name = value"], correct: 0 },
+            { q: "What does 'range' do in Go?", a: ["Iterates over slice/map", "Creates a range", "Defines scope", "Returns a range"], correct: 0 },
+            { q: "How do you check if a key exists in a map?", a: ["value, ok := m[key]", "m.has(key)", "m.exists(key)", "key in m"], correct: 0 },
+            { q: "What is the zero value of a pointer in Go?", a: ["nil", "null", "0", "undefined"], correct: 0 },
+            { q: "How do you create a map in Go?", a: ["make(map[string]int)", "map.new()", "newMap()", "[string]int{}"], correct: 0 },
+            { q: "What does 'defer' do in Go?", a: ["Executes after function returns", "Defers execution", "Deletes resource", "Creates default"], correct: 0 },
+            { q: "How do you handle errors in Go?", a: ["if err != nil", "try/catch", "catch err", "on error"], correct: 0 },
+            { q: "What is an interface in Go?", a: ["A set of method signatures", "A data type", "A struct", "A package"], correct: 0 },
+            { q: "How do you make a struct implement an interface?", a: ["Just define the methods", "Use implements keyword", "Extend the interface", "Declare implements"], correct: 0 },
+            { q: "What is the zero value of a boolean in Go?", a: ["false", "true", "null", "undefined"], correct: 0 },
+            { q: "How do you create a channel in Go?", a: ["make(chan int)", "chan.new()", "newChannel()", "create channel"], correct: 0 },
+            { q: "What does '<-' do with channels?", a: ["Send/receive value", "Compares channels", "Closes channel", "Creates channel"], correct: 0 },
+            { q: "How do you return multiple values in Go?", a: ["return a, b", "return [a, b]", "return (a, b)", "return {a, b}"], correct: 0 },
+            { q: "What is 'iota' used for in Go?", a: ["Enumerated constants", "Iterator type", "Import alias", "Type alias"], correct: 0 },
+            { q: "How do you write a for loop in Go?", a: ["for i := 0; i < n; i++", "for(i=0; i<n; i++)", "loop i in range(n)", "foreach i"], correct: 0 },
+            { q: "What is a package in Go?", a: ["Collection of source files", "A library", "A module", "A class"], correct: 0 },
+            { q: "What does 'init()' function do?", a: ["Runs before main", "Initializes variables", "Creates instance", "Starts program"], correct: 0 },
+            { q: "How do you create a struct in Go?", a: ["type Person struct { name string }", "struct Person { name }", "class Person", "define Person struct"], correct: 0 },
+            { q: "What is a method receiver in Go?", a: ["Attaches function to type", "Receives input", "Returns value", "Handles errors"], correct: 0 },
+            { q: "How do you convert types in Go?", a: ["T(value)", "(T)value", "convert(T, value)", "to.T(value)"], correct: 0 },
+            { q: "What is 'select' used for in Go?", a: ["Wait on channel operations", "Select database", "Choose option", "Switch case"], correct: 0 },
+            { q: "How do you close a channel?", a: ["close(ch)", "ch.close()", "chan.close()", "terminate(ch)"], correct: 0 },
+            { q: "What is the blank identifier used for?", a: ["Discard unused values", "Create empty variable", "Define placeholder", "Initialize zero"], correct: 0 },
+            { q: "How do you create a pointer in Go?", a: ["&variable", "*variable", "pointer(variable)", "new(variable)"], correct: 0 },
+            { q: "What does '*' do when used with pointer?", a: ["Dereferences pointer", "Creates pointer", "Multiplies", "Declares pointer"], correct: 0 },
+            { q: "What is 'go mod init' used for?", a: ["Initialize Go module", "Create package", "Start program", "Import module"], correct: 0 },
+            { q: "How do you install a package in Go?", a: ["go get package", "go install package", "npm install package", "import package"], correct: 0 },
+            { q: "What is a slice header in Go?", a: ["Pointer, length, capacity", "Array metadata", "Memory address", "Type info"], correct: 0 },
+            { q: "How do you append to a slice?", a: ["append(slice, element)", "slice.append()", "push(slice, element)", "add(slice, element)"], correct: 0 },
+            { q: "What is 'cap' function used for?", a: ["Returns capacity of slice", "Returns length", "Creates capacity", "Allocates memory"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the difference between 'new' and 'make' in Go?", a: ["new returns pointer, make returns initialized value", "They are the same", "new is deprecated", "make is for primitives only"], correct: 0 },
+            { q: "How do you implement a mutex in Go?", a: ["sync.Mutex{}", "mutex.new()", "Lock()", "mutex.Lock()"], correct: 0 },
+            { q: "What does 'context' package used for in Go?", a: ["Cancelation and deadlines", "HTTP context", "Database context", "File context"], correct: 0 },
+            { q: "How do you create a buffered channel?", a: ["make(chan int, 10)", "make(chan int, buffered)", "buffered.channel(10)", "chan int[10]"], correct: 0 },
+            { q: "What is 'errgroup' package used for?", a: ["Manage goroutine groups", "Handle errors", "Group types", "Sync routines"], correct: 0 },
+            { q: "How do you test in Go?", a: ["Create *_test.go file", "Use testing package", "Both a and b", "go test"], correct: 0 },
+            { q: "What does 't.Fatal' do in Go tests?", a: ["Logs error and stops test", "Fails test only", "Logs error only", "Reports success"], correct: 0 },
+            { q: "How do you set up and tear down in tests?", a: ["TestMain function", "init() and cleanup()", "setup/teardown", "Before/After"], correct: 0 },
+            { q: "What is table-driven testing?", a: ["Tests with multiple test cases", "Database testing", "UI testing", "Performance testing"], correct: 0 },
+            { q: "How do you run benchmarks in Go?", a: ["func Benchmark*(*testing.B)", "go bench", "benchmark()", "TestBenchmark()"], correct: 0 },
+            { q: "What is 't.Run' used for in tests?", a: ["Run subtests", "Run main test", "Repeat test", "Skip test"], correct: 0 },
+            { q: "How do you skip a test in Go?", a: ["t.Skip()", "skip()", "continue()", "break()"], correct: 0 },
+            { q: "What is 'http.Handler' interface?", a: ["ServeHTTP(ResponseWriter, *Request)", "Handle()", "Process()", "Request()"], correct: 0 },
+            { q: "How do you start HTTP server in Go?", a: ["http.ListenAndServe()", "http.StartServer()", "server.Start()", "http.NewServer()"], correct: 0 },
+            { q: "What is a router in Go web?", a: ["Maps URLs to handlers", "Routes network", "Balances load", "Caches requests"], correct: 0 },
+            { q: "How do you parse JSON in Go?", a: ["json.Unmarshal()", "json.Parse()", "ParseJSON()", "DecodeJSON()"], correct: 0 },
+            { q: "What is a struct tag in Go?", a: ["Metadata for fields", "Field name", "Type info", "Default value"], correct: 0 },
+            { q: "How do you encode JSON in Go?", a: ["json.Marshal()", "json.Encode()", "EncodeJSON()", "ToJSON()"], correct: 0 },
+            { q: "What is a goroutine leak?", a: ["Goroutine that never exits", "Memory leak", "CPU leak", "Network leak"], correct: 0 },
+            { q: "How do you wait for goroutines?", a: ["sync.WaitGroup", "time.Sleep()", "wait group", "done channel"], correct: 0 },
+            { q: "What is 'net/http' middleware?", a: ["Handler that wraps another", "Network middleware", "HTTP filter", "Request processor"], correct: 0 },
+            { q: "How do you serve static files in Go?", a: ["http.FileServer()", "http.Static()", "ServeFile()", "StaticServer()"], correct: 0 },
+            { q: "What is 'html/template' used for?", a: ["Safe HTML rendering", "HTML parsing", "Template engine", "Web pages"], correct: 0 },
+            { q: "How do you handle POST form data?", a: ["r.ParseForm()", "r.PostForm", "r.Form", "All of above"], correct: 0 },
+            { q: "What is REST API in Go?", a: ["JSON over HTTP", "HTML pages", "Web sockets", "GraphQL"], correct: 0 },
+            { q: "How do you return JSON from handler?", a: ["Write JSON to ResponseWriter", "return JSON", "json.Send()", "RespondJSON()"], correct: 0 },
+            { q: "What is 'gorilla/mux'?", a: ["HTTP router package", "Gorilla toolkit", "URL matcher", "Path handler"], correct: 0 },
+            { q: "How do you read request body?", a: ["io.ReadAll(r.Body)", "r.Read()", "r.Body.String()", "ReadBody()"], correct: 0 },
+            { q: "What is dependency injection in Go?", a: ["Pass dependencies as arguments", "Import packages", "Create objects", "Define types"], correct: 0 },
+            { q: "How do you structure a Go project?", a: ["cmd/, pkg/, internal/", "src/, lib/, app/", "main/, core/, util/", "app/, core/, data/"], correct: 0 },
+            { q: "What is 'go.sum' file?", a: ["Checksums of dependencies", "Source code", "Build script", "Config file"], correct: 0 },
+            { q: "What is 'go.mod' file?", a: ["Module definition and deps", "Go source", "Binary file", "Config"], correct: 0 },
+            { q: "How do you vendor dependencies?", a: ["go mod vendor", "vendor folder", "go vendor", "Both a and b"], correct: 0 },
+            { q: "What is semantic versioning?", a: ["Major.Minor.Patch", "Version numbers", "Release tags", "Build numbers"], correct: 0 },
+            { q: "How do you use build tags?", a: ["// +build tag", "#build tag", "@build tag", "%build tag"], correct: 0 },
+            { q: "What is 'io.Reader' interface?", a: ["Read(p []byte) (n, error)", "Read() method", "Reader type", "Stream interface"], correct: 0 },
+            { q: "How do you implement 'io.Reader'?", a: ["Define Read method", "Implement interface", "Embed type", "All of above"], correct: 0 },
+            { q: "What is 'bufio' package used for?", a: ["Buffered I/O operations", "Binary I/O", "File I/O", "Network I/O"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is a race condition in Go?", a: ["Accessing shared data concurrently", "Compilation error", "Memory issue", "Network problem"], correct: 0 },
+            { q: "How do you detect race conditions?", a: ["go test -race", "race detector", "Both a and b", "Go Race"], correct: 0 },
+            { q: "What is 'sync.Once' used for?", a: ["Execute once across goroutines", "Single execution", "One-time init", "Once sync"], correct: 0 },
+            { q: "How do you implement rate limiting?", a: ["golang.org/x/time/rate", "time.Tick()", "Rate limiter", "Both a and b"], correct: 0 },
+            { q: "What is 'context.WithTimeout' used for?", a: ["Cancel operation after duration", "Set deadline", "Both a and b", "Time context"], correct: 0 },
+            { q: "How do you create worker pool pattern?", a: ["Multiple goroutines with channels", "Thread pool", "Worker threads", "Job queue"], correct: 0 },
+            { q: "What is pipeline pattern in Go?", a: ["Stages connected by channels", "Data flow", "Processing chain", "All of above"], correct: 0 },
+            { q: "How do you handle graceful shutdown?", a: ["Signal handling + context", "os.Signal", "Both a and b", "Shutdown hook"], correct: 0 },
+            { q: "What is 'reflect' package used for?", a: ["Inspect types at runtime", "Reflection", "Type introspection", "All of above"], correct: 0 },
+            { q: "How do you use 'unsafe' package?", a: ["Bypass type safety", "Pointer arithmetic", "Both a and b", "Direct memory"], correct: 0 },
+            { q: "What is garbage collection in Go?", a: ["Automatic memory management", "Manual cleanup", "Reference counting", "Memory tracking"], correct: 0 },
+            { q: "How do you optimize Go code?", a: ["Profile first, then optimize", "Use benchmarks", "Avoid allocations", "All of above"], correct: 0 },
+            { q: "What is pprof used for?", a: ["Performance profiling", "Memory profiling", "CPU profiling", "All of above"], correct: 0 },
+            { q: "How do you analyze memory usage?", a: ["runtime/debug", "pprof heap", "All of above", "Memory tool"], correct: 0 },
+            { q: "What is 'cgo' used for?", a: ["Call C code from Go", "C Go binding", "C library", "Foreign function"], correct: 0 },
+            { q: "How do you embed static files?", a: ["go:embed directive", "Asset embedding", "Both a and b", "File embed"], correct: 0 },
+            { q: "What is context propagation?", a: ["Pass context through call stack", "Coroutine context", "Thread local", "All of above"], correct: 0 },
+            { q: "How do you implement circuit breaker?", a: ["Count failures, break on threshold", "Error handling", "Retry logic", "Fallback"], correct: 0 },
+            { q: "What is 'generics' in Go?", a: ["Type parameters for functions/types", "Generic types", "Polymorphism", "Templates"], correct: 0 },
+            { q: "How do you use generics?", a: "[T any]", "type T", "generic T", "All of above"], correct: 0 },
+            { q: "What is 'constraints' package?", a: ["Type constraints for generics", "Limit types", "Type bounds", "All of above"], correct: 0 },
+            { q: "How do you create custom errors?", a: ["Implement Error() method", "errors.New()", "fmt.Errorf()", "All of above"], correct: 0 },
+            { q: "What is error wrapping?", a: ["%w verb in fmt.Errorf", "Wrap error", "Chain errors", "All of above"], correct: 0 },
+            { q: "How do you use 'errors.Is' and 'errors.As'?", a: ["Check error types", "Unwrap errors", "Both a and b", "Error checking"], correct: 0 },
+            { q: "What is functional options pattern?", a: ["Pass options as functions", "Config pattern", "Option API", "All of above"], correct: 0 },
+            { q: "How do you implement builder pattern?", a: ["Method chaining", "Builder struct", "Both a and b", "Construct pattern"], correct: 0 },
+            { q: "What is dependency inversion?", a: ["Depend on abstractions", "Interface segregation", "DIP principle", "All of above"], correct: 0 },
+            { q: "How do you organize clean architecture?", a: ["Domain, UseCase, Repository, Delivery", "Layers", "Separation", "Structure"], correct: 0 },
+            { q: "What is hexagonal architecture?", a: ["Ports and adapters", "Clean separation", "Framework agnostic", "All of above"], correct: 0 },
+            { q: "How do you implement repository pattern?", a: ["Interface + Implementation", "Data access", "Abstraction", "All of above"], correct: 0 },
+            { q: "What is dependency injection container?", a: ["Manage dependencies", "Factory pattern", "Service locator", "All of above"], correct: 0 },
+            { q: "How do you write concurrent-safe tests?", a: ["sync.WaitGroup", "Mutex", "Atomic", "All of above"], correct: 0 },
+            { q: "What is fuzz testing in Go?", a: ["Random input testing", "Fuzzing", "Property testing", "All of above"], correct: 0 },
+            { q: "How do you use testify package?", a: ["Assertions and mocks", "Testing toolkit", "Both a and b", "Test helper"], correct: 0 },
+            { q: "What is mock testing?", a: ["Replace real dependencies", "Fake objects", "Stubbing", "All of above"], correct: 0 },
+            { q: "How do you test HTTP handlers?", a: ["httptest.NewRequest", "http testing", "Both a and b", "Handler test"], correct: 0 },
+            { q: "What is integration testing?", a: ["Test multiple components", "End-to-end", "System test", "All of above"], correct: 0 },
+            { q: "How do you structure integration tests?", a: ["Separate directory", "Build tags", "Environment", "All of above"], correct: 0 },
+            { q: "What is observability in Go?", a: ["Logging, Metrics, Tracing", "Monitoring", "Debugging", "All of above"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            const q = currentQuestions[currentQuestionIndex];
+            
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            
+            qDiv.innerHTML = `
+                <div class="question-text">${q.q}</div>
+                <div class="answers-grid">${answersHtml}</div>
+            `;
+            
+            container.appendChild(qDiv);
+            
+            updateStats();
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            buttons.forEach(btn => btn.disabled = true);
+            
+            if (index === q.correct) {
+                buttons[index].classList.add('correct');
+                score += 10 + (streak * 2);
+                streak++;
+                consecutiveCorrect++;
+                if (streak > maxStreak) maxStreak = streak;
+            } else {
+                buttons[index].classList.add('incorrect');
+                buttons[q.correct].classList.add('correct');
+                streak = 0;
+                consecutiveCorrect = 0;
+            }
+            
+            totalAnswered++;
+            
+            if (consecutiveCorrect >= 3 && difficulty === 'easy') {
+                difficulty = 'medium';
+                currentLevel = 2;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            } else if (consecutiveCorrect >= 3 && difficulty === 'medium') {
+                difficulty = 'hard';
+                currentLevel = 3;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            }
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex >= currentQuestions.length) {
+                    showResults();
+                } else {
+                    renderQuestion();
+                }
+            }, 1500);
+        }
+
+        function loadNextDifficulty() {
+            let newQuestions;
+            if (difficulty === 'medium') {
+                newQuestions = shuffle([...mediumQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            } else if (difficulty === 'hard') {
+                newQuestions = shuffle([...hardQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            }
+            currentQuestions = [...currentQuestions, ...newQuestions];
+        }
+
+        function updateStats() {
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+            
+            const progress = (currentQuestionIndex / currentQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('resultScreen').classList.add('active');
+            
+            const percentage = (score / (currentQuestions.length * 10)) * 100;
+            const passed = percentage >= 50;
+            
+            document.getElementById('resultIcon').textContent = passed ? '🏆' : '📚';
+            document.getElementById('resultText').textContent = passed ? 'PASSED!' : 'KEEP LEARNING';
+            document.getElementById('resultText').className = 'result-text ' + (passed ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score} | Max Streak: ${maxStreak}`;
+            document.getElementById('resultDetails').textContent = passed 
+                ? 'You have mastered Go!'
+                : 'Review the Go guide and try again.';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        initTest();
+    </script>
+</body>
+</html>

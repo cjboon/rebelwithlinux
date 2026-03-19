@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/hangman/hangman-jenkins.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman: Jenkins - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: var(--white); color: var(--black); font-family: 'Courier New', monospace; font-size: 15px; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        h1 { margin-bottom: 10px; font-size: 1.8rem; color: var(--black); }
+        .subtitle { margin-bottom: 20px; color: var(--charcoal); }
+        .definition-label { font-weight: bold; margin-bottom: 8px; color: var(--charcoal); }
+        .definition-text { line-height: 1.5; }
+        .guesses-label { margin-bottom: 8px; color: var(--charcoal); font-size: 0.9rem; }
+        .game-container { display: flex; gap: 40px; flex-wrap: nowrap; justify-content: center; align-items: flex-start; max-width: 900px; }
+        .hangman-area { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+        canvas { background: var(--black); }
+        @media (prefers-color-scheme: light) { canvas { background: var(--white); } }
+        .definition-box { background: var(--white); padding: 20px; margin-bottom: 20px; }
+        .word-display { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; font-size: 1.5rem; font-family: 'Courier New', monospace; }
+        .letter-slot { width: 18px; text-align: center; }
+        .letter-slot.correct { color: #00aa00; }
+        .letter-slot.wrong { color: #cc0000; }
+        .guess-input { padding: 12px 15px; background: var(--white); border: none; border-bottom: 2px solid var(--black); color: var(--black); font-family: 'Courier New', monospace; font-size: 1rem; width: 150px; text-transform: lowercase; }
+        .guessed-char { padding: 5px 8px; background: var(--charcoal); font-size: 0.85rem; color: var(--white); }
+        .guessed-chars { display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 20px; overflow-x: auto; }
+        .stats { display: flex; gap: 30px; padding-top: 15px; border-top: 1px solid var(--charcoal); }
+        .stat { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: var(--black); }
+        .stat-label { font-size: 0.8rem; color: var(--charcoal); }
+        .message { margin-top: 15px; padding: 15px; text-align: center; font-weight: bold; background: var(--white); }
+        .message.win { background: var(--white); color: #00aa00; }
+        .message.lose { background: var(--white); color: #cc0000; }
+        .difficulty { color: var(--charcoal); margin-bottom: 10px; }
+        @media (max-width: 500px) { body { padding: 10px; padding-bottom: 100px; font-size: 14px; } h1 { font-size: 1.4rem; } .subtitle { font-size: 0.9rem; margin-bottom: 10px; } .game-container { flex-wrap: wrap; flex-direction: column; align-items: center; } canvas { width: 150px; height: 188px; } .word-display { font-size: 1.2rem; } .letter-slot { width: 14px; } .guess-input { width: 100%; max-width: 200px; padding: 15px; font-size: 1.2rem; text-align: center; } .stats { gap: 15px; flex-wrap: wrap; justify-content: center; } .stat-value { font-size: 1.2rem; } .guessed-chars { flex-wrap: wrap; justify-content: center; } .guessed-char { padding: 8px 12px; font-size: 1rem; } .message { position: fixed; bottom: 0; left: 0; right: 0; padding: 15px; font-size: 1rem; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); } }
+    </style>
+</head>
+<body>
+    <h1>HANGMAN: JENKINS</h1>
+    <p class="subtitle">Guess the Jenkins term from its definition</p>
+    <p class="difficulty" id="difficultyDisplay">Difficulty: Easy</p>
+    <div class="game-container">
+        <div class="hangman-area"><canvas id="hangmanCanvas" width="300" height="400"></canvas></div>
+        <div class="game-info">
+            <div class="definition-box">
+                <div class="definition-label">DEFINITION:</div>
+                <div class="definition-text" id="definition"></div>
+            </div>
+            <div class="word-display" id="wordDisplay"></div>
+            <div class="input-area"><input type="text" class="guess-input" id="guessInput" placeholder="type a-z" autocomplete="off" autofocus></div>
+            <div class="guesses-label">GUESSED:</div>
+            <div class="guessed-chars" id="guessedChars"></div>
+            <div class="stats">
+                <div class="stat"><div class="stat-value" id="wrongCount">0</div><div class="stat-label">Wrong</div></div>
+                <div class="stat"><div class="stat-value" id="score">0</div><div class="stat-label">Score</div></div>
+                <div class="stat"><div class="stat-value" id="streak">0</div><div class="stat-label">Streak</div></div>
+            </div>
+            <div class="message" id="messageBox" style="display: none;"></div>
+        </div>
+    </div>
+    <div class="back-link"><a href="hangman-main.html">&lt;&lt; back to hangman games</a></div>
+    <script>
+        const commands = {
+            easy: [
+                { command: 'job', definition: 'A task or build process in Jenkins' },
+                { command: 'build', definition: 'Execution of a job' },
+                { command: 'node', definition: 'Machine that executes builds' },
+                { command: 'agent', definition: 'Executor of build jobs (formerly slave)' },
+                { command: 'stage', definition: 'Logical division of a pipeline' },
+                { command: 'step', definition: 'Single action in a pipeline' },
+                { command: 'plugin', definition: 'Extension to Jenkins functionality' },
+                { command: 'workspace', definition: 'Where builds run and files are stored' },
+                { command: 'artifact', definition: 'Files produced by a build' },
+                { command: 'trigger', definition: 'Event that starts a build' },
+                { command: 'param', definition: 'User-provided value for build' },
+                { command: 'crumb', definition: 'CSRF protection token in Jenkins' }
+            ],
+            medium: [
+                { command: 'pipeline', definition: 'Collection of build stages defined as code' },
+                { command: 'jenkinsfile', definition: 'File defining pipeline as code' },
+                { command: 'declarative', definition: 'Pipeline syntax using structured keywords' },
+                { command: 'scripted', definition: 'Pipeline syntax using Groovy code' },
+                { command: 'blue ocean', definition: 'Modern Jenkins UI interface' },
+                { command: 'webhook', definition: 'HTTP trigger from external service' },
+                { command: 'credential', definition: 'Stored secret for authentication' },
+                { command: 'archive', definition: 'Save build files for later access' },
+                { command: 'parameter', definition: 'Build parameter for user input' },
+                { command: 'environment', definition: 'Variables available during build' },
+                { command: 'timeout', definition: 'Time limit for build or step' },
+                { command: 'retry', definition: 'Repeat a step on failure' },
+                { command: 'stash', definition: 'Save files between stages' },
+                { command: 'unstash', definition: 'Restore stashed files' }
+            ],
+            hard: [
+                { command: 'sharedlibrary', definition: 'Reusable pipeline code library' },
+                { command: 'multibranch', definition: 'Pipeline creating jobs per branch' },
+                { command: 'organizationfolder', definition: 'Auto-discovers repositories' },
+                { command: 'kubernetesplugin', definition: 'Dynamic agents in K8s cluster' },
+                { command: 'configurationascode', definition: 'Jenkins config in YAML format' },
+                { command: 'groovysandbox', definition: 'Security for pipeline scripts' },
+                { command: 'securityrealm', definition: 'User authentication backend' },
+                { comment: 'authorizationstrategy', definition: 'Permission control mechanism' },
+                { command: 'builddiscarder', definition: 'Auto-delete old builds policy' },
+                { command: 'logrotation', definition: 'Limit build log size/age' },
+                { command: 'lightweightcheckout', definition: 'Faster SCM checkout method' },
+                { command: 'inputstep', definition: 'Pause pipeline for user input' },
+                { command: 'catcherror', definition: 'Catch and handle build errors' },
+                { command: 'withcredentials', definition: 'Bind credentials to variable' }
+            ]
+        };
+        let difficultyLevels = ['easy', 'medium', 'hard'];
+        let currentDifficulty = 'easy';
+        let difficultyStreak = 0;
+        let minStreakForAdvance = 5;
+        let currentWord = '';
+        let guessedLetters = [];
+        let wrongCount = 0;
+        let score = 0;
+        let streak = 0;
+        let maxWrong = 8;
+        let isDead = false;
+        let deathTime = 0;
+        const canvas = document.getElementById('hangmanCanvas');
+        const ctx = canvas.getContext('2d');
+        const definitionEl = document.getElementById('definition');
+        const wordDisplayEl = document.getElementById('wordDisplay');
+        const guessInput = document.getElementById('guessInput');
+        const guessedCharsEl = document.getElementById('guessedChars');
+        const wrongCountEl = document.getElementById('wrongCount');
+        const scoreEl = document.getElementById('score');
+        const streakEl = document.getElementById('streak');
+        const messageBox = document.getElementById('messageBox');
+        function init() { newGame(); }
+        function newGame() {
+            const currentCommands = commands[currentDifficulty];
+            const cmd = currentCommands[Math.floor(Math.random() * currentCommands.length)];
+            currentWord = cmd.command.toLowerCase();
+            guessedLetters = [];
+            wrongCount = 0;
+            score = Math.max(0, score);
+            messageBox.style.display = 'none';
+            messageBox.className = 'message';
+            guessInput.value = '';
+            isDead = false;
+            deathTime = 0;
+            updateDifficultyDisplay();
+            drawHangman();
+            updateDisplay();
+            guessInput.focus();
+        }
+        function updateDifficultyDisplay() {
+            const display = document.getElementById('difficultyDisplay');
+            if (display) { display.textContent = 'Difficulty: ' + currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1); }
+        }
+        function drawHangman() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const startColor = isDark ? '#000' : '#fff';
+            let faceFillColor = startColor;
+            let droopAmount = 0;
+            if (isDead) {
+                deathTime += 16;
+                const maxTime = 60000;
+                const progress = Math.min(deathTime / maxTime, 1);
+                const r = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
+                const g = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
+                const b = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
+                faceFillColor = `rgb(${r},${g},${b})`;
+                droopAmount = Math.sin(deathTime / 500) * 2;
+            }
+            ctx.fillStyle = faceFillColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = isDark ? '#fff' : '#000';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(50, 380); ctx.lineTo(250, 380);
+            ctx.moveTo(100, 380); ctx.lineTo(100, 50);
+            ctx.moveTo(100, 50); ctx.lineTo(220, 50);
+            ctx.moveTo(220, 50); ctx.lineTo(220, 90);
+            ctx.stroke();
+            if (wrongCount >= 1) { ctx.beginPath(); ctx.arc(220, 115 + droopAmount, 30, 0, Math.PI * 2); ctx.fillStyle = faceFillColor; ctx.fill(); ctx.stroke(); }
+            if (wrongCount >= 2) { ctx.beginPath(); ctx.moveTo(220, 145 + droopAmount); ctx.lineTo(220, 230); ctx.stroke(); }
+            if (wrongCount >= 3) { ctx.beginPath(); ctx.moveTo(220, 160 + droopAmount); ctx.lineTo(190, 200); ctx.stroke(); }
+            if (wrongCount >= 4) { ctx.beginPath(); ctx.moveTo(220, 160 + droopAmount); ctx.lineTo(250, 200); ctx.stroke(); }
+            if (wrongCount >= 5) { ctx.beginPath(); ctx.moveTo(220, 230); ctx.lineTo(190, 280); ctx.stroke(); }
+            if (wrongCount >= 6) { ctx.beginPath(); ctx.moveTo(220, 230); ctx.lineTo(250, 280); ctx.stroke(); }
+            if (wrongCount >= 7) { ctx.beginPath(); ctx.fillStyle = isDark ? '#fff' : '#000'; ctx.arc(210, 105 + droopAmount, 3, 0, Math.PI * 2); ctx.arc(230, 105 + droopAmount, 3, 0, Math.PI * 2); ctx.fill(); }
+            if (wrongCount >= 8) { ctx.beginPath(); ctx.strokeStyle = isDark ? '#fff' : '#000'; ctx.moveTo(210, 125 + droopAmount); ctx.lineTo(230, 125 + droopAmount); ctx.stroke(); }
+        }
+        function updateDisplay() {
+            definitionEl.textContent = commands[currentDifficulty].find(c => c.command.toLowerCase() === currentWord)?.definition || '';
+            wordDisplayEl.innerHTML = '';
+            for (let i = 0; i < currentWord.length; i++) {
+                const letter = currentWord[i];
+                const slot = document.createElement('span');
+                slot.className = 'letter-slot';
+                slot.textContent = guessedLetters.includes(letter) ? letter : '_';
+                if (guessedLetters.includes(letter)) slot.classList.add('correct');
+                wordDisplayEl.appendChild(slot);
+            }
+            guessedCharsEl.innerHTML = '';
+            guessedLetters.forEach(letter => { const char = document.createElement('span'); char.className = 'guessed-char'; char.textContent = letter; guessedCharsEl.appendChild(char); });
+            wrongCountEl.textContent = wrongCount;
+            scoreEl.textContent = score;
+            streakEl.textContent = streak;
+            checkWin();
+        }
+        function checkWin() {
+            const won = currentWord.split('').every(letter => guessedLetters.includes(letter));
+            if (won) {
+                messageBox.textContent = 'CORRECT! The word was: ' + currentWord.toUpperCase();
+                messageBox.className = 'message win';
+                messageBox.style.display = 'block';
+                score += 10 + (streak * 2);
+                streak++;
+                difficultyStreak++;
+                if (difficultyStreak >= minStreakForAdvance && currentDifficulty !== 'hard') {
+                    currentDifficulty = difficultyLevels[difficultyLevels.indexOf(currentDifficulty) + 1];
+                    difficultyStreak = 0;
+                }
+                setTimeout(newGame, 2000);
+            } else if (wrongCount >= maxWrong) {
+                isDead = true;
+                drawHangman();
+                messageBox.textContent = 'GAME OVER! The word was: ' + currentWord.toUpperCase();
+                messageBox.className = 'message lose';
+                messageBox.style.display = 'block';
+                streak = 0;
+                difficultyStreak = 0;
+                currentDifficulty = 'easy';
+                setTimeout(newGame, 3000);
+            }
+        }
+        guessInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const guess = guessInput.value.toLowerCase().trim();
+                if (guess && guess.length === 1 && guess.match(/[a-z]/)) {
+                    if (!guessedLetters.includes(guess)) {
+                        guessedLetters.push(guess);
+                        if (!currentWord.includes(guess)) { wrongCount++; streak = 0; difficultyStreak = 0; }
+                        updateDisplay();
+                        drawHangman();
+                    }
+                    guessInput.value = '';
+                }
+            }
+        });
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-jenkins.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jenkins Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+    </nav>
+    <div class="test-container">
+        <div class="test-header"><h1>// JENKINS TEST</h1><p>Prove your Jenkins CI/CD mastery</p></div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const easyQuestions = [
+            { q: "What is Jenkins?", a: ["Open source automation server", "Version control", "Database", "Web server"], correct: 0 },
+            { q: "What language is Jenkins written in?", a: ["Java", "Python", "Go", "Ruby"], correct: 0 },
+            { q: "What is a Jenkins 'job'?", a: ["A task or build process", "A user account", "A plugin", "A node"], correct: 0 },
+            { q: "What is a Jenkins 'pipeline'?", a: ["Collection of build stages", "Single build", "User job", "Plugin"], correct: 0 },
+            { q: "What is 'Jenkinsfile'?", a: ["Defines pipeline as code", "Build script", "Config file", "Plugin file"], correct: 0 },
+            { q: "What is 'Jenkins agent'?", a: ["Executes build jobs", "Manages jobs", "Stores builds", "UI component"], correct: 0 },
+            { q: "What is 'Jenkins controller'?", a: ["Main Jenkins server", "Build node", "Plugin", "Job type"], correct: 0 },
+            { q: "What is a 'build trigger'?", a: ["Starts a build automatically", "Stops builds", "Schedules jobs", "Creates jobs"], correct: 0 },
+            { q: "What is 'SCM polling'?", a: ["Checks for code changes", "Builds on schedule", "Monitors system", "Tests code"], correct: 0 },
+            { q: "What is 'webhook' in Jenkins?", a: ["HTTP trigger from external service", "UI element", "Build step", "Plugin"], correct: 0 },
+            { q: "What is 'Jenkins home directory'?", a: ["Stores configs, jobs, build history", "Web root", "Temp folder", "Plugin dir"], correct: 0 },
+            { q: "What is 'workspace' in Jenkins?", a: ["Where build runs, files stored", "Home directory", "Config folder", "Log location"], correct: 0 },
+            { q: "How do you install Jenkins?", a: ["Download WAR or use packages", "Compile from source", "App Store", "Only Docker"], correct: 0 },
+            { q: "What is default Jenkins port?", a: ["8080", "80", "443", "22"], correct: 0 },
+            { q: "What is a 'freestyle' project?", a: ["Basic job type", "Scripted pipeline", "Declarative pipeline", "Multibranch"], correct: 0 },
+            { q: "What is 'post-build action'?", a: ["Actions after build completes", "Build step", "Trigger", "Source config"], correct: 0 },
+            { q: "What is 'build step'?", a: ["Individual action in a build", "Build trigger", "Build result", "Build log"], correct: 0 },
+            { q: "What is 'parameterized build'?", a: ["Build with user-provided values", "Fixed build", "Auto build", "Scheduled build"], correct: 0 },
+            { q: "What is 'Copy Artifact' plugin?", a: ["Copies files between jobs", "Duplicates jobs", "Backs up builds", "Archives artifacts"], correct: 0 },
+            { q: "What is 'Credentials' in Jenkins?", a: ["Store secrets and keys", "User accounts", "Build parameters", "Node config"], correct: 0 },
+            { q: "What is 'Blue Ocean'?", a: ["Modern Jenkins UI", "Plugin manager", "Build tool", "Pipeline editor"], correct: 0 },
+            { q: "What is 'Build Pipeline' plugin?", a: ["Visualize pipeline flow", "Build multiple", "Pipeline version", "Stage view"], correct: 0 },
+            { q: "What does 'archiveArtifacts' do?", a: ["Saves build files", "Compresses files", "Encrypts files", "Copies files"], correct: 0 },
+            { q: "What is 'emailext'?", a: ["Email notifications", "External commands", "Embedded tools", "Extension plugin"], correct: 0 },
+            { q: "What is 'Jenkins CLI'?", a: ["Command line interface", "Build tool", "Plugin manager", "Config tool"], correct: 0 },
+            { q: "What is ' LTS' version?", a: ["Long Term Support", "Latest", "Testing", "Legacy"], correct: 0 },
+            { q: "What is 'Jenkins update center'?", a: ["Plugin repository", "Build server", "Config backup", "User directory"], correct: 0 },
+            { q: "What is 'matrix project'?", a: ["Build with multiple configurations", "Grid layout", "Build array", "Multi-branch"], correct: 0 },
+            { q: "What is 'slave' in Jenkins?", a: ["Old term for agent", "Build node", "Plugin", "Config type"], correct: 0 },
+            { q: "What is 'label' in Jenkins?", a: ["Groups agents by capability", "Tags jobs", "Build markers", "User tags"], correct: 0 },
+            { q: "What is 'quiet period'?", a: ["Delay before build starts", "Build timeout", "Quiet mode", "Shutdown time"], correct: 0 },
+            { q: "What is 'throttle' builds?", a: ["Limit concurrent builds", "Speed up builds", "Pause builds", "Stop builds"], correct: 0 },
+            { q: "What is 'crumb' in Jenkins?", a: ["CSRF protection token", "Build crumb", "Error marker", "Test result"], correct: 0 },
+            { q: "What is 'fingerprint'?", a: ["Tracks artifact dependencies", "Security feature", "User ID", "Build ID"], correct: 0 },
+            { q: "What is 'JDK' in Jenkins?", a: ["Java Development Kit for builds", "Build tool", "Plugin", "Version"], correct: 0 },
+            { q: "What is 'Groovy' in Jenkins?", a: ["Scripting language for pipelines", "Build tool", "Plugin type", "Version"], correct: 0 },
+            { q: "What is 'sh' step?", a: ["Execute shell command", "Share files", "Show output", "Skip step"], correct: 0 },
+            { q: "What is 'echo' in pipeline?", a: ["Print message", "Error message", "Warning", "Log level"], correct: 0 },
+            { q: "What is 'bat' step?", a: ["Execute Windows batch", "Build action", "Batch job", "Plugin"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is difference between freestyle and pipeline?", a: ["Pipeline as code, more features", "Same thing", "Freestyle is better", "No difference"], correct: 0 },
+            { q: "What is 'declarative pipeline'?", a: ["Pipeline defined with structured syntax", "Scripted", "Simple", "Legacy"], correct: 0 },
+            { q: "What is 'scripted pipeline'?", a: ["Uses Groovy code", "Uses declarative syntax", "No code", "UI only"], correct: 0 },
+            { q: "What does 'agent any' mean?", a: ["Use any available agent", "Skip agent", "Require all agents", "New agent"], correct: 0 },
+            { q: "What is 'stage' in pipeline?", a: ["Logical division of build", "Build step", "Agent", "Node"], correct: 0 },
+            { q: "What is 'parallel' in pipeline?", a: ["Run stages concurrently", "Sequential stages", "Skip stages", "Stage group"], correct: 0 },
+            { q: "What is 'when' condition?", a: ["Conditionally run stages", "Wait for input", "Check errors", "Timeout"], correct: 0 },
+            { q: "What is 'environment' directive?", a: ["Define environment variables", "Set stage", "Build config", "Agent config"], correct: 0 },
+            { q: "What is 'parameters' directive?", a: ["Define build parameters", "Pipeline params", "System properties", "Env vars"], correct: 0 },
+            { q: "What is 'triggers' directive?", a: ["Define build triggers", "Build start", "Stage trigger", "Agent trigger"], correct: 0 },
+            { q: "What is 'options' directive?", a: ["Pipeline-level settings", "Build options", "Stage options", "Agent options"], correct: 0 },
+            { q: "What is 'tools' directive?", a: ["Auto-install build tools", "Build software", "CI tools", "Dev tools"], correct: 0 },
+            { q: "What is 'input' step?", a: ["Pause for user input", "User login", "Get input", "Read file"], correct: 0 },
+            { q: "What is 'timeout' step?", a: ["Time limit for block", "Wait time", "Long build", "Delay"], correct: 0 },
+            { q: "What is 'retry' step?", a: ["Retry block on failure", "Try again", "Repeat build", "Loop"], correct: 0 },
+            { q: "What is 'catchError' step?", a: ["Catch and handle errors", "Error message", "Error log", "Error stage"], correct: 0 },
+            { q: "What is 'checkout' step?", a: ["Check out source code", "Check in", "Verify files", "Copy files"], correct: 0 },
+            { q: "What is 'withCredentials'?", a: ["Bind credentials to variable", "Use credentials", "Store credentials", "List credentials"], correct: 0 },
+            { q: "What is 'stash' and 'unstash'?", a: ["Save/restore files between stages", "Hide files", "Archive files", "Compress"], correct: 0 },
+            { q: "What is 'dir' step?", a: ["Change directory temporarily", "Create dir", "List dir", "Delete dir"], correct: 0 },
+            { q: "What is 'writeFile' step?", a: ["Write content to file", "Edit file", "Read file", "Copy file"], correct: 0 },
+            { q: "What is 'readFile' step?", a: ["Read file content", "Write file", "Edit file", "Copy file"], correct: 0 },
+            { q: "What is 'archiveArtifacts'?", a: ["Save files for later", "Compress", "Encrypt", "Copy"], correct: 0 },
+            { q: "What is 'junit' step?", a: ["Publish test results", "Run tests", "Test framework", "Test report"], correct: 0 },
+            { q: "What is 'publishHTML'?", a: ["Publish HTML reports", "HTML build", "Web content", "Static site"], correct: 0 },
+            { q: "What is 'emailext' step?", a: ["Send email notifications", "Read email", "Email plugin", "Mail server"], correct: 0 },
+            { q: "What is 'slackSend'?", a: ["Send notifications to Slack", "Slack integration", "Slack plugin", "Chat build"], correct: 0 },
+            { q: "What is 'docker.build'?", a: ["Build Docker image in pipeline", "Run container", "Pull image", "Docker plugin"], correct: 0 },
+            { q: "What is 'docker.withRegistry'?", a: ["Authenticate to registry", "Run registry", "Start registry", "List registry"], correct: 0 },
+            { q: "What is 'kubernetes' plugin?", a: ["Dynamic Kubernetes agents", "Deploy to K8s", "K8s integration", "K8s plugin"], correct: 0 },
+            { q: "What is 'shared libraries'?", a: ["Reusable pipeline code", "Shared plugins", "Shared jobs", "Common scripts"], correct: 0 },
+            { q: "How do you use shared library?", a: ["@Library('lib') _", "import library", "load library", "include library"], correct: 0 },
+            { q: "What is 'global variable' in pipeline?", a: ["Available in all pipelines", "Stage variable", "Build variable", "Env variable"], correct: 0 },
+            { q: "What is 'currentBuild'?", a: ["Access current build info", "Build object", "This build", "Active build"], correct: 0 },
+            { q: "What is 'env' variable?", a: ["Environment variables object", "Env vars", "System env", "Build env"], correct: 0 },
+            { q: "What is 'params'?", a: ["Build parameters object", "Parameter types", "Param plugin", "All params"], correct: 0 },
+            { q: "What is 'BRANCH_NAME'?", a: ["Current branch name", "Build name", "Job name", "Node name"], correct: 0 },
+            { q: "What is 'BUILD_NUMBER'?", a: ["Current build number", "Build ID", "Build count", "Job number"], correct: 0 },
+            { q: "What is 'WORKSPACE'?", a: ["Current build workspace path", "Home dir", "Temp dir", "Build dir"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is 'declarative vs scripted' pipeline?", a: ["Syntax difference, same runtime", "Different engines", "No difference", "Scripted deprecated"], correct: 0 },
+            { q: "How do you debug pipeline script?", a: ["echo, sleep, input", "Use IDE", "No debugging", "Add breakpoints"], correct: 0 },
+            { q: "What is 'replay' in pipeline?", a: ["Re-run with changes", "Playback", "Replay build", "Test script"], correct: 0 },
+            { q: "What is 'jenkinsfile in repository'?", a: ["Pipeline as code in SCM", "Jenkins config", "Build file", "Plugin config"], correct: 0 },
+            { q: "What is 'multibranch pipeline'?", a: ["Creates jobs for each branch", "Multiple jobs", "Branch builds", "Parallel jobs"], correct: 0 },
+            { q: "What is 'organization folder'?", a: ["Auto-discover repositories", "Folder organization", "Org config", "Multi-org"], correct: 0 },
+            { q: "What is 'folder' in Jenkins?", a: ["Organize jobs hierarchically", "Directory", "Group jobs", "Plugin"], correct: 0 },
+            { q: "What is 'view' in Jenkins?", a: ["Filtered job list", "Job view", "Dashboard", "UI view"], correct: 0 },
+            { q: "What is 'cloud' agent?", a: ["Dynamic agents in cloud", "Cloud storage", "Cloud backup", "Online Jenkins"], correct: 0 },
+            { q: "What is 'EC2' plugin?", a: ["Launch agents on AWS", "Amazon plugin", "Cloud plugin", "AWS integration"], correct: 0 },
+            { q: "What is 'Kubernetes' plugin for agents?", a: ["Dynamic agents in K8s cluster", "Deploy to K8s", "K8s integration", "Container plugin"], correct: 0 },
+            { q: "What is 'Docker' agent?", a: ["Run builds in containers", "Build Docker", "Docker integration", "Container plugin"], correct: 0 },
+            { q: "What is 'agent' label selector?", a: ["Choose agent by label", "Label agent", "Name agent", "Tag agent"], correct: 0 },
+            { q: "What is 'workspace cleanup'?", a: ["Clean workspace before build", "Delete files", "Remove artifacts", "Purge"], correct: 0 },
+            { q: "What is 'build discarder'?", a: ["Auto-delete old builds", "Discard builds", "Remove old", "Clean history"], correct: 0 },
+            { q: "What is 'log rotation'?", a: ["Limit build log size", "Rotate logs", "Compress logs", "Archive logs"], correct: 0 },
+            { q: "What is 'timestamps' in console?", a: ["Add timestamps to logs", "Time build", "Timestamp plugin", "Log time"], correct: 0 },
+            { q: "What is 'quietPeriod' in job?", a: ["Wait before starting build", "Quiet time", "Pause time", "Delay build"], correct: 0 },
+            { q: "What is 'skipDefaultCheckout'?", a: ["Skip automatic SCM checkout", "No checkout", "Skip default", "Manual checkout"], correct: 0 },
+            { q: "What is 'checkoutToSubdirectory'?", a: ["Checkout to specific folder", "Subdir checkout", "Folder checkout", "Custom checkout"], correct: 0 },
+            { q: "What is 'sh withPath'?", a: ["Add to PATH temporarily", "Set path", "Update path", "Modify path"], correct: 0 },
+            { q: "What is 'withEnv' override?", a: ["Set env vars in block", "Env vars", "Override env", "Block env"], correct: 0 },
+            { q: "What is 'load credentials' in pipeline?", a: ["Load from credential ID", "Read creds", "Access creds", "Use creds"], correct: 0 },
+            { q: "What is 'credentials binding'?", a: ["Bind creds to env var", "Bind to var", "Use creds", "Credentials plugin"], correct: 0 },
+            { q: "What is 'secret file' credential?", a: ["File-based secret", "Secret key", "Password file", "Key file"], correct: 0 },
+            { q: "What is 'usernamePassword' credential?", a: ["Username and password pair", "User creds", "Login creds", "Auth creds"], correct: 0 },
+            { q: "What is 'sshUserPrivateKey' credential?", a: ["SSH key pair", "SSH creds", "Key auth", "Private key"], correct: 0 },
+            { q: "What is 'string' credential?", a: ["Secret text/token", "Plain text", "Text secret", "Token"], correct: 0 },
+            { q: "What is 'pipeline script from SCM'?", a: ["Load Jenkinsfile from repo", "Script in repo", "External script", "SCM script"], correct: 0 },
+            { q: "What is 'lightweight checkout'?", a: ["Faster, less data", "Quick checkout", "Minimal checkout", "Fast clone"], correct: 0 },
+            { q: "What is 'build timeout' plugin?", a: ["Timeout builds automatically", "Time limit", "Kill build", "Max time"], correct: 0 },
+            { q: "What is 'timestamper' plugin?", a: ["Add timestamps to output", "Timestamp logs", "Time stamps", "Log times"], correct: 0 },
+            { q: "What is 'ansicolor' plugin?", a: ["ANSI color in console", "Color output", "Colored logs", "Rainbow logs"], correct: 0 },
+            { q: "What is 'warnings' plugin?", a: ["Parse compiler warnings", "Warning logs", "Error warnings", "Scan warnings"], correct: 0 },
+            { q: "What is 'jacoco' plugin?", a: ["Code coverage reports", "Coverage", "Test coverage", "JaCoCo"], correct: 0 },
+            { q: "What is 'sonar' scanner?", a: ["Code quality analysis", "SonarQube", "Code analysis", "Quality gate"], correct: 0 },
+            { q: "What is 'configuration as code'?", a: ["Jenkins config in YAML", "Jenkinsfile", "Config files", "YAML config"], correct: 0 },
+            { q: "What is 'groovy sandbox'?", a: ["Security for pipeline scripts", "Sandbox security", "Script security", "Safe scripts"], correct: 0 },
+            { q: "What is 'approval' for scripts?", a: ["Approve unsafe scripts", "Script approval", "Approve pipeline", "Allow scripts"], correct: 0 },
+            { q: "What is 'matrix authentication'?", a: ["Role-based access control", "Matrix users", "Auth matrix", "User roles"], correct: 0 },
+            { q: "What is 'role strategy' plugin?", a: ["Role-based authorization", "Roles", "Permissions", "Access control"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            const q = currentQuestions[currentQuestionIndex];
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`;
+            container.appendChild(qDiv);
+            updateStats();
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(btn => btn.disabled = true);
+            if (index === q.correct) {
+                buttons[index].classList.add('correct');
+                score += 10 + (streak * 2);
+                streak++;
+                consecutiveCorrect++;
+                if (streak > maxStreak) maxStreak = streak;
+            } else {
+                buttons[index].classList.add('incorrect');
+                buttons[q.correct].classList.add('correct');
+                streak = 0;
+                consecutiveCorrect = 0;
+            }
+            totalAnswered++;
+            if (consecutiveCorrect >= 3 && difficulty === 'easy') {
+                difficulty = 'medium';
+                currentLevel = 2;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            } else if (consecutiveCorrect >= 3 && difficulty === 'medium') {
+                difficulty = 'hard';
+                currentLevel = 3;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            }
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex >= currentQuestions.length) {
+                    showResults();
+                } else {
+                    renderQuestion();
+                }
+            }, 1500);
+        }
+
+        function loadNextDifficulty() {
+            let newQuestions;
+            if (difficulty === 'medium') {
+                newQuestions = shuffle([...mediumQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            } else if (difficulty === 'hard') {
+                newQuestions = shuffle([...hardQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            }
+            currentQuestions = [...currentQuestions, ...newQuestions];
+        }
+
+        function updateStats() {
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+            const progress = (currentQuestionIndex / currentQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('resultScreen').classList.add('active');
+            const percentage = (score / (currentQuestions.length * 10)) * 100;
+            const passed = percentage >= 50;
+            document.getElementById('resultIcon').textContent = passed ? '🏆' : '📚';
+            document.getElementById('resultText').textContent = passed ? 'PASSED!' : 'KEEP LEARNING';
+            document.getElementById('resultText').className = 'result-text ' + (passed ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score} | Max Streak: ${maxStreak}`;
+            document.getElementById('resultDetails').textContent = passed ? 'You have mastered Jenkins!' : 'Review the Jenkins guide and try again.';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        initTest();
+    </script>
+</body>
+</html>

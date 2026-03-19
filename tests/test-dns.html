@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-dns.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); }
+        .theme-toggle-checkbox { display: none; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../search.html" style="color: var(--charcoal);">SEARCH</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="../account.html" id="loginLink" class="auth-link" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// DNS TEST</h1>
+            <p>Prove your DNS mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What does DNS stand for?", a: ["Domain Name System", "Dynamic Network Service", "Data Network System", "Direct Name Service"], correct: 0 },
+            { q: "What port does DNS use?", a: ["53", "80", "443", "25"], correct: 0 },
+            { q: "What is an A record?", a: ["Maps domain to IP", "Maps subdomain", "Mail exchange", "Canonical name"], correct: 0 },
+            { q: "What is a CNAME record?", a: ["Alias to another domain", "Mail exchange", "Text record", "Start of authority"], correct: 0 },
+            { q: "What does 'dig' command do?", a: ["DNS lookup", "Ping host", "Trace route", "Scan ports"], correct: 0 },
+            { q: "What is the root zone represented by?", a: [".", "com", "org", "net"], correct: 0 },
+            { q: "What is an MX record?", a: ["Mail exchange", "Domain alias", "IP address", "Text record"], correct: 0 },
+            { q: "What is TTL in DNS?", a: ["Time to live", "Type to look", "Total transfer", "Test link"], correct: 0 },
+            { q: "What is a nameserver?", a: ["Server that resolves DNS", "Web server", "Mail server", "File server"], correct: 0 },
+            { q: "What is the SOA record?", a: ["Start of Authority", "Source of Address", "System of Access", "Secure Origin"], correct: 0 },
+            { q: "What is recursive DNS lookup?", a: ["Server queries other servers", "Direct query", "Local only", "No cache"], correct: 0 },
+            { q: "What is a TLD?", a: ["Top Level Domain", "Transfer Log Data", "Text Location Domain", "Time Limited DNS"], correct: 0 },
+            { q: "What is 'nslookup' used for?", a: ["Query DNS records", "List networks", "Scan nodes", "Name servers"], correct: 0 },
+            { q: "What does 'www' represent in a domain?", a: ["World Wide Web", "Wide World Web", "Web Resource", "Web Request"], correct: 0 },
+            { q: "What is DNS caching?", a: ["Storing DNS lookups", "Cache cleaning", "Data storage", "Name resolution"], correct: 0 },
+            { q: "What is an AAAA record?", a: ["IPv6 address", "IPv4 address", "Alias record", "Mail record"], correct: 0 },
+            { q: "What is a PTR record?", a: ["Reverse DNS lookup", "Pointer record", "Both a and b", "Priority record"], correct: 0 },
+            { q: "What is DNS propagation?", a: ["DNS changes spreading", "Signal propagation", "Network spread", "Data transfer"], correct: 0 },
+            { q: "What is the hosts file?", a: ["Local DNS mapping", "Network hosts", "Server list", "Domain list"], correct: 0 },
+            { q: "What is a TXT record?", a: ["Text information", "Transfer record", "Tax record", "Time record"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the difference between authoritative and recursive DNS?", a: ["Authoritative has zone data, recursive queries for clients", "Same thing", "Recursive is faster", "Authoritative is local only"], correct: 0 },
+            { q: "What is DNS zone transfer?", a: ["Copy zone between servers", "Transfer domain", "Move records", "Migrate DNS"], correct: 0 },
+            { q: "What is DNSSEC?", a: ["DNS Security extensions", "DNS Encryption", "DNS Certificates", "DNS Signing"], correct: 0 },
+            { q: "What is a glue record?", a: ["NS records at parent zone", "Bonding records", "Link records", "Additional records"], correct: 0 },
+            { q: "What is DNS over HTTPS (DoH)?", a: ["DNS queries via HTTPS", "Secure DNS", "Encrypted queries", "All of above"], correct: 0 },
+            { q: "What is a DNS resolver?", a: ["Client's DNS server", "Authoritative server", "Root server", "TLD server"], correct: 0 },
+            { q: "What is negative caching?", a: ["Caching NXDOMAIN responses", "Negative results", "Error caching", "No caching"], correct: 0 },
+            { q: "What is the difference between NS and A records?", a: ["NS nameserver, A IP address", "Same thing", "NS is alias", "No difference"], correct: 0 },
+            { q: "What is Anycast DNS?", a: ["Multiple servers same IP", "Single server", "Any DNS", "Public DNS"], correct: 0 },
+            { q: "What is a SRV record?", a: ["Service location", "Server record", "Service record", "Source record"], correct: 0 },
+            { q: "What is split-horizon DNS?", a: ["Different answers based on client", "DNS partitioning", "Multiple views", "All of above"], correct: 0 },
+            { q: "What is DNS cache poisoning?", a: ["Corrupting DNS cache", "Caching malware", "Injecting false data", "All of above"], correct: 0 },
+            { q: "What is a CAA record?", a: ["Certificate Authority Authorization", "Cache Access", "Central Auth", "Cert Access"], correct: 0 },
+            { q: "What is TTL propagation time?", a: ["Time for cache expiry", "Time to resolve", "Transfer time", "Test time"], correct: 0 },
+            { q: "What is a forwarder in DNS?", a: ["Forwards queries to upstream", "Routes traffic", "Proxies requests", "All of above"], correct: 0 },
+            { q: "What is DNS damping?", a: ["Reducing query frequency", "Limiting updates", "Rate limiting", "All of above"], correct: 0 },
+            { q: "What is a DS record?", a: ["Delegation Signer", "Domain Signature", "Data Signature", "Direct Sign"], correct: 0 },
+            { q: "What is EDNS0?", a: ["Extension mechanisms for DNS", "Extra DNS data", "Enhanced DNS", "Extended DNS"], correct: 0 },
+            { q: "What is a CNAME chain?", a: ["Multiple CNAMEs in sequence", "Linked records", "Alias chain", "All of above"], correct: 0 },
+            { q: "What is DNS query logging?", a: ["Recording DNS queries", "Logging errors", "Access logs", "Query tracking"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "How do you configure BIND views for split-horizon?", a: ["match-clients directive", "view statement", "Both a and b", "Cannot do"], correct: 0 },
+            { q: "What is DNS zone signing?", a: ["DNSSEC zone keys", "Signing transfers", "Securing updates", "All of above"], correct: 0 },
+            { q: "How do you implement DNS load balancing?", a: ["Multiple A records", "Geographic DNS", "Anycast", "All common"], correct: 0 },
+            { q: "What is Response Policy Zone (RPZ)?", a: ["DNS firewall", "Blocklist in DNS", "Both a and b", "Not used"], correct: 0 },
+            { q: "How do you secure zone transfers?", a: ["allow-transfer", "TSIG keys", "Both required", "Not secured"], correct: 0 },
+            { q: "What is DANE (DNS-based Authentication)?", a: ["TLSA records for certificates", "DNS authentication", "Certificate binding", "All of above"], correct: 0 },
+            { q: "How do you configure DNS failover?", a: ["Health checks + monitoring", "Multiple records", "Third-party", "All used"], correct: 0 },
+            { q: "What is DNS64/NAT64?", a: ["IPv6 transition mechanism", "NAT for DNS", "Translation", "All of above"], correct: 0 },
+            { q: "How do you implement DNS views for geolocation?", a: ["GeoDNS based on IP", "EDNS Client Subnet", "Both common", "Not possible"], correct: 0 },
+            { q: "What is DNS zone maintenance?", a: ["AXFR/IXFR transfers", "Zone signing", "Cache management", "All involved"], correct: 0 },
+            { q: "How do you configure DNS response rate limiting?", a: ["rate-limit statement", "Response limiting", "Query throttling", "All used"], correct: 0 },
+            { q: "What is DNS catalogue zones?", a: ["Automatic zone distribution", "Zone replication", "DNS automation", "All of above"], correct: 0 },
+            { q: "How do you implement DNS over TLS (DoT)?", a: ["Port 853", "TLS encryption", "Both required", "Not supported"], correct: 0 },
+            { q: "What is BGP-based DNS failover?", a: ["Anycast + BGP", "Route failover", "IP switching", "All involved"], correct: 0 },
+            { q: "How do you configure DNSSEC validation?", a: ["dnssec-validation auto", "trusted-keys", "Both required", "Not needed"], correct: 0 },
+            { q: "What is DNS_cookie?", a: ["DNS transaction security", "Client authentication", "Server validation", "All of above"], correct: 0 },
+            { q: "How do you implement DNS query minimization?", a: ["qname-minimisation-strict", "Reduced query data", "Privacy feature", "All of above"], correct: 0 },
+            { q: "What is DNS zone expiration?", a: ["Secondary stops serving zone", "TTL expiry", "Refresh timeout", "All involved"], correct: 0 },
+            { q: "How do you configure DNSnotify?", a: ["Zone change notifications", "Secondary updates", "Automatic sync", "All used"], correct: 0 },
+            { q: "What is RFC 5011 trust anchor management?", a: ["Automatic DNSSEC key updates", "Key rollover", "Trust management", "All of above"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+
+        function initTest() {
+            difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0;
+            document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer'); container.innerHTML = '';
+            const q = currentQuestions[currentQuestionIndex];
+            const qDiv = document.createElement('div'); qDiv.className = 'question-container active';
+            let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join('');
+            qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`;
+            container.appendChild(qDiv);
+            updateStats();
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex]; const btns = document.querySelectorAll('.answer-btn');
+            btns.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); else if (i === index) btn.classList.add('incorrect'); });
+            if (index === q.correct) { score += 10 + (streak * 2); streak++; consecutiveCorrect++; totalAnswered++; if (consecutiveCorrect >= 5 && difficulty !== 'hard') upgradeLevel(); }
+            else { streak = 0; consecutiveCorrect = 0; totalAnswered++; }
+            updateStats(); setTimeout(nextQuestion, 1000);
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++; if (currentQuestionIndex >= currentQuestions.length) { showResults(); return; }
+            if (currentQuestionIndex % 10 === 0 && difficulty === 'easy') { currentQuestions = [...currentQuestions, ...shuffle([...mediumQuestions]).slice(0, 10).map(q => shuffleAnswers(q))]; }
+            else if (currentQuestionIndex % 15 === 0 && difficulty === 'medium') { currentQuestions = [...currentQuestions, ...shuffle([...hardQuestions]).slice(0, 10).map(q => shuffleAnswers(q))]; }
+            renderQuestion();
+        }
+
+        function upgradeLevel() { if (currentLevel < 3) { currentLevel++; consecutiveCorrect = 0; document.getElementById('levelNum').textContent = currentLevel; difficulty = currentLevel === 2 ? 'medium' : 'hard'; } }
+
+        function updateStats() { document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; document.getElementById('progressFill').style.width = ((currentQuestionIndex) / currentQuestions.length * 100) + '%'; }
+
+        function showResults() { document.getElementById('quiz').style.display = 'none'; document.getElementById('resultScreen').classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '🎉' : '😔'; document.getElementById('resultText').textContent = pass ? 'Level Complete!' : 'Keep Practicing'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score} | Best Streak: ${maxStreak}`; document.getElementById('resultDetails').textContent = `You answered ${totalAnswered} questions at Level ${currentLevel}`; }
+
+        function restartTest() { initTest(); }
+        initTest();
+    </script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-grafana.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafana Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+    </nav>
+    <div class="test-container">
+        <div class="test-header"><h1>// GRAFANA TEST</h1><p>Prove your Grafana monitoring mastery</p></div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const easyQuestions = [
+            { q: "What is Grafana?", a: ["Open source visualization platform", "Database", "Web server", "Email server"], correct: 0 },
+            { q: "What is Grafana used for?", a: ["Dashboard and visualization", "File storage", "Code hosting", "Email"], correct: 0 },
+            { q: "What is 'datasource' in Grafana?", a: ["Backend that provides data", "Data source file", "User data", "Config data"], correct: 0 },
+            { q: "What is 'dashboard' in Grafana?", a: ["Visual display of metrics", "Data source", "User dashboard", "Admin panel"], correct: 0 },
+            { q: "What is 'panel' in Grafana?", a: ["Individual visualization component", "Full dashboard", "Data source", "User"], correct: 0 },
+            { q: "What is 'query' in Grafana?", a: ["Request for data from datasource", "Search", "Find", "Filter"], correct: 0 },
+            { q: "What is 'Prometheus'?", a: ["Common datasource for Grafana", "Visualization", "Dashboard", "User"], correct: 0 },
+            { q: "What is 'Graph' panel?", a: ["Time series visualization", "Pie chart", "Stat display", "Table view"], correct: 0 },
+            { q: "What is 'Singlestat' panel?", a: ["Single value display", "Multiple stats", "Time series", "Log view"], correct: 0 },
+            { q: "What is 'Table' panel?", a: ["Tabular data display", "Graph", "Chart", "Stat"], correct: 0 },
+            { q: "What is 'Pie chart' panel?", a: ["Proportional data visualization", "Time series", "Table", "Stat"], correct: 0 },
+            { q: "What is 'Gauge' panel?", a: ["Circular gauge visualization", "Bar graph", "Table", "List"], correct: 0 },
+            { q: "What is 'Alert' in Grafana?", a: ["Notification when condition met", "Warning only", "Error message", "Log entry"], correct: 0 },
+            { q: "What is 'annotation'?", a: ["Mark event on timeline", "Note", "Comment", "Tag"], correct: 0 },
+            { q: "What is 'variable' in Grafana?", a: ["Dynamic value for queries", "Constant", "Fixed value", "Setting"], correct: 0 },
+            { q: "What is 'folder' in Grafana?", a: ["Organize dashboards", "Directory", "Container", "Group"], correct: 0 },
+            { q: "What is default Grafana port?", a: ["3000", "80", "8080", "9090"], correct: 0 },
+            { q: "What is 'Time range'?", a: ["Period for data display", "Time zone", "Time format", "Time shift"], correct: 0 },
+            { q: "What is 'Refresh rate'?", a: ["How often to fetch data", "Data age", "Time range", "Load speed"], correct: 0 },
+            { q: "What is 'templating'?", a: ["Using variables in queries", "Templates", "Themes", "Alerts"], correct: 0 },
+            { q: "What is 'Quick range'?", a: ["Preset time range options", "Fast selection", "Quick filter", "Speed"], correct: 0 },
+            { q: "What is 'Relative time'?", a: ["Time relative to now", "Fixed time", "Absolute time", "Past time"], correct: 0 },
+            { q: "What is 'Time shift'?", a: ["Compare time periods", "Change timezone", "Shift data", "Offset"], correct: 0 },
+            { q: "What is 'JSON datasource'?", a: ["Query JSON over HTTP", "JSON storage", "JSON file", "JSON API"], correct: 0 },
+            { q: "What is 'Graphite'?", a: ["Time series datasource", "Graph tool", "Visualization", "Chart"], correct: 0 },
+            { q: "What is 'InfluxDB'?", a: ["Time series database", "Relational DB", "NoSQL", "Graph DB"], correct: 0 },
+            { q: "What is 'MySQL' datasource?", a: ["Query MySQL database", "Time series", "Graph DB", "NoSQL"], correct: 0 },
+            { q: "What is 'PostgreSQL' datasource?", a: ["Query PostgreSQL database", "Time series", "NoSQL", "Graph DB"], correct: 0 },
+            { q: "What is 'Loki'?", a: ["Log aggregation system", "Time series", "Metric DB", "Trace DB"], correct: 0 },
+            { q: "What is 'Tempo'?", a: ["Distributed tracing backend", "Time series", "Log aggr", "Metric"], correct: 0 },
+            { q: "What is 'Alertmanager'?", a: ["Handles alert notifications", "Alert panel", "Alert list", "Alert rule"], correct: 0 },
+            { q: "What is 'Provisioning' in Grafana?", a: ["Auto-create datasources/dashboards", "Alerts", "Users", "Settings"], correct: 0 },
+            { q: "What is 'HTTP API'?", a: ["Programmatic Grafana access", "Web interface", "Admin API", "User API"], correct: 0 },
+            { q: "What is 'Export' in Grafana?", a: ["Download dashboard as JSON", "Print", "Save", "Share"], correct: 0 },
+            { q: "What is 'Import' in Grafana?", a: ["Load dashboard from JSON", "Upload", "Add", "Create"], correct: 0 },
+            { q: "What is 'User' in Grafana?", a: ["Account for accessing Grafana", "Admin", "Viewer", "Editor"], correct: 0 },
+            { q: "What are 'Organization'?", a: ["Tenant for grouping", "Team", "Group", "Folder"], correct: 0 },
+            { q: "What is 'Team' in Grafana?", a: ["Group of users", "Org", "Admin group", "Viewer group"], correct: 0 },
+            { q: "What is 'Snapshot'?", a: ["Point-in-time dashboard copy", "Image", "Backup", "Export"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is 'aggregations' in queries?", a: ["Combine data points", "Filter data", "Transform", "Group"], correct: 0 },
+            { q: "What is 'rate()' function?", a: ["Calculate per-second rate", "Average", "Count", "Sum"], correct: 0 },
+            { q: "What is 'increase()' function?", a: ["Total increase over period", "Rate", "Delta", "Count"], correct: 0 },
+            { q: "What is 'sum()' aggregation?", a: ["Add all values", "Average", "Min", "Max"], correct: 0 },
+            { q: "What is 'avg()' aggregation?", a: ["Calculate mean", "Sum", "Min", "Max"], correct: 0 },
+            { q: "What is 'min()' and 'max()'?", a: ["Minimum and maximum", "Average", "Sum", "Count"], correct: 0 },
+            { q: "What is 'count()'?", a: ["Count number of points", "Sum", "Average", "Min"], correct: 0 },
+            { q: "What is 'group by'?", a: ["Group data by tag/time", "Filter", "Aggregate", "Transform"], correct: 0 },
+            { q: "What is 'fill' mode?", a: ["Fill missing data points", "Delete", "Skip", "Average"], correct: 0 },
+            { q: "What is 'alias' in query?", a: ["Rename query result", "Filter", "Group", "Aggregate"], correct: 0 },
+            { q: "What is 'legend'?", a: ["Label for time series", "Title", "Axis", "Grid"], correct: 0 },
+            { q: "What is 'stacking'?", a: ["Stack series on graph", "Line", "Point", "Bar"], correct: 0 },
+            { q: "What is 'line width'?", a: ["Thickness of line", "Style", "Color", "Fill"], correct: 0 },
+            { q: "What is 'fill opacity'?", a: ["Transparency of area fill", "Line width", "Color", "Style"], correct: 0 },
+            { q: "What is 'gradient mode'?", a: ["Area fill gradient style", "Line style", "Color scheme", "Legend"], correct: 0 },
+            { q: "What is 'thresholds' in panel?", a: ["Color based on value", "Lines", "Points", "Legend"], correct: 0 },
+            { q: "What is 'override' in panel?", a: ["Customize specific series", "Replace", "Remove", "Add"], correct: 0 },
+            { q: "What is 'data link'?", a: ["Link to external URL", "Internal link", "Panel link", "Dash link"], correct: 0 },
+            { q: "What is 'unit' in panel?", a: ["Display unit for value", "Format", "Label", "Title"], correct: 0 },
+            { q: "What is 'decimals' setting?", a: ["Decimal places", "Format", "Unit", "Label"], correct: 0 },
+            { q: "What is 'min'/'max' in axis?", a: ["Y-axis range", "Data range", "Scale", "Limit"], correct: 0 },
+            { q: "What is 'log scale'?", a: ["Logarithmic Y-axis", "Linear", "Time", "Ordinal"], correct: 0 },
+            { q: "What is 'reverse' Y-axis?", a: ["Flip axis direction", "Mirror", "Invert", "Flip X"], correct: 0 },
+            { q: "What is 'tooltip'?", a: ["Show data on hover", "Title", "Legend", "Label"], correct: 0 },
+            { q: "What is 'shared cursor'?", a: ["Sync tooltips across panels", "Share panel", "Share data", "Share cursor"], correct: 0 },
+            { q: "What is 'value mapping'?", a: ["Map values to text", "Format", "Transform", "Filter"], correct: 0 },
+            { q: "What is 'range mapping'?", a: ["Map value ranges to text", "Value map", "Range map", "Text map"], correct: 0 },
+            { q: "What is 'heatmap' panel?", a: ["Color-coded density", "Graph", "Table", "Stat"], correct: 0 },
+            { q: "What is 'bar chart' panel?", a: ["Bar visualization", "Graph", "Heatmap", "Pie"], correct: 0 },
+            { q: "What is 'state timeline'?", a: ["State over time", "Timeline", "Graph", "Table"], correct: 0 },
+            { q: "What is 'status history'?", a: ["Multiple states over time", "Status", "History", "Timeline"], correct: 0 },
+            { q: "What is 'alert rule'?", a: ["Define alert conditions", "Alert notification", "Alert state", "Alert group"], correct: 0 },
+            { q: "What is 'alert query'?", a: ["Data source for alert", "Alert rule", "Alert notify", "Alert state"], correct: 0 },
+            { q: "What is 'evaluator' in alert?", a: ["Condition evaluation type", "Time", "Query", "Notify"], correct: 0 },
+            { q: "What is 'for' duration in alert?", a: ["How long condition must be true", "Alert period", "Check interval", "Notify delay"], correct: 0 },
+            { q: "What is 'no data' handling?", a: ["What to do when no data", "Error", "Warning", "Info"], correct: 0 },
+            { q: "What is 'notification channel'?", a: ["Where to send alerts", "Alert rule", "Alert state", "Alert query"], correct: 0 },
+            { q: "What is 'email' notification?", a: ["Send alerts via email", "Chat", "Webhook", "Slack"], correct: 0 },
+            { q: "What is 'Slack' notification?", a: ["Send alerts to Slack", "Email", "Webhook", "Teams"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is 'PromQL'?", a: ["Prometheus query language", "Query language", "Data source", "API"], correct: 0 },
+            { q: "What is 'vector' in PromQL?", a: ["Single time series", "Range", "Scalar", "Matrix"], correct: 0 },
+            { q: "What is 'range vector' in PromQL?", a: ["Multiple points over time", "Single point", "Scalar", "Instant"], correct: 0 },
+            { q: "What is 'label matching'?", a: ["Filter by label values", "Add label", "Remove label", "Change label"], correct: 0 },
+            { q: "What is 'label_replace'?", a: ["Add/modify labels", "Remove labels", "Filter labels", "Select labels"], correct: 0 },
+            { q: "What is 'histogram_quantile()'?", a: ["Calculate quantile from histogram", "Count", "Sum", "Average"], correct: 0 },
+            { q: "What is 'subquery' in PromQL?", a: ["Nested query with range", "Query in query", "Subselect", "Inner query"], correct: 0 },
+            { q: "What is 'recording rule'?", a: ["Pre-compute expensive queries", "Alert rule", "Query rule", "Data rule"], correct: 0 },
+            { q: "What is 'recording rule group'?", a: ["Collection of recording rules", "Rule file", "Rule set", "Rule folder"], correct: 0 },
+            { q: "What is 'recording rule interval'?", a: ["How often to evaluate", "Alert interval", "Query time", "Data interval"], correct: 0 },
+            { q: "What is ' Grafana Alertmanager integration'?", a: ["Use external Alertmanager", "Built-in", "Plugin", "Default"], correct: 0 },
+            { q: "What is 'silence' in Alertmanager?", a: ["Temporarily mute alerts", "Delete alert", "Archive alert", "Skip alert"], correct: 0 },
+            { q: "What is 'inhibit' rule?", a: ["Suppress related alerts", "Alert rule", "Silence", "Group"], correct: 0 },
+            { q: "What is 'routing' in Alertmanager?", a: ["Route alerts to receivers", "Alert rule", "Alert group", "Receiver"], correct: 0 },
+            { q: "What is 'matcher' in routing?", a: ["Filter alerts by labels", "Group alerts", "Route alerts", "Silence alerts"], correct: 0 },
+            { q: "What is 'continue' in routing?", a: ["Continue to child routes", "Stop routing", "Pause routing", "End routing"], correct: 0 },
+            { q: "What is 'nested folder'?", a: ["Folder hierarchy", "Root folder", "Dashboard", "Panel"], correct: 0 },
+            { q: "What is 'permissions' inheritance?", a: ["Child inherits parent permissions", "No inheritance", "Explicit only", "Admin only"], correct: 0 },
+            { q: "What is 'team permissions'?", a: ["Permission for team members", "User perm", "Org perm", "Role perm"], correct: 0 },
+            { q: "What is 'admin' role?", a: ["Full access to Grafana", "Edit access", "View only", "No access"], correct: 0 },
+            { q: "What is 'editor' role?", a: ["Can edit dashboards", "Admin", "Viewer", "No role"], correct: 0 },
+            { q: "What is 'viewer' role?", a: ["Read-only access", "Admin", "Editor", "No role"], correct: 0 },
+            { q: "What is 'data source permission'?", a: ["Control who can query", "Data source", "User", "Org"], correct: 0 },
+            { q: "What is 'API key'?", a: ["Auth for HTTP API", "Password", "Token", "Key"], correct: 0 },
+            { q: "What is 'service account'?", a: ["Non-human authentication", "User account", "API key", "Token"], correct: 0 },
+            { q: "What is 'OAuth' integration?", a: ["External auth provider", "Auth token", "Password", "API key"], correct: 0 },
+            { q: "What is 'LDAP' integration?", a: ["Directory service auth", "Auth provider", "OAuth type", "SSO"], correct: 0 },
+            { q: "What is 'SAML'?", a: ["SSO protocol", "Auth type", "OAuth", "LDAP"], correct: 0 },
+            { q: "What is 'high availability' setup?", a: ["Multiple Grafana instances", "Single instance", "Backup", "Cluster"], correct: 0 },
+            { q: "What is 'remote cache'?", a: ["Share data between instances", "Data source", "Local cache", "Query cache"], correct: 0 },
+            { q: "What is 'query caching'?", a: ["Cache query results", "Data cache", "Result cache", "API cache"], correct: 0 },
+            { q: "What is 'image rendering'?", a: ["Generate dashboard images", "Render panel", "Render graph", "Screenshot"], correct: 0 },
+            { q: "What is 'renderer plugin'?", a: ["Handle image generation", "Panel plugin", "Data source", "App"], correct: 0 },
+            { q: "What is 'Grafana plugin'?", a: ["Extend Grafana functionality", "Extension", "Module", "Add-on"], correct: 0 },
+            { q: "What is 'data source plugin'?", a: ["Add new data source", "Panel", "App", "Datasource"], correct: 0 },
+            { q: "What is 'panel plugin'?", a: ["Add new visualization", "Data source", "App", "Datasource"], correct: 0 },
+            { q: "What is 'app plugin'?", a: ["Bundle features together", "Panel", "Data source", "Datasource"], correct: 0 },
+            { q: "What is 'frontend plugin'?", a: ["Frontend-only extensions", "Backend plugin", "Panel plugin", "App"], correct: 0 },
+            { q: "What is 'backend plugin'?", a: ["Run code on backend", "Frontend plugin", "Panel", "App"], correct: 0 },
+            { q: "What is 'Grafana Enterprise'?", a: ["Commercial Grafana version", "Open source", "Free version", "Trial"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            const q = currentQuestions[currentQuestionIndex];
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`;
+            container.appendChild(qDiv);
+            updateStats();
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(btn => btn.disabled = true);
+            if (index === q.correct) {
+                buttons[index].classList.add('correct');
+                score += 10 + (streak * 2);
+                streak++;
+                consecutiveCorrect++;
+                if (streak > maxStreak) maxStreak = streak;
+            } else {
+                buttons[index].classList.add('incorrect');
+                buttons[q.correct].classList.add('correct');
+                streak = 0;
+                consecutiveCorrect = 0;
+            }
+            totalAnswered++;
+            if (consecutiveCorrect >= 3 && difficulty === 'easy') {
+                difficulty = 'medium';
+                currentLevel = 2;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            } else if (consecutiveCorrect >= 3 && difficulty === 'medium') {
+                difficulty = 'hard';
+                currentLevel = 3;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            }
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex >= currentQuestions.length) {
+                    showResults();
+                } else {
+                    renderQuestion();
+                }
+            }, 1500);
+        }
+
+        function loadNextDifficulty() {
+            let newQuestions;
+            if (difficulty === 'medium') {
+                newQuestions = shuffle([...mediumQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            } else if (difficulty === 'hard') {
+                newQuestions = shuffle([...hardQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            }
+            currentQuestions = [...currentQuestions, ...newQuestions];
+        }
+
+        function updateStats() {
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+            const progress = (currentQuestionIndex / currentQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('resultScreen').classList.add('active');
+            const percentage = (score / (currentQuestions.length * 10)) * 100;
+            const passed = percentage >= 50;
+            document.getElementById('resultIcon').textContent = passed ? '🏆' : '📚';
+            document.getElementById('resultText').textContent = passed ? 'PASSED!' : 'KEEP LEARNING';
+            document.getElementById('resultText').className = 'result-text ' + (passed ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score} | Max Streak: ${maxStreak}`;
+            document.getElementById('resultDetails').textContent = passed ? 'You have mastered Grafana!' : 'Review the Grafana guide and try again.';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        initTest();
+    </script>
+</body>
+</html>

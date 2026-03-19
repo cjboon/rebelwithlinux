@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/builders/builder-grafana.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafana Builder - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--white); color: var(--black); font-family: 'Courier New', monospace; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; padding: 20px; }
+        .header h1 { font-size: 28px; color: #f79c25; margin-bottom: 8px; letter-spacing: 2px; }
+        .header p { color: var(--charcoal); font-size: 14px; }
+        .stats-bar { display: flex; gap: 30px; margin-bottom: 30px; background: var(--beige); padding: 15px 30px; border-radius: 8px; border: 1px solid var(--charcoal); }
+        .stat { text-align: center; }
+        .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #58a6ff; }
+        .stat-value.score { color: #4eaa25; }
+        .game-container { background: var(--beige); border-radius: 12px; padding: 30px; max-width: 800px; width: 100%; border: 1px solid var(--charcoal); display: none; }
+        .game-container.active { display: block; }
+        .level-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+        .level-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--charcoal); }
+        .level-dot.completed { background: #4eaa25; }
+        .level-dot.current { background: #58a6ff; }
+        .question-box { background: var(--white); border-radius: 8px; padding: 20px; margin-bottom: 25px; border-left: 4px solid #f79c25; }
+        .question-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .question-text { font-size: 16px; color: var(--black); line-height: 1.6; }
+        .hint-text { margin-top: 12px; font-size: 13px; color: #d29922; font-style: italic; }
+        .answer-area { background: var(--white); border-radius: 8px; padding: 20px; margin-bottom: 25px; min-height: 80px; border: 2px dashed var(--charcoal); }
+        .answer-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+        .letter-slots { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; min-height: 50px; align-items: center; }
+        .letter-slot { width: 46px; height: 46px; background: var(--white); border: 2px dashed var(--charcoal); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; color: var(--black); }
+        .letter-slot.filled { border-style: solid; border-color: #f79c25; }
+        .letter-pool { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 20px; background: var(--white); border-radius: 8px; min-height: 80px; }
+        .letter-tile { width: 46px; height: 46px; background: linear-gradient(135deg, #f79c25, #d68a1e); border-radius: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; color: var(--white); cursor: grab; transition: all 0.2s ease; user-select: none; }
+        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(247, 156, 37, 0.3); }
+        .actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .btn { padding: 12px 24px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s ease; border: none; }
+        .btn-primary { background: #238636; color: white; }
+        .btn-secondary { background: var(--charcoal); color: var(--black); border: 1px solid var(--charcoal); }
+        .feedback { padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; display: none; }
+        .feedback.success { display: block; background: rgba(38, 77, 228, 0.1); border: 1px solid #264de4; color: #264de4; }
+        .feedback.error { display: block; background: rgba(248, 81, 73, 0.1); border: 1px solid #f85149; color: #f85149; }
+        .completion-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; z-index: 1000; }
+        .completion-modal.active { display: flex; }
+        .modal-content { background: var(--beige); padding: 40px; border-radius: 12px; text-align: center; border: 1px solid var(--charcoal); max-width: 400px; }
+        .modal-content h2 { color: #4eaa25; margin-bottom: 20px; }
+        .back-link { display: inline-block; margin-top: 20px; color: #58a6ff; text-decoration: none; font-size: 14px; }
+        .progress-info { margin-top: 20px; text-align: center; color: var(--charcoal); font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 GRAFANA BUILDER</h1>
+        <p>Drag & drop to learn Grafana terms</p>
+    </div>
+    <div class="stats-bar">
+        <div class="stat"><div class="stat-label">Level</div><div class="stat-value" id="levelNum">1</div></div>
+        <div class="stat"><div class="stat-label">Score</div><div class="stat-value score" id="score">0</div></div>
+        <div class="stat"><div class="stat-label">Streak</div><div class="stat-value" id="streak">0</div></div>
+    </div>
+    <div class="game-container active" id="gameContainer">
+        <div class="level-indicator" id="levelIndicator"></div>
+        <div class="question-box">
+            <div class="question-label">Challenge</div>
+            <div class="question-text" id="questionText"></div>
+            <div class="hint-text" id="hintText"></div>
+        </div>
+        <div class="answer-area">
+            <div class="answer-label">Your Answer</div>
+            <div class="letter-slots" id="letterSlots"></div>
+        </div>
+        <div class="letter-pool" id="letterPool"></div>
+        <div class="feedback" id="feedback"></div>
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="clearAnswer()">Clear</button>
+            <button class="btn btn-primary" onclick="checkAnswer()">Submit</button>
+        </div>
+        <div class="progress-info">Question <span id="currentQ">1</span> of <span id="totalQ">10</span></div>
+    </div>
+    <div class="completion-modal" id="completionModal">
+        <div class="modal-content">
+            <h2>🎉 Level Complete!</h2>
+            <p>You scored <span id="finalScore">0</span> points!</p>
+            <button class="btn btn-primary" onclick="nextLevel()">Next Level</button>
+        </div>
+    </div>
+    <a href="builder-main.html" class="back-link">&lt;&lt; back to builder games</a>
+    <script>
+        const levels = [
+            { questions: [
+                { answer: "panel", hint: "Visualization component", code: "Individual chart" },
+                { answer: "query", hint: "Data request", code: "Request from datasource" },
+                { answer: "alert", hint: "Notification", code: "Condition-based alert" },
+                { answer: "dashboard", hint: "Metric display", code: "Collection of panels" },
+                { answer: "datasource", hint: "Data backend", code: "Provides data" },
+                { answer: "folder", hint: "Organization", code: "Group dashboards" },
+                { answer: "variable", hint: "Dynamic value", code: "Template variable" },
+                { answer: "theme", hint: "Visual style", code: "Color settings" },
+                { answer: "user", hint: "Account", code: "Access account" },
+                { answer: "plugin", hint: "Extension", code: "Add features" }
+            ]},
+            { questions: [
+                { answer: "prometheus", hint: "Time-series DB", code: "Common datasource" },
+                { answer: "loki", hint: "Log aggregator", code: "Log datasource" },
+                { answer: "tempo", hint: "Tracing", code: "Trace backend" },
+                { answer: "influxdb", hint: "Time-series DB", code: "Metric storage" },
+                { answer: "graphite", hint: "Metrics DB", code: "Old datasource" },
+                { answer: "override", hint: "Customize series", code: "Panel setting" },
+                { answer: "threshold", hint: "Color breakpoint", code: "Alert condition" },
+                { answer: "templating", hint: "Use variables", code: "Dynamic queries" },
+                { answer: "legend", hint: "Series label", code: "Chart label" },
+                { answer: "heatmap", hint: "Density chart", code: "Color visualization" }
+            ]},
+            { questions: [
+                { answer: "promql", hint: "Query language", code: "Prometheus query" },
+                { answer: "recordingrule", hint: "Pre-compute", code: "Cached query" },
+                { answer: "alertmanager", hint: "Alert handler", code: "Route alerts" },
+                { answer: "silence", hint: "Mute alerts", code: "Temp suppress" },
+                { answer: "provisioning", hint: "Auto-setup", code: "Config as code" },
+                { answer: "serviceaccount", hint: "Programmatic access", code: "API auth" },
+                { answer: "snapshot", hint: "Point-in-time copy", code: "Dashboard backup" },
+                { answer: "oauth", hint: "External auth", code: "SSO login" },
+                { answer: "highavailability", hint: "Multiple instances", code: "HA setup" },
+                { answer: "remote", definition: "Central fetch", code: "Data source" }
+            ]}
+        ];
+        let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null;
+        function initLevel() { const level = levels[currentLevel]; document.getElementById('levelNum').textContent = currentLevel + 1; document.getElementById('totalQ').textContent = level.questions.length; renderLevelIndicator(); loadQuestion(); }
+        function renderLevelIndicator() { const level = levels[currentLevel]; const indicator = document.getElementById('levelIndicator'); indicator.innerHTML = ''; for (let i = 0; i < level.questions.length; i++) { const dot = document.createElement('div'); dot.className = 'level-dot'; if (i < currentQuestion) dot.classList.add('completed'); if (i === currentQuestion) dot.classList.add('current'); indicator.appendChild(dot); } }
+        function loadQuestion() { const q = levels[currentLevel].questions[currentQuestion]; document.getElementById('currentQ').textContent = currentQuestion + 1; document.getElementById('questionText').textContent = q.code; document.getElementById('hintText').textContent = q.hint; document.getElementById('feedback').className = 'feedback'; placedLetters = new Array(q.answer.length).fill(null); renderLetterSlots(); renderLetterPool(); renderLevelIndicator(); }
+        function renderLetterSlots() { const slotsContainer = document.getElementById('letterSlots'); slotsContainer.innerHTML = ''; placedLetters.forEach((item, index) => { const slot = document.createElement('div'); slot.className = 'letter-slot' + (item ? ' filled' : ''); slot.textContent = item ? item.letter : ''; if (item) slot.addEventListener('click', () => removeLetter(index)); slot.addEventListener('dragover', e => e.preventDefault()); slot.addEventListener('drop', e => { e.preventDefault(); handleDrop(index); }); slotsContainer.appendChild(slot); }); }
+        function renderLetterPool() { const pool = document.getElementById('letterPool'); pool.innerHTML = ''; const answer = levels[currentLevel].questions[currentQuestion].answer; const letters = answer.split('').map((letter, i) => ({ letter, index: i })); letters.sort(() => Math.random() - 0.5); const placedIndices = placedLetters.map(l => l !== null ? l.index : -1).filter(i => i !== -1); letters.forEach(item => { if (placedIndices.includes(item.index)) return; const tile = document.createElement('div'); tile.className = 'letter-tile'; tile.textContent = item.letter; tile.draggable = true; tile.addEventListener('dragstart', e => draggedLetter = { letter: item.letter, index: item.index }); tile.addEventListener('click', () => clickToPlace(item.letter, item.index)); pool.appendChild(tile); }); }
+        function clickToPlace(letter, originalIndex) { const emptyIndex = placedLetters.findIndex(l => l === null); if (emptyIndex !== -1) { placedLetters[emptyIndex] = { letter, index: originalIndex }; renderLetterSlots(); renderLetterPool(); if (!placedLetters.includes(null)) setTimeout(checkAnswer, 300); } }
+        function handleDrop(slotIndex) { if (draggedLetter && placedLetters[slotIndex] === null) { placedLetters[slotIndex] = draggedLetter; renderLetterSlots(); renderLetterPool(); draggedLetter = null; } }
+        function removeLetter(index) { placedLetters[index] = null; renderLetterSlots(); renderLetterPool(); }
+        function clearAnswer() { placedLetters = placedLetters.map(() => null); renderLetterSlots(); renderLetterPool(); }
+        function checkAnswer() { const correct = levels[currentLevel].questions[currentQuestion].answer.toLowerCase(); const answer = placedLetters.map(l => l ? l.letter.toLowerCase() : '').join(''); const feedback = document.getElementById('feedback'); if (answer === correct) { feedback.className = 'feedback success'; feedback.textContent = '✓ Correct!'; score += 10 + (streak * 2); streak++; setTimeout(() => { currentQuestion++; if (currentQuestion >= levels[currentLevel].questions.length) { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); } else { loadQuestion(); } }, 1000); } else { feedback.className = 'feedback error'; feedback.textContent = '✗ Try again!'; streak = 0; } document.getElementById('score').textContent = score; document.getElementById('streak').textContent = streak; }
+        function nextLevel() { document.getElementById('completionModal').classList.remove('active'); currentLevel++; currentQuestion = 0; if (currentLevel >= levels.length) currentLevel = 0; initLevel(); }
+        initLevel();
+    </script>
+</body>
+</html>

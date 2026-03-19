@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-hardening.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hardening Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); }
+        .theme-toggle-checkbox { display: none; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../search.html" style="color: var(--charcoal);">SEARCH</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="../account.html" id="loginLink" class="auth-link" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// HARDENING TEST</h1>
+            <p>Prove your system hardening mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What is system hardening?", a: ["Reducing attack surface", "Hardening software", "Physical security", "All of above"], correct: 0 },
+            { q: "What is the principle of least privilege?", a: ["Minimal permissions needed", "All privileges", "No privileges", "Maximum access"], correct: 0 },
+            { q: "What does 'disable root login' mean?", a: ["Prevent root SSH access", "Disable root account", "Remove root", "Lock root"], correct: 0 },
+            { q: "What is a firewall?", a: ["Network security filter", "Antivirus", "Encryption", "Backup system"], correct: 0 },
+            { q: "What is SSH key-based authentication?", a: ["Passwordless login using keys", "Secure password", "Token auth", "Biometric"], correct: 0 },
+            { q: "What does 'ufw' stand for?", a: ["Uncomplicated Firewall", "Unified Firewall", "User Firewall", "Universal Firewall"], correct: 0 },
+            { q: "What is fail2ban?", a: ["Blocks brute force attacks", "Firewall", "Antivirus", "IDS"], correct: 0 },
+            { q: "What is SSH port forwarding?", a: ["Tunnel traffic through SSH", "Port blocking", "Port scanning", "Port filtering"], correct: 0 },
+            { q: "What is a strong password policy?", a: ["Complex, long, changed regularly", "Simple password", "Same password", "No password"], correct: 0 },
+            { q: "What is two-factor authentication?", a: ["Something you know + have", "Two passwords", "Two users", "Two logins"], correct: 0 },
+            { q: "What does 'sudo' do?", a: ["Execute as root", "Super user", "Both a and b", "Security"], correct: 0 },
+            { q: "What is IPtables?", a: ["Linux firewall tool", "Network tool", "Security tool", "Monitoring"], correct: 0 },
+            { q: "What is network segmentation?", a: ["Separating network zones", "Segmenting disks", "Memory segmentation", "None"], correct: 0 },
+            { q: "What is a DMZ?", a: ["Demilitarized zone - public network", "Database zone", "Data zone", "None"], correct: 0 },
+            { q: "What does 'chmod 600' do?", a: ["Owner read/write only", "Everyone read", "Everyone write", "No permissions"], correct: 0 },
+            { q: "What is port knocking?", a: ["Hidden ports opened by sequence", "Port scanning", "Port blocking", "Port forwarding"], correct: 0 },
+            { q: "What is a honeypot?", a: ["Decoy system to trap attackers", "Honey trap", "Sweet system", "None"], correct: 0 },
+            { q: "What does 'disable services' mean?", a: ["Turn off unused services", "Remove services", "Hide services", "Block services"], correct: 0 },
+            { q: "What is SELinux?", a: ["Security Enhanced Linux", "Simple Linux", "Secure Linux", "System Linux"], correct: 0 },
+            { q: "What is AppArmor?", a: ["Linux security module", "Application armor", "Application protection", "None"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the difference between iptables and nftables?", a: ["nftables is newer unified", "Same thing", "iptables faster", "No difference"], correct: 0 },
+            { q: "What is a security benchmark?", a: ["Configuration standards", "Performance test", "Load test", "None"], correct: 0 },
+            { q: "What does 'kernel.sysctl' hardening involve?", a: ["Tuning kernel parameters", "Kernel updates", "Kernel compile", "None"], correct: 0 },
+            { q: "What is system audit logging?", a: ["Track system events", "User logs", "Network logs", "All logs"], correct: 0 },
+            { q: "What is the CIS benchmark?", a: ["Center for Internet Security standards", "Certification", "Security audit", "None"], correct: 0 },
+            { q: "What does 'enable auditd' provide?", a: ["Comprehensive audit trail", "Basic logging", "No logging", "Limited logs"], correct: 0 },
+            { q: "What is network intrusion detection?", a: ["Monitor for threats", "Block traffic", "Filter packets", "All of above"], correct: 0 },
+            { q: "What does 'harden SSH' include?", a: ["Disable password auth, use keys, change port", "Change banner", "Add users", "All small"], correct: 0 },
+            { q: "What is a privilege escalation attack?", a: ["Gain higher permissions", "Login attack", "Brute force", "None"], correct: 0 },
+            { q: "What does 'disable IPv6' help prevent?", a: ["Attack surface reduction", "Network issues", "Speed issues", "Nothing"], correct: 0 },
+            { q: "What is log monitoring?", a: ["Real-time log analysis", "Log storage", "Log rotation", "Log backup"], correct: 0 },
+            { q: "What does 'fs.suid_dumpable' control?", a: ["Core dump of setuid programs", "File permissions", "System dumps", "Memory dumps"], correct: 0 },
+            { q: "What is a security patch management?", a: ["Regularly update systems", "Patch testing", "Patch deployment", "All involved"], correct: 0 },
+            { q: "What does 'net.ipv4.icmp_echo_ignore_broadcasts' do?", a: ["Block ping sweeps", "Ignore pings", "Block broadcasts", "None"], correct: 0 },
+            { q: "What is an intrusion prevention system?", a: ["Detect and block threats", "Monitor only", "Log only", "None"], correct: 0 },
+            { q: "What does 'tcp_syncookies' protect against?", a: ["SYN flood attacks", "TCP issues", "Connection issues", "Nothing"], correct: 0 },
+            { q: "What is container security hardening?", a: ["Minimal images, no root, secrets management", "Docker install", "Container run", "None"], correct: 0 },
+            { q: "What does 'disable Ctrl+Alt+Delete' prevent?", a: ["Unexpected reboots", "Login", "Shutdown", "Nothing"], correct: 0 },
+            { q: "What is the purpose of 'sysctl' tuning?", a: ["Kernel parameter hardening", "System speed", "Memory tuning", "None"], correct: 0 },
+            { q: "What is a file integrity monitor?", a: ["Detect unauthorized changes", "Monitor files", "Check integrity", "All of above"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "How do you implement multi-factor authentication?", a: ["Combine auth methods", "Use tokens", "Use biometrics", "All used"], correct: 0 },
+            { q: "What is the difference between MAC, DAC, and RAC?", a: ["Mandatory, Discretionary, Role-based access", "Multiple access types", "Security levels", "None"], correct: 0 },
+            { q: "What does 'grsecurity' provide?", a: ["Kernel security patches", "Runtime protection", "Access control", "All of above"], correct: 0 },
+            { q: "What is a security information and event management (SIEM)?", a: ["Centralized security monitoring", "Log management", "Threat detection", "All of above"], correct: 0 },
+            { q: "How do you implement zero trust security?", a: ["Never trust, always verify", "Network-based", "Perimeter-based", "None"], correct: 0 },
+            { q: "What is Linux kernel live patching?", a: ["Apply security updates without reboot", "Patch management", "Kernel updates", "All of above"], correct: 0 },
+            { q: "What does 'Lynis' do?", a: ["Security auditing and hardening", "Vulnerability scan", "Compliance check", "All of above"], correct: 0 },
+            { q: "What is the difference between WAF and firewall?", a: ["WAF = web app firewall, traditional = network", "Same thing", "WAF faster", "No difference"], correct: 0 },
+            { q: "How do you implement defense in depth?", a: ["Multiple security layers", "Perimeter security", "Internal security", "All layers"], correct: 0 },
+            { q: "What is a security baseline?", a: ["Minimum security configuration", "Best practices", "Standards", "All of above"], correct: 0 },
+            { q: "What does 'aide' do?", a: ["File integrity checker", "Intrusion detection", "Log analysis", "All of above"], correct: 0 },
+            { q: "How do you secure Docker containers?", a: ["Non-root user, read-only rootfs, seccomp, capabilities drop", "Docker daemon", "Container images", "All basic"], correct: 0 },
+            { q: "What is OSSEC?", a: ["Host-based intrusion detection", "Security monitoring", "File integrity", "All of above"], correct: 0 },
+            { q: "How do you implement cryptographic policy?", a: ["TLS 1.3, strong ciphers only", "Certificate management", "Key rotation", "All involved"], correct: 0 },
+            { q: "What is RKHunter?", a: ["Rootkit detector", "Malware scanner", "Intrusion detection", "All of above"], correct: 0 },
+            { q: "How do you secure kernel parameters with sysctl?", a: ["Configure network, memory, process settings", "System tuning", "Performance", "None"], correct: 0 },
+            { q: "What is the CIS Docker Benchmark?", a: ["Container security standards", "Best practices", "Configuration", "All of above"], correct: 0 },
+            { q: "How do you implement mandatory access control?", a: ["SELinux/AppArmor policies", "Rule-based", "Label-based", "All used"], correct: 0 },
+            { q: "What is auditd rules configuration?", a: ["Track file access, commands, network", "System logging", "Security events", "All tracked"], correct: 0 },
+            { q: "How do you implement cloud security hardening?", a: ["IAM, network restrictions, encryption, monitoring", "Cloud config", "Security groups", "All used"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+
+        function initTest() {
+            difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0;
+            document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer'); container.innerHTML = '';
+            const q = currentQuestions[currentQuestionIndex];
+            const qDiv = document.createElement('div'); qDiv.className = 'question-container active';
+            let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join('');
+            qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`;
+            container.appendChild(qDiv);
+            updateStats();
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex]; const btns = document.querySelectorAll('.answer-btn');
+            btns.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); else if (i === index) btn.classList.add('incorrect'); });
+            if (index === q.correct) { score += 10 + (streak * 2); streak++; consecutiveCorrect++; totalAnswered++; if (consecutiveCorrect >= 5 && difficulty !== 'hard') upgradeLevel(); }
+            else { streak = 0; consecutiveCorrect = 0; totalAnswered++; }
+            updateStats(); setTimeout(nextQuestion, 1000);
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++; if (currentQuestionIndex >= currentQuestions.length) { showResults(); return; }
+            if (currentQuestionIndex % 10 === 0 && difficulty === 'easy') { currentQuestions = [...currentQuestions, ...shuffle([...mediumQuestions]).slice(0, 10).map(q => shuffleAnswers(q))]; }
+            else if (currentQuestionIndex % 15 === 0 && difficulty === 'medium') { currentQuestions = [...currentQuestions, ...shuffle([...hardQuestions]).slice(0, 10).map(q => shuffleAnswers(q))]; }
+            renderQuestion();
+        }
+
+        function upgradeLevel() { if (currentLevel < 3) { currentLevel++; consecutiveCorrect = 0; document.getElementById('levelNum').textContent = currentLevel; difficulty = currentLevel === 2 ? 'medium' : 'hard'; } }
+
+        function updateStats() { document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; document.getElementById('progressFill').style.width = ((currentQuestionIndex) / currentQuestions.length * 100) + '%'; }
+
+        function showResults() { document.getElementById('quiz').style.display = 'none'; document.getElementById('resultScreen').classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '🎉' : '😔'; document.getElementById('resultText').textContent = pass ? 'Level Complete!' : 'Keep Practicing'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score} | Best Streak: ${maxStreak}`; document.getElementById('resultDetails').textContent = `You answered ${totalAnswered} questions at Level ${currentLevel}`; }
+
+        function restartTest() { initTest(); }
+        initTest();
+    </script>
+</body>
+</html>

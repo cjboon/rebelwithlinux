@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-apache2.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache2 Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); }
+        .theme-toggle-checkbox { display: none; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../search.html" style="color: var(--charcoal);">SEARCH</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="../account.html" id="loginLink" class="auth-link" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// APACHE2 TEST</h1>
+            <p>Prove your Apache mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What is the default port for Apache2?", a: ["80", "443", "8080", "22"], correct: 0 },
+            { q: "What is the main configuration file for Apache2?", a: ["apache2.conf", "httpd.conf", "config.conf", "server.conf"], correct: 0 },
+            { q: "How do you start Apache2 on Debian/Ubuntu?", a: ["systemctl start apache2", "systemctl start httpd", "apache2 start", "start apache2"], correct: 0 },
+            { q: "What directory contains available site configurations?", a: ["/etc/apache2/sites-available", "/etc/apache2/sites-enabled", "/etc/httpd/conf", "/etc/apache2/conf"], correct: 0 },
+            { q: "What command enables a site in Apache?", a: ["a2ensite", "a2enconf", "a2enserver", "enable site"], correct: 0 },
+            { q: "What is the document root by default on Debian?", a: ["/var/www/html", "/var/www", "/var/html", "/usr/share/apache2/htdocs"], correct: 0 },
+            { q: "How do you check Apache2 configuration syntax?", a: ["apache2ctl configtest", "apache2 --test", "apache2 -t", "a2test"], correct: 0 },
+            { q: "What module is needed for HTTPS?", a: ["mod_ssl", "mod_https", "mod_security", "mod_tls"], correct: 0 },
+            { q: "What is the command to reload Apache2 config?", a: ["systemctl reload apache2", "systemctl restart apache2", "apache2 reload", "reload apache2"], correct: 0 },
+            { q: "What does 'a2dissite' do?", a: ["Disables a site", "Enables a site", "Deletes a site", "Creates a site"], correct: 0 },
+            { q: "What port does Apache listen on for HTTPS?", a: ["443", "80", "8080", "8443"], correct: 0 },
+            { q: "Where are Apache error logs typically stored?", a: ["/var/log/apache2/error.log", "/var/log/httpd/error.log", "/var/log/apache/error.log", "/var/log/apache2/errors"], correct: 0 },
+            { q: "What directive sets the domain name?", a: ["ServerName", "ServerDomain", "DomainName", "HostName"], correct: 0 },
+            { q: "How do you enable mod_rewrite?", a: ["a2enmod rewrite", "a2enconf rewrite", "enable mod_rewrite", "rewrite on"], correct: 0 },
+            { q: "What is the Apache control command?", a: ["apache2ctl", "apachectl", "apache-ctl", "httpdctl"], correct: 0 },
+            { q: "What file contains user authentication passwords?", a: [".htpasswd", ".htaccess", ".apachepwd", "passwd"], correct: 0 },
+            { q: "What does 'AllowOverride All' do?", a: ["Enables .htaccess", "Denies overrides", "Limits overrides", "Disables config"], correct: 0 },
+            { q: "What is the MPM prefork module?", a: ["Non-threaded processes", "Multi-processing", "Worker processes", "Event handling"], correct: 0 },
+            { q: "How do you view enabled modules?", a: ["apache2ctl -M", "lsmod apache2", "a2lsmode", "modlist apache2"], correct: 0 },
+            { q: "What is the PID file location?", a: ["/var/run/apache2/apache2.pid", "/var/log/apache2.pid", "/run/apache2.pid", "/var/run/httpd.pid"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the difference between 'require all granted' and 'require all denied'?", a: ["Allow access vs deny", "Deny vs allow", "Grant vs revoke", "Enable vs disable"], correct: 0 },
+            { q: "How do you configure virtual hosts in Apache?", a: ["sites-available/*.conf", "vhosts.conf", "virtual.conf", "httpd-vhosts.conf"], correct: 0 },
+            { q: "What does 'Options Indexes' do?", a: ["Lists directory contents", "Hides directory", "Enables CGI", "Disables PHP"], correct: 0 },
+            { q: "How do you redirect HTTP to HTTPS?", a: ["Redirect permanent / https://", "RewriteRule", "Both a and b", "Cannot redirect"], correct: 0 },
+            { q: "What is the purpose of 'AllowOverride'?", a: [".htaccess usage control", "Config override", "Permission override", "None"], correct: 0 },
+            { q: "How do you set up basic authentication?", a: ["htpasswd + AllowOverride", "auth_basic module", "Both a and b", "Cannot do"], correct: 0 },
+            { q: "What does 'KeepAlive' directive do?", a: ["Persistent connections", "Alive check", "Connection timeout", "None"], correct: 0 },
+            { q: "What is the worker MPM?", a: ["Threaded processes", "Prefork processes", "Event-driven", "None"], correct: 0 },
+            { q: "How do you limit access by IP?", a: ["Require ip address", "Allow from ip", "Both a and b", "Cannot limit"], correct: 0 },
+            { q: "What is 'mod_rewrite' used for?", a: ["URL rewriting", "Security", "Caching", "Compression"], correct: 0 },
+            { q: "How do you configure SSL certificate?", a: ["SSLCertificateFile + SSLCertificateKeyFile", "SSLEngine on", "Both required", "No config needed"], correct: 0 },
+            { q: "What does 'MaxClients' setting control?", a: ["Max simultaneous connections", "Client timeout", "Request size", "Upload size"], correct: 0 },
+            { q: "How do you enable CGI scripts?", a: ["Options +ExecCGI", "ScriptAlias", "Both a and b", "Not possible"], correct: 0 },
+            { q: "What is the purpose of 'DirectoryIndex'?", a: ["Default file to serve", "Index location", "Directory listing", "None"], correct: 0 },
+            { q: "How do you log to a custom file?", a: ["ErrorLog directive", "CustomLog directive", "Both a and b", "Cannot custom"], correct: 0 },
+            { q: "What does 'ServerTokens' control?", a: ["Server header info", "Error messages", "Log level", "None"], correct: 0 },
+            { q: "How do you enable compression?", a: ["mod_deflate", "mod_gzip", "Both available", "Not available"], correct: 0 },
+            { q: "What is 'Timeout' directive?", a: ["Request timeout", "Keep-alive timeout", "Read timeout", "Write timeout"], correct: 0 },
+            { q: "How do you block hotlinking?", a: ["RewriteCond for referer", "SetEnvIf", "Both common", "Cannot block"], correct: 0 },
+            { q: "What is the event MPM?", a: ["Async connections", "Threaded workers", "Hybrid model", "Deprecated"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "How do you configure Apache as a reverse proxy?", a: ["ProxyPass + ProxyPassReverse", "mod_proxy", "Both a and b", "Not possible"], correct: 0 },
+            { q: "What is 'mod_security' used for?", a: ["Web application firewall", "Security headers", "SSL/TLS", "Authentication"], correct: 0 },
+            { q: "How do you implement rate limiting?", a: ["mod_ratelimit", "mod_evasive", "Third-party", "Not built-in"], correct: 0 },
+            { q: "What does 'SSLProtocol all -SSLv3' do?", a: ["Enables modern TLS only", "Disables SSLv3", "Both a and b", "Enables SSLv3"], correct: 0 },
+            { q: "How do you configure Apache with PHP-FPM?", a: ["ProxyPassMatch + mod_fcgid", "mod_php", "Both work", "Not compatible"], correct: 0 },
+            { q: "What is 'mod_headers' used for?", a: ["Custom HTTP headers", "Header manipulation", "Both a and b", "Security only"], correct: 0 },
+            { q: "How do you set up client certificate authentication?", a: ["SSLVerifyClient require", "SSLCACertificateFile", "Both required", "Not supported"], correct: 0 },
+            { q: "What is 'Mutex' directive?", a: ["Process synchronization", "Lock file", "Both a and b", "Not needed"], correct: 0 },
+            { q: "How do you optimize 'MaxConnectionsPerChild'?", a: ["Recycle workers", "Memory management", "Performance tuning", "All of above"], correct: 0 },
+            { q: "What does 'SSLHonorCipherOrder' do?", a: ["Server cipher preference", "Client cipher preference", "Both same", "No effect"], correct: 0 },
+            { q: "How do you configure load balancing?", a: ["mod_proxy_balancer", "ProxyPass with stickysession", "Both required", "Not built-in"], correct: 0 },
+            { q: "What is 'TraceEnable' directive?", a: ["Enable/disable TRACE", "HTTP method", "Security setting", "All of above"], correct: 0 },
+            { q: "How do you use 'mod_remoteip'?", a: ["Replace client IP behind proxy", "Trust proxy headers", "Both a and b", "Not needed"], correct: 0 },
+            { q: "What does 'UseCanonicalName' control?", a: ["Server name in URLs", "Self-referencing", "Both a and b", "Nothing"], correct: 0 },
+            { q: "How do you configure OCSP stapling?", a: ["SSLUseStapling", "SSLStaplingCache", "Both required", "Not supported"], correct: 0 },
+            { q: "What is 'mod_socache_shmcb'?", a: ["Session caching", "Shared memory cache", "SSL session", "All of above"], correct: 0 },
+            { q: "How do you configure conditional logging?", a: ["LogIf", "SetEnvIf + ConditionalLog", "CustomLog with env", "All possible"], correct: 0 },
+            { q: "What does 'GracefulShutdownTimeout' control?", a: ["Grace period", "Timeout waiting", "Worker finish", "All of above"], correct: 0 },
+            { q: "How do you implement distributed deny of protection?", a: ["mod_evasive", "iptables", "fail2ban", "All common"], correct: 0 },
+            { q: "What is 'mod_http2' purpose?", a: ["HTTP/2 protocol", "Multiplexing", "Header compression", "All of above"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+
+        function initTest() {
+            difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0;
+            document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer'); container.innerHTML = '';
+            const q = currentQuestions[currentQuestionIndex];
+            const qDiv = document.createElement('div'); qDiv.className = 'question-container active';
+            let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join('');
+            qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`;
+            container.appendChild(qDiv);
+            updateStats();
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex]; const btns = document.querySelectorAll('.answer-btn');
+            btns.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); else if (i === index) btn.classList.add('incorrect'); });
+            if (index === q.correct) { score += 10 + (streak * 2); streak++; consecutiveCorrect++; totalAnswered++; if (consecutiveCorrect >= 5 && difficulty !== 'hard') upgradeLevel(); }
+            else { streak = 0; consecutiveCorrect = 0; totalAnswered++; }
+            updateStats(); setTimeout(nextQuestion, 1000);
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++; if (currentQuestionIndex >= currentQuestions.length) { showResults(); return; }
+            if (currentQuestionIndex % 10 === 0 && difficulty === 'easy') { currentQuestions = [...currentQuestions, ...shuffle([...mediumQuestions]).slice(0, 10).map(q => shuffleAnswers(q))]; }
+            else if (currentQuestionIndex % 15 === 0 && difficulty === 'medium') { currentQuestions = [...currentQuestions, ...shuffle([...hardQuestions]).slice(0, 10).map(q => shuffleAnswers(q))]; }
+            renderQuestion();
+        }
+
+        function upgradeLevel() {
+            if (currentLevel < 3) { currentLevel++; consecutiveCorrect = 0; document.getElementById('levelNum').textContent = currentLevel; difficulty = currentLevel === 2 ? 'medium' : 'hard'; }
+        }
+
+        function updateStats() {
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+            document.getElementById('progressFill').style.width = ((currentQuestionIndex) / currentQuestions.length * 100) + '%';
+        }
+
+        function showResults() {
+            document.getElementById('quiz').style.display = 'none'; document.getElementById('resultScreen').classList.add('active');
+            const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '🎉' : '😔';
+            document.getElementById('resultText').textContent = pass ? 'Level Complete!' : 'Keep Practicing';
+            document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score} | Best Streak: ${maxStreak}`;
+            document.getElementById('resultDetails').textContent = `You answered ${totalAnswered} questions at Level ${currentLevel}`;
+        }
+
+        function restartTest() { initTest(); }
+        initTest();
+    </script>
+</body>
+</html>

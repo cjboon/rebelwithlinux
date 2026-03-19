@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-logging.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logging Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); }
+        .theme-toggle-checkbox { display: none; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../search.html" style="color: var(--charcoal);">SEARCH</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="../account.html" id="loginLink" class="auth-link" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// LOGGING TEST</h1>
+            <p>Prove your logging mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What is syslog?", a: ["Standard logging facility", "System logger", "Log file", "All of above"], correct: 0 },
+            { q: "Where are system logs typically stored on Linux?", a: ["/var/log", "/var/system", "/var/systemlog", "/log"], correct: 0 },
+            { q: "What does rsyslog use for configuration?", a: ["/etc/rsyslog.conf", "/etc/log.conf", "/etc/syslog", "/etc/rsys"], correct: 0 },
+            { q: "What is the purpose of log rotation?", a: ["Prevent disk full", "Archive logs", "Compress old logs", "All of above"], correct: 0 },
+            { q: "What is systemd-journald?", a: [" systemd logging daemon", "System log manager", "Journal service", "None"], correct: 0 },
+            { q: "What command views system logs in real-time?", a: ["tail -f", "watch log", "monitor log", "view log"], correct: 0 },
+            { q: "What is /var/log/syslog?", a: ["General system messages", "Kernel messages", "Application logs", "None"], correct: 0 },
+            { q: "What is dmesg used for?", a: ["Kernel ring buffer", "System messages", "Driver messages", "All of above"], correct: 0 },
+            { q: "What is the auth.log file?", a: ["Authentication logs", "Authorization", "Admin logs", "User logs"], correct: 0 },
+            { q: "What does 'logger' command do?", a: ["Send syslog messages", "Create logs", "Write to log", "All of above"], correct: 0 },
+            { q: "What is journalctl?", a: ["Query systemd journal", "System logs", "Journal viewer", "All of above"], correct: 0 },
+            { q: "What log level is WARNING?", a: ["Below error, above info", "Highest level", "Lowest level", "Debug"], correct: 0 },
+            { q: "What is kern.log?", a: ["Kernel messages", "System messages", "Kernel errors", "All kernel"], correct: 0 },
+            { q: "What does logrotate configuration include?", a: ["Frequency, size, compress", "Rotation time", "Archive settings", "All included"], correct: 0 },
+            { q: "What is daemon.log?", a: ["Daemon messages", "Background services", "System services", "All daemons"], correct: 0 },
+            { q: "What is the difference between syslog and rsyslog?", a: ["rsyslog is enhanced syslog", "Same thing", "syslog newer", "No difference"], correct: 0 },
+            { q: "What are application logs?", a: ["Program-specific logs", "System logs", "Kernel logs", "Hardware logs"], correct: 0 },
+            { q: "What is nginx access log?", a: ["HTTP request logs", "Error logs", "Access denied", "All requests"], correct: 0 },
+            { q: "What does 'last' command show?", a: ["Recent login records", "Last login", "Login history", "All of above"], correct: 0 },
+            { q: "What is boot.log?", a: ["System boot messages", "Startup logs", "Boot sequence", "All boot"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What are the syslog facilities?", a: ["Message sources (kernel, mail, auth)", "Log levels", "Priority levels", "None"], correct: 0 },
+            { q: "What is the difference between syslog priorities?", a: ["Severity levels 0-7", "Facility codes", "Log types", "None"], correct: 0 },
+            { q: "What is structured logging?", a: ["JSON/formatted logs", "Plain text", "Binary logs", "None"], correct: 0 },
+            { q: "What is centralized logging?", a: ["Aggregate logs from multiple systems", "Local logs only", "Single server", "None"], correct: 0 },
+            { q: "What is ELK stack?", a: ["Elasticsearch, Logstash, Kibana", "Logging system", "Log analysis", "All of above"], correct: 0 },
+            { q: "What does rsyslog 'action' define?", a: ["Where to send logs", "Log format", "Log level", "None"], correct: 0 },
+            { q: "What is Graylog?", a: ["Centralized log management", "Log aggregator", "Analysis platform", "All of above"], correct: 0 },
+            { q: "What is the difference between UDP and TCP for syslog?", a: ["UDP is unreliable, TCP reliable", "UDP faster", "TCP faster", "Same"], correct: 0 },
+            { q: "What is fluentd?", a: ["Data collector for logging", "Log processor", "Log forwarder", "All of above"], correct: 0 },
+            { q: "What are log levels in order?", a: ["emerg, alert, crit, err, warning, notice, info, debug", "error, warn, info, debug", "high to low", "low to high"], correct: 0 },
+            { q: "What is Grafana Loki?", a: ["Log aggregation system", "Monitoring", "Visualization", "All of above"], correct: 0 },
+            { q: "What does 'imjournal' module do in rsyslog?", a: ["Read systemd journal", "Import logs", "External logs", "Internal"], correct: 0 },
+            { q: "What is SIEM?", a: ["Security information and event management", "System log", "Log analysis", "All of above"], correct: 0 },
+            { q: "What is the purpose of log compression?", a: ["Save disk space", "Faster transfer", "Security", "All of above"], correct: 0 },
+            { q: "What is Splunk?", a: ["Log analysis platform", "Search engine", "Monitoring", "All of above"], correct: 0 },
+            { q: "What does rsyslog 'template' define?", a: ["Log message format", "Log destination", "Log source", "None"], correct: 0 },
+            { q: "What is remote logging?", a: ["Send logs to remote server", "Local logging", "Network logs", "All of above"], correct: 0 },
+            { q: "What is the difference between journald and syslog?", a: ["journald is binary, syslog text", "Same thing", "syslog newer", "No difference"], correct: 0 },
+            { q: "What is Datadog?", a: ["Cloud monitoring and logging", "Log platform", "APM", "All of above"], correct: 0 },
+            { q: "What is log correlation?", a: ["Linking related log entries", "Log sorting", "Log filtering", "None"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "How do you configure rsyslog to send logs to remote server?", a: ["*.* @@remotehost:514", "TCP forwarding", "UDP forwarding", "All methods"], correct: 0 },
+            { q: "What is the difference between imfile and imtail in rsyslog?", a: ["imfile monitors files, imtail tails files", "Same thing", "Different output", "No difference"], correct: 0 },
+            { q: "How do you implement log encryption in transit?", a: ["TLS/SSL for syslog", "GPG encryption", "SSH tunnel", "All used"], correct: 0 },
+            { q: "What is the purpose of Riemann in logging?", a: ["Stream processing for events", "Log aggregation", "Alerting", "All of above"], correct: 0 },
+            { q: "How do you configure log rotation based on size?", a: ["size directive in logrotate", "daily/weekly", "maxsize", "All used"], correct: 0 },
+            { q: "What is the difference between journald storage modes?", a: ["volatile, persistent, auto", "binary, text", "direct, indirect", "none"], correct: 0 },
+            { q: "How do you set up Elastic Stack for logging?", a: ["Logstash → Elasticsearch → Kibana", "Filebeat → Lucene", "Beats only", "None"], correct: 0 },
+            { q: "What is the purpose of beats in ELK?", a: ["Lightweight data shippers", "Log collection", "Parsing", "All involved"], correct: 0 },
+            { q: "How do you implement log retention policies?", a: ["Archive, delete, tier storage", "Compression", "Retention rules", "All included"], correct: 0 },
+            { q: "What is the difference between Grafana Loki and Elasticsearch?", a: ["Loki indexes labels, ES indexes content", "Same thing", "Loki faster", "No difference"], correct: 0 },
+            { q: "How do you secure logs from tampering?", a: ["Write-once storage, integrity checks, remote syslog", "Permissions", "Encryption", "All used"], correct: 0 },
+            { q: "What is the purpose of parsing in log management?", a: ["Extract structured data", "Filter logs", "Format logs", "All involved"], correct: 0 },
+            { q: "How do you implement high availability for centralized logging?", a: ["Multiple log servers, load balancing", "Clustering", "Replication", "All used"], correct: 0 },
+            { q: "What is the difference between push and pull log collection?", a: ["Agents send vs centralized collection", "Active vs passive", "Real-time vs batch", "All compared"], correct: 0 },
+            { q: "How do you configure rsyslog with omelasticsearch output?", a: ["Send directly to Elasticsearch", "Logstash alternative", "JSON output", "All used"], correct: 0 },
+            { q: "What is the purpose of log normalization?", a: ["Standardize log formats", "Parse differently", "Filter noise", "All involved"], correct: 0 },
+            { q: "How do you implement alerting based on logs?", a: ["Correlate events, define thresholds", "Log rules", "Alert managers", "All used"], correct: 0 },
+            { q: "What is the difference between syslog legacy and RFC 5424?", a: ["RFC 5424 adds structured data", "Newer format", "Better parsing", "All above"], correct: 0 },
+            { q: "How do you implement log-based metrics?", a: ["Extract counters, rates from logs", "Aggregations", "Time series", "All created"], correct: 0 },
+            { q: "What is the purpose of a log analytics pipeline?", a: ["Ingest, parse, enrich, store, analyze", "Filter only", "Search only", "None"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+
+        function initTest() {
+            difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0;
+            document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer'); container.innerHTML = '';
+            const q = currentQuestions[currentQuestionIndex];
+            const qDiv = document.createElement('div'); qDiv.className = 'question-container active';
+            let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join('');
+            qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`;
+            container.appendChild(qDiv);
+            updateStats();
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex]; const btns = document.querySelectorAll('.answer-btn');
+            btns.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); else if (i === index) btn.classList.add('incorrect'); });
+            if (index === q.correct) { score += 10 + (streak * 2); streak++; consecutiveCorrect++; totalAnswered++; if (consecutiveCorrect >= 5 && difficulty !== 'hard') upgradeLevel(); }
+            else { streak = 0; consecutiveCorrect = 0; totalAnswered++; }
+            updateStats(); setTimeout(nextQuestion, 1000);
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++; if (currentQuestionIndex >= currentQuestions.length) { showResults(); return; }
+            if (currentQuestionIndex % 10 === 0 && difficulty === 'easy') { currentQuestions = [...currentQuestions, ...shuffle([...mediumQuestions]).slice(0, 10).map(q => shuffleAnswers(q))]; }
+            else if (currentQuestionIndex % 15 === 0 && difficulty === 'medium') { currentQuestions = [...currentQuestions, ...shuffle([...hardQuestions]).slice(0, 10).map(q => shuffleAnswers(q))]; }
+            renderQuestion();
+        }
+
+        function upgradeLevel() { if (currentLevel < 3) { currentLevel++; consecutiveCorrect = 0; document.getElementById('levelNum').textContent = currentLevel; difficulty = currentLevel === 2 ? 'medium' : 'hard'; } }
+
+        function updateStats() { document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; document.getElementById('progressFill').style.width = ((currentQuestionIndex) / currentQuestions.length * 100) + '%'; }
+
+        function showResults() { document.getElementById('quiz').style.display = 'none'; document.getElementById('resultScreen').classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '🎉' : '😔'; document.getElementById('resultText').textContent = pass ? 'Level Complete!' : 'Keep Practicing'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score} | Best Streak: ${maxStreak}`; document.getElementById('resultDetails').textContent = `You answered ${totalAnswered} questions at Level ${currentLevel}`; }
+
+        function restartTest() { initTest(); }
+        initTest();
+    </script>
+</body>
+</html>

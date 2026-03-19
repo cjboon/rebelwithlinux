@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-homelab.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homelab Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+    </nav>
+    <div class="test-container">
+        <div class="test-header"><h1>// HOMELAB TEST</h1><p>Prove your Homelab mastery</p></div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const easyQuestions = [
+            { q: "What is a homelab?", a: ["Personal IT lab at home", "Commercial data center", "Cloud server", "Office network"], correct: 0 },
+            { q: "What is a common hardware for homelab?", a: ["Old desktop PC", "Raspberry Pi", "Server hardware", "All of above"], correct: 3 },
+            { q: "What is 'Proxmox'?", a: ["Virtualization platform", "Operating system", "Container runtime", "Network tool"], correct: 0 },
+            { q: "What is 'Docker' used for in homelab?", a: ["Containerized applications", "Virtual machines", "Network storage", "Backup system"], correct: 0 },
+            { q: "What is 'NAS'?", a: ["Network Attached Storage", "Network Admin System", "New Access Server", "Node Array Storage"], correct: 0 },
+            { q: "What is 'PVE'?", a: ["Proxmox Virtual Environment", "Personal Virtual Engine", "Private VM Environment", "Proxmox Version"], correct: 0 },
+            { q: "What does 'RAM' stand for?", a: ["Random Access Memory", "Read Access Memory", "Run Access Memory", "Rapid Access Module"], correct: 0 },
+            { q: "What is 'CPU'?", a: ["Central Processing Unit", "Computer Processing Unit", "Central Program Utility", "Core Processing Unit"], correct: 0 },
+            { q: "What is 'SSD'?", a: ["Solid State Drive", "Serial System Drive", "Super Speed Disk", "Standard State Drive"], correct: 0 },
+            { q: "What is 'HDD'?", a: ["Hard Disk Drive", "High Data Drive", "Hybrid Disk Drive", "Heavy Data Device"], correct: 0 },
+            { q: "What is 'RAID'?", a: ["Redundant Array of Independent Disks", "Rapid Array of Internal Disks", "Redundant Access to Internal Data", "Random Array of Independent Drives"], correct: 0 },
+            { q: "What is 'NAT'?", a: ["Network Address Translation", "Network Access Tunnel", "New Address Type", "Node Address Table"], correct: 0 },
+            { q: "What is 'DHCP'?", a: ["Dynamic Host Configuration Protocol", "Data Host Control Protocol", "Direct Host Connection Protocol", "Dynamic Hardware Control Program"], correct: 0 },
+            { q: "What is 'DNS'?", a: ["Domain Name System", "Data Network Service", "Dynamic Name Server", "Domain Network System"], correct: 0 },
+            { q: "What is 'VLAN'?", a: ["Virtual Local Area Network", "Very Large Area Network", "Virtual Link Area Network", "Verified LAN"], correct: 0 },
+            { q: "What is 'VPN'?", a: ["Virtual Private Network", "Very Private Network", "Virtual Public Network", "Verified Private Network"], correct: 0 },
+            { q: "What is 'SSH'?", a: ["Secure Shell", "Simple Shell", "Super Shell", "Standard Shell"], correct: 0 },
+            { q: "What is 'IP' address?", a: ["Internet Protocol address", "Internal Protocol", "Internet Provider", "Internal Provider"], correct: 0 },
+            { q: "What is 'MAC address'?", a: ["Media Access Control address", "Main Access Control", "Memory Access Card", "Multiple Access Control"], correct: 0 },
+            { q: "What is 'router'?", a: ["Routes network traffic", "Stores data", "Processes requests", "Manages users"], correct: 0 },
+            { q: "What is 'switch'?", a: ["Connects devices on network", "Routes between networks", "Manages internet", "Filters traffic"], correct: 0 },
+            { q: "What is 'firewall'?", a: ["Blocks unauthorized access", "Speeds up network", "Stores files", "Manages users"], correct: 0 },
+            { q: "What is 'Pi-hole' used for?", a: ["Network-wide ad blocking", "VPN server", "File storage", "Media server"], correct: 0 },
+            { q: "What is 'Nextcloud'?", a: ["Self-hosted cloud platform", "Weather app", "Video game", "Social media"], correct: 0 },
+            { q: "What is 'Plex'?", a: ["Media server software", "Programming language", "Backup tool", "Email server"], correct: 0 },
+            { q: "What is 'Jellyfin'?", a: ["Free media server", "Email client", "VPN service", "Web browser"], correct: 0 },
+            { q: "What is 'Home Assistant'?", a: ["Home automation platform", "Office suite", "Email server", "File manager"], correct: 0 },
+            { q: "What is 'wireguard'?", a: ["VPN solution", "Firewall", "Storage system", "Backup tool"], correct: 0 },
+            { q: "What is 'Portainer'?", a: ["Docker management UI", "Email client", "File browser", "Network tool"], correct: 0 },
+            { q: "What is 'Traefik'?", a: ["Reverse proxy and load balancer", "Email server", "Database", "Backup system"], correct: 0 },
+            { q: "What is 'Nginx'?", a: ["Web server and reverse proxy", "Database", "Backup tool", "Email system"], correct: 0 },
+            { q: "What is 'Apache'?", a: ["Web server software", "Database", "Backup system", "Email client"], correct: 0 },
+            { q: "What is 'GitLab'?", a: ["Git repository manager", "Email server", "File storage", "Network tool"], correct: 0 },
+            { q: "What is 'MariaDB'?", a: ["MySQL-compatible database", "Web server", "Backup tool", "Email system"], correct: 0 },
+            { q: "What is 'PostgreSQL'?", a: ["Advanced database", "Web server", "Backup system", "Email server"], correct: 0 },
+            { q: "What is 'Redis'?", a: ["In-memory data store", "Web server", "File storage", "Email system"], correct: 0 },
+            { q: "What is 'Unraid'?", a: ["Network storage OS", "Web server", "Backup tool", "Email server"], correct: 0 },
+            { q: "What is 'TrueNAS'?", a: ["FreeNAS rebranded, storage OS", "Web server", "VPN service", "Email system"], correct: 0 },
+            { q: "What is 'OpenWrt'?", a: ["Router firmware", "Database", "Backup tool", "Email server"], correct: 0 },
+            { q: "What is 'pfSense'?", a: ["Firewall/router software", "Web server", "Storage system", "Email system"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is 'PCIe'?", a: ["Peripheral Component Interconnect Express", "Parallel Computer Interface Extension", "Protocol Control Information Exchange", "Primary Channel Input/Output"], correct: 0 },
+            { q: "What does 'ECC RAM' do?", a: ["Detects and corrects memory errors", "Increases speed", "Expands capacity", "Reduces power"], correct: 0 },
+            { q: "What is 'ZFS'?", a: ["Advanced file system with data protection", "Compression format", "Network protocol", "Storage type"], correct: 0 },
+            { q: "What is 'Docker Compose'?", a: ["Define multi-container applications", "Single container", "Image builder", "Network manager"], correct: 0 },
+            { q: "What is 'Kubernetes'?", a: ["Container orchestration platform", "Single container", "Virtual machine", "Backup system"], correct: 0 },
+            { q: "What is 'KVM'?", a: ["Kernel-based Virtual Machine", "Key Value Memory", "Kernel Virtual Module", "Knowledge Virtual Machine"], correct: 0 },
+            { q: "What is 'LXC'?", a: ["Linux Containers", "Linux Virtualization", "Local Container Exchange", "Linux VM"], correct: 0 },
+            { q: "What is 'NFS'?", a: ["Network File System", "Network Forwarding Service", "Node File Storage", "New File System"], correct: 0 },
+            { q: "What is 'SMB'?", a: ["Server Message Block", "Storage Management Block", "System Memory Buffer", "Secure Mail Box"], correct: 0 },
+            { q: "What is 'iSCSI'?", a: ["Internet SCSI for storage", "Internal SCSI", "Internet Security", "iPhone SC"], correct: 0 },
+            { q: "What is 'SFP'?", a: ["Small Form-factor Pluggable transceiver", "System Function Processor", "Storage File Protocol", "Serial Front Panel"], correct: 0 },
+            { q: "What is '10GbE'?", a: ["10 Gigabit Ethernet", "10GB Ethernet", "10 Gigabit Eternet", "10GBE Standard"], correct: 0 },
+            { q: "What is 'VLAN tagging'?", a: ["Identifies VLAN traffic", "Tags files", "Marks packets", "Labels users"], correct: 0 },
+            { q: "What is 'jumbo frames'?", a: ["Larger network packets for performance", "Large email", "Big files", "Heavy traffic"], correct: 0 },
+            { q: "What is 'MTU'?", a: ["Maximum Transmission Unit", "Main Transfer Unit", "Multiple Transfer Units", "Media Transfer Utility"], correct: 0 },
+            { q: "What is 'cluster' in homelab?", a: ["Group of servers working together", "Storage device", "Network type", "Backup system"], correct: 0 },
+            { q: "What is 'HA'?", a: ["High Availability", "Home Automation", "Hardware Array", "Hybrid Access"], correct: 0 },
+            { q: "What is 'failover'?", a: ["Automatic switch to backup", "Failure detection", "Error handling", "System restart"], correct: 0 },
+            { q: "What is 'load balancing'?", a: ["Distributes traffic across servers", "Increases storage", "Manages users", "Blocks attacks"], correct: 0 },
+            { q: "What is 'reverse proxy'?", a: ["Routes external requests to internal services", "Blocks traffic", "Stores cache", "Manages DNS"], correct: 0 },
+            { q: "What is 'Let's Encrypt'?", a: ["Free SSL/TLS certificates", "Email service", "File storage", "Backup provider"], correct: 0 },
+            { q: "What is 'DDNS'?", a: ["Dynamic DNS updates", "Direct DNS", "Domain Data Network", "Default DNS"], correct: 0 },
+            { q: "What is 'UPnP'?", a: ["Universal Plug and Play", "User Priority Network", "Unique Port Number", "Universal Protocol"], correct: 0 },
+            { q: "What is 'Wake on LAN'?", a: ["Power on device remotely", "Network security", "File sharing", "Backup feature"], correct: 0 },
+            { q: "What is 'backplane' in servers?", a: ["Internal connection for components", "Backup system", "Network card", "Power supply"], correct: 0 },
+            { q: "What is 'iDRAC'?", a: ["Dell remote management", "Internal Drive", "Internet Data Access", "Integrated Disk Array Controller"], correct: 0 },
+            { q: "What is 'IPMI'?", a: ["Intelligent Platform Management Interface", "Internet Protocol Management", "Internal Process Management", "IP Management Interface"], correct: 0 },
+            { q: "What is 'BMC'?", a: ["Baseboard Management Controller", "Basic Memory Controller", "Board Management Card", "Boot Management Console"], correct: 0 },
+            { q: "What is 'UPS'?", a: ["Uninterruptible Power Supply", "Universal Power Supply", "Unified Power System", "Utility Power Source"], correct: 0 },
+            { q: "What is 'power cycling'?", a: ["Turning device off and on", "Power saving", "Energy monitoring", "Battery charge"], correct: 0 },
+            { q: "What is 'RPO'?", a: ["Recovery Point Objective", "Recovery Process Option", "Redundant Power Output", "Remote Protection Option"], correct: 0 },
+            { q: "What is 'RTO'?", a: ["Recovery Time Objective", "Real Time Output", "Remote Transfer Option", "Recovery Transfer Option"], correct: 0 },
+            { q: "What is 'incremental backup'?", a: ["Backs up only changes", "Full backup", "Differential backup", "Mirror backup"], correct: 0 },
+            { q: "What is 'rsync'?", a: ["File synchronization tool", "Remote sync", "Recovery system", "Router protocol"], correct: 0 },
+            { q: "What is 'Rancher'?", a: ["Kubernetes management platform", "Container runtime", "Storage system", "Network tool"], correct: 0 },
+            { q: "What is 'Portainer' used for?", a: ["Docker container management", "Port forwarding", "Network management", "Storage"], correct: 0 },
+            { q: "What is 'Ansible'?", a: ["Automation and configuration tool", "Backup system", "Monitoring", "Network tool"], correct: 0 },
+            { q: "What is 'Grafana'?", a: ["Metrics visualization", "File storage", "Email server", "Firewall"], correct: 0 },
+            { q: "What is 'Prometheus'?", a: ["Monitoring and alerting", "Backup tool", "Database", "Email system"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is 'nested virtualization'?", a: ["VM running inside VM", "Multiple hypervisors", "Hardware virtualization", "Network virtualization"], correct: 0 },
+            { q: "What is 'PCI passthrough'?", a: ["Give VM direct hardware access", "Pass network", "Share PCI", "Virtual PCI"], correct: 0 },
+            { q: "What is 'SR-IOV'?", a: ["Single Root I/O Virtualization", "System Resource I/O", "Serial Rapid I/O", "Storage I/O Virtualization"], correct: 0 },
+            { q: "What is 'vGPU'?", a: ["Virtual GPU for VMs", "Virtual network", "Guest OS", "Video processing"], correct: 0 },
+            { q: "What is 'NFSv4' vs 'NFSv3'?", a: ["Better performance, security", "Same protocol", "Version numbers", "No difference"], correct: 0 },
+            { q: "What is 'ZFS deduplication'?", a: ["Eliminates duplicate data", "Compresses data", "Encrypts data", "Stores data"], correct: 0 },
+            { q: "What is 'ZFS compression'?", a: ["Reduces storage space", "Expands capacity", "Speeds up", "Protects data"], correct: 0 },
+            { q: "What is 'ZFS snapshot'?", a: ["Point-in-time data copy", "Backup copy", "Full copy", "Incremental copy"], correct: 0 },
+            { q: "What is 'ZFS send/receive'?", a: ["Replicate snapshots", "Stream data", "Transfer files", "Network copy"], correct: 0 },
+            { q: "What is 'TrueNAS Scale'?", a: ["Scale-out storage with containers", "Basic NAS", "Network switch", "Backup device"], correct: 0 },
+            { q: "What is 'Ceph'?", a: ["Distributed storage system", "Network protocol", "File system", "Backup tool"], correct: 0 },
+            { q: "What is 'GlusterFS'?", a: ["Scale-out network filesystem", "File storage", "Network tool", "Backup system"], correct: 0 },
+            { q: "What is 'iSCSI target'?", a: ["iSCSI storage server", "iSCSI client", "Network device", "Server protocol"], correct: 0 },
+            { q: "What is 'iSCSI initiator'?", a: ["iSCSI client", "iSCSI server", "Network switch", "Storage array"], correct: 0 },
+            { q: "What is 'MPIO'?", a: ["Multiple Path I/O for redundancy", "Multi Protocol", "Main Power", "Memory Path"], correct: 0 },
+            { q: "What is 'link aggregation'?", a: ["Combine network ports for speed", "Network security", "Load balancer", "VPN type"], correct: 0 },
+            { q: "What is 'LACP'?", a: ["Link Aggregation Control Protocol", "Local Area Control", "Layer Access", "Link Access"], correct: 0 },
+            { q: "What is 'VLAN trunking'?", a: ["Carries multiple VLANs", "Single VLAN", "Network switch", "Router config"], correct: 0 },
+            { q: "What is 'VxLAN'?", a: ["Virtual Extensible LAN", "VPN Extension", "Very Extra LAN", "Virtual X LAN"], correct: 0 },
+            { q: "What is 'wireguard mesh'?", a: ["Full mesh VPN topology", "Point-to-point", "Star topology", "Not supported"], correct: 0 },
+            { q: "What is 'Kubernetes Operator'?", a: ["Automates complex app deployment", "Simple script", "Container runtime", "Network plugin"], correct: 0 },
+            { q: "What is 'Helm'?", a: ["Kubernetes package manager", "Package tool", "Container build", "Storage system"], correct: 0 },
+            { q: "What is 'Istio'?", a: ["Service mesh for Kubernetes", "VPN service", "Storage system", "Monitoring"], correct: 0 },
+            { q: "What is 'Prometheus operator'?", a: ["Manages Prometheus in K8s", "Monitors operators", "Backup system", "Network tool"], correct: 0 },
+            { q: "What is 'Longhorn'?", a: ["Cloud-native block storage", "Long storage", "Network drive", "Backup system"], correct: 0 },
+            { q: "What is 'MinIO'?", a: ["S3-compatible object storage", "File storage", "Database", "Email server"], correct: 0 },
+            { q: "What is 'Vault'?", a: ["Secrets management", "File storage", "Backup tool", "Email system"], correct: 0 },
+            { q: "What is 'Consul'?", a: ["Service discovery and configuration", "Database", "Monitoring", "Network tool"], correct: 0 },
+            { q: "What is 'Nomad'?", a: ["Workload orchestrator", "Container runtime", "VM manager", "Backup tool"], correct: 0 },
+            { q: "What is 'Fabrics' in homelab?", a: ["High-speed network infrastructure", "Server cases", "Storage devices", "Power supplies"], correct: 0 },
+            { q: "What is 'RDMA'?", a: ["Remote Direct Memory Access", "Random Data Access", "Rapid Data Transfer", "Remote Data Access"], correct: 0 },
+            { q: "What is 'InfiniBand'?", a: ["High-speed cluster interconnect", "Network type", "Storage protocol", "Backup system"], correct: 0 },
+            { q: "What is 'OPA'?", a: ["Open Policy Agent", "Open Power Access", "Object Policy Agent", "Online Policy Admin"], correct: 0 },
+            { q: "What is 'ArgoCD'?", a: ["GitOps continuous delivery", "Container build", "Storage system", "Backup tool"], correct: 0 },
+            { q: "What is 'Flux'?", a: ["GitOps toolkit for Kubernetes", "Data flow", "Network protocol", "Backup system"], correct: 0 },
+            { q: "What is 'Tailscale'?", a: ["WireGuard-based VPN", "Scale tool", "Network monitor", "Storage system"], correct: 0 },
+            { q: "What is 'Headscale'?", a: ["Self-hosted Tailscale control server", "Network tool", "Load balancer", "Storage"], correct: 0 },
+            { q: "What is 'Cloudflare Tunnel'?", a: ["Expose local services securely", "VPN type", "Network protocol", "Backup system"], correct: 0 },
+            { q: "What is 'jwilder/nginx-proxy'?", a: ["Automated reverse proxy for Docker", "Web server", "Proxy config", "Nginx container"], correct: 0 },
+            { q: "What is 'Authelia'?", a: ["Multi-factor authentication portal", "Auth system", "Single sign-on", "Login portal"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            const q = currentQuestions[currentQuestionIndex];
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`;
+            container.appendChild(qDiv);
+            updateStats();
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(btn => btn.disabled = true);
+            if (index === q.correct) {
+                buttons[index].classList.add('correct');
+                score += 10 + (streak * 2);
+                streak++;
+                consecutiveCorrect++;
+                if (streak > maxStreak) maxStreak = streak;
+            } else {
+                buttons[index].classList.add('incorrect');
+                buttons[q.correct].classList.add('correct');
+                streak = 0;
+                consecutiveCorrect = 0;
+            }
+            totalAnswered++;
+            if (consecutiveCorrect >= 3 && difficulty === 'easy') {
+                difficulty = 'medium';
+                currentLevel = 2;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            } else if (consecutiveCorrect >= 3 && difficulty === 'medium') {
+                difficulty = 'hard';
+                currentLevel = 3;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            }
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex >= currentQuestions.length) {
+                    showResults();
+                } else {
+                    renderQuestion();
+                }
+            }, 1500);
+        }
+
+        function loadNextDifficulty() {
+            let newQuestions;
+            if (difficulty === 'medium') {
+                newQuestions = shuffle([...mediumQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            } else if (difficulty === 'hard') {
+                newQuestions = shuffle([...hardQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            }
+            currentQuestions = [...currentQuestions, ...newQuestions];
+        }
+
+        function updateStats() {
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+            const progress = (currentQuestionIndex / currentQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('resultScreen').classList.add('active');
+            const percentage = (score / (currentQuestions.length * 10)) * 100;
+            const passed = percentage >= 50;
+            document.getElementById('resultIcon').textContent = passed ? '🏆' : '📚';
+            document.getElementById('resultText').textContent = passed ? 'PASSED!' : 'KEEP LEARNING';
+            document.getElementById('resultText').className = 'result-text ' + (passed ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score} | Max Streak: ${maxStreak}`;
+            document.getElementById('resultDetails').textContent = passed ? 'You have mastered Homelab!' : 'Review the Homelab guide and try again.';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        initTest();
+    </script>
+</body>
+</html>

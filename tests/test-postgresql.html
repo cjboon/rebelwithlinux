@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-postgresql.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostgreSQL Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); }
+        .theme-toggle-checkbox { display: none; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../search.html" style="color: var(--charcoal);">SEARCH</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="../account.html" id="loginLink" class="auth-link" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// POSTGRESQL TEST</h1>
+            <p>Prove your PostgreSQL mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What is PostgreSQL?", a: ["Advanced open source database", "NoSQL database", "In-memory database", "Cloud database"], correct: 0 },
+            { q: "What port does PostgreSQL use by default?", a: ["5432", "3306", "1433", "27017"], correct: 0 },
+            { q: "How do you connect to PostgreSQL?", a: ["psql -U user -d db", "mysql -u user", "pg connect", "db connect"], correct: 0 },
+            { q: "What command lists databases?", a: ["\\l", "SHOW DATABASES", "LIST DBS", "DATABASES"], correct: 0 },
+            { q: "What command connects to a database?", a: ["\\c dbname", "USE dbname", "CONNECT dbname", "OPEN dbname"], correct: 0 },
+            { q: "What is a SCHEMA in PostgreSQL?", a: ["Namespace for objects", "Database", "Table", "Column"], correct: 0 },
+            { q: "What does SERIAL create?", a: ["Auto-increment column", "Sequence", "Both a and b", "None"], correct: 0 },
+            { q: "What is UUID data type?", a: ["Universal unique identifier", "User ID", "Unicode", "None"], correct: 0 },
+            { q: "What does COPY do?", a: ["Import/export data", "Copy table", "Duplicate data", "None"], correct: 0 },
+            { q: "What is the default superuser?", a: ["postgres", "root", "admin", "sa"], correct: 0 },
+            { q: "What does VACUUM do?", a: ["Reclaims storage", "Deletes data", "Optimizes", "Both a and c"], correct: 0 },
+            { q: "What is a SEQUENCE?", a: ["Auto-number generator", "Table sequence", "Data type", "None"], correct: 0 },
+            { q: "What command lists tables?", a: ["\\dt", "SHOW TABLES", "LIST TABLES", "TABLES"], correct: 0 },
+            { q: "What does \\d show?", a: ["Describe table/relation", "Delete table", "Drop table", "None"], correct: 0 },
+            { q: "What is JSONB in PostgreSQL?", a: ["Binary JSON storage", "JSON text", "JSON type", "None"], correct: 0 },
+            { q: "What does RETURNING do?", a: ["Return modified rows", "Return query", "Return data", "None"], correct: 0 },
+            { q: "What is an INDEX?", a: ["Speeds up queries", "Stores data", "Backs up", "None"], correct: 0 },
+            { q: "What is COPY vs \\copy?", a: ["Server vs client side", "Same thing", "COPY faster", "No difference"], correct: 0 },
+            { q: "What is a VIEW?", a: ["Virtual table", "Real table", "Temp table", "None"], correct: 0 },
+            { q: "What does \\x do in psql?", a: ["Expanded display", "Exit", "Execute", "None"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the difference between DELETE and TRUNCATE?", a: ["TRUNCATE is faster, cannot rollback", "Same thing", "DELETE faster", "No difference"], correct: 0 },
+            { q: "What does EXPLAIN ANALYZE show?", a: ["Query execution time and plan", "Query results", "Index usage", "None"], correct: 0 },
+            { q: "What is a CTE (Common Table Expression)?", a: ["Temporary named subquery", "Permanent table", "Temp table", "None"], correct: 0 },
+            { q: "What is window function?", a: ["Calculate across rows", "Filter rows", "Sort rows", "None"], correct: 0 },
+            { q: "What is UPSERT (INSERT ... ON CONFLICT)?", a: ["Insert or update", "Insert or ignore", "Both a and b", "None"], correct: 0 },
+            { q: "What does COALESCE do?", a: ["Returns first non-null", "Creates null", "Removes null", "None"], correct: 0 },
+            { q: "What is partitioning in PostgreSQL?", a: ["Split large tables", "Join tables", "Copy tables", "None"], correct: 0 },
+            { q: "What does ARRAY_AGG do?", a: ["Aggregates into array", "Count array", "Create array", "None"], correct: 0 },
+            { q: "What is a MATERIALIZED VIEW?", a: ["Stores query physically", "Virtual view", "Temp view", "None"], correct: 0 },
+            { q: "What is the purpose of pg_dump?", a: ["Backup database", "Restore", "Optimize", "None"], correct: 0 },
+            { q: "What is logical vs physical replication?", a: ["Row-based vs whole database", "Same thing", "Logical faster", "No difference"], correct: 0 },
+            { q: "What is JSON path in PostgreSQL?", a: ["Query JSON data", "Create JSON", "Store JSON", "None"], correct: 0 },
+            { q: "What does GENERATE_SERIES do?", a: ["Generate number sequence", "Generate dates", "Both a and b", "None"], correct: 0 },
+            { q: "What is the purpose of TRIGGER?", a: ["Auto-execute on events", "Insert data", "Update data", "None"], correct: 0 },
+            { q: "What is a FUNCTION in PostgreSQL?", a: ["Stored procedure", "Query", "View", "None"], correct: 0 },
+            { q: "What does ALTER TABLE allow?", a: ["Modify structure", "Add columns", "Rename", "All of above"], correct: 0 },
+            { q: "What is the difference between HAVING and WHERE?", a: ["HAVING filters groups", "WHERE filters rows", "Same thing", "No difference"], correct: 0 },
+            { q: "What is JSONG in PostgreSQL?", a: ["Binary JSON with indexing", "JSON text", "JSON type", "None"], correct: 0 },
+            { q: "What does SELECT DISTINCT ON do?", a: ["Unique on specific columns", "Remove duplicates", "Filter", "None"], correct: 0 },
+            { q: "What is the purpose of pg_restore?", a: ["Restore from backup", "Backup database", "Optimize", "None"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is the difference between CLUSTER and REINDEX?", a: ["CLUSTER reorders physically, REINDEX rebuilds indexes", "Same thing", "Different purpose", "No difference"], correct: 0 },
+            { q: "What is write-ahead logging (WAL)?", a: ["Transaction logging for durability", "Query log", "Error log", "None"], correct: 0 },
+            { q: "What does pg_stat_activity show?", a: ["Current connections and queries", "Historical stats", "Table stats", "None"], correct: 0 },
+            { q: "What is the purpose of connection pooling?", a: ["Manage database connections efficiently", "Limit connections", "Speed up", "Security"], correct: 0 },
+            { q: "What is a GiST index?", a: ["Generalized Search Tree", "Geographic", "Hash", "None"], correct: 0 },
+            { q: "What does pgbench do?", a: ["Benchmark PostgreSQL", "Backup tool", "Monitoring", "None"], correct: 0 },
+            { q: "What is the difference between hot standby and warm standby?", a: ["Hot can handle queries, warm cannot", "Same thing", "Hot faster", "No difference"], correct: 0 },
+            { q: "What is the purpose of advisory locks?", a: ["Application-defined locking", "Row locks", "Table locks", "None"], correct: 0 },
+            { q: "What is the purpose of autovacuum?", a: ["Automatic VACUUM and ANALYZE", "Auto backup", "Auto optimize", "None"], correct: 0 },
+            { q: "What does work_mem control?", a: ["Memory for sorting/hashing", "Connection memory", "Cache size", "None"], correct: 0 },
+            { q: "What is the purpose of LISTEN/NOTIFY?", a: ["Pub/sub messaging", "Notifications", "Events", "All of above"], correct: 0 },
+            { q: "What is row-level security?", a: ["Filter rows per user", "Encrypt rows", "Compress rows", "None"], correct: 0 },
+            { q: "What is the difference between foreign data wrapper and dblink?", a: ["FDW accesses external data, dblink remote queries", "Same thing", "FDW newer", "No difference"], correct: 0 },
+            { q: "What does shared_buffers control?", a: ["Memory for caching data", "Connection limit", "Query memory", "None"], correct: 0 },
+            { q: "What is the purpose of logical decoding?", a: ["Extract changes for replication", "Decode queries", "Decode logs", "None"], correct: 0 },
+            { q: "What is the difference between range and hash partitioning?", a: ["Range uses intervals, hash uses modulus", "Same thing", "Range faster", "No difference"], correct: 0 },
+            { q: "What does pg_ident_file_mappings track?", a: ["User mappings", "Connections", "Queries", "None"], correct: 0 },
+            { q: "What is the purpose of parallel queries?", a: ["Use multiple CPU cores", "Faster execution", "Resource management", "All of above"], correct: 0 },
+            { q: "What is the difference between BRIN and B-tree indexes?", a: ["BRIN is block range, B-tree is balanced tree", "Same thing", "BRIN faster", "No difference"], correct: 0 },
+            { q: "What does maintenance_work_mem control?", a: ["Memory for VACUUM, CREATE INDEX", "User queries", "Connection memory", "None"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+
+        function initTest() {
+            difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0;
+            document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer'); container.innerHTML = '';
+            const q = currentQuestions[currentQuestionIndex];
+            const qDiv = document.createElement('div'); qDiv.className = 'question-container active';
+            let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join('');
+            qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`;
+            container.appendChild(qDiv);
+            updateStats();
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex]; const btns = document.querySelectorAll('.answer-btn');
+            btns.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); else if (i === index) btn.classList.add('incorrect'); });
+            if (index === q.correct) { score += 10 + (streak * 2); streak++; consecutiveCorrect++; totalAnswered++; if (consecutiveCorrect >= 5 && difficulty !== 'hard') upgradeLevel(); }
+            else { streak = 0; consecutiveCorrect = 0; totalAnswered++; }
+            updateStats(); setTimeout(nextQuestion, 1000);
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++; if (currentQuestionIndex >= currentQuestions.length) { showResults(); return; }
+            if (currentQuestionIndex % 10 === 0 && difficulty === 'easy') { currentQuestions = [...currentQuestions, ...shuffle([...mediumQuestions]).slice(0, 10).map(q => shuffleAnswers(q))]; }
+            else if (currentQuestionIndex % 15 === 0 && difficulty === 'medium') { currentQuestions = [...currentQuestions, ...shuffle([...hardQuestions]).slice(0, 10).map(q => shuffleAnswers(q))]; }
+            renderQuestion();
+        }
+
+        function upgradeLevel() { if (currentLevel < 3) { currentLevel++; consecutiveCorrect = 0; document.getElementById('levelNum').textContent = currentLevel; difficulty = currentLevel === 2 ? 'medium' : 'hard'; } }
+
+        function updateStats() { document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; document.getElementById('progressFill').style.width = ((currentQuestionIndex) / currentQuestions.length * 100) + '%'; }
+
+        function showResults() { document.getElementById('quiz').style.display = 'none'; document.getElementById('resultScreen').classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '🎉' : '😔'; document.getElementById('resultText').textContent = pass ? 'Level Complete!' : 'Keep Practicing'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score} | Best Streak: ${maxStreak}`; document.getElementById('resultDetails').textContent = `You answered ${totalAnswered} questions at Level ${currentLevel}`; }
+
+        function restartTest() { initTest(); }
+        initTest();
+    </script>
+</body>
+</html>

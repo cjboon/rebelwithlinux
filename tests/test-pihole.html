@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-pihole.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pi-hole Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+    </nav>
+    <div class="test-container">
+        <div class="test-header"><h1>// PI-HOLE TEST</h1><p>Prove your Pi-hole DNS mastery</p></div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const easyQuestions = [
+            { q: "What is Pi-hole?", a: ["Network-wide ad blocker", "VPN server", "Web server", "Email server"], correct: 0 },
+            { q: "How does Pi-hole work?", a: ["Blocks DNS queries to ads", "Filters web traffic", "Blocks IP addresses", "Uses firewall"], correct: 0 },
+            { q: "What port does Pi-hole use for DNS?", a: ["53", "80", "443", "22"], correct: 0 },
+            { q: "What is 'gravity' in Pi-hole?", a: ["List of blocklist domains", "Pull force", "Filter list", "Database"], correct: 0 },
+            { q: "What is 'FTL' in Pi-hole?", a: ["Faster Than Light - DNS engine", "File Transfer", "Full Text List", "Filter Tool"], correct: 0 },
+            { q: "What is 'blacklist' in Pi-hole?", a: ["Domains to block", "Allowed list", "White list", "Filter"], correct: 0 },
+            { q: "What is 'whitelist' in Pi-hole?", a: ["Domains to allow", "Block list", "Deny list", "Filter list"], correct: 0 },
+            { q: "What is 'regex' in Pi-hole?", a: ["Pattern matching for domains", "Regular expression", "Block list", "Filter"], correct: 1 },
+            { q: "What is Pi-hole admin interface?", a: ["Web UI for management", "Command line", "API only", "Mobile app"], correct: 0 },
+            { q: "What is default Pi-hole web port?", a: ["80", "53", "443", "8080"], correct: 0 },
+            { q: "What is 'DHCP' role in Pi-hole?", a: ["Assign IP addresses to clients", "Domain hosting", "Data transfer", "Backup"], correct: 0 },
+            { q: "What is Pi-hole gravity list?", a: ["Compiled blocklist", "Database", "Config file", "Log file"], correct: 0 },
+            { q: "What is 'pihole -w' command?", a: ["Whitelist domain", "Block domain", "Show stats", "Restart"], correct: 0 },
+            { q: "What is 'pihole -b' command?", a: ["Blacklist domain", "Whitelist domain", "Show blocklist", "Backup"], correct: 0 },
+            { q: "What is 'pihole status'?", a: ["Show Pi-hole service status", "Show blocked", "Show stats", "Show list"], correct: 0 },
+            { q: "What is 'pihole -q'?", a: ["Query domain status", "Quick stats", "Quit", "Queue"], correct: 0 },
+            { q: "What is 'pihole restartdns'?", a: ["Restart DNS service", "Stop DNS", "Start DNS", "Check DNS"], correct: 0 },
+            { q: "What is 'pihole updateGravity'?", a: ["Update blocklists", "Update gravity", "Update all", "Update lists"], correct: 0 },
+            { q: "What is 'pihole -a'?", a: ["Admin interface options", "Add domain", "Audit", "API"], correct: 0 },
+            { q: "What is 'pihole -t'?", a: ["Enable/disable telemetry", "Test DNS", "Top queries", "Timing"], correct: 0 },
+            { q: "What is 'exact blacklist'?", a: ["Block specific domain only", "Block subdomain", "Block all", "Block pattern"], correct: 0 },
+            { q: "What is 'wildcard blocking'?", a: ["Block domain and all subdomains", "Block exact", "Allow subdomains", "Allow all"], correct: 0 },
+            { q: "What is 'CNAME' record blocking?", a: ["Block CNAME to blocked domain", "DNS record", "Forward", "Reverse"], correct: 0 },
+            { q: "What is 'Long-term database'?", a: ["Stores query history", "Blocklist DB", "Config DB", "User DB"], correct: 0 },
+            { q: "What is 'query log'?", a: ["All DNS queries made", "Error log", "Access log", "Block log"], correct: 0 },
+            { q: "What is 'Top Clients'?", a: ["Most active DNS clients", "Top users", "Admin users", "Blocked clients"], correct: 0 },
+            { q: "What is 'Top Domains'?", a: ["Most queried domains", "Top ads", "Top blocked", "Top allowed"], correct: 0 },
+            { q: "What is 'Top Advertisers'?", a: ["Most blocked ad domains", "Top clients", "Top queries", "Top sites"], correct: 0 },
+            { q: "What is 'Forward Destinations'?", a: ["Where queries are forwarded", "Blocked", "Logged", "Cached"], correct: 0 },
+            { q: "What is 'upstream DNS'?", a: ["External DNS server to use", "Local DNS", "Pi-hole DNS", "Client DNS"], correct: 0 },
+            { q: "What is 'Conditional Forwarding'?", a: ["Forward local domain queries", "Block forward", "Allow forward", "Filter forward"], correct: 0 },
+            { q: "What is 'DNSSEC'?", a: ["DNS Security Extensions", "DNS Cache", "DNS Filter", "DNS Log"], correct: 0 },
+            { q: "What is 'DNS over HTTPS'?", a: ["Encrypt DNS with HTTPS", "DNS to HTTP", "HTTP DNS", "Secure DNS"], correct: 0 },
+            { q: "What is 'DNS over TLS'?", a: ["Encrypt DNS with TLS", "DNS TLS", "TLS DNS", "Secure TLS"], correct: 0 },
+            { q: "What is 'query blocking'?", a: ["Prevent domain resolution", "Log queries", "Cache queries", "Allow queries"], correct: 0 },
+            { q: "What is 'Pi-hole dashboard'?", a: ["Visual statistics interface", "Config panel", "Blocklist", "Admin"], correct: 0 },
+            { q: "What is 'API token' in Pi-hole?", a: ["Auth for API access", "User token", "Admin key", "Access key"], correct: 0 },
+            { q: "What is 'telemetery' in Pi-hole?", a: ["Anonymous usage data", "Traffic data", "Block data", "Query data"], correct: 0 },
+            { q: "What is 'Groups' in Pi-hole?", a: ["Manage multiple client groups", "Group blocklists", "Group users", "Group domains"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is Pi-hole blocking mode?", a: ["How to handle blocked queries", "Block algorithm", "Filter mode", "List mode"], correct: 0 },
+            { q: "What is 'NULL' blocking?", a: ["Return 0.0.0.0 for blocked", "Return NXDOMAIN", "Return local", "Return error"], correct: 0 },
+            { q: "What is 'IP NODATA' blocking?", a: ["Return IP for non-existent domain", "Return NULL", "Return blocked", "Return local"], correct: 0 },
+            { q: "What is 'NXDOMAIN' blocking?", a: ["Return non-existent domain", "Return IP", "Return NULL", "Return local"], correct: 0 },
+            { q: "What is 'custom IPv4' blocking?", a: ["Return custom IP for blocked", "Custom block", "Custom allow", "Custom return"], correct: 0 },
+            { q: "What is 'Pi-hole as All DNS'?", a: ["Handle all DNS queries", "Partial DNS", "Backup DNS", "Second DNS"], correct: 0 },
+            { q: "What is 'Pi-hole as All DHCP'?", a: ["Handle all DHCP queries", "Partial DHCP", "Backup DHCP", "Second DHCP"], correct: 0 },
+            { q: "What is 'IPv6 support'?", a: ["Handle IPv6 DNS queries", "IPv4 only", "IPv6 DNS", "No IPv6"], correct: 0 },
+            { q: "What is 'interface binding'?", a: ["Listen on specific network interface", "Bind to port", "Bind to IP", "Bind all"], correct: 0 },
+            { q: "What is 'bogus priv IP'?", a: ["Return NXDOMAIN for private IP", "Block private", "Allow private", "Ignore private"], correct: 0 },
+            { q: "What is 'DNSSEC validation'?", a: ["Verify DNSSEC signatures", "Enable DNS", "Disable DNSSEC", "Cache DNSSEC"], correct: 0 },
+            { q: "What is 'conditional forwarding'?", a: ["Forward local domains to router", "Forward all", "Block forward", "Allow forward"], correct: 0 },
+            { q: "What is 'local host records'?", a: ["Custom DNS entries", "Host file", "Local DNS", "Static DHCP"], correct: 0 },
+            { q: "What is 'CNAME record'?", a: ["DNS alias record", "A record", "AAAA record", "PTR record"], correct: 0 },
+            { q: "What is 'DNSSEC' required?", a: ["Upstream DNS supports DNSSEC", "Local validation", "Client validation", "No DNSSEC"], correct: 0 },
+            { q: "What is 'cache size'?", a: ["Number of DNS entries to cache", "Cache time", "Cache memory", "Cache type"], correct: 0 },
+            { q: "What is 'cache TTL'?", a: ["Time to live for cached entries", "Cache size", "Cache life", "Cache time"], correct: 0 },
+            { q: "What is 'negative caching'?", a: ["Cache NXDOMAIN responses", "Positive cache", "Query cache", "Domain cache"], correct: 0 },
+            { q: "What is 'gravity.db'?", a: ["SQLite database of blocklists", "Main config", "Query log", "User data"], correct: 0 },
+            { q: "What is 'pihole-FTL.db'?", a: ["Query history database", "Blocklist", "Config", "User"], correct: 0 },
+            { q: "What is 'GRAVITY_UPDATE_NOW'?", a: ["Trigger gravity update", "Show gravity", "Check gravity", "List gravity"], correct: 0 },
+            { q: "What is 'REGEX_DEBUG'?", a: ["Enable regex debugging", "Debug regex", "Regex log", "Test regex"], correct: 0 },
+            { q: "What is 'BLOCKINGMODE'?", a: ["How blocked domains respond", "Blocking level", "Block type", "Block mode"], correct: 0 },
+            { q: "What is 'PRIVACYLEVEL'?", a: ["Privacy level for statistics", "Privacy mode", "Stats level", "Hide level"], correct: 0 },
+            { q: "What is 'API_QUERIES_DISPLAY'?", a: ["Show query types in API", "Query API", "Display API", "List API"], correct: 0 },
+            { q: "What is 'WEBUIBOXEDLAYOUT'?", a: ["Dashboard layout setting", "Box layout", "UI layout", "Web layout"], correct: 0 },
+            { q: "What is 'Web password'?", a: ["Protect admin interface", "API password", "User password", "Login password"], correct: 0 },
+            { q: "What is 'ADMIN_EMAIL'?", a: ["Email for notifications", "User email", "Contact email", "Alert email"], correct: 0 },
+            { q: "What is 'WEBTHEME'?", a: ["Dashboard color theme", "Web theme", "UI theme", "Theme"], correct: 0 },
+            { q: "What is 'INSTALL_LOGGING'?", a: ["Logging verbosity level", "Install log", "Log level", "Debug log"], correct: 0 },
+            { q: "What is 'DNSMASQ_USER'?", a: ["User for DNSMASQ", "DNS user", "Run user", "Service user"], correct: 0 },
+            { q: "What is 'PIHOLE_INTERFACE'?", a: ["Network interface to use", "DNS interface", "Web interface", "Admin interface"], correct: 0 },
+            { q: "What is 'IPV4_ADDRESS'?", a: ["IPv4 address to bind", "IPv4 interface", "IPv4 DNS", "IPv4 web"], correct: 0 },
+            { q: "What is 'IPV6_ADDRESS'?", a: ["IPv6 address to bind", "IPv6 interface", "IPv6 DNS", "IPv6 web"], correct: 0 },
+            { q: "What is 'DNSMASQ_LISTENING'?", a: ["DNS listening configuration", "Listen mode", "Listen type", "Listen setup"], correct: 0 },
+            { q: "What is 'DNS_FQDN'?", a: ["Use fully qualified domain", "Use FQDN", "DNS type", "Domain type"], correct: 0 },
+            { q: "What is 'DNS_BOGUS_PRIV'?", a: ["Bogus private reverse lookups", "Private lookup", "Bogus priv", "Priv reverse"], correct: 0 },
+            { q: "What is 'EXPAND_ALIASES'?", a: ["Expand CNAME aliases", "Alias expand", "CNAME expand", "Expand CNAME"], correct: 0 },
+            { q: "What is 'BLOCK_ESNI'?", a: ["Block Encrypted SNI", "Block ECH", "Block TLS", "Block SSL"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is 'Pi-hole distribution'?", a: ["Package for different OS", "Install method", "Version type", "Flavor"], correct: 0 },
+            { q: "What is 'docker-pihole'?", a: ["Official Docker container", "Docker image", "Container setup", "Pi-hole in Docker"], correct: 1 },
+            { q: "What is 'FTL' engine architecture?", a: ["Multi-threaded DNS", "Single thread", "Forked", "Modular"], correct: 0 },
+            { q: "What is 'embedded dnsmasq'?", a: ["Built-in DNSMASQ", "External dnsmasq", "Modified dnsmasq", "Custom dnsmasq"], correct: 0 },
+            { q: "What is 'query dispatching'?", a: ["Distribute queries to threads", "Thread pool", "Query queue", "Thread load"], correct: 0 },
+            { q: "What is 'SDS' in FTL?", a: ["Shared Data Structure", "Signal Delivery", "Socket Data", "System Data"], correct: 0 },
+            { q: "What is 'ring buffer' in FTL?", a: ["Circular log buffer", "Memory buffer", "Log file", "Query buffer"], correct: 0 },
+            { q: "What is 'port 4711' in Pi-hole?", a: ["FTL API port", "Web port", "DNS port", "DHCP port"], correct: 0 },
+            { q: "What is 'port 4712'?", a: ["FTLteleporter port", "API port", "Web port", "DNS port"], correct: 0 },
+            { q: "What is 'teleporter' feature?", a: ["Backup/restore Pi-hole config", "Import/export", "Transfer", "Migrate"], correct: 0 },
+            { q: "What is 'long-term data' retention?", a: ["How long query history kept", "Data size", "Log time", "History time"], correct: 0 },
+            { q: "What is 'database VACUUM'?", a: ["Optimize SQLite database", "Clean database", "Compact database", "Rebuild database"], correct: 0 },
+            { q: "What is 'regex filter' matching?", a: ["Pattern-based domain blocking", "Simple filter", "Text filter", "Block filter"], correct: 0 },
+            { q: "What is 'grep' vs 'regex'?", a: ["grep=exact, regex=pattern", "Same thing", "grep=pattern", "regex=exact"], correct: 0 },
+            { q: "What is 'ADLists'?", a: ["Sources of blocklists", "List of ads", "Block list", "Ad sources"], correct: 0 },
+            { q: "What is 'list type'?", a: ["Block/warning/allow domain", "List category", "List group", "List type"], correct: 0 },
+            { q: "What is 'client group'?", a: ["Group clients for different rules", "User group", "Network group", "Device group"], correct: 0 },
+            { q: "What is 'group assignment'?", a: ["Assign client to group", "Group users", "Group devices", "Group domains"], correct: 0 },
+            { q: "What is 'per-client blocking'?", a: ["Different blocking per client", "Client block", "IP block", "Device block"], correct: 0 },
+            { q: "What is 'exact whitelist'?", a: ["Allow only exact domain", "Allow all", "Allow sub", "Allow pattern"], correct: 0 },
+            { q: "What is 'regex whitelist'?", a: ["Whitelist by pattern", "Domain list", "Pattern list", "Allow list"], correct: 0 },
+            { q: "What is 'client regex'?", a: ["Regex matching client IPs", "Client pattern", "IP regex", "Device regex"], correct: 0 },
+            { q: "What is 'audit log'?", a: ["Log domain listing actions", "Audit trail", "Listing log", "Action log"], correct: 0 },
+            { q: "What is 'pihole -adlists'?", a: ["Set blocklist sources", "List ads", "Ad sources", "Block sources"], correct: 0 },
+            { q: "What is 'chronometer'?", a: ["Terminal dashboard", "Web dashboard", "Mobile app", "API"], correct: 0 },
+            { q: "What is 'pihole -v'?", a: ["Show version info", "View logs", "Verify", "Verbose"], correct: 0 },
+            { q: "What is 'debug log'?", a: ["Generate troubleshooting log", "Error log", "Verbose log", "Test log"], correct: 0 },
+            { q: "What is 'query blocking rate'?", a: ["Percentage blocked", "Block rate", "Query rate", "Block percentage"], correct: 0 },
+            { q: "What is 'gravity.sh' script?", a: ["Updates blocklists", "Gravity list", "Update script", "List updater"], correct: 0 },
+            { q: "What is 'list parser'?", a: ["Parses blocklist formats", "List reader", "List processor", "List parser"], correct: 0 },
+            { q: "What is 'adlist group'?", a: ["Group blocklists for control", "List group", "Block group", "Ad group"], correct: 0 },
+            { q: "What is 'database schema'?", a: ["Structure of Pi-hole DB", "DB structure", "DB format", "DB layout"], correct: 0 },
+            { q: "What is 'API /stats' endpoint?", a: ["Query statistics", "Status", "Summary", "All three"], correct: 3 },
+            { q: "What is 'API /queries' endpoint?", a: ["Query log access", "Get queries", "List queries", "Query list"], correct: 0 },
+            { q: "What is 'API /domains' endpoint?", a: ["Manage domain lists", "List domains", "Domain API", "Add domain"], correct: 0 },
+            { q: "What is 'API /groups' endpoint?", a: ["Manage client groups", "Group API", "List groups", "Add group"], correct: 0 },
+            { q: "What is 'API /clients' endpoint?", a: ["Manage clients", "Client API", "List clients", "Add client"], correct: 0 },
+            { q: "What is 'Pi-hole hardware' recommendations?", a: ["1GB RAM, 8GB SD", "4GB RAM", "2GB RAM", "512MB RAM"], correct: 0 },
+            { q: "What is 'Pi-hole on ARM'?", a: ["Runs on Raspberry Pi", "x86 only", "Intel only", "AMD64 only"], correct: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let difficulty = 'easy';
+        let currentLevel = 1;
+        let consecutiveCorrect = 0;
+        let totalAnswered = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function shuffleAnswers(question) {
+            const answers = [...question.a];
+            const correctAnswer = answers[question.correct];
+            const shuffled = shuffle(answers);
+            const newCorrectIndex = shuffled.indexOf(correctAnswer);
+            return { ...question, a: shuffled, correct: newCorrectIndex };
+        }
+
+        function initTest() {
+            difficulty = 'easy';
+            currentLevel = 1;
+            consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            totalAnswered = 0;
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('quiz').style.display = 'block';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            const q = currentQuestions[currentQuestionIndex];
+            const qDiv = document.createElement('div');
+            qDiv.className = 'question-container active';
+            let answersHtml = q.a.map((answer, index) => 
+                `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`
+            ).join('');
+            qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`;
+            container.appendChild(qDiv);
+            updateStats();
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(btn => btn.disabled = true);
+            if (index === q.correct) {
+                buttons[index].classList.add('correct');
+                score += 10 + (streak * 2);
+                streak++;
+                consecutiveCorrect++;
+                if (streak > maxStreak) maxStreak = streak;
+            } else {
+                buttons[index].classList.add('incorrect');
+                buttons[q.correct].classList.add('correct');
+                streak = 0;
+                consecutiveCorrect = 0;
+            }
+            totalAnswered++;
+            if (consecutiveCorrect >= 3 && difficulty === 'easy') {
+                difficulty = 'medium';
+                currentLevel = 2;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            } else if (consecutiveCorrect >= 3 && difficulty === 'medium') {
+                difficulty = 'hard';
+                currentLevel = 3;
+                consecutiveCorrect = 0;
+                loadNextDifficulty();
+            }
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex >= currentQuestions.length) {
+                    showResults();
+                } else {
+                    renderQuestion();
+                }
+            }, 1500);
+        }
+
+        function loadNextDifficulty() {
+            let newQuestions;
+            if (difficulty === 'medium') {
+                newQuestions = shuffle([...mediumQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            } else if (difficulty === 'hard') {
+                newQuestions = shuffle([...hardQuestions]).slice(0, 15).map(q => shuffleAnswers(q));
+            }
+            currentQuestions = [...currentQuestions, ...newQuestions];
+        }
+
+        function updateStats() {
+            document.getElementById('questionNum').textContent = currentQuestionIndex + 1;
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('scoreNum').textContent = score;
+            document.getElementById('levelNum').textContent = currentLevel;
+            const progress = (currentQuestionIndex / currentQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('resultScreen').classList.add('active');
+            const percentage = (score / (currentQuestions.length * 10)) * 100;
+            const passed = percentage >= 50;
+            document.getElementById('resultIcon').textContent = passed ? '🏆' : '📚';
+            document.getElementById('resultText').textContent = passed ? 'PASSED!' : 'KEEP LEARNING';
+            document.getElementById('resultText').className = 'result-text ' + (passed ? 'pass' : 'fail');
+            document.getElementById('resultScore').textContent = `Score: ${score} | Max Streak: ${maxStreak}`;
+            document.getElementById('resultDetails').textContent = passed ? 'You have mastered Pi-hole!' : 'Review the Pi-hole guide and try again.';
+        }
+
+        function restartTest() {
+            initTest();
+        }
+
+        initTest();
+    </script>
+</body>
+</html>

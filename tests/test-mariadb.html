@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-mariadb.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MariaDB Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--charcoal); transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: var(--charcoal); color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; }
+        .stat-item { text-align: center; }
+        .stat-value { font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); }
+        .theme-toggle-checkbox { display: none; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks" style="color: var(--charcoal);">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu" style="color: var(--charcoal);">× Close</a>
+                    <a href="../search.html" style="color: var(--charcoal);">SEARCH</a>
+                    <a href="../index.html#games" style="color: var(--charcoal);">GAMES</a>
+                    <a href="../index.html#guides" style="color: var(--charcoal);">GUIDES</a>
+                    <a href="../index.html#blog" style="color: var(--charcoal);">BLOG</a>
+                    <a href="../index.html#about" style="color: var(--charcoal);">ABOUT</a>
+                    <a href="../account.html" id="loginLink" class="auth-link" style="color: var(--charcoal);">LOGIN</a>
+                    <a href="../account.html" id="accountLink" style="display:none; color: var(--charcoal);">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <div class="test-header">
+            <h1>// MARIADB TEST</h1>
+            <p>Prove your MariaDB mastery</p>
+        </div>
+
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const easyQuestions = [
+            { q: "What is MariaDB?", a: ["MySQL fork database", "SQL Server", "NoSQL", "Oracle"], correct: 0 },
+            { q: "What port does MariaDB use by default?", a: ["3306", "5432", "1433", "8080"], correct: 0 },
+            { q: "How do you connect to MariaDB from command line?", a: ["mysql -u user -p", "mariadb -u user", "connect mysql", "db connect"], correct: 0 },
+            { q: "What command creates a database?", a: ["CREATE DATABASE", "MAKE DATABASE", "NEW DATABASE", "ADD DATABASE"], correct: 0 },
+            { q: "What command creates a table?", a: ["CREATE TABLE", "MAKE TABLE", "NEW TABLE", "ADD TABLE"], correct: 0 },
+            { q: "What is the primary key?", a: ["Unique identifier", "First column", "Main key", "Index key"], correct: 0 },
+            { q: "What does SELECT do?", a: ["Retrieves data", "Inserts data", "Updates data", "Deletes data"], correct: 0 },
+            { q: "What does INSERT do?", a: ["Adds data", "Selects data", "Updates data", "Deletes data"], correct: 0 },
+            { q: "What does UPDATE do?", a: ["Modifies data", "Adds data", "Removes data", "Creates data"], correct: 0 },
+            { q: "What does DELETE do?", a: ["Removes data", "Adds data", "Updates data", "Creates data"], correct: 0 },
+            { q: "What is WHERE clause used for?", a: ["Filter results", "Sort results", "Group results", "Join tables"], correct: 0 },
+            { q: "What is a JOIN?", a: ["Combine tables", "Split tables", "Delete tables", "Create tables"], correct: 0 },
+            { q: "What is InnoDB?", a: ["Storage engine", "Database type", "Table type", "Index type"], correct: 0 },
+            { q: "What does COUNT() do?", a: ["Counts rows", "Sums values", "Averages", "Finds max"], correct: 0 },
+            { q: "What is ORDER BY?", a: ["Sort results", "Filter results", "Group results", "Join tables"], correct: 0 },
+            { q: "What is GROUP BY?", a: ["Group results", "Sort results", "Filter results", "Join results"], correct: 0 },
+            { q: "What does GRANT do?", a: ["Gives permissions", "Removes access", "Creates user", "Deletes user"], correct: 0 },
+            { q: "What does REVOKE do?", a: ["Removes permissions", "Gives permissions", "Creates user", "Deletes user"], correct: 0 },
+            { q: "What is a FOREIGN KEY?", a: ["Links tables", "Primary key", "Unique key", "Index key"], correct: 0 },
+            { q: "What does DROP TABLE do?", a: ["Deletes table", "Creates table", "Modifies table", "Views table"], correct: 0 }
+        ];
+
+        const mediumQuestions = [
+            { q: "What is the difference between InnoDB and MyISAM?", a: ["InnoDB supports transactions, MyISAM does not", "Different speed", "Different storage", "No difference"], correct: 0 },
+            { q: "What is a database index?", a: ["Speeds up queries", "Stores data", "Backs up data", "None"], correct: 0 },
+            { q: "What does ALTER TABLE do?", a: ["Modifies table structure", "Deletes table", "Creates table", "Views table"], correct: 0 },
+            { q: "What is a VIEW?", a: ["Virtual table based on query", "Real table", "Backup table", "Temp table"], correct: 0 },
+            { q: "What does UNION do?", a: ["Combines results", "Joins tables", "Filters data", "Sorts data"], correct: 0 },
+            { q: "What is a subquery?", a: ["Query within query", "Main query", "Join query", "None"], correct: 0 },
+            { q: "What does LIKE do?", a: ["Pattern matching", "Equality check", "Range check", "Null check"], correct: 0 },
+            { q: "What is a stored procedure?", a: ["Precompiled SQL code", "Stored data", "Stored trigger", "Stored view"], correct: 0 },
+            { q: "What is a TRIGGER?", a: ["Executes on events", "Stores procedure", "Creates index", "None"], correct: 0 },
+            { q: "What does AUTO_INCREMENT do?", a: ["Auto number generation", "Auto date", "Auto increment", "Auto index"], correct: 0 },
+            { q: "What is normalization?", a: ["Organize data to reduce redundancy", "Speed up queries", "Back up data", "None"], correct: 0 },
+            { q: "What is a composite key?", a: ["Multiple columns as key", "Single key", "Foreign key", "None"], correct: 0 },
+            { q: "What does DISTINCT do?", a: ["Removes duplicates", "Adds duplicates", "Filters nulls", "Sorts results"], correct: 0 },
+            { q: "What is the difference between HAVING and WHERE?", a: ["HAVING filters groups, WHERE filters rows", "Same thing", "WHERE faster", "No difference"], correct: 0 },
+            { q: "What does LIMIT do?", a: ["Restricts number of rows", "Sets limit size", "Maximum rows", "Minimum rows"], correct: 0 },
+            { q: "What is a transaction?", a: ["Atomic operations group", "Single operation", "Multiple queries", "None"], correct: 0 },
+            { q: "What does COMMIT do?", a: ["Save transaction", "Undo transaction", "Rollback", "Begin transaction"], correct: 0 },
+            { q: "What does ROLLBACK do?", a: ["Undo transaction", "Save transaction", "Commit", "Begin"], correct: 0 },
+            { q: "What is a LEFT JOIN?", a: ["All left + matching right", "Only matching", "Only left", "All data"], correct: 0 },
+            { q: "What is an INNER JOIN?", a: ["Only matching rows", "All left", "All right", "All rows"], correct: 0 }
+        ];
+
+        const hardQuestions = [
+            { q: "What is the difference between VARCHAR and CHAR?", a: ["Variable vs fixed length", "Same thing", "CHAR faster", "No difference"], correct: 0 },
+            { q: "What is a composite index?", a: ["Index on multiple columns", "Single index", "Unique index", "None"], correct: 0 },
+            { q: "What does EXPLAIN show?", a: ["Query execution plan", "Query results", "Index usage", "Table stats"], correct: 0 },
+            { q: "What is query optimization?", a: ["Improve query performance", "Write queries", "Execute queries", "None"], correct: 0 },
+            { q: "What is replication in MariaDB?", a: ["Copy data to other servers", "Back up data", "Restore data", "None"], correct: 0 },
+            { q: "What is master-slave replication?", a: ["One primary, multiple secondaries", "All equal", "No difference", "None"], correct: 0 },
+            { q: "What is Galera Cluster?", a: ["Multi-master clustering", "Single master", "Backup solution", "None"], correct: 0 },
+            { q: "What does OPTIMIZE TABLE do?", a: ["Reclaim space, defragment", "Check table", "Repair table", "None"], correct: 0 },
+            { q: "What is a covering index?", a: ["Includes all columns needed", "Single column", "Partial index", "None"], correct: 0 },
+            { q: "What does ANALYZE TABLE do?", a: ["Update statistics", "Check integrity", "Optimize", "Repair"], correct: 0 },
+            { q: "What is the difference between DELETE and TRUNCATE?", a: ["TRUNCATE is faster, cannot rollback", "Same thing", "DELETE slower", "No difference"], correct: 0 },
+            { q: "What is partitioning?", a: ["Split large tables", "Copy table", "Merge tables", "None"], correct: 0 },
+            { q: "What is a materialized view?", a: ["Stores query results physically", "Virtual view", "Temp table", "None"], correct: 0 },
+            { q: "How do you secure MariaDB?", a: ["Remove test DB, set root password, limit users", "Default install", "No setup", "None"], correct: 0 },
+            { q: "What is the purpose of max_connections?", a: ["Limit concurrent connections", "Max queries", "Max time", "None"], correct: 0 },
+            { q: "What doesinnodb_buffer_pool_size control?", a: ["Memory for caching", "Disk space", "Connection limit", "None"], correct: 0 },
+            { q: "What is the difference between MyISAM and Aria?", a: ["Aria is MyISAM with recovery", "Same thing", "Aria newer", "No difference"], correct: 0 },
+            { q: "What is columnar storage in MariaDB?", a: ["Column-oriented storage", "Row storage", "Hybrid", "None"], correct: 0 },
+            { q: "What does thread_pool_size control?", a: ["Number of worker threads", "Connection threads", "Query threads", "None"], correct: 0 },
+            { q: "What is dynamic column formatting?", a: ["Flexible column types", "Fixed columns", "No format", "None"], correct: 0 }
+        ];
+
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+
+        function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+        function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
+
+        function initTest() {
+            difficulty = 'easy'; currentLevel = 1; consecutiveCorrect = 0;
+            currentQuestions = shuffle([...easyQuestions]).slice(0, 20).map(q => shuffleAnswers(q));
+            currentQuestionIndex = 0; score = 0; streak = 0; maxStreak = 0; totalAnswered = 0;
+            document.getElementById('resultScreen').classList.remove('active'); document.getElementById('quiz').style.display = 'block';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const container = document.getElementById('questionsContainer'); container.innerHTML = '';
+            const q = currentQuestions[currentQuestionIndex];
+            const qDiv = document.createElement('div'); qDiv.className = 'question-container active';
+            let answersHtml = q.a.map((answer, index) => `<button class="answer-btn" onclick="selectAnswer(${index})">${answer}</button>`).join('');
+            qDiv.innerHTML = `<div class="question-text">${q.q}</div><div class="answers-grid">${answersHtml}</div>`;
+            container.appendChild(qDiv);
+            updateStats();
+        }
+
+        function selectAnswer(index) {
+            const q = currentQuestions[currentQuestionIndex]; const btns = document.querySelectorAll('.answer-btn');
+            btns.forEach((btn, i) => { btn.disabled = true; if (i === q.correct) btn.classList.add('correct'); else if (i === index) btn.classList.add('incorrect'); });
+            if (index === q.correct) { score += 10 + (streak * 2); streak++; consecutiveCorrect++; totalAnswered++; if (consecutiveCorrect >= 5 && difficulty !== 'hard') upgradeLevel(); }
+            else { streak = 0; consecutiveCorrect = 0; totalAnswered++; }
+            updateStats(); setTimeout(nextQuestion, 1000);
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++; if (currentQuestionIndex >= currentQuestions.length) { showResults(); return; }
+            if (currentQuestionIndex % 10 === 0 && difficulty === 'easy') { currentQuestions = [...currentQuestions, ...shuffle([...mediumQuestions]).slice(0, 10).map(q => shuffleAnswers(q))]; }
+            else if (currentQuestionIndex % 15 === 0 && difficulty === 'medium') { currentQuestions = [...currentQuestions, ...shuffle([...hardQuestions]).slice(0, 10).map(q => shuffleAnswers(q))]; }
+            renderQuestion();
+        }
+
+        function upgradeLevel() { if (currentLevel < 3) { currentLevel++; consecutiveCorrect = 0; document.getElementById('levelNum').textContent = currentLevel; difficulty = currentLevel === 2 ? 'medium' : 'hard'; } }
+
+        function updateStats() { document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; document.getElementById('progressFill').style.width = ((currentQuestionIndex) / currentQuestions.length * 100) + '%'; }
+
+        function showResults() { document.getElementById('quiz').style.display = 'none'; document.getElementById('resultScreen').classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '🎉' : '😔'; document.getElementById('resultText').textContent = pass ? 'Level Complete!' : 'Keep Practicing'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score} | Best Streak: ${maxStreak}`; document.getElementById('resultDetails').textContent = `You answered ${totalAnswered} questions at Level ${currentLevel}`; }
+
+        function restartTest() { initTest(); }
+        initTest();
+    </script>
+</body>
+</html>
