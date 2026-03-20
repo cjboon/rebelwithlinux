@@ -177,7 +177,7 @@ Quick guides and tips organized by category:
 - Automation & IaC (Ansible, Jenkins)
 
 ### Terms (13 total)
-Command reference pages: awk, bash, curl, git, jq, nix, py, regex, sed, sql, ssh, vim
+Interactive terminal command learning games: awk, bash, curl, git, jq, nix, py, regex, sed, sql, ssh, vim
 
 ### Projects (9 total)
 Step-by-step project tutorials: blog, fileshare, homelab, i3, mail, matrix, onion, paste, wireguard

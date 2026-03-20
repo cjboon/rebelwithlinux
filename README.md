@@ -40,7 +40,7 @@ Stop renting. Stop licensing. Stop being the product.
 | Hangman | 42 | Word-guessing games for learning terms |
 | Tests | 41 | Interactive quizzes |
 | Blog | 58 | Quick guides and tips |
-| Terms | 13 | Command reference pages |
+| Terms | 13 | Terminal command learning games |
 | Projects | 9 | Step-by-step project tutorials |
 | Games | 6 | Interactive learning games |
 
