@@ -129,9 +129,9 @@
 |---------|-------|---------|---------|------|------|
 | Monitoring | ✓ | ✓ | - | ✓ | ✓ |
 | Grafana | ✓ | ✓ | - | ✓ | ✓ |
-| Prometheus | - | ✓ | - | ✓ | ✓ |
+| Prometheus | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Logging | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Vault | - | ✓ | - | - | ✓ |
+| Vault | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 ### Privacy & Self-Hosting
 | Subject | Guide | Hangman | Builder | Test | Blog |
@@ -145,26 +145,26 @@
 | Subject | Guide | Hangman | Builder | Test | Blog |
 |---------|-------|---------|---------|------|------|
 | Git | ✓ | ✓ | ✓ | ✓ | ✓ |
-| GitHub | - | ✓ | - | - | ✓ |
-| Helm | - | ✓ | - | - | - |
+| GitHub | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Helm | ✓ | ✓ | ✓ | ✓ | - |
 
 ---
 
 ## 5. Content Type Specifications
 
-### Guides (37 total)
+### Guides (40 total)
 Comprehensive written tutorials covering theory and practical examples.
 
-### Builders (56 files)
+### Builders (97 files)
 Multi-part drag-and-drop code building games. Some subjects have 3 parts (e.g., builder-bash.html, builder-bash-2.html, builder-bash-3.html).
 
-### Hangman (45 total)
+### Hangman (42 total)
 Word-guessing games for learning commands and terms. Includes a main hub (hangman-main.html).
 
-### Tests (39 total)
+### Tests (41 total)
 Interactive fill-in-the-blank quizzes with hints and scoring.
 
-### Blog (55 total)
+### Blog (58 total)
 Quick guides and tips organized by category:
 - Foundations (Linux, Bash, Vim)
 - Web Basics (HTML, CSS, JavaScript, PHP)
@@ -244,11 +244,11 @@ Interactive learning games: debian, debian-2, debian-3, quiz, speed, turing
 ├── sw.js               # Service worker
 ├── fonts.css           # Font definitions
 ├── fonts/              # Self-hosted fonts
-├── guides/             # 37 comprehensive guides
-├── builders/           # 56 builder game files
-├── hangman/            # 45 hangman game files
-├── tests/              # 39 quiz files
-├── blog/               # 55 blog posts
+├── guides/             # 40 comprehensive guides
+├── builders/           # 97 builder game files
+├── hangman/            # 42 hangman game files
+├── tests/              # 41 quiz files
+├── blog/               # 58 blog posts
 ├── terms/              # 13 term reference pages
 ├── projects/           # 9 project tutorials
 ├── games/              # 6 learning games

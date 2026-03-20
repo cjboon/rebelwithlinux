@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-github.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub - Master Code Collaboration | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn GitHub from basics to advanced. Master repositories, branches, pull requests, GitHub Actions, and collaborative development workflows.">
+    <meta name="keywords" content="GitHub, Git tutorial, version control, GitHub Actions, pull requests, repositories, GitHub Pages, GitHub CLI, collaboration">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                const saved = localStorage.getItem('theme');
+                toggle.checked = (saved === 'dark' || !saved);
+            }
+        });
+    </script>
+    <script src="../terminal-select.js"></script>
+    <style>
+        :root {
+            --nav-color: #238636;
+        }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../search.html">SEARCH</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#login" id="loginLink" class="auth-link">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>MASTER YOUR<br>CODE HOSTING</h1>
+        <p class="tagline">// The world's largest code platform.</p>
+        
+        <div class="manifesto">
+            <p><strong>GITHUB CHANGED HOW WE COLLABORATE ON CODE.</strong></p>
+            <p>GitHub hosts over 100 million repositories. It's the home for open source, the platform for team collaboration, and the foundation for modern DevOps workflows with GitHub Actions.</p>
+            <p><strong>WHY GITHUB?</strong></p>
+            <p>GitHub provides free hosting for public repos, integrated CI/CD with Actions, project management tools, and the world's largest community of developers. Your code lives in the cloud, backed up, and accessible anywhere.</p>
+            <p><strong>JOIN THE REVOLUTION.</strong></p>
+            <p>From personal projects to enterprise teams, GitHub powers how we build software together. Fork repos, submit pull requests, automate workflows, and ship faster with the world's most popular code platform.</p>
+        </div>
+
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// The Path to Mastery</h2>
+            <p>10 lessons. Complete GitHub control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to GitHub</h3>
+                <p class="lesson-desc">Understand GitHub, repos, and the ecosystem</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Repositories</h3>
+                <p class="lesson-desc">Create, clone, and manage repositories</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Branching & Merging</h3>
+                <p class="lesson-desc">Work with branches and pull requests</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">GitHub Issues</h3>
+                <p class="lesson-desc">Track bugs and manage feature requests</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Markdown & Documentation</h3>
+                <p class="lesson-desc">Write READMEs and documentation</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">GitHub Actions</h3>
+                <p class="lesson-desc">Automate CI/CD workflows</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Forks & Contributing</h3>
+                <p class="lesson-desc">Contribute to open source projects</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">GitHub CLI</h3>
+                <p class="lesson-desc">Work with GitHub from terminal</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">GitHub Pages</h3>
+                <p class="lesson-desc">Host websites for free</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Security & Dependabot</h3>
+                <p class="lesson-desc">Secure your repositories</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why GitHub</h2>
+            <p>GitHub was founded in 2008 and acquired by Microsoft in 2018 for $7.5 billion. Today it hosts over 100 million repositories and has over 83 million developers.</p>
+            <p>GitHub isn't just storage—it's a complete platform for collaborative development. Issues track bugs and features. Actions automate testing and deployment. Projects provide Kanban boards. Codespaces offer cloud development environments.</p>
+            <p>For open source, GitHub is the de facto standard. Popular projects like Linux, Kubernetes, React, and millions of others call GitHub home. Fork any repo, submit improvements, and your code can be part of something bigger.</p>
+            <p><strong>The world's code lives on GitHub. Make it yours.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>📖 GitHub Docs</h3>
+                <p>Official Documentation</p>
+                <a href="https://docs.github.com" target="_blank">docs.github.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>💻 GitHub CLI</h3>
+                <p>Command Line Interface</p>
+                <a href="https://cli.github.com" target="_blank">cli.github.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>⚡ Actions</h3>
+                <p>CI/CD Automation</p>
+                <a href="https://github.com/features/actions" target="_blank">Actions</a>
+            </div>
+            <div class="resource-card">
+                <h3>📝 GitHub Pages</h3>
+                <p>Static Site Hosting</p>
+                <a href="https://pages.github.com" target="_blank">pages.github.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔒 Security</h3>
+                <p>Security Features</p>
+                <a href="https://github.com/features/security" target="_blank">Security</a>
+            </div>
+            <div class="resource-card">
+                <h3>🐙 Codespaces</h3>
+                <p>Cloud IDE</p>
+                <a href="https://github.com/features/codespaces" target="_blank">Codespaces</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="copyleft">⟲</span>
+                <span>REBEL WITH LINUX</span>
+            </div>
+            <p class="footer-tagline">Learn Linux the hard way.</p>
+            <div class="footer-links">
+                <a href="../site-map.html">Site Map</a>
+                <span class="footer-divider">|</span>
+                <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion">Onion Site</a>
+                <span class="footer-divider">|</span>
+                <a href="https://github.com/cjboon/rebelwithlinux">GitHub</a>
+            </div>
+            <p class="footer-copyright">COPYRIGHT © 2026 — ALL RIGHTS RESERVED</p>
+        </div>
+    </footer>
+
+    <div class="modal-content" id="modalContent"></div>
+
+    <!-- Lesson 1 --><div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Introduction to GitHub</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is GitHub?</h3>
+                <p>GitHub is a cloud-based platform for hosting and collaborating on Git repositories. While Git is the version control system, GitHub provides the infrastructure, tools, and community around it.</p>
+                    
+                <h3>Key GitHub Concepts</h3>
+                <ul>
+                    <li><strong>Repository:</strong> A project folder that stores all files and their history</li>
+                    <li><strong>Remote:</strong> The cloud copy of your repo on GitHub</li>
+                    <li><strong>Fork:</strong> Your copy of someone else's repository</li>
+                    <li><strong>Clone:</strong> Download a repo to your local machine</li>
+                    <li><strong>Push:</strong> Upload commits from local to remote</li>
+                    <li><strong>Pull:</strong> Download changes from remote to local</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>GITHUB'S PHILOSOPHY:</strong> "GitHub is where people build software." It's not just for developers—anyone can participate in open source, file bug reports, or contribute documentation.
+                </div>
+
+                <h3>GitHub vs Git</h3>
+                <div class="code-block">
+<span class="comment"># Git - distributed version control system</span>
+<span class="comment"># GitHub - cloud platform hosting Git repos</span>
+<span class="comment"># GitLab, Bitbucket - similar competing platforms</span>
+                </div>
+
+                <h3>Getting Started</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">git init</span>
+<span class="output"># Create local repository</span>
+<span class="prompt">$</span> <span class="command">git remote add origin https://github.com/username/repo.git</span>
+<span class="output"># Link to GitHub repository</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. GitHub hosts _____ repositories.</p>
+                        <input type="text" class="quiz-input" data-answer="git" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Version control system</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. A _____ is a copy of someone else's repository.</p>
+                        <input type="text" class="quiz-input" data-answer="fork" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: F-word</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Download a repo with git _____.</p>
+                        <input type="text" class="quiz-input" data-answer="clone" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Copy command</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Upload commits with git _____.</p>
+                        <input type="text" class="quiz-input" data-answer="push" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Opposite of pull</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. A project folder is called a _____.</p>
+                        <input type="text" class="quiz-input" data-answer="repository" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Repo</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Git</p>
+                            <p>2. Fork</p>
+                            <p>3. Clone</p>
+                            <p>4. Push</p>
+                            <p>5. Repository</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 --><div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Repositories</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Creating Repositories</h3>
+                <p>Repositories can be public (visible to everyone) or private (only visible to you and collaborators you invite).</p>
+
+                <h3>GitHub Repository URL Format</h3>
+                <div class="code-block">
+<span class="comment"># HTTPS format</span>
+https://github.com/username/repository-name
+
+<span class="comment"># SSH format</span>
+git@github.com:username/repository-name
+
+<span class="comment"># Clone with HTTPS</span>
+git clone https://github.com/username/repo.git
+                </div>
+
+                <h3>Repository Setup</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">git init</span>
+<span class="output">Initialized empty Git repository</span>
+<span class="prompt">$</span> <span class="command">git add README.md</span>
+<span class="prompt">$</span> <span class="command">git commit -m "Initial commit"</span>
+<span class="output">[main abc1234] Initial commit</span>
+<span class="prompt">$</span> <span class="command">git remote add origin https://github.com/user/repo.git</span>
+<span class="prompt">$</span> <span class="command">git push -u origin main</span>
+<span class="output"># Push and set upstream</span>
+                </div>
+
+                <h3>README Files</h3>
+                <p>A README.md in your repository root is automatically displayed on GitHub. It's your project's documentation—explain what it does, how to install it, and how to contribute.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Public repos are visible to _____. </p>
+                        <input type="text" class="quiz-input" data-answer="everyone" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: All people</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. -u flag in push sets the _____ branch.</p>
+                        <input type="text" class="quiz-input" data-answer="upstream" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Upstream</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. README files are written in _____.</p>
+                        <input type="text" class="quiz-input" data-answer="markdown" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: md</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Everyone</p>
+                            <p>2. Upstream</p>
+                            <p>3. Markdown</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 --><div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Branching & Merging</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Pull Requests</h3>
+                <p>A Pull Request (PR) proposes your changes to a repository. It allows review, discussion, and approval before merging code into the main branch.</p>
+
+                <h3>PR Workflow</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">git checkout -b feature/my-feature</span>
+<span class="output">Switched to new branch 'feature/my-feature'</span>
+<span class="prompt">$</span> <span class="command">git add .</span>
+<span class="prompt">$</span> <span class="command">git commit -m "Add new feature"</span>
+<span class="prompt">$</span> <span class="command">git push origin feature/my-feature</span>
+<span class="output"># Push branch to GitHub</span>
+<span class="output"># Then create PR on GitHub web interface</span>
+                </div>
+
+                <h3>Branch Protection</h3>
+                <p>Branch protection rules prevent direct pushes to main. Require PR reviews, status checks, or specific approvers before merging.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. A _____ Request proposes code changes.</p>
+                        <input type="text" class="quiz-input" data-answer="pull" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: P-R</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Create branch with git checkout -b _____.</p>
+                        <input type="text" class="quiz-input" data-answer="branch-name" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Branch name</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Main branch protection prevents _____ pushes.</p>
+                        <input type="text" class="quiz-input" data-answer="direct" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Straight to</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Pull</p>
+                            <p>2. branch-name</p>
+                            <p>3. Direct</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 --><div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// GitHub Issues</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Issues?</h3>
+                <p>Issues track bugs, feature requests, and tasks. They provide a discussion thread attached to your repository, separate from code changes.</p>
+
+                <h3>Issue Labels</h3>
+                <div class="code-block">
+<span class="comment"># Common labels</span>
+bug          # Something isn't working
+enhancement  # New feature request
+documentation # Improvements to docs
+help-wanted  # Extra attention needed
+good-first-issue  # Good for beginners
+                </div>
+
+                <h3>Issue Workflow</h3>
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command"># Create issue on GitHub web interface</span>
+<span class="prompt">#</span> <span class="command"># Reference in commit:</span>
+<span class="prompt">$</span> <span class="command">git commit -m "Fix login bug (closes #42)"</span>
+<span class="output"># Closes issue #42 automatically when merged</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Issues track _____ and features.</p>
+                        <input type="text" class="quiz-input" data-answer="bugs" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Software errors</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. _____ labels categorize issues.</p>
+                        <input type="text" class="quiz-input" data-answer="tags" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Also called labels</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. (closes #42) in commit message _____ issue 42.</p>
+                        <input type="text" class="quiz-input" data-answer="closes" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Verb</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Bugs</p>
+                            <p>2. Tags</p>
+                            <p>3. Closes</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 --><div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Markdown & Documentation</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>GitHub Flavored Markdown</h3>
+                <p>GitHub uses Markdown with extensions for tables, task lists, code blocks, and more.</p>
+
+                <h3>Common Markdown</h3>
+                <div class="code-block">
+<span class="comment"># Headers</span>
+# H1
+## H2
+### H3
+
+<span class="comment"># Lists</span>
+- Item 1
+- Item 2
+  - Nested item
+
+<span class="comment"># Task list</span>
+- [x] Done
+- [ ] Not done
+
+<span class="comment"># Code</span>
+`inline code`
+
+```bash
+code block
+```
+                </div>
+
+                <h3>README Template</h3>
+                <div class="code-block">
+# Project Name
+
+Description of what this project does.
+
+## Installation
+
+```bash
+npm install
+```
+
+## Usage
+
+```bash
+npm start
+```
+
+## Contributing
+
+Pull requests welcome!
+
+## License
+
+MIT
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. README files use _____ format.</p>
+                        <input type="text" class="quiz-input" data-answer="markdown" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: .md</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Code blocks use three _____.</p>
+                        <input type="text" class="quiz-input" data-answer="backticks" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: ` ` `</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Task lists use [ ] with _____ or x.</p>
+                        <input type="text" class="quiz-input" data-answer="space" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Blank</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Markdown</p>
+                            <p>2. Backticks</p>
+                            <p>3. Space</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 --><div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// GitHub Actions</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are GitHub Actions?</h3>
+                <p>GitHub Actions automate workflows: test code, build packages, deploy to servers—all triggered by events like push or pull request.</p>
+
+                <h3>Basic Workflow</h3>
+                <div class="code-block"><pre>name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: npm test</pre></div>
+
+                <h3>Common Actions</h3>
+                <div class="code-block">
+<span class="comment"># Checkout code</span>
+uses: actions/checkout@v4
+
+<span class="comment"># Setup Node.js</span>
+uses: actions/setup-node@v4
+with:
+  node-version: '20'
+
+<span class="comment"># Deploy</span>
+uses: peaceiris/actions-gh-pages@v3
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Actions are triggered by _____ events.</p>
+                        <input type="text" class="quiz-input" data-answer="github" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Like push</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Actions run on _____-latest by default.</p>
+                        <input type="text" class="quiz-input" data-answer="ubuntu" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Linux distro</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. uses: keyword loads _____ from marketplace.</p>
+                        <input type="text" class="quiz-input" data-answer="actions" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Reusable units</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. GitHub</p>
+                            <p>2. Ubuntu</p>
+                            <p>3. Actions</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 --><div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Forks & Contributing</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is a Fork?</h3>
+                <p>A fork is your personal copy of someone else's repository. You can experiment freely without affecting the original project.</p>
+
+                <h3>Contributing Workflow</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command"># Fork on GitHub, then clone your fork</span>
+<span class="prompt">$</span> <span class="command">git clone https://github.com/your-username/repo.git</span>
+<span class="prompt">$</span> <span class="command">git remote add upstream https://github.com/original/repo.git</span>
+<span class="prompt">$</span> <span class="command">git checkout -b fix-bug</span>
+<span class="prompt">$</span> <span class="command"># Make changes and push</span>
+<span class="prompt">$</span> <span class="command">git push origin fix-bug</span>
+<span class="output"># Create PR from your fork to original</span>
+                </div>
+
+                <h3>Keeping Fork Updated</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">git fetch upstream</span>
+<span class="prompt">$</span> <span class="command">git checkout main</span>
+<span class="prompt">$</span> <span class="command">git merge upstream/main</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. A _____ is your copy of someone else's repo.</p>
+                        <input type="text" class="quiz-input" data-answer="fork" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: F-word</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Add original as upstream with git remote add _____.</p>
+                        <input type="text" class="quiz-input" data-answer="upstream" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Direction</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Sync fork with git fetch _____.</p>
+                        <input type="text" class="quiz-input" data-answer="upstream" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Same as before</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Fork</p>
+                            <p>2. Upstream</p>
+                            <p>3. Upstream</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 --><div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// GitHub CLI</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>GitHub CLI Overview</h3>
+                <p>gh is the official GitHub command-line tool. Create PRs, manage issues, and interact with GitHub without leaving your terminal.</p>
+
+                <h3>Essential Commands</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">gh repo clone user/repo</span>
+<span class="output"># Clone repository</span>
+<span class="prompt">$</span> <span class="command">gh issue list</span>
+<span class="output"># List open issues</span>
+<span class="prompt">$</span> <span class="command">gh issue create --title "Bug" --body "Details"</span>
+<span class="output"># Create issue</span>
+<span class="prompt">$</span> <span class="command">gh pr create --title "Feature" --body "Description"</span>
+<span class="output"># Create pull request</span>
+<span class="prompt">$</span> <span class="command">gh pr checkout 42</span>
+<span class="output"># Checkout PR locally</span>
+<span class="prompt">$</span> <span class="command">gh pr merge 42</span>
+<span class="output"># Merge PR</span>
+                </div>
+
+                <h3>Authentication</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">gh auth login</span>
+<span class="output"># Authenticate with GitHub</span>
+<span class="prompt">$</span> <span class="command">gh auth status</span>
+<span class="output"># Check authentication</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. The GitHub CLI command is _____. </p>
+                        <input type="text" class="quiz-input" data-answer="gh" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Two letters</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Create PR with gh _____ create.</p>
+                        <input type="text" class="quiz-input" data-answer="pr" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Pull Request</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Authenticate with gh auth _____.</p>
+                        <input type="text" class="quiz-input" data-answer="login" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Sign in</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. gh</p>
+                            <p>2. Pr</p>
+                            <p>3. Login</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 --><div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// GitHub Pages</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is GitHub Pages?</h3>
+                <p>GitHub Pages hosts static websites directly from your repositories. Perfect for documentation, portfolios, and project sites—free hosting with your own subdomain.</p>
+
+                <h3>Enabling Pages</h3>
+                <div class="code-block">
+<span class="comment"># Settings → Pages → Source</span>
+<span class="comment"># Select branch (usually main or gh-pages)</span>
+<span class="comment"># Your site appears at:</span>
+<span class="comment"># https://username.github.io/repo-name</span>
+                </div>
+
+                <h3>Custom Domains</h3>
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command"># Add CNAME file to repo root with your domain</span>
+<span class="prompt">#</span> <span class="command"># Configure DNS:</span>
+<span class="prompt">#</span> <span class="command"># CNAME: www → username.github.io</span>
+<span class="prompt">#</span> <span class="command"># A: @ → 185.199.108.153</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. GitHub Pages hosts _____ websites.</p>
+                        <input type="text" class="quiz-input" data-answer="static" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: No backend</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Add custom domain with _____ file.</p>
+                        <input type="text" class="quiz-input" data-answer="cname" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Domain name file</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Site URL format: username.github._____.</p>
+                        <input type="text" class="quiz-input" data-answer="io" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Not .com</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Static</p>
+                            <p>2. CNAME</p>
+                            <p>3. io</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 --><div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Security & Dependabot</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Repository Security</h3>
+                <p>GitHub provides security features to protect your code: vulnerability alerts, dependency scanning, and secret scanning.</p>
+
+                <h3>Security Tab</h3>
+                <div class="code-block">
+<span class="comment"># Security → Overview shows:</span>
+<span class="comment"># - Vulnerability alerts</span>
+<span class="comment"># - Dependency graph</span>
+<span class="comment"># - Secret scanning alerts</span>
+<span class="comment"># - Code scanning alerts</span>
+                </div>
+
+                <h3>Dependabot</h3>
+                <p>Dependabot automatically creates PRs to update outdated dependencies. Enable it with a simple configuration file.</p>
+
+                <div class="code-block">
+<span class="comment"># .github/dependabot.yml</span>
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Dependabot updates _____ dependencies.</p>
+                        <input type="text" class="quiz-input" data-answer="outdated" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Old</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Dependabot creates _____ requests.</p>
+                        <input type="text" class="quiz-input" data-answer="pull" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: PRs</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Secret _____ scans for exposed keys.</p>
+                        <input type="text" class="quiz-input" data-answer="scanning" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Finding</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Outdated</p>
+                            <p>2. Pull</p>
+                            <p>3. Scanning</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../nav.js"></script>
+    <script src="../guides.js"></script>
+</body>
+</html>

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-helm.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helm - Kubernetes Package Manager | REBEL WITH LINUX</title>
+    <meta name="description" content="Master Helm, the Kubernetes package manager. Learn to install, upgrade, and manage Kubernetes applications with Helm charts.">
+    <meta name="keywords" content="Helm, Kubernetes, K8s, package manager, Helm charts, Kubernetes deployment, Helm templates, DevOps">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+    <script src="../terminal-select.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.checked = (savedTheme === 'dark' || !savedTheme);
+            }
+        });
+    </script>
+    <style>
+        :root {
+            --nav-color: #0f1689;
+        }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../search.html">SEARCH</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#login" id="loginLink" class="auth-link">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>MASTER YOUR<br>K8S PACKAGES</h1>
+        <p class="tagline">// The Kubernetes package manager.</p>
+        
+        <div class="manifesto">
+            <p><strong>HELM IS THE MISSING PACKAGE MANAGER FOR KUBERNETES.</strong></p>
+            <p>Deploying complex applications on Kubernetes requires dozens of YAML files—ConfigMaps, Secrets, Deployments, Services, and more. Helm packages all of this into a single chart that can be installed with one command.</p>
+            <p><strong>WHY HELM?</strong></p>
+            <p>Helm is to Kubernetes what apt is to Debian. It templatizes Kubernetes manifests, enables versioned releases, and makes upgrades and rollbacks trivial. Share charts via repositories like Helm Hub.</p>
+            <p><strong>BECOME A K8S PACKAGE PRO.</strong></p>
+            <p>Learn Helm charts, templates, values, releases, and rollbacks. Deploy complex applications like Prometheus, Grafana, and Jenkins with confidence.</p>
+        </div>
+
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// The Path to Helm Mastery</h2>
+            <p>10 lessons. Complete Helm control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Helm</h3>
+                <p class="lesson-desc">What is Helm and why you need it</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Installing Helm</h3>
+                <p class="lesson-desc">Set up Helm and configure repositories</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Charts & Releases</h3>
+                <p class="lesson-desc">Understand Helm charts and releases</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Basic Commands</h3>
+                <p class="lesson-desc">Install, upgrade, and uninstall charts</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson5" class="lesson-card">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Values & Templates</h3>
+                <p class="lesson-desc">Customize charts with values</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson6" class="lesson-card">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Hooks & Lifecycle</h3>
+                <p class="lesson-desc">Manage pre/post-install hooks</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Dependencies</h3>
+                <p class="lesson-desc">Manage chart dependencies</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Testing Charts</h3>
+                <p class="lesson-desc">Validate and test your charts</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Creating Charts</h3>
+                <p class="lesson-desc">Build your own Helm charts</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Helmfile & Advanced</h3>
+                <p class="lesson-desc">Helmfile, libraries, and advanced patterns</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why Helm</h2>
+            <p>Helm was created by Deis (now Microsoft) and donated to the CNCF. It's now the de facto standard for packaging Kubernetes applications.</p>
+            <p>Without Helm, deploying something like the ELK stack requires managing 20+ YAML files with complex relationships. With Helm, one command handles everything: helm install elastic/elasticsearch.</p>
+            <p>Helm charts support templating, versioning, rollbacks, and dependencies. The Helm Hub hosts thousands of community charts for everything from databases to monitoring.</p>
+            <p><strong>Your Kubernetes deployments deserve package management.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>📖 Helm Docs</h3>
+                <p>Official Documentation</p>
+                <a href="https://helm.sh/docs" target="_blank">helm.sh/docs</a>
+            </div>
+            <div class="resource-card">
+                <h3>☸️ Artifact Hub</h3>
+                <p>Find Charts</p>
+                <a href="https://artifacthub.io" target="_blank">artifacthub.io</a>
+            </div>
+            <div class="resource-card">
+                <h3>📦 Chart Repository</h3>
+                <p>Publish Charts</p>
+                <a href="https://chartmuseum.com" target="_blank">ChartMuseum</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔧 Helmfile</h3>
+                <p>Declarative Charts</p>
+                <a href="https://github.com/roboll/helmfile" target="_blank">helmfile</a>
+            </div>
+            <div class="resource-card">
+                <h3>🧪 Helm unittest</h3>
+                <p>Chart Testing</p>
+                <a href="https://github.com/lrills/helm-unittest" target="_blank">unittest</a>
+            </div>
+            <div class="resource-card">
+                <h3>⎈ Helm Operators</h3>
+                <p>Operator Pattern</p>
+                <a href="https://operatorhub.io" target="_blank">OperatorHub</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="copyleft">⟲</span>
+                <span>REBEL WITH LINUX</span>
+            </div>
+            <p class="footer-tagline">Learn Linux the hard way.</p>
+            <div class="footer-links">
+                <a href="../site-map.html">Site Map</a>
+                <span class="footer-divider">|</span>
+                <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion">Onion Site</a>
+                <span class="footer-divider">|</span>
+                <a href="https://github.com/cjboon/rebelwithlinux">GitHub</a>
+            </div>
+            <p class="footer-copyright">COPYRIGHT © 2026 — ALL RIGHTS RESERVED</p>
+        </div>
+    </footer>
+
+    <div class="modal-content" id="modalContent"></div>
+
+    <!-- Lesson 1 --><div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Introduction to Helm</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Helm?</h3>
+                <p>Helm is the package manager for Kubernetes. It bundles Kubernetes manifests (YAML files) into a deployable unit called a chart. A single command can deploy complex applications.</p>
+
+                <h3>Helm Concepts</h3>
+                <ul>
+                    <li><strong>Chart:</strong> A package of Kubernetes YAML templates</li>
+                    <li><strong>Release:</strong> A deployed instance of a chart</li>
+                    <li><strong>Repository:</strong> A place to store and share charts</li>
+                    <li><strong>Values:</strong> Configuration to customize chart deployment</li>
+                    <li><strong>Templates:</strong> Go templates that generate Kubernetes manifests</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>HELM'S PHILOSOPHY:</strong> "Helm is apt for Kubernetes." Just as apt manages Debian packages, Helm manages Kubernetes applications.
+                </div>
+
+                <h3>Installing Helm</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash</span>
+<span class="output"># Download and install helm</span>
+<span class="prompt">$</span> <span class="command">helm version</span>
+<span class="output">v3.14.0+build.HELMVERSION</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Helm is the _____ manager for Kubernetes.</p>
+                        <input type="text" class="quiz-input" data-answer="package" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Package type</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. A deployed chart instance is called a _____.</p>
+                        <input type="text" class="quiz-input" data-answer="release" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Versioned deployment</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Charts use Go _____ for templating.</p>
+                        <input type="text" class="quiz-input" data-answer="templates" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Template files</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Charts are stored in a _____ repository.</p>
+                        <input type="text" class="quiz-input" data-answer="chart" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: What Helm uses</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. Values _____ chart deployment.</p>
+                        <input type="text" class="quiz-input" data-answer="customize" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Configure</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Package</p>
+                            <p>2. Release</p>
+                            <p>3. Templates</p>
+                            <p>4. Chart</p>
+                            <p>5. Customize</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 --><div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Installing Helm</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Adding Repositories</h3>
+                <p>Helm charts are stored in repositories. Add popular repositories to access stable charts for common applications.</p>
+
+                <h3>Common Repositories</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">helm repo add bitnami https://charts.bitnami.com/bitnami</span>
+<span class="output"># Add Bitnami charts (many popular apps)</span>
+<span class="prompt">$</span> <span class="command">helm repo add prometheus-community https://prometheus-community.github.io/helm-charts</span>
+<span class="output"># Add Prometheus community charts</span>
+<span class="prompt">$</span> <span class="command">helm repo update</span>
+<span class="output"># Update local cache of charts</span>
+<span class="prompt">$</span> <span class="command">helm repo list</span>
+<span class="output"># List added repositories</span>
+                </div>
+
+                <h3>Finding Charts</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">helm search hub nginx</span>
+<span class="output"># Search Helm Hub for nginx</span>
+<span class="prompt">$</span> <span class="command">helm search repo nginx</span>
+<span class="output"># Search locally added repos</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Add repo with helm repo _____.</p>
+                        <input type="text" class="quiz-input" data-answer="add" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Add command</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Update local cache with helm repo _____.</p>
+                        <input type="text" class="quiz-input" data-answer="update" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Refresh</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Search Hub with helm _____ hub.</p>
+                        <input type="text" class="quiz-input" data-answer="search" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Find</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Add</p>
+                            <p>2. Update</p>
+                            <p>3. Search</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 --><div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Charts & Releases</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Chart Structure</h3>
+                <p>A Helm chart is a directory with a specific structure containing templates, values, and metadata.</p>
+
+                <h3>Chart Directory</h3>
+                <div class="code-block">
+<span class="comment"># mychart/</span>
+Chart.yaml          <span class="comment"># Chart metadata</span>
+values.yaml          <span class="comment"># Default values</span>
+templates/           <span class="comment"># Kubernetes manifests</span>
+  deployment.yaml
+  service.yaml
+  ingress.yaml
+charts/              <span class="comment"># Chart dependencies</span>
+README.md            <span class="comment"># README</span>
+LICENSE              <span class="comment"># License</span>
+                </div>
+
+                <h3>Chart.yaml</h3>
+                <div class="code-block">
+<span class="keyword">apiVersion:</span> v2
+<span class="keyword">name:</span> mychart
+<span class="keyword">version:</span> 1.0.0
+<span class="keyword">appVersion:</span> "1.0"
+<span class="keyword">description:</span> My Kubernetes chart
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Chart metadata is in _____.</p>
+                        <input type="text" class="quiz-input" data-answer="chart.yaml" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: YAML file</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Default values are in _____.</p>
+                        <input type="text" class="quiz-input" data-answer="values.yaml" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Values file</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. K8s manifests go in the _____ directory.</p>
+                        <input type="text" class="quiz-input" data-answer="templates" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Template folder</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Chart.yaml</p>
+                            <p>2. Values.yaml</p>
+                            <p>3. Templates</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 --><div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Basic Commands</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Installing Charts</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">helm install my-release bitnami/nginx</span>
+<span class="output"># Install nginx chart from bitnami repo</span>
+<span class="prompt">$</span> <span class="command">helm list</span>
+<span class="output"># List deployed releases</span>
+<span class="prompt">$</span> <span class="command">helm status my-release</span>
+<span class="output"># Show release status</span>
+                </div>
+
+                <h3>Upgrading & Rollback</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">helm upgrade my-release bitnami/nginx --set replicaCount=3</span>
+<span class="output"># Upgrade with new values</span>
+<span class="prompt">$</span> <span class="command">helm rollback my-release 1</span>
+<span class="output"># Rollback to revision 1</span>
+<span class="prompt">$</span> <span class="command">helm history my-release</span>
+<span class="output"># Show release history</span>
+                </div>
+
+                <h3>Uninstalling</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">helm uninstall my-release</span>
+<span class="output"># Remove release</span>
+<span class="prompt">$</span> <span class="command">helm uninstall my-release --keep-history</span>
+<span class="output"># Keep history for rollback</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Install chart with helm _____.</p>
+                        <input type="text" class="quiz-input" data-answer="install" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Deploy</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. List releases with helm _____.</p>
+                        <input type="text" class="quiz-input" data-answer="list" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Show all</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Go back with helm _____.</p>
+                        <input type="text" class="quiz-input" data-answer="rollback" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Undo</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Remove release with helm _____. </p>
+                        <input type="text" class="quiz-input" data-answer="uninstall" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Delete</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Install</p>
+                            <p>2. List</p>
+                            <p>3. Rollback</p>
+                            <p>4. Uninstall</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 --><div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Values & Templates</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Overriding Values</h3>
+                <p>Charts have default values in values.yaml. Override them with --set flags or custom values files.</p>
+
+                <h3>Setting Values</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">helm install my-release bitnami/wordpress --set replicaCount=2</span>
+<span class="output"># Override with --set</span>
+<span class="prompt">$</span> <span class="command">helm install my-release bitnami/wordpress -f custom-values.yaml</span>
+<span class="output"># Override with values file</span>
+                </div>
+
+                <h3>Template Syntax</h3>
+                <div class="code-block">
+<span class="comment"># In templates/deployment.yaml</span>
+<span class="keyword">apiVersion:</span> apps/v1
+<span class="keyword">kind:</span> Deployment
+<span class="keyword">metadata:</span>
+  <span class="keyword">name:</span> {{ .Release.Name }}
+<span class="keyword">spec:</span>
+  <span class="keyword">replicas:</span> {{ .Values.replicaCount }}
+<span class="keyword">template:</span>
+  <span class="keyword">spec:</span>
+    <span class="keyword">containers:</span>
+      - <span class="keyword">name:</span> {{ .Chart.Name }}
+        <span class="keyword">image:</span> "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Override values with --_____ flag.</p>
+                        <input type="text" class="quiz-input" data-answer="set" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Set command</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Use custom file with -f _____.</p>
+                        <input type="text" class="quiz-input" data-answer="filename" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Your file</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Access release name with ._____.Name.</p>
+                        <input type="text" class="quiz-input" data-answer="release" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Deployment concept</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Access values with ._____.fieldName.</p>
+                        <input type="text" class="quiz-input" data-answer="values" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Values.yaml</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Set</p>
+                            <p>2. Filename</p>
+                            <p>3. Release</p>
+                            <p>4. Values</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 --><div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Hooks & Lifecycle</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Hooks?</h3>
+                <p>Hooks run arbitrary jobs at specific points in a release lifecycle—before install, after install, before upgrade, etc.</p>
+
+                <h3>Hook Types</h3>
+                <div class="code-block">
+<span class="comment"># pre-install - Before template render</span>
+<span class="comment"># post-install - After resources created</span>
+<span class="comment"># pre-upgrade - Before upgrade</span>
+<span class="comment"># post-upgrade - After upgrade</span>
+<span class="comment"># pre-delete - Before delete</span>
+<span class="comment"># post-delete - After delete</span>
+<span class="comment"># test - Run test hooks</span>
+                </div>
+
+                <h3>Hook Annotation</h3>
+                <div class="code-block">
+<span class="keyword">apiVersion:</span> v1
+<span class="keyword">kind:</span> Job
+<span class="keyword">metadata:</span>
+  <span class="keyword">name:</span> backup-job
+  <span class="keyword">annotations:</span>
+    <span class="string">"helm.sh/hook":</span> post-install,post-upgrade
+    <span class="string">"helm.sh/hook-weight":</span> "-1"
+    <span class="string">"helm.sh/hook-delete-policy":</span> hook-succeeded
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Run job after install with _____ install hook.</p>
+                        <input type="text" class="quiz-input" data-answer="post" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: After</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Hook weight uses annotation helm.sh/hook _____.</p>
+                        <input type="text" class="quiz-input" data-answer="weight" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Order</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Delete hook policy uses helm.sh/hook-delete _____.</p>
+                        <input type="text" class="quiz-input" data-answer="policy" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: What to do</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Post</p>
+                            <p>2. Weight</p>
+                            <p>3. Policy</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 --><div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Dependencies</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Chart Dependencies</h3>
+                <p>Charts can depend on other charts. The dependencies section in Chart.yaml declares them.</p>
+
+                <h3>Dependency Declaration</h3>
+                <div class="code-block">
+<span class="keyword">apiVersion:</span> v2
+<span class="keyword">name:</span> mychart
+<span class="keyword">version:</span> 1.0.0
+<span class="keyword">dependencies:</span>
+  - <span class="keyword">name:</span> postgresql
+    <span class="keyword">version:</span> "12.x.x"
+    <span class="keyword">repository:</span> "https://charts.bitnami.com/bitnami"
+  - <span class="keyword">name:</span> redis
+    <span class="keyword">version:</span> "17.x.x"
+    <span class="keyword">repository:</span> "https://charts.bitnami.com/bitnami"
+                </div>
+
+                <h3>Managing Dependencies</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">helm dependency update mychart</span>
+<span class="output"># Download dependencies to charts/</span>
+<span class="prompt">$</span> <span class="command">helm dependency build mychart</span>
+<span class="output"># Build from Chart.lock</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Dependencies declared in _____.</p>
+                        <input type="text" class="quiz-input" data-answer="chart.yaml" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Chart file</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Download dependencies with helm dependency _____.</p>
+                        <input type="text" class="quiz-input" data-answer="update" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Get</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Dependencies stored in _____ directory.</p>
+                        <input type="text" class="quiz-input" data-answer="charts" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Folder</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Chart.yaml</p>
+                            <p>2. Update</p>
+                            <p>3. Charts</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 --><div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Testing Charts</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Linting Charts</h3>
+                <p>Before deploying, validate your chart for syntax errors and best practices.</p>
+
+                <h3>Lint Command</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">helm lint mychart</span>
+<span class="output"># Lint chart for issues</span>
+<span class="prompt">$</span> <span class="command">helm lint mychart --strict</span>
+<span class="output"># Enable strict validation</span>
+                </div>
+
+                <h3>Template Rendering</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">helm template mychart ./mychart</span>
+<span class="output"># Render templates locally</span>
+<span class="prompt">$</span> <span class="command">helm template mychart ./mychart --debug</span>
+<span class="output"># Show template debug output</span>
+<span class="prompt">$</span> <span class="command">helm install --dry-run mychart ./mychart</span>
+<span class="output"># Test install without cluster</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Validate chart with helm _____.</p>
+                        <input type="text" class="quiz-input" data-answer="lint" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Check</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Render templates locally with helm _____.</p>
+                        <input type="text" class="quiz-input" data-answer="template" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Show</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Test without cluster using --dry-_____.</p>
+                        <input type="text" class="quiz-input" data-answer="run" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Test</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Lint</p>
+                            <p>2. Template</p>
+                            <p>3. Run</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 --><div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Creating Charts</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Scaffolding a Chart</h3>
+                <p>Helm can scaffold a new chart with the basic structure.</p>
+
+                <h3>Create Chart</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">helm create mychart</span>
+<span class="output"># Create chart directory structure</span>
+<span class="prompt">$</span> <span class="command">ls mychart</span>
+<span class="output">Chart.yaml values.yaml templates/</span>
+<span class="prompt">$</span> <span class="command">helm package mychart</span>
+<span class="output"># Package chart into .tgz</span>
+                </div>
+
+                <h3>Example Deployment Template</h3>
+                <div class="code-block">
+<span class="keyword">apiVersion:</span> apps/v1
+<span class="keyword">kind:</span> Deployment
+<span class="keyword">metadata:</span>
+  <span class="keyword">name:</span> {{ include "mychart.fullname" . }}
+  <span class="keyword">labels:</span>
+    {{- include "mychart.labels" . | nindent 4 }}
+<span class="keyword">spec:</span>
+  <span class="keyword">replicas:</span> {{ .Values.replicaCount }}
+  <span class="keyword">selector:</span>
+    {{- include "mychart.selectorLabels" . | nindent 6 }}
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Scaffold chart with helm _____.</p>
+                        <input type="text" class="quiz-input" data-answer="create" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Make</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Package chart into ._____ file.</p>
+                        <input type="text" class="quiz-input" data-answer="tgz" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Compressed</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Include helper with _____ function.</p>
+                        <input type="text" class="quiz-input" data-answer="include" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Bring in</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Create</p>
+                            <p>2. tgz</p>
+                            <p>3. Include</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 --><div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Helmfile & Advanced</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Helmfile</h3>
+                <p>Helmfile extends Helm with declarative configuration for managing multiple releases across different environments.</p>
+
+                <h3>Helmfile Example</h3>
+                <div class="code-block">
+<span class="keyword">repositories:</span>
+  - <span class="keyword">name:</span> bitnami
+    <span class="keyword">url:</span> https://charts.bitnami.com/bitnami
+
+<span class="keyword">releases:</span>
+  - <span class="keyword">name:</span> nginx
+    <span class="keyword">chart:</span> bitnami/nginx
+    <span class="keyword">values:</span>
+      - <span class="keyword">replicaCount:</span> 2
+
+  - <span class="keyword">name:</span> prometheus
+    <span class="keyword">chart:</span> prometheus-community/prometheus
+    <span class="keyword">namespace:</span> monitoring
+    <span class="keyword">values:</span>
+      - <span class="keyword">alertmanager:</span>
+          <span class="keyword">enabled:</span> true
+                </div>
+
+                <h3>Helmfile Commands</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">helmfile apply</span>
+<span class="output"># Deploy all releases</span>
+<span class="prompt">$</span> <span class="command">helmfile diff</span>
+<span class="output"># Show changes without applying</span>
+<span class="prompt">$</span> <span class="command">helmfile destroy</span>
+<span class="output"># Remove all releases</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. _____ extends Helm for multi-environment deployments.</p>
+                        <input type="text" class="quiz-input" data-answer="helmfile" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: File type</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Deploy with helmfile _____.</p>
+                        <input type="text" class="quiz-input" data-answer="apply" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Run</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Show diff without applying with helmfile _____.</p>
+                        <input type="text" class="quiz-input" data-answer="diff" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Show</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Helmfile</p>
+                            <p>2. Apply</p>
+                            <p>3. Diff</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../nav.js"></script>
+    <script src="../guides.js"></script>
+</body>
+</html>

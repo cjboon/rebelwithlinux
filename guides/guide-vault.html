@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-vault.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vault - Master Secrets Management | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn Vault from basics to advanced. Master secrets management, dynamic credentials, encryption, and the PKI secrets engine for production security.">
+    <meta name="keywords" content="Vault, secrets management, HashiCorp, dynamic credentials, PKI, encryption, AWS secrets, database credentials, Kubernetes, DevOps security">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+    <script src="../terminal-select.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.checked = (savedTheme === 'dark' || !savedTheme);
+            }
+        });
+    </script>
+    <style>
+        :root {
+            --nav-color: #000000;
+        }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../search.html">SEARCH</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#login" id="loginLink" class="auth-link">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>SECURE YOUR<br>SECRETS</h1>
+        <p class="tagline">// The secrets vault for cloud-native.</p>
+        
+        <div class="manifesto">
+            <p><strong>VAULT CHANGED HOW WE MANAGE SECRETS.</strong></p>
+            <p>Every application needs secrets—API keys, database passwords, certificates. Vault centralizes all of this with fine-grained access control, automatic rotation, and audit logging. No more hardcoded credentials in config files.</p>
+            <p><strong>WHY VAULT?</strong></p>
+            <p>Vault uses dynamic secrets—credentials generated on-demand with automatic expiration. It handles encryption, PKI certificates, and integrates with Kubernetes, AWS, and more. Security without complexity.</p>
+            <p><strong>YOUR SECRETS DESERVE BETTER.</strong></p>
+            <p>Learn Vault from the ground up. Master KV secrets, dynamic credentials, policies, and enterprise features. Stop storing secrets in git. Start using Vault.</p>
+        </div>
+
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// The Path to Vault Mastery</h2>
+            <p>10 lessons. Complete secrets management.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Vault</h3>
+                <p class="lesson-desc">What is Vault and why secrets management matters</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Installation & Setup</h3>
+                <p class="lesson-desc">Install Vault and start dev server</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">KV Secrets Engine</h3>
+                <p class="lesson-desc">Store and retrieve secrets</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Policies & Auth</h3>
+                <p class="lesson-desc">Control access with policies</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Dynamic Secrets</h3>
+                <p class="lesson-desc">Generate credentials on-demand</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">PKI & Certificates</h3>
+                <p class="lesson-desc">Manage TLS certificates</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Transit Secrets</h3>
+                <p class="lesson-desc">Encryption as a service</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Kubernetes Integration</h3>
+                <p class="lesson-desc">Vault Agent and K8s auth</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Auditing</h3>
+                <p class="lesson-desc">Track all Vault operations</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">High Availability</h3>
+                <p class="lesson-desc">Scale Vault in production</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why Vault</h2>
+            <p>Vault was created by HashiCorp and open-sourced in 2015. It became the standard for secrets management, with over 50 million downloads and adoption by Fortune 500 companies worldwide.</p>
+            <p>Before Vault, secrets were scattered—hardcoded in apps, stored in config files, or worse, in git. Vault provides a centralized, audited, and secure home for all your sensitive data.</p>
+            <p>Vault's key innovation is dynamic secrets. Instead of static passwords, Vault generates short-lived credentials for databases, AWS, and more. When a lease expires, the credentials are automatically revoked. This reduces the blast radius of any compromise.</p>
+            <p><strong>Your secrets deserve a vault. Literally.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>📖 Vault Docs</h3>
+                <p>Official Documentation</p>
+                <a href="https://developer.hashicorp.com/vault/docs" target="_blank">vaultproject.io/docs</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔐 HashiCorp</h3>
+                <p>Company Behind Vault</p>
+                <a href="https://www.hashicorp.com" target="_blank">hashicorp.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>☸️ Vault Kubernetes</h3>
+                <p>K8s Integration</p>
+                <a href="https://developer.hashicorp.com/vault/docs/platform/kubernetes" target="_blank">K8s docs</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔧 Vault Agent</h3>
+                <p>Auto-Authentication</p>
+                <a href="https://developer.hashicorp.com/vault/docs/agent" target="_blank">Agent docs</a>
+            </div>
+            <div class="resource-card">
+                <h3>📝 Policies</h3>
+                <p>Policy Language</p>
+                <a href="https://developer.hashicorp.com/vault/docs/concepts/policies" target="_blank">Policies</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔄 Vault UI</h3>
+                <p>Web Interface</p>
+                <a href="https://developer.hashicorp.com/vault/tutorials/getting-started-ui" target="_blank">UI tutorial</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="copyleft">⟲</span>
+                <span>REBEL WITH LINUX</span>
+            </div>
+            <p class="footer-tagline">Learn Linux the hard way.</p>
+            <div class="footer-links">
+                <a href="../site-map.html">Site Map</a>
+                <span class="footer-divider">|</span>
+                <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion">Onion Site</a>
+                <span class="footer-divider">|</span>
+                <a href="https://github.com/cjboon/rebelwithlinux">GitHub</a>
+            </div>
+            <p class="footer-copyright">COPYRIGHT © 2026 — ALL RIGHTS RESERVED</p>
+        </div>
+    </footer>
+
+    <div class="modal-content" id="modalContent"></div>
+
+    <!-- Lesson 1 --><div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Introduction to Vault</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Vault?</h3>
+                <p>Vault is a secrets management system. It stores sensitive data (API keys, passwords, certificates), controls access through policies, and provides an audit trail of all secret access.</p>
+
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Secrets:</strong> Sensitive data stored in Vault</li>
+                    <li><strong>Secret Engine:</strong> Component that stores/generates secrets</li>
+                    <li><strong>Secrets:</strong> Sensitive data stored in Vault</li>
+                    <li><strong>Token:</strong> Authentication credential for Vault access</li>
+                    <li><strong>Policy:</strong> Rules defining what paths a token can access</li>
+                    <li><strong>Lease:</strong> Time-limited access to secrets</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>VAULT PHILOSOPHY:</strong> "Secrets are dynamic." Vault doesn't just store secrets—it generates them on-demand with automatic expiration and revocation.
+                </div>
+
+                <h3>What Vault Secures</h3>
+                <div class="code-block">
+<span class="comment"># Types of secrets Vault manages:</span>
+<span class="comment"># - Static secrets (username/password)</span>
+<span class="comment"># - Dynamic credentials (database, AWS)</span>
+<span class="comment"># - TLS certificates</span>
+<span class="comment"># - Encryption keys</span>
+<span class="comment"># - SSH keys</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Vault manages _____, not code.</p>
+                        <input type="text" class="quiz-input" data-answer="secrets" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Sensitive data</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Policies control _____ to paths.</p>
+                        <input type="text" class="quiz-input" data-answer="access" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: What you can do</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Time-limited secret access is a _____.</p>
+                        <input type="text" class="quiz-input" data-answer="lease" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Rental period</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Auth credential is called a _____.</p>
+                        <input type="text" class="quiz-input" data-answer="token" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Access key</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. Vault generates _____ credentials dynamically.</p>
+                        <input type="text" class="quiz-input" data-answer="dynamic" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: On-demand</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Secrets</p>
+                            <p>2. Access</p>
+                            <p>3. Lease</p>
+                            <p>4. Token</p>
+                            <p>5. Dynamic</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 --><div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Installation & Setup</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Installing Vault</h3>
+                <p>Vault runs as a single binary. Download it and you're ready.</p>
+
+                <h3>Quick Start</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">curl -LO https://releases.hashicorp.com/vault/1.15.0/vault_1.15.0_linux_amd64.zip</span>
+<span class="prompt">$</span> <span class="command">unzip vault_1.15.0_linux_amd64.zip</span>
+<span class="prompt">$</span> <span class="command">sudo mv vault /usr/local/bin/</span>
+<span class="prompt">$</span> <span class="command">vault --version</span>
+<span class="output">Vault v1.15.0</span>
+                </div>
+
+                <h3>Dev Server</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">vault server -dev</span>
+<span class="output"># WARNING: Dev mode is not for production!</span>
+<span class="output"># Unseal Key: XXXXXX</span>
+<span class="output"># Root Token: XXXXXX</span>
+<span class="output"># Vault listening on localhost:8200</span>
+                </div>
+
+                <h3>Environment Variables</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">export VAULT_ADDR='http://localhost:8200'</span>
+<span class="prompt">$</span> <span class="command">export VAULT_TOKEN='your-root-token'</span>
+<span class="prompt">$</span> <span class="command">vault status</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Dev server is not for _____.</p>
+                        <input type="text" class="quiz-input" data-answer="production" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Real use</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Default Vault port is _____.</p>
+                        <input type="text" class="quiz-input" data-answer="8200" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: 8200</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Set address with VAULT _____ env var.</p>
+                        <input type="text" class="quiz-input" data-answer="addr" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Address</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Production</p>
+                            <p>2. 8200</p>
+                            <p>3. ADDR</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 --><div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// KV Secrets Engine</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is KV?</h3>
+                <p>KV (Key-Value) is Vault's basic secrets engine. Store arbitrary key-value pairs with versioning support.</p>
+
+                <h3>Using KV</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">vault kv put secret/myapp database=localhost username=admin</span>
+<span class="output"># Secret written</span>
+<span class="prompt">$</span> <span class="command">vault kv get secret/myapp</span>
+<span class="output"># ====== Data ======</span>
+<span class="output"># Key        Value</span>
+<span class="output"># database   localhost</span>
+<span class="output"># username   admin</span>
+<span class="prompt">$</span> <span class="command">vault kv delete secret/myapp</span>
+<span class="output"># Secret deleted</span>
+                </div>
+
+                <h3>KV Versions</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">vault kv get -version=1 secret/myapp</span>
+<span class="output"># Get specific version</span>
+<span class="prompt">$</span> <span class="command">vault kv rollback -version=1 secret/myapp</span>
+<span class="output"># Rollback to version 1</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Store secret with vault kv _____.</p>
+                        <input type="text" class="quiz-input" data-answer="put" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Add</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Read secret with vault kv _____. </p>
+                        <input type="text" class="quiz-input" data-answer="get" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Read</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Delete secret with vault kv _____. </p>
+                        <input type="text" class="quiz-input" data-answer="delete" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Remove</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Put</p>
+                            <p>2. Get</p>
+                            <p>3. Delete</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 --><div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Policies & Auth</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Policies?</h3>
+                <p>Policies control access to paths in Vault. They're written in HCL (HashiCorp Configuration Language).</p>
+
+                <h3>Policy Example</h3>
+                <div class="code-block">
+<span class="comment"># Read access to secret/myapp</span>
+<span class="keyword">path</span> "secret/myapp/*" {
+  <span class="keyword">capabilities</span> = ["read"]
+}
+
+<span class="comment"># Full control</span>
+<span class="keyword">path</span> "secret/admin/*" {
+  <span class="keyword">capabilities</span> = ["create", "read", "update", "delete", "list"]
+}
+                </div>
+
+                <h3>Capabilities</h3>
+                <ul>
+                    <li><strong>create:</strong> Write new data</li>
+                    <li><strong>read:</strong> Read data</li>
+                    <li><strong>update:</strong> Write data</li>
+                    <li><strong>delete:</strong> Delete data</li>
+                    <li><strong>list:</strong> List keys</li>
+                </ul>
+
+                <h3>Auth Methods</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">vault login -method=userpass username=admin password=secret</span>
+<span class="output"># Authenticate with username/password</span>
+<span class="prompt">$</span> <span class="command">vault login token=xxxx</span>
+<span class="output"># Authenticate with token</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Policies written in _____ format.</p>
+                        <input type="text" class="quiz-input" data-answer="hcl" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Config language</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Policy paths control _____ to secrets.</p>
+                        <input type="text" class="quiz-input" data-answer="access" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: What you can do</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Login with vault _____-method.</p>
+                        <input type="text" class="quiz-input" data-answer="auth" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Auth method</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. HCL</p>
+                            <p>2. Access</p>
+                            <p>3. Auth</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 --><div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Dynamic Secrets</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Dynamic Secrets?</h3>
+                <p>Dynamic secrets are generated on-demand when requested. They have automatic expiration via leases and can be revoked instantly.</p>
+
+                <h3>Database Secrets</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">vault secrets enable database</span>
+<span class="output"># Enable database secrets engine</span>
+<span class="prompt">$</span> <span class="command">vault write database/config/mydb plugin_name=postgresql-database-plugin connection_url="postgresql://localhost:5432"</span>
+<span class="prompt">$</span> <span class="command">vault read database/creds/my-role</span>
+<span class="output"># Request credentials</span>
+<span class="output"># lease_id: database/creds/my-role/xxxx</span>
+<span class="output"># lease_duration: 1h</span>
+<span class="output"># username: v-token-myrole-xxxx</span>
+<span class="output"># password: xxxx-xxxx</span>
+                </div>
+
+                <h3>AWS Secrets</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">vault secrets enable aws</span>
+<span class="prompt">$</span> <span class="command">vault write aws/config/root access_key=xxx secret_key=yyy</span>
+<span class="prompt">$</span> <span class="command">vault read aws/creds/my-role</span>
+<span class="output"># Access key ID and secret</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Dynamic secrets are generated on _____.</p>
+                        <input type="text" class="quiz-input" data-answer="demand" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: When needed</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Credentials expire after _____ duration.</p>
+                        <input type="text" class="quiz-input" data-answer="lease" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Time period</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Enable secrets engine with vault _____ enable.</p>
+                        <input type="text" class="quiz-input" data-answer="secrets" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Secrets</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Demand</p>
+                            <p>2. Lease</p>
+                            <p>3. Secrets</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 --><div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// PKI & Certificates</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>PKI Secrets Engine</h3>
+                <p>Vault can act as a Certificate Authority (CA), generating TLS certificates dynamically for your services.</p>
+
+                <h3>Setup PKI</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">vault secrets enable pki</span>
+<span class="prompt">$</span> <span class="command">vault write pki/ca generate=internal ttl=87600h</span>
+<span class="output"># Generate root CA</span>
+<span class="prompt">$</span> <span class="command">vault write pki/roles/myapp allowed_domains="myapp.internal" allow_subdomains=true</span>
+                </div>
+
+                <h3>Generate Certificates</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">vault write pki/issue/myapp common_name="db.myapp.internal"</span>
+<span class="output"># Returns certificate and private key</span>
+<span class="output"># certificate: -----BEGIN CERTIFICATE-----</span>
+<span class="output"># issuing_ca: -----BEGIN CERTIFICATE-----</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Vault acts as Certificate _____.</p>
+                        <input type="text" class="quiz-input" data-answer="authority" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: CA</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Enable PKI with vault _____ enable pki.</p>
+                        <input type="text" class="quiz-input" data-answer="secrets" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Secrets</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Generate certs with pki/_____ command.</p>
+                        <input type="text" class="quiz-input" data-answer="issue" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Get certificate</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Authority</p>
+                            <p>2. Secrets</p>
+                            <p>3. Issue</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 --><div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Transit Secrets</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Transit?</h3>
+                <p>Transit is Vault's encryption-as-a-service. It encrypts data so you don't need to manage encryption keys yourself.</p>
+
+                <h3>Using Transit</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">vault secrets enable transit</span>
+<span class="prompt">$</span> <span class="command">vault write transit/keys/my-key</span>
+<span class="output"># Create encryption key</span>
+<span class="prompt">$</span> <span class="command">vault write transit/encrypt/my-key plaintext=$(echo -n "secret data" | base64)</span>
+<span class="output"># Returns encrypted ciphertext</span>
+<span class="prompt">$</span> <span class="command">vault write transit/decrypt/my-key ciphertext=$CIPHERTEXT</span>
+<span class="output"># Returns decrypted plaintext</span>
+                </div>
+
+                <h3>Use Cases</h3>
+                <ul>
+                    <li><strong>Database encryption:</strong> Encrypt fields before storage</li>
+                    <li><strong>API payloads:</strong> Encrypt sensitive data in transit</li>
+                    <li><strong>File encryption:</strong> Encrypt files at rest</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Transit provides _____ as a service.</p>
+                        <input type="text" class="quiz-input" data-answer="encryption" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Data protection</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Enable transit with vault _____ enable transit.</p>
+                        <input type="text" class="quiz-input" data-answer="secrets" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Secrets</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Encryption/decryption with transit _____ command.</p>
+                        <input type="text" class="quiz-input" data-answer="encrypt" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Encrypt</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Encryption</p>
+                            <p>2. Secrets</p>
+                            <p>3. Encrypt</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 --><div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Kubernetes Integration</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Vault + Kubernetes</h3>
+                <p>Vault can authenticate with Kubernetes using service account tokens. Applications can get secrets directly from Vault without storing long-lived credentials.</p>
+
+                <h3>Kubernetes Auth</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">vault auth enable kubernetes</span>
+<span class="prompt">$</span> <span class="command">vault write auth/kubernetes/config token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443"</span>
+                </div>
+
+                <h3>Vault Agent</h3>
+                <p>Vault Agent auto-authenticates and injects secrets into pods via annotations.</p>
+
+                <h3>Annotations</h3>
+                <div class="code-block">
+<span class="comment"># pod annotations for automatic secrets</span>
+<span class="keyword">annotations:</span>
+  <span class="string">"vault.hashicorp.com/agent-inject"</span>: <span class="string">"true"</span>
+  <span class="string">"vault.hashicorp.com/role"</span>: <span class="string">"myapp"</span>
+  <span class="string">"vault.hashicorp.com/agent-inject-secret-db"</span>: <span class="string">"database/creds/myapp"</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Kubernetes _____ enables K8s auth.</p>
+                        <input type="text" class="quiz-input" data-answer="auth" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Auth method</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. _____ injects secrets into pods.</p>
+                        <input type="text" class="quiz-input" data-answer="agent" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Sidecar</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. vault.hashicorp.com/role specifies _____.</p>
+                        <input type="text" class="quiz-input" data-answer="policy" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Access rights</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Auth</p>
+                            <p>2. Agent</p>
+                            <p>3. Policy</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 --><div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Auditing</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Auditing?</h3>
+                <p>Vault audit devices log every operation—authentication, secret access, secret creation, and more. Essential for compliance and security investigations.</p>
+
+                <h3>Enable Audit</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">vault audit enable file file_path=/var/log/vault_audit.log</span>
+<span class="output"># Enable file audit device</span>
+<span class="prompt">$</span> <span class="command">vault audit list</span>
+<span class="output"># List enabled audit devices</span>
+                </div>
+
+                <h3>Audit Log Format</h3>
+                <div class="code-block">
+<span class="comment"># {"time":"2024-01-01T00:00:00.000Z","type":"request","...}</span>
+<span class="comment"># {"time":"2024-01-01T00:00:00.000Z","type":"response","...}</span>
+                </div>
+
+                <h3>Multiple Audit Devices</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">vault audit enable syslog</span>
+<span class="output"># Enable syslog audit</span>
+<span class="prompt">$</span> <span class="command">vault audit enable websocket address=https://audit.example.com</span>
+<span class="output"># Enable webhook audit</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Audit devices _____ all Vault operations.</p>
+                        <input type="text" class="quiz-input" data-answer="log" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Record</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Enable audit with vault _____ enable.</p>
+                        <input type="text" class="quiz-input" data-answer="audit" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Audit</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. List audit devices with vault _____ list.</p>
+                        <input type="text" class="quiz-input" data-answer="audit" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Audit</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Log</p>
+                            <p>2. Audit</p>
+                            <p>3. Audit</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 --><div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// High Availability</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>HA Overview</h3>
+                <p>Vault supports high availability with multiple server nodes. One node is the leader, others are standby. Standbys forward requests to the leader.</p>
+
+                <h3>Storage Backends</h3>
+                <p>HA requires a distributed storage backend like Consul, etcd, or DynamoDB.</p>
+
+                <h3>Configuration</h3>
+                <div class="code-block">
+<span class="comment"># ha_backend.hcl</span>
+<span class="keyword">storage:</span> "consul"
+<span class="keyword">listener:</span> "tcp"
+  <span class="keyword">address:</span> "0.0.0.0:8200"
+<span class="keyword">cluster_addr:</span> "http://node1:8201"
+
+<span class="prompt">$</span> <span class="command">vault server -config=ha_backend.hcl</span>
+                </div>
+
+                <h3>HA Features</h3>
+                <ul>
+                    <li><strong>Automatic failover:</strong> Standby becomes leader if leader fails</li>
+                    <li><strong>Request routing:</strong> Standbys forward requests to leader</li>
+                    <li><strong>Seal unsealing:</strong> Only one node needs to unseal</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Vault HA uses a distributed _____ backend.</p>
+                        <input type="text" class="quiz-input" data-answer="storage" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Where data lives</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. One node is the _____, others are standby.</p>
+                        <input type="text" class="quiz-input" data-answer="leader" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Primary</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Consul is a common _____ backend.</p>
+                        <input type="text" class="quiz-input" data-answer="storage" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Storage</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Storage</p>
+                            <p>2. Leader</p>
+                            <p>3. Storage</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../nav.js"></script>
+    <script src="../guides.js"></script>
+</body>
+</html>

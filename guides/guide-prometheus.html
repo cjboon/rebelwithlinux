@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-prometheus.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prometheus - Master Metrics & Monitoring | REBEL WITH LINUX</title>
+    <meta name="description" content="Learn Prometheus from basics to advanced. Master metrics collection, PromQL queries, exporters, alerting, and Grafana integration.">
+    <meta name="keywords" content="Prometheus, metrics, monitoring, PromQL, alerting, exporters, Grafana, observability, time series, DevOps">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+    <script src="../terminal-select.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.checked = (savedTheme === 'dark' || !savedTheme);
+            }
+        });
+    </script>
+    <style>
+        :root {
+            --nav-color: #e6522c;
+        }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../search.html">SEARCH</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#login" id="loginLink" class="auth-link">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>PROMETHEUS<br>METRICS</h1>
+        <p class="tagline">// The metrics database for cloud-native.</p>
+        
+        <div class="manifesto">
+            <p><strong>PROMETHEUS CHANGED HOW WE THINK ABOUT METRICS.</strong></p>
+            <p>Originally built at SoundCloud, Prometheus is now a CNCF graduated project. It pulls metrics from targets, stores them efficiently, and lets you query with PromQL—a powerful expression language for time series data.</p>
+            <p><strong>WHY PROMETHEUS?</strong></p>
+            <p>Prometheus uses a pull model—it scrapes metrics from targets over HTTP. No agents needed on most systems. It handles millions of time series, alerts on conditions, and integrates perfectly with Grafana for visualization.</p>
+            <p><strong>JOIN THE METRICS REVOLUTION.</strong></p>
+            <p>Learn to instrument your applications, write PromQL queries, set up alerting rules, and build dashboards. Prometheus is the backbone of modern observability.</p>
+        </div>
+
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY →</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// The Path to Prometheus Mastery</h2>
+            <p>10 lessons. Complete metrics control.</p>
+        </div>
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Prometheus</h3>
+                <p class="lesson-desc">What is Prometheus and how it works</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Installation & Setup</h3>
+                <p class="lesson-desc">Install Prometheus and configure</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Metrics & Labels</h3>
+                <p class="lesson-desc">Understanding metrics and label dimensions</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">PromQL Basics</h3>
+                <p class="lesson-desc">Query Prometheus with PromQL</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Exporters</h3>
+                <p class="lesson-desc">Node, cAdvisor, and custom exporters</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">PromQL Advanced</h3>
+                <p class="lesson-desc">Functions, aggregations, and joins</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Recording Rules</h3>
+                <p class="lesson-desc">Pre-compute complex queries</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Alerting</h3>
+                <p class="lesson-desc">Define and route alerts with Alertmanager</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Service Discovery</h3>
+                <p class="lesson-desc">Auto-discover targets in Kubernetes</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Grafana Integration</h3>
+                <p class="lesson-desc">Build dashboards with Grafana</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why Prometheus</h2>
+            <p>Prometheus was created by Matt Levachimov and Julius Volz at SoundCloud in 2012. It joined CNCF in 2016 and graduated in 2018—the second project to do so after Kubernetes.</p>
+            <p>Unlike traditional monitoring systems with push agents, Prometheus uses a pull model. It scrapes metrics from HTTP endpoints at regular intervals. This makes it simple, reliable, and scalable to thousands of targets.</p>
+            <p>Prometheus stores time series data with dimensional data—each metric has labels (key-value pairs) that allow flexible querying. This multidimensional approach, combined with PromQL, makes Prometheus incredibly powerful.</p>
+            <p><strong>Metrics are truth. Let Prometheus show you the truth.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>📖 Prometheus Docs</h3>
+                <p>Official Documentation</p>
+                <a href="https://prometheus.io/docs" target="_blank">prometheus.io/docs</a>
+            </div>
+            <div class="resource-card">
+                <h3>📊 Grafana</h3>
+                <p>Visualization</p>
+                <a href="https://grafana.com" target="_blank">grafana.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>📦 Exporters</h3>
+                <p>Metrics Exporters</p>
+                <a href="https://prometheus.io/docs/instrumenting/exporters/" target="_blank">exporters</a>
+            </div>
+            <div class="resource-card">
+                <h3>🖥️ Node Exporter</h3>
+                <p>System Metrics</p>
+                <a href="https://github.com/prometheus/node_exporter" target="_blank">node_exporter</a>
+            </div>
+            <div class="resource-card">
+                <h3>🧊 cAdvisor</h3>
+                <p>Container Metrics</p>
+                <a href="https://github.com/google/cadvisor" target="_blank">cadvisor</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔔 Alertmanager</h3>
+                <p>Alert Routing</p>
+                <a href="https://prometheus.io/docs/alerting/latest/alertmanager/" target="_blank">alertmanager</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="copyleft">⟲</span>
+                <span>REBEL WITH LINUX</span>
+            </div>
+            <p class="footer-tagline">Learn Linux the hard way.</p>
+            <div class="footer-links">
+                <a href="../site-map.html">Site Map</a>
+                <span class="footer-divider">|</span>
+                <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion">Onion Site</a>
+                <span class="footer-divider">|</span>
+                <a href="https://github.com/cjboon/rebelwithlinux">GitHub</a>
+            </div>
+            <p class="footer-copyright">COPYRIGHT © 2026 — ALL RIGHTS RESERVED</p>
+        </div>
+    </footer>
+
+    <div class="modal-content" id="modalContent"></div>
+
+    <!-- Lesson 1 --><div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Introduction to Prometheus</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is Prometheus?</h3>
+                <p>Prometheus is an open-source systems monitoring and alerting toolkit. It collects and stores metrics as time series data—numerical values identified by metric name and optional key-value labels.</p>
+
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Metrics:</strong> Numerical measurements over time</li>
+                    <li><strong>Targets:</strong> Services or systems being monitored</li>
+                    <li><strong>Exporters:</strong> Programs that expose metrics in Prometheus format</li>
+                    <li><strong>Scrape:</strong> Prometheus pulls metrics from targets</li>
+                    <li><strong>PromQL:</strong> Prometheus Query Language</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>PROMETHEUS PHILOSOPHY:</strong> "Pull over push." Prometheus scrapes metrics from targets, rather than waiting for them to push data. This makes it simpler and more reliable.
+                </div>
+
+                <h3>How Prometheus Works</h3>
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command"># Prometheus server:</span>
+<span class="prompt">#</span> <span class="command"># 1. Scrapes metrics from targets at regular intervals</span>
+<span class="prompt">#</span> <span class="command"># 2. Stores time series data locally</span>
+<span class="prompt">#</span> <span class="command"># 3. Evaluates alerting rules</span>
+<span class="prompt">#</span> <span class="command"># 4. Exposes API for querying</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Prometheus uses a _____ model.</p>
+                        <input type="text" class="quiz-input" data-answer="pull" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Opposite of push</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Programs exposing metrics are called _____. </p>
+                        <input type="text" class="quiz-input" data-answer="exporters" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Export metrics</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Metrics stored as _____ series.</p>
+                        <input type="text" class="quiz-input" data-answer="time" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Time-based</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Query language is _____. </p>
+                        <input type="text" class="quiz-input" data-answer="promql" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Prometheus Query Language</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">5. Prometheus collects from targets at regular _____.</p>
+                        <input type="text" class="quiz-input" data-answer="intervals" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Regular times</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Pull</p>
+                            <p>2. Exporters</p>
+                            <p>3. Time</p>
+                            <p>4. PromQL</p>
+                            <p>5. Intervals</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 --><div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Installation & Setup</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Installing Prometheus</h3>
+                <p>Prometheus can run as a binary, in Docker, or on Kubernetes. The binary is simplest for learning.</p>
+
+                <h3>Quick Start</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command">curl -LO https://github.com/prometheus/prometheus/releases/download/v2.47.0/prometheus-2.47.0.linux-amd64.tar.gz</span>
+<span class="prompt">$</span> <span class="command">tar xzf prometheus-*.linux-amd64.tar.gz</span>
+<span class="prompt">$</span> <span class="command">cd prometheus-2.47.0.linux-amd64</span>
+<span class="prompt">$</span> <span class="command">./prometheus --config.file=prometheus.yml</span>
+                </div>
+
+                <h3>Basic Configuration</h3>
+                <div class="code-block">
+<span class="comment"># prometheus.yml</span>
+<span class="keyword">global:</span>
+  <span class="keyword">scrape_interval:</span> 15s
+  <span class="keyword">evaluation_interval:</span> 15s
+
+<span class="keyword">alerting:</span>
+  <span class="keyword">alertmanagers:</span>
+    - <span class="keyword">static_configs:</span>
+        - <span class="keyword">targets:</span>
+          - alertmanager:9093
+
+<span class="keyword">rule_files:</span>
+  - "rules/*.yml"
+
+<span class="keyword">scrape_configs:</span>
+  - <span class="keyword">job_name:</span> 'prometheus'
+    <span class="keyword">static_configs:</span>
+      - <span class="keyword">targets:</span> ['localhost:9090']
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Default scrape interval is _____ seconds.</p>
+                        <input type="text" class="quiz-input" data-answer="15" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: 15</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Configuration file is prometheus._____.</p>
+                        <input type="text" class="quiz-input" data-answer="yml" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: YAML</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Alert rules in _____ files.</p>
+                        <input type="text" class="quiz-input" data-answer="rule" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Rules</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. 15</p>
+                            <p>2. yml</p>
+                            <p>3. Rule</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 --><div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Metrics & Labels</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Metric Format</h3>
+                <p>Prometheus metrics follow a specific format with metric name and labels.</p>
+
+                <h3>Metric Structure</h3>
+                <div class="code-block">
+<span class="comment"># metric_name{label1="value1", label2="value2"}</span>
+<span class="comment"># Example:</span>
+<span class="comment"># process_cpu_seconds_total{job="prometheus", instance="localhost:9090"}</span>
+<span class="comment"># </span>
+<span class="comment"># - metric name: process_cpu_seconds_total</span>
+<span class="comment"># - labels: job, instance</span>
+<span class="comment"># - value: number (seconds)</span>
+                </div>
+
+                <h3>Metric Types</h3>
+                <ul>
+                    <li><strong>Counter:</strong> Always increasing (requests_total, errors_total)</li>
+                    <li><strong>Gauge:</strong> Can go up or down (memory_usage, temperature)</li>
+                    <li><strong>Histogram:</strong> Buckets for distributions (request_duration)</li>
+                    <li><strong>Summary:</strong> Quantiles over sliding window (response_latency)</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. A metric that only increases is a _____.</p>
+                        <input type="text" class="quiz-input" data-answer="counter" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Counting</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. A metric that goes up and down is a _____.</p>
+                        <input type="text" class="quiz-input" data-answer="gauge" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Measurement</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Key-value pairs attached to metrics are _____.</p>
+                        <input type="text" class="quiz-input" data-answer="labels" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Dimensions</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">4. Histogram is for _____ distributions.</p>
+                        <input type="text" class="quiz-input" data-answer="bucket" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Bucketed</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Counter</p>
+                            <p>2. Gauge</p>
+                            <p>3. Labels</p>
+                            <p>4. Bucket</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 --><div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// PromQL Basics</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>PromQL Overview</h3>
+                <p>PromQL (Prometheus Query Language) lets you select and aggregate time series data.</p>
+
+                <h3>Basic Queries</h3>
+                <div class="terminal-block">
+<span class="comment"># Simple metric query</span>
+<span class="command">up</span>
+<span class="comment"># Returns 1 if target is up, 0 if down</span>
+
+<span class="comment"># Query with labels</span>
+<span class="command">up{job="prometheus"}</span>
+<span class="comment"># Only prometheus job</span>
+
+<span class="comment"># Range vectors (last 5 minutes)</span>
+<span class="command">up[5m]</span>
+                </div>
+
+                <h3>Operators</h3>
+                <div class="code-block">
+<span class="comment"># Arithmetic</span>
+<span class="command">rate(http_requests_total[5m])</span>
+<span class="comment"># rate of requests</span>
+
+<span class="comment"># Comparison</span>
+<span class="command">node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100</span>
+<span class="comment"># Memory usage percentage</span>
+
+<span class="comment"># Logical</span>
+<span class="command">up == 1</span>
+<span class="comment"># Only targets that are up</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. up{job="prometheus"} filters by _____.</p>
+                        <input type="text" class="quiz-input" data-answer="label" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Label filter</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. up[5m] is a _____ vector.</p>
+                        <input type="text" class="quiz-input" data-answer="range" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Time range</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Rate calculates per-second _____.</p>
+                        <input type="text" class="quiz-input" data-answer="rate" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Speed</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Label</p>
+                            <p>2. Range</p>
+                            <p>3. Rate</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 --><div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Exporters</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Exporters?</h3>
+                <p>Exporters are programs that collect metrics from systems and expose them in Prometheus format. They translate existing monitoring data into Prometheus metrics.</p>
+
+                <h3>Popular Exporters</h3>
+                <ul>
+                    <li><strong>node_exporter:</strong> System metrics (CPU, memory, disk, network)</li>
+                    <li><strong>cAdvisor:</strong> Docker/container metrics</li>
+                    <li><strong>blackbox_exporter:</strong> HTTP, TCP, DNS checks</li>
+                    <li><strong>mysqld_exporter:</strong> MySQL/MariaDB metrics</li>
+                    <li><strong>postgres_exporter:</strong> PostgreSQL metrics</li>
+                    <li><strong>redis_exporter:</strong> Redis metrics</li>
+                </ul>
+
+                <h3>Using Node Exporter</h3>
+                <div class="terminal-block">
+<span class="prompt">$</span> <span class="command"># Install node_exporter</span>
+<span class="prompt">$</span> <span class="command">./node_exporter</span>
+<span class="output"># Listening on :9100</span>
+<span class="prompt">#</span> <span class="command"># Metrics available at:</span>
+<span class="prompt">#</span> <span class="command">curl localhost:9100/metrics</span>
+                </div>
+
+                <h3>Add to Prometheus</h3>
+                <div class="code-block">
+<span class="keyword">scrape_configs:</span>
+  - <span class="keyword">job_name:</span> 'node'
+    <span class="keyword">static_configs:</span>
+      - <span class="keyword">targets:</span> ['localhost:9100']
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. _____ exporter collects system metrics.</p>
+                        <input type="text" class="quiz-input" data-answer="node" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: System</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. cAdvisor collects _____ metrics.</p>
+                        <input type="text" class="quiz-input" data-answer="container" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Docker</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Node exporter listens on port _____.</p>
+                        <input type="text" class="quiz-input" data-answer="9100" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: 9100</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Node</p>
+                            <p>2. Container</p>
+                            <p>3. 9100</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 --><div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// PromQL Advanced</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Aggregation Operators</h3>
+                <p>PromQL provides powerful aggregation to combine metrics across dimensions.</p>
+
+                <h3>Aggregations</h3>
+                <div class="terminal-block">
+<span class="comment"># Sum of all HTTP requests</span>
+<span class="command">sum(http_requests_total)</span>
+
+<span class="comment"># Average by job</span>
+<span class="command">avg by (job) (http_request_duration_seconds)</span>
+
+<span class="comment"># Count of targets up</span>
+<span class="command">count(up == 1)</span>
+
+<span class="comment"># Max CPU usage per instance</span>
+<span class="command">max by (instance) (rate(cpu_usage[5m]))</span>
+                </div>
+
+                <h3>Functions</h3>
+                <div class="code-block">
+<span class="comment"># Rate (per-second)</span>
+<span class="command">rate(http_requests_total[5m])</span>
+
+<span class="comment"># Increase (total growth)</span>
+<span class="command">increase(http_requests_total[1h])</span>
+
+<span class="comment"># Predict future (30 minutes)</span>
+<span class="command">predict_linear(node_memory_MemAvailable_bytes[10m], 30*60)</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. _____ aggregates to total sum.</p>
+                        <input type="text" class="quiz-input" data-answer="sum" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Total</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Predict linear _____ future values.</p>
+                        <input type="text" class="quiz-input" data-answer="linear" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Linear</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Increase shows total _____ over time.</p>
+                        <input type="text" class="quiz-input" data-answer="growth" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Change</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Sum</p>
+                            <p>2. Linear</p>
+                            <p>3. Growth</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 --><div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Recording Rules</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Recording Rules?</h3>
+                <p>Recording rules pre-compute expensive queries and store results as new time series. This speeds up dashboards and reduces load.</p>
+
+                <h3>Rule File</h3>
+                <div class="code-block">
+<span class="keyword">groups:</span>
+  - <span class="keyword">name:</span> example
+    <span class="keyword">rules:</span>
+      - <span class="keyword">record:</span> job:http_requests_total:rate5m
+        <span class="keyword">expr:</span> rate(http_requests_total[5m])
+
+      - <span class="keyword">record:</span> instance:cpu_usage:avg
+        <span class="keyword">expr:</span> avg by (instance) (rate(cpu_usage[5m]))
+                </div>
+
+                <h3>Using Recording Rules</h3>
+                <div class="terminal-block">
+<span class="prompt">#</span> <span class="command"># Add to prometheus.yml:</span>
+<span class="keyword">rule_files:</span>
+  - "rules/*.yml"
+
+<span class="prompt">$</span> <span class="command"># Reload Prometheus</span>
+<span class="prompt">$</span> <span class="command">curl -X POST http://localhost:9090/-/reload</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Recording rules pre-_____ expensive queries.</p>
+                        <input type="text" class="quiz-input" data-answer="compute" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Calculate</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Rules stored in _____ files.</p>
+                        <input type="text" class="quiz-input" data-answer="yml" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: YAML</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Reload API endpoint is /-/_____.</p>
+                        <input type="text" class="quiz-input" data-answer="reload" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Reload</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Compute</p>
+                            <p>2. yml</p>
+                            <p>3. Reload</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 --><div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Alerting</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Alert Rules</h3>
+                <p>Prometheus evaluates alert rules and sends to Alertmanager when conditions are met.</p>
+
+                <h3>Alert Rule Example</h3>
+                <div class="code-block">
+<span class="keyword">groups:</span>
+  - <span class="keyword">name:</span> example_alerts
+    <span class="keyword">rules:</span>
+      - <span class="keyword">alert:</span> HighMemoryUsage
+        <span class="keyword">expr:</span> node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.1
+        <span class="keyword">for:</span> 5m
+        <span class="keyword">labels:</span>
+          <span class="keyword">severity:</span> warning
+        <span class="keyword">annotations:</span>
+          <span class="keyword">summary:</span> "High memory usage detected"
+          <span class="keyword">description:</span> "Memory usage is above 90%"
+                </div>
+
+                <h3>Alertmanager Config</h3>
+                <div class="code-block">
+<span class="keyword">global:</span>
+  <span class="keyword">resolve_timeout:</span> 5m
+
+<span class="keyword">route:</span>
+  <span class="keyword">receiver:</span> 'email'
+
+<span class="keyword">receivers:</span>
+  - <span class="keyword">name:</span> 'email'
+    <span class="keyword">email_configs:</span>
+      - <span class="keyword">to:</span> 'alerts@example.com'
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Alert rules evaluate and send to _____.</p>
+                        <input type="text" class="quiz-input" data-answer="alertmanager" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Alert manager</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Duration before firing with _____ clause.</p>
+                        <input type="text" class="quiz-input" data-answer="for" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Wait period</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Annotations provide _____ details.</p>
+                        <input type="text" class="quiz-input" data-answer="description" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: What happened</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Alertmanager</p>
+                            <p>2. For</p>
+                            <p>3. Description</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 --><div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Service Discovery</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Dynamic Target Discovery</h3>
+                <p>Instead of static configs, use service discovery to automatically find targets in Kubernetes, Docker, EC2, and more.</p>
+
+                <h3>Kubernetes SD</h3>
+                <div class="code-block">
+<span class="keyword">scrape_configs:</span>
+  - <span class="keyword">job_name:</span> 'kubernetes-pods'
+    <span class="keyword">kubernetes_sd_configs:</span>
+      - <span class="keyword">role:</span> pod
+    <span class="keyword">relabel_configs:</span>
+      - <span class="keyword">source_labels:</span> [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        <span class="keyword">action:</span> keep
+        <span class="keyword">regex:</span> true
+                </div>
+
+                <h3>Relabeling</h3>
+                <div class="terminal-block">
+<span class="comment"># Relabeling transforms labels during scraping</span>
+<span class="comment"># __meta_* contain service discovery metadata</span>
+<span class="comment"># Use regex to filter and transform</span>
+                </div>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. _____ discovery auto-finds targets.</p>
+                        <input type="text" class="quiz-input" data-answer="service" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Auto-find</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. K8s SD uses role _____.</p>
+                        <input type="text" class="quiz-input" data-answer="pod" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Pod</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. _____ configs transform labels.</p>
+                        <input type="text" class="quiz-input" data-answer="relabel" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Label modification</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Service</p>
+                            <p>2. Pod</p>
+                            <p>3. Relabel</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 --><div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Grafana Integration</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Prometheus + Grafana</h3>
+                <p>Grafana is the standard visualization tool for Prometheus. Add Prometheus as a data source and build dashboards.</p>
+
+                <h3>Add Data Source</h3>
+                <div class="terminal-block">
+<span class="comment"># In Grafana:</span>
+<span class="comment"># 1. Configuration → Data Sources</span>
+<span class="comment"># 2. Add Prometheus</span>
+<span class="comment"># 3. URL: http://localhost:9090</span>
+<span class="comment"># 4. Save & Test</span>
+                </div>
+
+                <h3>Query in Grafana</h3>
+                <div class="code-block">
+<span class="comment"># In dashboard panels:</span>
+<span class="command">rate(http_requests_total{job="$job"}[5m])</span>
+
+<span class="comment"># Variables:</span>
+<span class="command">$__rate_interval</span>
+<span class="comment"># Auto-adjusts for scrape interval</span>
+                </div>
+
+                <h3>Dashboards</h3>
+                <p>Import pre-built dashboards from Grafana.com. Search for "Prometheus" to find community dashboards for Kubernetes, nodes, databases, and more.</p>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Grafana visualizes _____ from Prometheus.</p>
+                        <input type="text" class="quiz-input" data-answer="metrics" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Data</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">2. Import dashboards from _____.com.</p>
+                        <input type="text" class="quiz-input" data-answer="grafana" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Grafana</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p class="question-text">3. Auto-interval variable is $__rate _____.</p>
+                        <input type="text" class="quiz-input" data-answer="interval" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Interval</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <p>1. Metrics</p>
+                            <p>2. Grafana</p>
+                            <p>3. Interval</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../nav.js"></script>
+    <script src="../guides.js"></script>
+</body>
+</html>
