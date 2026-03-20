@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-tar.html" />
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tar Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid #444444; }
+        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
+        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
+        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
+        .tar-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .tar-output-line { color: #aaaaaa; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .tar-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .tar-success-line { color: #b5bd68; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1e; }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .tar-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .tar-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .tar-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid #444444; }
+            .left-pane { border-right: none; border-top: 2px solid #444444; }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">tar Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type tar command:</div>
+                <textarea id="command-input" placeholder="tar -cvf archive.tar files/" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="tar-output-area" id="tar-output">
+                <div class="tar-output-line" style="color: #586e75;">tar output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const tarOutput = document.getElementById('tar-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=tar');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'tar', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addTarLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'tar-error-line' : type === 'success' ? 'tar-success-line' : 'tar-output-line';
+            line.textContent = text;
+            tarOutput.appendChild(line);
+            tarOutput.scrollTop = tarOutput.scrollHeight;
+        }
+        
+        function clearTarOutput() { tarOutput.innerHTML = ''; }
+        
+        function runTar(cmd) {
+            addTarLine('$ ' + cmd);
+            
+            const responses = {
+                "tar -cvf": "a file1.txt 1K\na file2.txt 2K\na folder/ 4K",
+                "tar -xvf": "x file1.txt\nx file2.txt\nx folder/\nx folder/file3.txt",
+                "tar -tvf": "drwxr-xr-x user/group 4096 Jan 15 folder/\n-rw-r--r-- user/group 1024 Jan 15 file1.txt\n-rw-r--r-- user/group 2048 Jan 15 file2.txt",
+                "tar -czvf": "a file1.txt 1K\na file2.txt 2K",
+                "tar -xzvf": "x file1.txt\nx file2.txt",
+                "-czvf": "Compressed archive created",
+                "-xzvf": "Compressed archive extracted",
+                "-cvf": "Archive created",
+                "-xvf": "Archive extracted",
+                "tar -czf": "archive.tar.gz created",
+                "tar -xzf": "archive.tar.gz extracted",
+                "tar -cjf": "archive.tar.bz2 created",
+                "tar -xjf": "archive.tar.bz2 extracted",
+                "--strip-components": "Components stripped from paths",
+                "-C": "Changed to directory",
+                "-p": "Preserved permissions",
+                "--exclude": "Excluded files from archive"
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addTarLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.toLowerCase().includes('tar')) {
+                    addTarLine('Archive operation completed');
+                    matched = true;
+                } else {
+                    addTarLine('Try: tar -cvf archive.tar files/', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "Tar Tammy",
+            greeting: "Hey! I'm Tar Tammy - your archiving ace! tar bundles multiple files into one archive - essential for backups and distribution. Tape archive lives on! Let's compress and bundle!",
+            encourage: ["Excellent!", "Archived!", "You're a packing pro!", "Keep bundling!", "Backup hero!", "Brilliant!"],
+            getEncouragement: function() { return this.encourage[Math.floor(Math.random() * this.encourage.length)]; }
+        };
+        
+        const beginnerLevels = [
+            { id: 1, title: "Create Archive", intro: "Welcome! tar -cvf creates an archive. c=create, v=verbose (show files), f=file.", content: "Create archive:\ntar -cvf archive.tar folder/", hint: "Type: tar -cvf", answer: "tar -cvf", success: "Archive created! -cvf shows files as they're added. archive.tar now contains folder/!", type: "contains" },
+            { id: 2, title: "Extract Archive", intro: "tar -xvf extracts an archive. x=extract, v=verbose, f=file.", content: "Extract archive:\ntar -xvf archive.tar", hint: "Type: tar -xvf", answer: "tar -xvf", success: "Files extracted! The files are now in your current directory!", type: "contains" },
+            { id: 3, title: "List Archive Contents", intro: "tar -tvf lists contents without extracting. t=list, v=verbose, f=file.", content: "List archive:\ntar -tvf archive.tar", hint: "Type: tar -tvf", answer: "tar -tvf", success: "Contents listed! Shows permissions, size, dates, filenames. Inspect before extracting!", type: "contains" },
+            { id: 4, title: "Create gzipped Archive", intro: "Add -z for gzip compression. .tar.gz is the standard compressed archive format.", content: "Create compressed:\ntar -czvf archive.tar.gz folder/", hint: "Type: tar -czvf", answer: "tar -czvf", success: "Gzipped archive created! -z adds gzip compression. Much smaller than uncompressed!", type: "contains" },
+            { id: 5, title: "Extract gzipped Archive", intro: "Extract .tar.gz with -xzf. x=extract, z=gzip, f=file.", content: "Extract compressed:\ntar -xzvf archive.tar.gz", hint: "Type: tar -xzvf", answer: "tar -xzvf", success: "Gzipped archive extracted! -xzvf extracts and decompresses in one step!", type: "contains" },
+            { id: 6, title: "Extract to Directory", intro: "Use -C to extract to a specific directory.", content: "Extract to /tmp:\ntar -xzvf archive.tar.gz -C /tmp", hint: "Type: -C /tmp", answer: "-C", success: "Extracted to /tmp! -C changes directory before extracting. Keep your workspace clean!", type: "contains" },
+            { id: 7, title: "Add Files to Archive", intro: "tar -rf adds files to an existing archive (not compressed).", content: "Add to archive:\ntar -rf archive.tar newfile.txt", hint: "Type: tar -rf", answer: "tar -rf", success: "File added! -rf appends files to existing uncompressed archive!", type: "contains" },
+            { id: 8, title: "Update Files in Archive", intro: "tar -uf updates files already in archive with newer versions.", content: "Update archive:\ntar -uf archive.tar updated_file.txt", hint: "Type: tar -uf", answer: "tar -uf", success: "File updated! Only newer versions replace old ones. Incremental archives!", type: "contains" },
+            { id: 9, title: "Append Archive", intro: "tar -A adds one archive to another.", content: "Append archives:\ntar -Af archive1.tar archive2.tar", hint: "Type: tar -Af", answer: "tar -Af", success: "Archives appended! archive1.tar now contains both sets of files!", type: "contains" },
+            { id: 10, title: "Wildcard Extract", intro: "Use --wildcards to extract only matching files.", content: "Extract only .txt:\ntar -xvf archive.tar --wildcards '*.txt'", hint: "Type: --wildcards", answer: "--wildcards", success: "Only .txt files extracted! --wildcards enables glob pattern matching!", type: "contains" },
+            { id: 11, title: "Preserve Permissions", intro: "Use -p to preserve original permissions when extracting.", content: "Extract with perms:\ntar -xvpvf archive.tar", hint: "Type: -p", answer: "-p", success: "Permissions preserved! -p maintains original file permissions. Important for system files!", type: "contains" },
+            { id: 12, title: "Beginner Finale", intro: "Final challenge! Create a compressed archive of a folder and list its contents!", content: "Challenge:\ntar -czvf mybackup.tar.gz myfolder/", hint: "Type: tar -czvf", answer: "tar -czvf", success: "BEGINNER COMPLETE! You master: create, extract, list, compress, -C, -p! Archive ace!", type: "starts" }
+        ];
+        
+        const intermediateLevels = [
+            { id: 1, title: "Exclude Files", intro: "INTERMEDIATE! Use --exclude to skip files matching a pattern.", content: "Exclude .log files:\ntar -czvf backup.tar.gz --exclude='*.log' folder/", hint: "Type: --exclude", answer: "--exclude", success: "Logs excluded! Multiple --exclude flags work. Keep archives clean!", type: "contains" },
+            { id: 2, title: "Exclude Directory", intro: "Exclude entire directories with --exclude.", content: "Exclude node_modules:\ntar -czvf app.tar.gz --exclude='node_modules' ./app/", hint: "Type: --exclude='node_modules'", answer: "--exclude='node_modules'", success: "node_modules excluded! Massive savings - those deps get huge!", type: "contains" },
+            { id: 3, title: "bzip2 Compression", intro: "Use -j for bzip2 compression (.tar.bz2). Better compression than gzip but slower.", content: "Create bz2 archive:\ntar -cjvf archive.tar.bz2 folder/", hint: "Type: tar -cjvf", answer: "tar -cjvf", success: "bzip2 archive created! Better compression than gzip. Good for distribution!", type: "contains" },
+            { id: 4, title: "xz Compression", intro: "Use -J for xz compression (.tar.xz). Best compression, slowest.", content: "Create xz archive:\ntar -cJvf archive.tar.xz folder/", hint: "Type: tar -cJvf", answer: "tar -cJvf", success: "xz archive created! Maximum compression. Takes time but results are tiny!", type: "contains" },
+            { id: 5, title: "Strip Components", intro: "--strip-components=N removes N leading path components.", content: "Strip first component:\ntar -xvf archive.tar --strip-components=1", hint: "Type: --strip-components", answer: "--strip-components", success: "Leading path stripped! Useful when archive contains ./ prefix or unwanted dirs!", type: "contains" },
+            { id: 6, title: "List with grep", intro: "Pipe tar listing through grep to find specific files.", content: "Find .conf files:\ntar -tvf archive.tar | grep .conf", hint: "Type: tar -tvf archive.tar | grep", answer: "tar -tvf archive.tar | grep", success: "Found .conf files! Combine with grep for powerful archive searching!", type: "contains" },
+            { id: 7, title: "Verify Archive", intro: "tar -d compares archive to filesystem. Lists differences.", content: "Compare archive to files:\ntar -df archive.tar", hint: "Type: tar -df", answer: "tar -df", success: "Archive compared! Shows missing or changed files. Verify integrity!", type: "contains" },
+            { id: 8, title: "Concatenate Archives", intro: "tar -A concatenates archives into one.", content: "Join archives:\ntar -A -f combined.tar archive1.tar archive2.tar", hint: "Type: tar -A", answer: "tar -A", success: "Archives joined! combined.tar now contains everything. Order matters!", type: "contains" },
+            { id: 9, title: "Files from Archive List", intro: "tar -T reads file list from file or stdin for archiving.", content: "Archive from list:\necho \"file1.txt\" | tar -czvf backup.tar.gz -T -", hint: "Type: -T", answer: "-T", success: "Archive from list! -T reads filenames to archive. Great for selective backups!", type: "contains" },
+            { id: 10, title: "Backup with Date", intro: "Use command substitution to add date to archive filename.", content: "Backup with date:\ntar -czvf backup-$(date +%Y%m%d).tar.gz folder/", hint: "Type: $(date +%Y%m%d)", answer: "$(date", success: "Dated backup! Automatically creates backup-20260115.tar.gz. Script-friendly!", type: "contains" },
+            { id: 11, title: "Incremental Backup", intro: "Create snapshots with --listed-incremental for backup systems.", content: "Incremental snapshot:\ntar --listed-incremental=snapshot.snar -czvf backup.tar.gz folder/", hint: "Type: --listed-incremental", answer: "--listed-incremental", success: "Incremental snapshot! Only backs up changes since last run. Efficient backups!", type: "contains" },
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Create compressed archive excluding temp files, extract to new folder!", content: "Challenge:\ntar -czvf app.tar.gz --exclude='*.tmp' --exclude='cache' ./app -C /tmp", hint: "Type: tar -czvf --exclude", answer: "tar -czvf --exclude", success: "INTERMEDIATE COMPLETE! You master: exclude, -j/-J, --strip-components, -T, incremental! tar MASTER!", type: "starts" }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') return user === answer;
+            else if (level.type === 'contains') return user.includes(answer);
+            else if (level.type === 'starts') return user.startsWith(answer);
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! tar levels complete! You're an archiving master!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: create, extract, list, gzip. I'll make you an archive ace!"); }
+            else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Advanced: exclude, bzip2, xz, --strip-components, incremental!"); }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) { document.exitFullscreen(); }
+            else { document.documentElement.requestFullscreen(); }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=updateTheme&theme=' + newTheme, credentials: 'include' });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearTarOutput();
+                runTar(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearTarOutput();
+                runTar(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) { currentLevel = savedLevel - 1; }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basics: create, extract, gzip (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Advanced: exclude, bzip2, xz, incremental (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Choose your path - click above or type --beginner, --intermediate, --fullscreen, --darkmode, or --exit", '', true);
+        }
+        init();
+    </script>
+</body>
+</html>

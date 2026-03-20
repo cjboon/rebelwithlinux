@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-systemctl.html" />
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>systemctl Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid #444444; }
+        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
+        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
+        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
+        .systemctl-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .systemctl-output-line { color: #aaaaaa; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .systemctl-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .systemctl-success-line { color: #b5bd68; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1e; }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .systemctl-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .systemctl-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .systemctl-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid #444444; }
+            .left-pane { border-right: none; border-top: 2px solid #444444; }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">systemctl Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type systemctl command:</div>
+                <textarea id="command-input" placeholder="systemctl status nginx" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="systemctl-output-area" id="systemctl-output">
+                <div class="systemctl-output-line" style="color: #586e75;">systemctl output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const systemctlOutput = document.getElementById('systemctl-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=systemctl');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'systemctl', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addSystemctlLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'systemctl-error-line' : type === 'success' ? 'systemctl-success-line' : 'systemctl-output-line';
+            line.textContent = text;
+            systemctlOutput.appendChild(line);
+            systemctlOutput.scrollTop = systemctlOutput.scrollHeight;
+        }
+        
+        function clearSystemctlOutput() { systemctlOutput.innerHTML = ''; }
+        
+        function runSystemctl(cmd) {
+            addSystemctlLine('$ ' + cmd);
+            
+            const responses = {
+                "systemctl status": "● nginx.service - A high performance web server\n   Loaded: loaded (/lib/systemd/system/nginx.service; enabled)\n   Active: active (running) since Thu 2024-01-15 10:00:00 UTC; 5 days ago",
+                "systemctl start": "Service started",
+                "systemctl stop": "Service stopped",
+                "systemctl restart": "Service restarted",
+                "systemctl reload": "Configuration reloaded",
+                "systemctl enable": "Created symlink /etc/systemd/system/multi-user.target.wants/nginx.service",
+                "systemctl disable": "Removed symlink /etc/systemd/system/multi-user.target.wants/nginx.service",
+                "systemctl status nginx": "● nginx.service - A high performance web server\n   Loaded: loaded (/lib/systemd/system/nginx.service; enabled)\n   Active: active (running)",
+                "systemctl is-active": "active",
+                "systemctl is-enabled": "enabled",
+                "systemctl list-units": "nginx.service        loaded active running A high performance web server\nssh.service          loaded active running OpenSSH server daemon",
+                "systemctl list-unit-files": "nginx.service       enabled\nssh.service          enabled\ncron.service         enabled",
+                "systemctl daemon-reload": "Daemon reloaded",
+                "systemctl mask": "Created symlink /etc/systemd/system/nginx.service → /dev/null",
+                "systemctl unmask": "Removed symlink /etc/systemd/system/nginx.service",
+                "systemctl kill": "Service killed",
+                "systemctl show": "MainPID=1234\nExecStart={ path=/usr/sbin/nginx; argv[]=/usr/sbin/nginx -g daemon on; }",
+                "--type=service": "Lists only service units",
+                "--state=running": "Lists only running units",
+                "systemctl poweroff": "System is powering off",
+                "systemctl reboot": "System is rebooting",
+                "systemctl suspend": "System is suspending",
+                "systemctl hibernate": "System is hibernating"
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addSystemctlLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.toLowerCase().includes('systemctl')) {
+                    addSystemctlLine('Operation completed');
+                    matched = true;
+                } else {
+                    addSystemctlLine('Try: systemctl status nginx', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "SysAdmin Sam",
+            greeting: "Greetings! I'm SysAdmin Sam - your service management guide! systemctl controls systemd services - start, stop, enable, monitor. If it runs on Linux, systemd manages it! Let's keep your servers running!",
+            encourage: ["Excellent!", "Service managed!", "You're a sysadmin hero!", "Keep it running!", "System stable!", "Brilliant!"],
+            getEncouragement: function() { return this.encourage[Math.floor(Math.random() * this.encourage.length)]; }
+        };
+        
+        const beginnerLevels = [
+            { id: 1, title: "Check Service Status", intro: "Welcome! systemctl status shows if a service is running.", content: "Check nginx status:\nsystemctl status nginx", hint: "Type: systemctl status nginx", answer: "systemctl status", success: "Service status shown! See if it's active, running, and recent logs!", type: "contains" },
+            { id: 2, title: "Start a Service", intro: "systemctl start begins a service.", content: "Start nginx:\nsystemctl start nginx", hint: "Type: systemctl start", answer: "systemctl start", success: "Service started! Now nginx is running. Use status to verify!", type: "contains" },
+            { id: 3, title: "Stop a Service", intro: "systemctl stop halts a running service.", content: "Stop nginx:\nsystemctl stop nginx", hint: "Type: systemctl stop", answer: "systemctl stop", success: "Service stopped! nginx is no longer running. Use for maintenance!", type: "contains" },
+            { id: 4, title: "Restart a Service", intro: "systemctl restart stops then starts a service. Good for config changes.", content: "Restart nginx:\nsystemctl restart nginx", hint: "Type: systemctl restart", answer: "systemctl restart", success: "Service restarted! Config changes often need a restart to take effect!", type: "contains" },
+            { id: 5, title: "Reload Configuration", intro: "systemctl reload reloads config without restarting. Some services support this.", content: "Reload nginx config:\nsystemctl reload nginx", hint: "Type: systemctl reload", answer: "systemctl reload", success: "Config reloaded! No downtime - nginx keeps serving while reloading!", type: "contains" },
+            { id: 6, title: "Enable at Boot", intro: "systemctl enable makes service start automatically on boot.", content: "Enable nginx at boot:\nsystemctl enable nginx", hint: "Type: systemctl enable", answer: "systemctl enable", success: "Enabled! nginx will start automatically after reboot. enable != start!", type: "contains" },
+            { id: 7, title: "Disable at Boot", intro: "systemctl disable removes auto-start at boot.", content: "Disable nginx at boot:\nsystemctl disable nginx", hint: "Type: systemctl disable", answer: "systemctl disable", success: "Disabled! nginx won't start automatically on reboot!", type: "contains" },
+            { id: 8, title: "Check if Active", intro: "systemctl is-active checks if service is currently running.", content: "Check if active:\nsystemctl is-active nginx", hint: "Type: systemctl is-active", answer: "systemctl is-active", success: "Returns 'active' or 'inactive'. Great for scripts!", type: "contains" },
+            { id: 9, title: "Check if Enabled", intro: "systemctl is-enabled checks if service starts at boot.", content: "Check if enabled:\nsystemctl is-enabled nginx", hint: "Type: systemctl is-enabled", answer: "systemctl is-enabled", success: "Returns 'enabled', 'disabled', or 'masked'. Boot configuration check!", type: "contains" },
+            { id: 10, title: "List Running Services", intro: "systemctl list-units shows all active units.", content: "List running services:\nsystemctl list-units --type=service --state=running", hint: "Type: --type=service --state=running", answer: "--type=service", success: "Running services listed! See all active daemons at a glance!", type: "contains" },
+            { id: 11, title: "View Service Logs", intro: "journalctl -u shows logs for a specific service.", content: "View nginx logs:\njournalctl -u nginx", hint: "Type: journalctl -u", answer: "journalctl -u", success: "Service logs shown! Essential for debugging what went wrong!", type: "contains" },
+            { id: 12, title: "Beginner Finale", intro: "Final challenge! Enable, start, and verify nginx!", content: "Challenge:\nsystemctl enable nginx && systemctl start nginx && systemctl status nginx", hint: "Type: systemctl enable nginx", answer: "systemctl enable", success: "BEGINNER COMPLETE! You can: start, stop, restart, enable, disable, status! Sysadmin hero!", type: "starts" }
+        ];
+        
+        const intermediateLevels = [
+            { id: 1, title: "Daemon Reload", intro: "INTERMEDIATE! systemctl daemon-reload reloads systemd config after editing unit files.", content: "Reload systemd:\nsystemctl daemon-reload", hint: "Type: systemctl daemon-reload", answer: "systemctl daemon-reload", success: "Daemon reloaded! After editing .service files, this picks up changes!", type: "contains" },
+            { id: 2, title: "Mask a Service", intro: "systemctl mask completely prevents a service from starting - even manually!", content: "Mask nginx:\nsystemctl mask nginx", hint: "Type: systemctl mask", answer: "systemctl mask", success: "Service masked! Even start fails. Use unmask to reverse. Really disable!", type: "contains" },
+            { id: 3, title: "Unmask a Service", intro: "systemctl unmask removes the mask, allowing service to run again.", content: "Unmask nginx:\nsystemctl unmask nginx", hint: "Type: systemctl unmask", answer: "systemctl unmask", success: "Service unmasked! Can be started again. Mask is stronger than disable!", type: "contains" },
+            { id: 4, title: "Kill a Service", intro: "systemctl kill sends a signal to a service's processes.", content: "Kill nginx:\nsystemctl kill nginx", hint: "Type: systemctl kill", answer: "systemctl kill", success: "Service killed! Sends SIGTERM (or custom) to service processes. Emergency stop!", type: "contains" },
+            { id: 5, title: "Show Service Properties", intro: "systemctl show displays properties of a service unit.", content: "Show nginx properties:\nsystemctl show nginx", hint: "Type: systemctl show", answer: "systemctl show", success: "Properties shown! MainPID, ExecStart, Environment - all the details!", type: "contains" },
+            { id: 6, title: "Edit Service File", intro: "systemctl edit creates drop-in unit file snippets.", content: "Edit nginx:\nsystemctl edit nginx --full", hint: "Type: systemctl edit", answer: "systemctl edit", success: "Editor opened! --full edits main file, default edits drop-in. Customize without editing /lib!", type: "contains" },
+            { id: 7, title: "List Failed Services", intro: "systemctl list-units --state=failed shows all failed services.", content: "List failed:\nsystemctl list-units --state=failed", hint: "Type: --state=failed", answer: "--state=failed", success: "Failed services shown! Check these after crashes or boot issues!", type: "contains" },
+            { id: 8, title: "System Power Management", intro: "systemctl poweroff, reboot, suspend, hibernate control power.", content: "Reboot system:\nsystemctl reboot", hint: "Type: systemctl reboot", answer: "systemctl reboot", success: "System rebooting! poweroff, suspend, hibernate also available. systemd controls power!", type: "contains" },
+            { id: 9, title: "Set Default Target", intro: "systemctl set-default changes the default boot target (graphical, multi-user).", content: "Set multi-user target:\nsystemctl set-default multi-user.target", hint: "Type: systemctl set-default", answer: "systemctl set-default", success: "Default target set! multi-user = CLI, graphical = GUI. Boot customization!", type: "contains" },
+            { id: 10, title: "Isolate Target", intro: "systemctl isolate changes current target immediately.", content: "Isolate to graphical:\nsystemctl isolate graphical.target", hint: "Type: systemctl isolate", answer: "systemctl isolate", success: "Target isolated! Immediately switches to graphical.target. No reboot!", type: "contains" },
+            { id: 11, title: "Dependency Tree", intro: "systemctl list-dependencies shows what a service needs.", content: "List dependencies:\nsystemctl list-dependencies nginx.service", hint: "Type: systemctl list-dependencies", answer: "systemctl list-dependencies", success: "Dependency tree shown! See what nginx requires to run!", type: "contains" },
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Mask, unmask, and verify nginx service!", content: "Challenge:\nsystemctl mask nginx && systemctl is-enabled nginx && systemctl unmask nginx", hint: "Type: systemctl mask", answer: "systemctl mask", success: "INTERMEDIATE COMPLETE! You master: mask/unmask, kill, show, daemon-reload, power mgmt! SYSADMIN MASTER!", type: "starts" }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') return user === answer;
+            else if (level.type === 'contains') return user.includes(answer);
+            else if (level.type === 'starts') return user.startsWith(answer);
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! systemctl levels complete! You're a system administration master!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: start, stop, restart, enable, disable, status. I'll make you a sysadmin!"); }
+            else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Advanced: mask, kill, show, daemon-reload, power mgmt!"); }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) { document.exitFullscreen(); }
+            else { document.documentElement.requestFullscreen(); }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=updateTheme&theme=' + newTheme, credentials: 'include' });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearSystemctlOutput();
+                runSystemctl(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearSystemctlOutput();
+                runSystemctl(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) { currentLevel = savedLevel - 1; }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basics: start, stop, restart, enable (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Advanced: mask, kill, show, daemon-reload (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Choose your path - click above or type --beginner, --intermediate, --fullscreen, --darkmode, or --exit", '', true);
+        }
+        init();
+    </script>
+</body>
+</html>

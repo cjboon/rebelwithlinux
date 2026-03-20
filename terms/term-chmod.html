@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-chmod.html" />
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chmod Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid #444444; }
+        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
+        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
+        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
+        .chmod-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .chmod-output-line { color: #aaaaaa; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .chmod-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .chmod-success-line { color: #b5bd68; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1e; }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .chmod-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .chmod-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .chmod-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid #444444; }
+            .left-pane { border-right: none; border-top: 2px solid #444444; }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">chmod Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type chmod command:</div>
+                <textarea id="command-input" placeholder="chmod 755 script.sh" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="chmod-output-area" id="chmod-output">
+                <div class="chmod-output-line" style="color: #586e75;">chmod output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const chmodOutput = document.getElementById('chmod-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=chmod');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'chmod', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addChmodLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'chmod-error-line' : type === 'success' ? 'chmod-success-line' : 'chmod-output-line';
+            line.textContent = text;
+            chmodOutput.appendChild(line);
+            chmodOutput.scrollTop = chmodOutput.scrollHeight;
+        }
+        
+        function clearChmodOutput() { chmodOutput.innerHTML = ''; }
+        
+        function runChmod(cmd) {
+            addChmodLine('$ ' + cmd);
+            
+            const responses = {
+                "chmod 755": "Permissions changed for script.sh",
+                "chmod 644": "Permissions changed for file.txt",
+                "chmod 700": "Permissions changed - owner only",
+                "chmod 600": "Permissions changed - owner only",
+                "chmod 755 script": "ls -la script.sh: -rwxr-xr-x",
+                "chmod 644 file": "ls -la file.txt: -rw-r--r--",
+                "chmod +x": "Added execute permission",
+                "chmod -x": "Removed execute permission",
+                "chmod +r": "Added read permission",
+                "chmod +w": "Added write permission",
+                "chmod u+x": "Owner execute added",
+                "chmod g+x": "Group execute added",
+                "chmod o+x": "Other execute added",
+                "chmod a+x": "All execute added",
+                "chmod u-x": "Owner execute removed",
+                "chmod g-r": "Group read removed",
+                "chmod o-w": "Other write removed",
+                "chmod +rw": "Read and write added for all",
+                "chmod =rw": "Exactly read and write for all",
+                "chmod 4755": "SUID bit set",
+                "chmod 2755": "SGID bit set",
+                "chmod 1755": "Sticky bit set",
+                "chmod -R": "Recursive permissions changed",
+                "chmod -R 755": "All files and directories updated"
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addChmodLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.toLowerCase().includes('chmod')) {
+                    addChmodLine('Permissions changed');
+                    matched = true;
+                } else {
+                    addChmodLine('Try: chmod 755 script.sh', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "Chmod Charlie",
+            greeting: "Yo! I'm Chmod Charlie - permissions master! chmod controls who can read, write, and execute files. Security starts with permissions - let's lock down your system!",
+            encourage: ["Excellent!", "Permission granted!", "You're a security hero!", "Keep securing!", "Access granted!", "Brilliant!"],
+            getEncouragement: function() { return this.encourage[Math.floor(Math.random() * this.encourage.length)]; }
+        };
+        
+        const beginnerLevels = [
+            { id: 1, title: "Understanding Permissions", intro: "Welcome! Permissions control access to files. There are 3 types: read (r), write (w), execute (x).", content: "Check permissions:\nls -la script.sh", hint: "Type: ls -la script.sh", answer: "ls -la", success: "See the permissions! -rw-r--r-- means: owner can read/write, group can read, others can read.", type: "contains" },
+            { id: 2, title: "Numeric Permissions", intro: "Permissions use numbers: 4=read, 2=write, 1=execute. Add them up!", content: "Set rwxr-xr-x (755):\nchmod 755 script.sh", hint: "Type: chmod 755", answer: "chmod 755", success: "755 = owner:rwx (7), group:rx (5), others:rx (5). 7=4+2+1, 5=4+0+1!", type: "contains" },
+            { id: 3, title: "Common Permission 644", intro: "644 is common for regular files: owner read/write, group/others read.", content: "Set rw-r--r-- (644):\nchmod 644 file.txt", hint: "Type: chmod 644", answer: "chmod 644", success: "644 = owner:rw- (6), group:r-- (4), others:r-- (4). Standard file permissions!", type: "contains" },
+            { id: 4, title: "Executable Scripts", intro: "Scripts need execute permission to run. Use 755 for executable scripts.", content: "Make script executable:\nchmod 755 myscript.sh", hint: "Type: chmod 755 myscript", answer: "chmod 755", success: "Now the script can run! Without execute, you'd get 'Permission denied'!", type: "contains" },
+            { id: 5, title: "Add Execute with +x", intro: "Use +x to ADD execute permission without changing other permissions.", content: "Add execute:\nchmod +x script.sh", hint: "Type: chmod +x", answer: "chmod +x", success: "Execute added! +x adds to existing. Compare: chmod +x vs chmod 755!", type: "contains" },
+            { id: 6, title: "Remove Execute with -x", intro: "Use -x to REMOVE execute permission.", content: "Remove execute:\nchmod -x script.sh", hint: "Type: chmod -x", answer: "chmod -x", success: "Execute removed! Now script can't run. Security best practice: remove when not needed!", type: "contains" },
+            { id: 7, title: "Owner Only (700)", intro: "700 means owner only - no access for group or others. Super secure!", content: "Owner only (700):\nchmod 700 secret.txt", hint: "Type: chmod 700", answer: "chmod 700", success: "700 = owner:rwx (7), group:--- (0), others:--- (0). Only you can access!", type: "contains" },
+            { id: 8, title: "Symbolic Format - u", intro: "u = user (owner), g = group, o = others, a = all. Modify specific entities!", content: "Add write to owner:\nchmod u+w file.txt", hint: "Type: chmod u+w", answer: "chmod u+w", success: "Owner can now write! Symbolic format lets you target specific permission types!", type: "contains" },
+            { id: 9, title: "Symbolic Format - g and o", intro: "g targets group, o targets others.", content: "Add read to group:\nchmod g+r file.txt", hint: "Type: chmod g+r", answer: "chmod g+r", success: "Group can read now! g+r adds, g-r removes. Precise control!", type: "contains" },
+            { id: 10, title: "Multiple Changes", intro: "You can combine changes: chmod u+x,g+r file.", content: "Owner execute, group read:\nchmod u+x,g+r file.txt", hint: "Type: chmod u+x,g+r", answer: "chmod u+x,g+r", success: "Multiple changes in one command! Powerful and efficient!", type: "contains" },
+            { id: 11, title: "Directory Permissions", intro: "Directories need execute to enter (cd into). 755 is common for directories.", content: "Set directory permissions:\nchmod 755 myfolder/", hint: "Type: chmod 755 myfolder", answer: "chmod 755", success: "Directory accessible! Execute (x) on dirs = 'can enter'. Read (r) = 'can list contents'.", type: "contains" },
+            { id: 12, title: "Beginner Finale", intro: "Final challenge! Create a secure script with 755!", content: "Challenge:\nchmod 755 secure-script.sh", hint: "Type: chmod 755", answer: "chmod 755", success: "BEGINNER COMPLETE! You master: numeric (755,644,700), symbolic (u+x,g+r), directories! Permission pro!", type: "starts" }
+        ];
+        
+        const intermediateLevels = [
+            { id: 1, title: "Recursive chmod -R", intro: "INTERMEDIATE! -R applies permissions recursively to all files and folders.", content: "Recursive permissions:\nchmod -R 755 myfolder/", hint: "Type: chmod -R 755", answer: "chmod -R", success: "All files and folders updated! Use carefully - could expose sensitive files!", type: "contains" },
+            { id: 2, title: "SUID Bit (4000)", intro: "SUID (4) runs program as the file owner, not the user. Use sparingly!", content: "Set SUID:\nchmod 4755 /usr/bin/passwd", hint: "Type: chmod 4755", answer: "chmod 4755", success: "SUID set! passwd needs root to modify /etc/passwd - SUID lets regular users run it as root!", type: "contains" },
+            { id: 3, title: "SGID Bit (2000)", intro: "SGID (2) runs program as the group, or inherits group on new files.", content: "Set SGID:\nchmod 2755 /shared/folder", hint: "Type: chmod 2755", answer: "chmod 2755", success: "SGID set! New files inherit group ownership - great for shared folders!", type: "contains" },
+            { id: 4, title: "Sticky Bit (1000)", intro: "Sticky bit on directory: only owners can delete their files. /tmp uses it!", content: "Set sticky bit:\nchmod 1777 /shared/tmp", hint: "Type: chmod 1777", answer: "chmod 1777", success: "Sticky bit set! Anyone can write, but only owners delete their files!", type: "contains" },
+            { id: 5, title: "Viewing Special Bits", intro: "ls shows special bits in permissions: SUID=s, SGID=s, Sticky=t.", content: "Check special bits:\nls -la /usr/bin/passwd", hint: "Type: ls -la /usr/bin/passwd", answer: "ls -la /usr/bin/passwd", success: "See -rwsr-xr-x ! The 's' in owner's execute = SUID. Powerful but dangerous!", type: "contains" },
+            { id: 6, title: "umask Default", intro: "umask sets default permissions for new files. Run umask to see current value.", content: "Check umask:\numask", hint: "Type: umask", answer: "umask", success: "umask 0022 means: new files get 666-022=644. Controls starting permissions!", type: "contains" },
+            { id: 7, title: "Set umask", intro: "umask [value] changes default permissions.", content: "Set strict umask:\numask 077", hint: "Type: umask 077", answer: "umask 077", success: "Strict umask! New files get 666-077=599 (rw-r--r--). Only owner access by default!", type: "contains" },
+            { id: 8, title: "Exact Permissions with =", intro: "= sets exact permissions, not relative addition/removal.", content: "Exactly rw-r--r--:\nchmod =644 file.txt", hint: "Type: chmod =644", answer: "chmod =644", success: "Exactly rw-r--r--! Unlike +rw which ADDS, = SETS exact permissions!", type: "contains" },
+            { id: 9, title: "Octal vs Symbolic", intro: "Octal is compact (755), symbolic is descriptive (u+rwx,g=rx,o=rx).", content: "Same as 755 symbolic:\nchmod u=rwx,g=rx,o=rx script.sh", hint: "Type: chmod u=rwx,g=rx", answer: "chmod u=rwx", success: "u=rwx,g=rx,o=rx equals 755! Symbolic is clearer for documentation!", type: "contains" },
+            { id: 10, title: "Copying Permissions", intro: "--reference=[file] copies permissions from another file.", content: "Copy permissions:\nchmod --reference=file1.txt file2.txt", hint: "Type: chmod --reference=", answer: "chmod --reference=", success: "Permissions copied! file2 now has same perms as file1. Quick permission cloning!", type: "contains" },
+            { id: 11, title: "X Special Execute", intro: "Capital X gives execute only if it's a dir or already has execute.", content: "Smart execute:\nchmod -R u+X,go+X myproject/", hint: "Type: chmod u+X", answer: "chmod u+X", success: "Smart! Directories get execute, existing executables keep execute. Safe recursive!", type: "contains" },
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Set SUID on a script and verify!", content: "Challenge:\nchmod 4755 myapp && ls -la myapp", hint: "Type: chmod 4755", answer: "chmod 4755", success: "INTERMEDIATE COMPLETE! You master: SUID/SGID/Sticky, umask, -R, =, --reference! Permission MASTER!", type: "starts" }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') return user === answer;
+            else if (level.type === 'contains') return user.includes(answer);
+            else if (level.type === 'starts') return user.startsWith(answer);
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! chmod levels complete! You're a permissions master!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: numeric (755,644,700), symbolic (u+x), directories. I'll make you a permissions pro!"); }
+            else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Advanced: SUID/SGID/Sticky, umask, -R, =, --reference!"); }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) { document.exitFullscreen(); }
+            else { document.documentElement.requestFullscreen(); }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=updateTheme&theme=' + newTheme, credentials: 'include' });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearChmodOutput();
+                runChmod(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearChmodOutput();
+                runChmod(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) { currentLevel = savedLevel - 1; }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basics: numeric, symbolic, directories (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Advanced: SUID, SGID, Sticky, umask (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Choose your path - click above or type --beginner, --intermediate, --fullscreen, --darkmode, or --exit", '', true);
+        }
+        init();
+    </script>
+</body>
+</html>
