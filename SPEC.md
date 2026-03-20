@@ -176,8 +176,8 @@ Quick guides and tips organized by category:
 - Containers (Docker, Kubernetes)
 - Automation & IaC (Ansible, Jenkins)
 
-### Terms (19 total)
-Interactive terminal command learning games: awk, bash, chmod, curl, docker, find, git, grep, jq, kubectl, nix, py, regex, sed, sql, ssh, systemctl, tar, vim
+### Terms (22 total)
+Interactive terminal command learning games: awk, bash, chmod, cron, curl, docker, find, git, grep, jq, kubectl, nix, py, regex, rsync, sed, sql, ssh, systemctl, tar, vim, wget
 
 ### Projects (9 total)
 Step-by-step tutorials for building self-hosted infrastructure: homelab dashboard, VPN, email, Matrix, hidden services, blog, fileshare, pastebin, i3 WM
@@ -249,7 +249,7 @@ Interactive learning games: debian, debian-2, debian-3, quiz, speed, turing
 ├── hangman/            # 42 hangman game files
 ├── tests/              # 41 quiz files
 ├── blog/               # 58 blog posts
-├── terms/              # 19 term learning games
+├── terms/              # 22 term learning games
 ├── projects/           # 9 project tutorials
 ├── games/              # 6 learning games
 └── cgi-bin/            # CGI scripts

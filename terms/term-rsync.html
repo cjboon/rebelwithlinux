@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-rsync.html" />
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rsync Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid #444444; }
+        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
+        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
+        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
+        .rsync-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .rsync-output-line { color: #aaaaaa; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .rsync-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .rsync-success-line { color: #b5bd68; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1e; }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .rsync-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .rsync-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .rsync-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid #444444; }
+            .left-pane { border-right: none; border-top: 2px solid #444444; }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">rsync Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type rsync command:</div>
+                <textarea id="command-input" placeholder="rsync -av source/ dest/" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="rsync-output-area" id="rsync-output">
+                <div class="rsync-output-line" style="color: #586e75;">rsync output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const rsyncOutput = document.getElementById('rsync-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=rsync');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'rsync', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addRsyncLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'rsync-error-line' : type === 'success' ? 'rsync-success-line' : 'rsync-output-line';
+            line.textContent = text;
+            rsyncOutput.appendChild(line);
+            rsyncOutput.scrollTop = rsyncOutput.scrollHeight;
+        }
+        
+        function clearRsyncOutput() { rsyncOutput.innerHTML = ''; }
+        
+        function runRsync(cmd) {
+            addRsyncLine('$ ' + cmd);
+            
+            const responses = {
+                "rsync -av": "sending incremental file list\n./file1.txt\n./file2.txt\n\nsent 1,234 bytes  received 89 bytes",
+                "rsync -v": "file1.txt\nfile2.txt\n\ntotal size is 1,048,576",
+                "rsync -a": "sending incremental file list\n./",
+                "rsync -z": "sending incremental file list\ncompressed 45%",
+                "rsync -h": "1.2G  file1.tar.gz",
+                "rsync --progress": "file1.txt\n     1024 100%    0.00kB/s   0:00:00",
+                "rsync -P": "file1.txt\n     1024 100%    0.00kB/s   0:00:00",
+                "rsync --delete": "deleting orphaned_file.txt",
+                "rsync -n": "sending incremental file list\n./file1.txt\n./file2.txt",
+                "--dry-run": "sending incremental file list\n./file1.txt",
+                "rsync -e": "using prepended ssh port 2222",
+                "-e ssh": "ssh: connecting to host port 22",
+                "rsync --exclude": "excluding file pattern *.log",
+                "--exclude-from": "reading exclude file exclude.txt",
+                "rsync --bwlimit": "bytes per second limited to 1024",
+                "rsync -W": "whole file transfer (no delta)",
+                "rsync --partial": "partial file preserved",
+                "rsync --append": "append mode enabled"
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addRsyncLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.toLowerCase().includes('rsync')) {
+                    addRsyncLine('sending incremental file list');
+                    matched = true;
+                } else {
+                    addRsyncLine('Try: rsync -av source/ dest/', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "Rsync Ryan",
+            greeting: "Hey! I'm Rsync Ryan - file sync specialist! rsync copies files efficiently, only transferring changes. Perfect for backups and mirroring. Let's sync like pros!",
+            encourage: ["Excellent!", "Synced!", "You're a backup hero!", "Keep transferring!", "Files synchronized!", "Brilliant!"],
+            getEncouragement: function() { return this.encourage[Math.floor(Math.random() * this.encourage.length)]; }
+        };
+        
+        const beginnerLevels = [
+            { id: 1, title: "Basic Sync", intro: "Welcome! rsync syncs files between locations. Basic syntax: rsync source dest.", content: "Sync local files:\nrsync source/ dest/", hint: "Type: rsync source/ dest/", answer: "rsync", success: "Files synced! rsync only transfers differences - efficient!", type: "contains" },
+            { id: 2, title: "Archive Mode", intro: "-a archive mode preserves permissions, timestamps, and more.", content: "Archive sync:\nrsync -a source/ dest/", hint: "Type: rsync -a", answer: "rsync -a", success: "Preserved! -a keeps permissions, ownership, timestamps, symlinks!", type: "contains" },
+            { id: 3, title: "Verbose Output", intro: "-v shows what's being transferred. Good for seeing progress.", content: "Verbose sync:\nrsync -av source/ dest/", hint: "Type: rsync -av", answer: "rsync -av", success: "Verbose output! Shows each file as it's synced. Combine -a and -v!", type: "contains" },
+            { id: 4, title: "Trailing Slash", intro: "The trailing / on source matters! source/ copies CONTENTS, source copies the directory itself.", content: "With trailing slash:\nrsync -av source/ dest/", hint: "Type: rsync -av source/", answer: "rsync -av source/", success: "Contents synced! Trailing / means 'contents of source' - crucial distinction!", type: "contains" },
+            { id: 5, title: "Human Readable", intro: "-h makes output human-readable (1K, 1M, 1G).", content: "Human readable:\nrsync -ah source/ dest/", hint: "Type: rsync -ah", answer: "rsync -ah", success: "Human readable! -h shows sizes in convenient units!", type: "contains" },
+            { id: 6, title: "Dry Run", intro: "-n --dry-run shows what would be synced without actually copying. Always test first!", content: "Dry run:\nrsync -avn source/ dest/", hint: "Type: rsync -avn", answer: "rsync -avn", success: "Dry run! -n shows what WOULD happen. Always dry-run before real sync!", type: "contains" },
+            { id: 7, title: "Show Progress", intro: "--progress shows transfer progress per file.", content: "With progress:\nrsync --progress source/ dest/", hint: "Type: --progress", answer: "--progress", success: "Progress shown! See transfer speed and percentage per file!", type: "contains" },
+            { id: 8, title: "Compressed Transfer", intro: "-z compresses data during transfer. Good for slow network links.", content: "Compressed sync:\nrsync -avz source/ dest/", hint: "Type: rsync -avz", answer: "rsync -avz", success: "Compressed! -z reduces bandwidth but uses CPU. Great for remote syncs!", type: "contains" },
+            { id: 9, title: "Delete Files", intro: "--delete removes files in dest that no longer exist in source.", content: "Sync and delete:\nrsync -av --delete source/ dest/", hint: "Type: --delete", answer: "--delete", success: "Deleted! --delete makes dest mirror source exactly. Careful!", type: "contains" },
+            { id: 10, title: "Exclude Patterns", intro: "--exclude excludes files matching a pattern.", content: "Exclude logs:\nrsync -av --exclude='*.log' source/ dest/", hint: "Type: --exclude", answer: "--exclude", success: "Excluded! --exclude='*.log' skips all log files. Multiple --exclude work!", type: "contains" },
+            { id: 11, title: "Remote Sync", intro: "rsync can sync to/from remote hosts via SSH.", content: "Remote sync:\nrsync -avz source/ user@host:/path/", hint: "Type: user@host:", answer: "user@host:", success: "Remote synced! rsync over SSH encrypts everything. Secure sync!", type: "contains" },
+            { id: 12, title: "Beginner Finale", intro: "Final challenge! Archive-sync with compression and progress to remote!", content: "Challenge:\nrsync -avzP source/ user@host:/backup/", hint: "Type: rsync -avzP", answer: "rsync -avzP", success: "BEGINNER COMPLETE! You master: -a, -v, -z, -P, --delete, --exclude! Sync ace!", type: "starts" }
+        ];
+        
+        const intermediateLevels = [
+            { id: 1, title: "Bandwidth Limit", intro: "INTERMEDIATE! --bwlimit restricts transfer speed.", content: "Limit speed:\nrsync -avz --bwlimit=1024 source/ dest/", hint: "Type: --bwlimit", answer: "--bwlimit", success: "Limited! --bwlimit=1024 KB/s. Prevent rsync from hogging bandwidth!", type: "contains" },
+            { id: 2, title: "Partial Files", intro: "--partial keeps partial transfers. --append resumes them.", content: "Partial + append:\nrsync --partial --append source/ dest/", hint: "Type: --partial", answer: "--partial", success: "Partial preserved! Resume interrupted syncs with --partial --append!", type: "contains" },
+            { id: 3, title: "Whole File", intro: "-W transfers whole files even when delta would be faster. For dissimilar files.", content: "Whole file:\nrsync -avW source/ dest/", hint: "Type: rsync -avW", answer: "rsync -avW", success: "Whole file! -W skips delta check. Good for encrypted files that look random!", type: "contains" },
+            { id: 4, title: "Exclude From File", intro: "--exclude-from reads exclude patterns from a file.", content: "Exclude file:\nrsync -av --exclude-from=exclude.txt source/ dest/", hint: "Type: --exclude-from", answer: "--exclude-from", success: "Excludes loaded! File lets you manage many exclusion patterns!", type: "contains" },
+            { id: 5, title: "Include Override", intro: "--include can override --exclude for certain patterns.", content: "Include after exclude:\nrsync -av --exclude='*.txt' --include='important.txt' source/ dest/", hint: "Type: --include", answer: "--include", success: "Included! --include overrides --exclude for specific patterns!", type: "contains" },
+            { id: 6, title: "SSH Encryption", intro: "-e ssh forces SSH encryption for the transfer.", content: "Force SSH:\nrsync -avz -e ssh source/ user@host:/dest/", hint: "Type: -e ssh", answer: "-e ssh", success: "Encrypted! -e ssh ensures secure tunnel. rsync over SSH = safe sync!", type: "contains" },
+            { id: 7, title: "Custom SSH Port", intro: "-e 'ssh -p PORT' lets you use non-standard SSH ports.", content: "SSH port 2222:\nrsync -avz -e 'ssh -p 2222' source/ dest/", hint: "Type: -e 'ssh -p", answer: "-e 'ssh", success: "Custom port! Connect via alternate SSH port. Useful for hardening!", type: "contains" },
+            { id: 8, title: "Link Destinations", intro: "--link-dest hardlinks unchanged files to a reference directory. Efficient backups!", content: "Link dest backup:\nrsync -av --link-dest=/backup/current source/ /backup/new/", hint: "Type: --link-dest", answer: "--link-dest", success: "Hardlinked! --link-dest saves space by hardlinking unchanged files! Incremental backups!", type: "contains" },
+            { id: 9, title: "Compare Directories", intro: "rsync can compare directories without syncing using N without output.", content: "Compare dirs:\nrsync -avun source/ dest/", hint: "Type: rsync -avun", answer: "rsync -avun", success: "Compared! -u skips updating newer files, -n is dry run. See differences!", type: "contains" },
+            { id: 10, title: "Iconv Conversion", intro: "--iconv converts file names between character encodings.", content: "Convert encoding:\nrsync --iconv=UTF-8,ISO-8859-1 source/ dest/", hint: "Type: --iconv", answer: "--iconv", success: "Converted! --iconv handles charset conversion. Useful for cross-system sync!", type: "contains" },
+            { id: 11, title: "Remote rsync Daemon", intro: "rsync:// protocol access remote rsync daemon directly.", content: "Rsync daemon:\nrsync -av rsync://host/module/path dest/", hint: "Type: rsync://", answer: "rsync://", success: "Daemon access! rsync:// bypasses SSH. Fast for public mirrors!", type: "contains" },
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Create incremental backup with hardlinks and progress!", content: "Challenge:\nrsync -avzP --link-dest=/backup/yesterday -e ssh source/ user@host:/backup/today/", hint: "Type: rsync -avzP --link-dest", answer: "--link-dest", success: "INTERMEDIATE COMPLETE! You master: --bwlimit, --partial, -W, --link-dest, -e ssh! Backup MASTER!", type: "starts" }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') return user === answer;
+            else if (level.type === 'contains') return user.includes(answer);
+            else if (level.type === 'starts') return user.startsWith(answer);
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! rsync levels complete! You're a sync master!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: -a, -v, -z, -P. I'll make you a sync pro!"); }
+            else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Advanced: --bwlimit, --partial, -W, --link-dest, -e ssh!"); }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) { document.exitFullscreen(); }
+            else { document.documentElement.requestFullscreen(); }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=updateTheme&theme=' + newTheme, credentials: 'include' });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearRsyncOutput();
+                runRsync(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearRsyncOutput();
+                runRsync(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) { currentLevel = savedLevel - 1; }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basics: -a, -v, -z, -P (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Advanced: --bwlimit, --link-dest, -e ssh (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Choose your path - click above or type --beginner, --intermediate, --fullscreen, --darkmode, or --exit", '', true);
+        }
+        init();
+    </script>
+</body>
+</html>
