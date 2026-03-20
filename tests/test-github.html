@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-github.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #238636; transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: #238636; color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+    </nav>
+    <div class="test-container">
+        <div class="test-header"><h1>// GITHUB TEST</h1><p>Prove your GitHub mastery</p></div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const easyQuestions = [
+            { q: "What is GitHub?", a: ["Code hosting platform", "Code editor", "Operating system", "Browser"], correct: 0 },
+            { q: "What is a repository?", a: ["Project folder", "Code editor", "User account", "Issue tracker"], correct: 0 },
+            { q: "What does 'fork' do?", a: ["Creates copy of repo", "Deletes repo", "Stars repo", "Clones repo"], correct: 0 },
+            { q: "What is a pull request?", a: ["Request to merge code", "Delete request", "Fork request", "Star request"], correct: 0 },
+            { q: "What does 'clone' do?", a: ["Copies repo locally", "Deletes repo", "Creates repo", "Forks repo"], correct: 0 },
+            { q: "What is an issue?", a: ["Bug report or feature request", "Code review", "Commit message", "Repository"], correct: 0 },
+            { q: "What does 'star' do?", a: ["Bookmarks a repo", "Deletes repo", "Forks repo", "Clones repo"], correct: 0 },
+            { q: "What is a branch?", a: ["Parallel development line", "Main code", "Bug fix", "Release"], correct: 0 },
+            { q: "What does 'merge' do?", a: ["Combines branches", "Deletes branches", "Creates branches", "Hides branches"], correct: 0 },
+            { q: "What is 'README'?", a: ["Project documentation", "Code file", "Bug report", "Branch name"], correct: 0 },
+            { q: "What is .gitignore?", a: ["Files to ignore", "Important files", "Code files", "Data files"], correct: 0 },
+            { q: "What does 'commit' do?", a: ["Saves changes", "Deletes changes", "Uploads changes", "Merges changes"], correct: 0 },
+            { q: "What is a repository URL?", a: ["Repo web address", "Local path", "File name", "User name"], correct: 0 },
+            { q: "What is GitHub Actions?", a: ["CI/CD automation", "Code editor", "Bug tracker", "Wiki tool"], correct: 0 },
+            { q: "What is a 'fork' used for?", a: ["Contribute to others code", "Backup code", "Share code", "Delete code"], correct: 0 },
+            { q: "What does 'push' do?", a: ["Uploads commits", "Downloads commits", "Deletes commits", "Views commits"], correct: 0 },
+            { q: "What does 'pull' do?", a: ["Downloads changes", "Uploads changes", "Deletes changes", "Hides changes"], correct: 0 },
+            { q: "What is an organization?", a: ["Team account", "Single user", "Repository", "Code file"], correct: 0 },
+            { q: "What is 'wiki'?", a: ["Documentation pages", "Code files", "Issue tracker", "Pull requests"], correct: 0 },
+            { q: "What is 'insights'?", a: ["Repository analytics", "Bug reports", "Code reviews", "User settings"], correct: 0 },
+            { q: "What is 'security' tab?", a: ["Vulnerability alerts", "Code editor", "Issue tracker", "Wiki"], correct: 0 },
+            { q: "What does 'watch' do?", a: ["Notifies of updates", "Downloads code", "Uploads code", "Deletes code"], correct: 0 },
+            { q: "What is 'releases'?", a: ["Published versions", "Bug reports", "Code drafts", "User profiles"], correct: 0 },
+            { q: "What is 'packages'?", a: ["Container registry", "Code library", "Bug tracker", "User list"], correct: 0 },
+            { q: "What is 'projects'?", a: ["Kanban boards", "Code files", "Bug reports", "Releases"], correct: 0 }
+        ];
+        const mediumQuestions = [
+            { q: "What is 'CODEOWNERS'?", a: ["Auto-assign reviewers", "Code editor", "Code backup", "Code archive"], correct: 0 },
+            { q: "What is 'Dependabot'?", a: ["Auto dependency updates", "Bug bot", "Code analyzer", "Security scanner"], correct: 0 },
+            { q: "What does 'Actions secrets' do?", a: ["Store encrypted vars", "Code storage", "User auth", "Repo settings"], correct: 0 },
+            { q: "What is ' Codespaces'?", a: ["Cloud development environment", "Code editor", "Code backup", "Code share"], correct: 0 },
+            { q: "What is 'Gists'?", a: ["Code snippet sharing", "Bug reports", "Code reviews", "User profiles"], correct: 0 },
+            { q: "What are 'Webhooks'?", a: ["Event notifications", "Code editors", "User logins", "Repository settings"], correct: 0 },
+            { q: "What is 'GitHub CLI'?", a: ["Command line tool", "Code editor", "Web browser", "Mobile app"], correct: 0 },
+            { q: "What does 'git archive' do?", a: ["Package repo files", "Delete files", "Edit files", "View files"], correct: 0 },
+            { q: "What is 'Pull Request review'?", a: ["Code review before merge", "Issue tracker", "Code editor", "Release notes"], correct: 0 },
+            { q: "What is 'branch protection'?", a: ["Prevent direct pushes", "Backup branch", "Delete protection", "Share branch"], correct: 0 },
+            { q: "What does 'require PR reviews' do?", a: ["Mandatory code review", "Optional review", "Skip review", "Auto review"], correct: 0 },
+            { q: "What is 'status checks'?", a: ["CI test results", "User status", "Code format", "Branch name"], correct: 0 },
+            { q: "What is 'merge queue'?", a: ["Batches PRs for merge", "PR list", "Branch list", "Release queue"], correct: 0 },
+            { q: "What is 'draft PR'?", a: ["Work in progress PR", "Final PR", "Deleted PR", "Merged PR"], correct: 0 },
+            { q: "What is '.milestone'?", a: ["Group issues for release", "Code file", "User badge", "Repo setting"], correct: 0 },
+            { q: "What is 'GitHub Pages'?", a: ["Static site hosting", "Code editor", "Bug tracker", "CI system"], correct: 0 },
+            { q: "What is 'fork sync'?", a: ["Update fork with upstream", "Delete fork", "Star fork", "Share fork"], correct: 0 },
+            { q: "What is 'contributing guidelines'?", a: ["How to contribute docs", "Code rules", "Delete policy", "Star policy"], correct: 0 },
+            { q: "What is 'issue template'?", a: ["Pre-filled issue format", "Issue list", "Issue delete", "Issue search"], correct: 0 },
+            { q: "What is 'PR template'?", a: ["Pre-filled PR description", "PR list", "PR delete", "PR merge"], correct: 0 }
+        ];
+        const hardQuestions = [
+            { q: "What is 'GitHub API'?", a: ["Programmatic access", "Code editor", "Web interface", "Mobile app"], correct: 0 },
+            { q: "What is 'GraphQL API'?", a: ["Query language for API", "REST alternative", "Code language", "Query editor"], correct: 0 },
+            { q: "What is 'OAuth'?", a: ["External authentication", "Code editor", "API key", "User name"], correct: 0 },
+            { q: "What is 'GitHub Apps'?", a: ["Integrations with permissions", "Mobile app", "Code editor", "User account"], correct: 0 },
+            { q: "What is 'GitHub Actions runner'?", a: ["Executes CI/CD jobs", "Code reviewer", "Bug tracker", "Code archiver"], correct: 0 },
+            { q: "What is 'action.yml'?", a: ["Action definition", "Code file", "Config file", "Data file"], correct: 0 },
+            { q: "What is 'matrix builds'?", a: ["Test multiple configs", "Single test", "Code build", "Release build"], correct: 0 },
+            { q: "What is 'workflow dispatch'?", a: ["Manual trigger", "Auto trigger", "Delete trigger", "Skip trigger"], correct: 0 },
+            { q: "What is 'environment protection'?", a: ["Require approval for deploy", "Code protection", "Branch protection", "Repo protection"], correct: 0 },
+            { q: "What is 'deployment branches'?", a: ["Which branches can deploy", "Code branches", "Feature branches", "Fix branches"], correct: 0 },
+            { q: "What is 'open source license'?", a: ["Legal permissions", "Code format", "File type", "User permission"], correct: 0 },
+            { q: "What is 'CLA'?", a: ["Contributor agreement", "Code license", "User badge", "Code review"], correct: 0 },
+            { q: "What is 'funding.yml'?", a: ["Funding platform links", "Code file", "Security file", "Config file"], correct: 0 },
+            { q: "What is 'Sponsors'?", a: ["Support developers financially", "Code sponsors", "Issue sponsors", "PR sponsors"], correct: 0 },
+            { q: "What is 'GitHub Enterprise'?", a: ["Self-hosted or cloud version", "Code editor", "Bug tracker", "CI system"], correct: 0 }
+        ];
+        let currentQuestions=[],currentQuestionIndex=0,score=0,streak=0,maxStreak=0,difficulty='easy',currentLevel=1,consecutiveCorrect=0,totalAnswered=0;
+        function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+        function shuffleAnswers(q){let a=[...q.a],c=a[q.correct],s=shuffle(a);return{...q,a:s,correct:s.indexOf(c)}}
+        function initTest(){difficulty='easy';currentLevel=1;consecutiveCorrect=0;currentQuestions=shuffle([...easyQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0;score=0;streak=0;maxStreak=0;totalAnswered=0;document.getElementById('resultScreen').classList.remove('active');document.getElementById('quiz').style.display='block';renderQuestion()}
+        function renderQuestion(){let c=document.getElementById('questionsContainer');c.innerHTML='';let q=currentQuestions[currentQuestionIndex],d=document.createElement('div');d.className='question-container active';d.innerHTML=`<div class="question-text">${q.q}</div><div class="answers-grid">${q.a.map((a,i)=>`<button class="answer-btn" onclick="selectAnswer(${i})">${a}</button>`).join('')}</div>`;c.appendChild(d);updateUI()}
+        function updateUI(){let t=currentQuestions.length,p=(currentQuestionIndex/t)*100;document.getElementById('progressFill').style.width=p+'%';document.getElementById('questionNum').textContent=currentQuestionIndex+1;document.getElementById('streakNum').textContent=streak;document.getElementById('scoreNum').textContent=score;document.getElementById('levelNum').textContent=currentLevel}
+        function selectAnswer(i){let q=currentQuestions[currentQuestionIndex],b=document.querySelectorAll('.answer-btn');b.forEach((btn,j)=>{btn.disabled=true;if(j===q.correct)btn.classList.add('correct')});totalAnswered++;if(i===q.correct){streak++;if(streak>maxStreak)maxStreak=streak;consecutiveCorrect++;score+=difficulty==='easy'?10:difficulty==='medium'?20:30;if(currentLevel===1&&consecutiveCorrect>=7){currentLevel=2;difficulty='medium';consecutiveCorrect=0;currentQuestions=shuffle([...mediumQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0}else if(currentLevel===2&&consecutiveCorrect>=7){currentLevel=3;difficulty='hard';consecutiveCorrect=0;currentQuestions=shuffle([...hardQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0}else currentQuestionIndex++;setTimeout(()=>{currentQuestionIndex<currentQuestions.length?renderQuestion():showResult()},1200)}else{b[i].classList.add('incorrect');streak=0;consecutiveCorrect=0;currentQuestionIndex++;setTimeout(()=>{currentQuestionIndex<currentQuestions.length?renderQuestion():showResult()},2000);return}}
+        function showResult(){document.getElementById('questionsContainer').innerHTML='';let p=score>=100;document.getElementById('resultScreen').classList.add('active');document.getElementById('resultIcon').textContent=p?'✓':'✗';document.getElementById('resultText').textContent=p?'PASS':'FAIL';document.getElementById('resultText').className='result-text '+(p?'pass':'fail');document.getElementById('resultScore').textContent=`Score: ${score}`;document.getElementById('resultDetails').innerHTML=`Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`;document.getElementById('progressFill').style.width='100%'}
+        function restartTest(){initTest()}
+        function handleThemeChange(isDark){let t=isDark?'dark':'light';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t)}
+        document.addEventListener('DOMContentLoaded',function(){let s=localStorage.getItem('theme');if(s==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('themeToggle').checked=true}initTest()});
+    </script>
+</body>
+</html>

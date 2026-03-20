@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/tests/test-helm.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helm Test - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../nav.js" defer></script>
+    <script src="../achievements.js" defer></script>
+    <style>
+        .test-container { padding: 32px 32px; background: var(--white); max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .test-header { text-align: center; margin-bottom: 20px; }
+        .test-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 4px; }
+        .test-header p { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .progress-bar { width: 100%; height: 8px; background: var(--light-gray); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #0f1689; transition: width 0.3s ease; }
+        .question-container { display: none; }
+        .question-container.active { display: block; }
+        .question-text { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 24px; line-height: 1.6; }
+        .answers-grid { display: flex; flex-direction: column; gap: 12px; }
+        .answer-btn { padding: 16px 20px; border: 2px solid var(--charcoal); background: transparent; color: var(--charcoal); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; text-align: left; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .answer-btn:hover { background: var(--light-gray); }
+        .answer-btn.correct { background: #22c55e !important; border-color: #22c55e !important; color: white !important; }
+        .answer-btn.incorrect { background: #ef4444 !important; border-color: #ef4444 !important; color: white !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .result-screen { display: none; text-align: center; padding: 60px 20px; }
+        .result-screen.active { display: block; }
+        .result-icon { font-size: 5rem; margin-bottom: 24px; }
+        .result-text { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
+        .result-text.pass { color: #22c55e; }
+        .result-text.fail { color: #ef4444; }
+        .result-score { font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; color: var(--charcoal); margin-bottom: 32px; }
+        .result-details { font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); margin-bottom: 32px; }
+        .retry-btn { padding: 16px 32px; background: #0f1689; color: var(--white); font-family: 'IBM Plex Mono', monospace; font-size: 1rem; border: none; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
+        .retry-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .stats-row { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; font-family: 'IBM Plex Mono', monospace; color: var(--charcoal); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; }
+        nav { display: flex; align-items: center; padding: 8px 16px; background: var(--white); gap: 8px; }
+        .nav-left { display: flex; align-items: center; gap: 8px; }
+        .nav-title { font-size: 1.1rem; font-weight: 700; white-space: nowrap; color: var(--charcoal); text-decoration: none; display: inline-block; cursor: pointer; }
+        .theme-toggle-label { cursor: pointer; font-size: 1.25rem; }
+        .theme-toggle-icon.sun { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon:not(.sun) { display: none; }
+        :root:has(#themeToggle:checked) .theme-toggle-icon.sun { display: inline; }
+        [data-theme="dark"] .theme-toggle-icon:not(.sun) { display: none; }
+        [data-theme="dark"] .theme-toggle-icon.sun { display: inline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-title" aria-label="Go to home">REBEL WITH LINUX</a>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-icon sun">☀️</span></label>
+        </div>
+    </nav>
+    <div class="test-container">
+        <div class="test-header"><h1>// HELM TEST</h1><p>Prove your Helm package mastery</p></div>
+        <div id="quiz">
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value" id="questionNum">1</div><div class="stat-label">Question</div></div>
+                <div class="stat-item"><div class="stat-value" id="streakNum">0</div><div class="stat-label">Streak</div></div>
+                <div class="stat-item"><div class="stat-value" id="scoreNum">0</div><div class="stat-label">Score</div></div>
+                <div class="stat-item"><div class="stat-value" id="levelNum">1</div><div class="stat-label">Level</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            <div id="questionsContainer"></div>
+            <div class="result-screen" id="resultScreen">
+                <div class="result-icon" id="resultIcon"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="result-score" id="resultScore"></div>
+                <div class="result-details" id="resultDetails"></div>
+                <button class="retry-btn" onclick="restartTest()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const easyQuestions = [
+            { q: "What is Helm?", a: ["K8s package manager", "Container runtime", "Code editor", "Web server"], correct: 0 },
+            { q: "What is a Helm chart?", a: ["Package of K8s resources", "Single file", "K8s cluster", "Docker image"], correct: 0 },
+            { q: "What is a Helm release?", a: ["Deployed chart instance", "Chart file", "Repository", "Template"], correct: 0 },
+            { q: "What does 'helm install' do?", a: ["Deploys a chart", "Creates a chart", "Deletes a chart", "Lists charts"], correct: 0 },
+            { q: "What does 'helm uninstall' do?", a: ["Removes a release", "Lists releases", "Updates release", "Creates release"], correct: 0 },
+            { q: "What is Chart.yaml?", a: ["Chart metadata", "Values file", "Templates", "K8s manifest"], correct: 0 },
+            { q: "What is values.yaml?", a: ["Default configuration", "Chart metadata", "Release info", "K8s config"], correct: 0 },
+            { q: "What does 'helm list' show?", a: ["Deployed releases", "Available charts", "Repositories", "Templates"], correct: 0 },
+            { q: "What is 'helm repo'?", a: ["Chart storage location", "Local directory", "K8s resource", "Release name"], correct: 0 },
+            { q: "What does 'helm search' do?", a: ["Finds charts in repos", "Searches K8s", "Searches values", "Searches templates"], correct: 0 },
+            { q: "What is 'helm upgrade'?", a: ["Updates a release", "Deletes release", "Creates release", "Lists release"], correct: 0 },
+            { q: "What does 'helm rollback' do?", a: ["Reverts to previous version", "Forwards release", "Deletes release", "Creates release"], correct: 0 },
+            { q: "What is 'helm status'?", a: ["Shows release state", "Lists charts", "Searches repos", "Updates repos"], correct: 0 },
+            { q: "What does 'helm repo update' do?", a: ["Fetches latest charts", "Updates K8s", "Updates values", "Updates templates"], correct: 0 },
+            { q: "What is 'helm template'?", a: ["Renders chart locally", "Creates chart", "Deletes chart", "Installs chart"], correct: 0 },
+            { q: "What is 'helm pull'?", a: ["Downloads chart package", "Uploads chart", "Builds chart", "Runs chart"], correct: 0 },
+            { q: "What is 'helm lint'?", a: ["Validates chart syntax", "Runs tests", "Builds chart", "Deploys chart"], correct: 0 },
+            { q: "What does 'helm show' do?", a: ["Displays chart info", "Shows K8s", "Shows logs", "Shows status"], correct: 0 },
+            { q: "What is 'namespace' in Helm?", a: ["K8s isolation boundary", "Chart name", "Release name", "Repo name"], correct: 0 },
+            { q: "What is 'helm get'?", a: ["Downloads release info", "Gets chart", "Gets repo", "Gets values"], correct: 0 },
+            { q: "What is 'hooks' in Helm?", a: ["Lifecycle events", "Templates", "Values", "K8s resources"], correct: 0 },
+            { q: "What does 'helm dependency' do?", a: ["Manages chart dependencies", "Builds chart", "Tests chart", "Packages chart"], correct: 0 },
+            { q: "What is 'helm package'?", a: ["Creates chart archive", "Extracts chart", "Lists chart", "Shows chart"], correct: 0 },
+            { q: "What is 'helm env'?", a: ["Shows Helm environment", "Sets env vars", "K8s env", "Chart env"], correct: 0 }
+        ];
+        const mediumQuestions = [
+            { q: "What is 'helmfile'?", a: ["Declarative chart deployments", "Chart file", "Values file", "Template file"], correct: 0 },
+            { q: "What is 'ChartMuseum'?", a: ["Self-hosted chart repository", "K8s tool", "Template engine", "Package manager"], correct: 0 },
+            { q: "What is 'helm test'?", a: ["Runs chart tests", "Tests K8s", "Tests values", "Tests templates"], correct: 0 },
+            { q: "What is 'helm plugin'?", a: ["Extends Helm functionality", "Chart component", "K8s resource", "Template function"], correct: 0 },
+            { q: "What is ' Helm Hub'?", a: ["Public chart repository", "K8s dashboard", "Chart editor", "Package registry"], correct: 0 },
+            { q: "What is 'helm history'?", a: ["Shows release revisions", "Lists charts", "Shows dependencies", "Lists repos"], correct: 0 },
+            { q: "What is 'helm registry'?", a: ["OCI-based chart storage", "Chart repo", "Local storage", "K8s storage"], correct: 0 },
+            { q: "What is 'helm diff'?", a: ["Shows value changes", "Compares files", "Shows K8s diff", "Compares repos"], correct: 0 },
+            { q: "What is 'helmunittest'?", a: ["Unit testing for charts", "K8s testing", "Integration testing", "Load testing"], correct: 0 },
+            { q: "What does '--set' flag do?", a: ["Sets values on command line", "Lists values", "Gets values", "Shows values"], correct: 0 },
+            { q: "What does '-f' flag do?", a: ["Specifies values file", "Sets flag", "Forces install", "Fetches chart"], correct: 0 },
+            { q: "What is 'helm.sh/resource-policy' annotation?", a: ["Controls resource cleanup", "Sets priority", "Defines resources", "Creates resources"], correct: 0 },
+            { q: "What is 'helm.sh/hook' annotation?", a: ["Defines lifecycle event", "Creates hook", "Deletes hook", "Lists hooks"], correct: 0 },
+            { q: "What is 'post-install' hook?", a: ["Runs after install", "Runs before install", "Runs on delete", "Runs on upgrade"], correct: 0 },
+            { q: "What is 'pre-delete' hook?", a: ["Runs before delete", "Runs after delete", "Runs on install", "Runs on upgrade"], correct: 0 },
+            { q: "What is 'crds' in Helm?", a: ["Custom Resource Definitions", "Kubernetes resources", "Chart resources", "Template resources"], correct: 0 },
+            { q: "What is 'helm create'?", a: ["Scaffolds new chart", "Creates K8s", "Creates values", "Creates repo"], correct: 0 },
+            { q: "What is 'NOTES.txt'?", a: ["Post-install instructions", "Chart notes", "Template notes", "Value notes"], correct: 0 },
+            { q: "What is 'helpers.tpl'?", a: ["Template functions", "Chart helpers", "K8s helpers", "Value helpers"], correct: 0 },
+            { q: "What is '_tpl.tpl' file?", a: ["Internal templates", "External templates", "User templates", "K8s templates"], correct: 0 }
+        ];
+        const hardQuestions = [
+            { q: "What is 'helm.sh/release'?", a: ["Release tracking label", "K8s label", "Chart label", "Resource label"], correct: 0 },
+            { q: "What is ' HelmleastVersion'?", a: ["Minimum Helm version requirement", "Chart version", "K8s version", "Release version"], correct: 0 },
+            { q: "What is 'ignoreMissingValues'?", a: ["Allow missing values", "Ignore errors", "Skip validation", "Default values"], correct: 0 },
+            { q: "What is ' helm unittest' CI integration?", a: ["GitHub Actions for tests", "Test runner", "Chart builder", "Release tool"], correct: 0 },
+            { q: "What is ' Helm operator'?", a: ["Manage Helm via CRD", "K8s operator", "Chart operator", "Release operator"], correct: 0 },
+            { q: "What is 'template' function?", a: ["Includes templates", "Creates templates", "Lists templates", "Renders templates"], correct: 0 },
+            { q: "What is 'include' function?", a: ["Includes named template", "Excludes template", "Creates template", "Lists template"], correct: 0 },
+            { q: "What is 'required' function?", a: ["Enforces value presence", "Sets default", "Validates value", "Formats value"], correct: 0 },
+            { q: "What is 'default' function?", a: ["Sets fallback value", "Required value", "Ignored value", "Skipped value"], correct: 0 },
+            { q: "What is 'toYaml' function?", a: ["Converts to YAML string", "Parses YAML", "Validates YAML", "Formats YAML"], correct: 0 },
+            { q: "What is 'fromYaml' function?", a: ["Parses YAML string", "Creates YAML", "Validates YAML", "Formats YAML"], correct: 0 },
+            { q: "What is 'tpl' function?", a: ["Templates string as template", "Lists templates", "Creates template", "Parses template"], correct: 0 },
+            { q: "What is 'helm upgrade --install'?", a: ["Installs or upgrades", "Only installs", "Only upgrades", "Tests upgrade"], correct: 0 },
+            { q: "What is 'helm.sh/hook-weight'?", a: ["Defines hook execution order", "Hook priority", "Hook type", "Hook name"], correct: 0 },
+            { q: "What is 'helm.sh/hook-delete-policy'?", a: ["When to delete hook resources", "Delete hook", "Policy name", "Delete resource"], correct: 0 }
+        ];
+        let currentQuestions=[],currentQuestionIndex=0,score=0,streak=0,maxStreak=0,difficulty='easy',currentLevel=1,consecutiveCorrect=0,totalAnswered=0;
+        function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+        function shuffleAnswers(q){let a=[...q.a],c=a[q.correct],s=shuffle(a);return{...q,a:s,correct:s.indexOf(c)}}
+        function initTest(){difficulty='easy';currentLevel=1;consecutiveCorrect=0;currentQuestions=shuffle([...easyQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0;score=0;streak=0;maxStreak=0;totalAnswered=0;document.getElementById('resultScreen').classList.remove('active');document.getElementById('quiz').style.display='block';renderQuestion()}
+        function renderQuestion(){let c=document.getElementById('questionsContainer');c.innerHTML='';let q=currentQuestions[currentQuestionIndex],d=document.createElement('div');d.className='question-container active';d.innerHTML=`<div class="question-text">${q.q}</div><div class="answers-grid">${q.a.map((a,i)=>`<button class="answer-btn" onclick="selectAnswer(${i})">${a}</button>`).join('')}</div>`;c.appendChild(d);updateUI()}
+        function updateUI(){let t=currentQuestions.length,p=(currentQuestionIndex/t)*100;document.getElementById('progressFill').style.width=p+'%';document.getElementById('questionNum').textContent=currentQuestionIndex+1;document.getElementById('streakNum').textContent=streak;document.getElementById('scoreNum').textContent=score;document.getElementById('levelNum').textContent=currentLevel}
+        function selectAnswer(i){let q=currentQuestions[currentQuestionIndex],b=document.querySelectorAll('.answer-btn');b.forEach((btn,j)=>{btn.disabled=true;if(j===q.correct)btn.classList.add('correct')});totalAnswered++;if(i===q.correct){streak++;if(streak>maxStreak)maxStreak=streak;consecutiveCorrect++;score+=difficulty==='easy'?10:difficulty==='medium'?20:30;if(currentLevel===1&&consecutiveCorrect>=7){currentLevel=2;difficulty='medium';consecutiveCorrect=0;currentQuestions=shuffle([...mediumQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0}else if(currentLevel===2&&consecutiveCorrect>=7){currentLevel=3;difficulty='hard';consecutiveCorrect=0;currentQuestions=shuffle([...hardQuestions]).slice(0,20).map(q=>shuffleAnswers(q));currentQuestionIndex=0}else currentQuestionIndex++;setTimeout(()=>{currentQuestionIndex<currentQuestions.length?renderQuestion():showResult()},1200)}else{b[i].classList.add('incorrect');streak=0;consecutiveCorrect=0;currentQuestionIndex++;setTimeout(()=>{currentQuestionIndex<currentQuestions.length?renderQuestion():showResult()},2000);return}}
+        function showResult(){document.getElementById('questionsContainer').innerHTML='';let p=score>=100;document.getElementById('resultScreen').classList.add('active');document.getElementById('resultIcon').textContent=p?'✓':'✗';document.getElementById('resultText').textContent=p?'PASS':'FAIL';document.getElementById('resultText').className='result-text '+(p?'pass':'fail');document.getElementById('resultScore').textContent=`Score: ${score}`;document.getElementById('resultDetails').innerHTML=`Questions answered: ${totalAnswered}<br>Best streak: ${maxStreak}<br>Highest level reached: ${currentLevel}`;document.getElementById('progressFill').style.width='100%'}
+        function restartTest(){initTest()}
+        function handleThemeChange(isDark){let t=isDark?'dark':'light';document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t)}
+        document.addEventListener('DOMContentLoaded',function(){let s=localStorage.getItem('theme');if(s==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('themeToggle').checked=true}initTest()});
+    </script>
+</body>
+</html>

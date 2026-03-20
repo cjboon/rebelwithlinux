@@ -2,175 +2,255 @@
 
 ## 1. Project Overview
 
-**Project Name:** Rebel With Linux  
-**Project Type:** Educational Website (Single-page application with lesson navigation)  
-**Core Functionality:** A comprehensive Linux learning platform with interactive lessons and fill-in-the-blank quizzes, promoting FOSS and privacy-consciousness  
-**Target Users:** Beginners to intermediate users transitioning from proprietary software to Linux
+**Project Name:** Rebel With Linux
+**Project Type:** Educational Website
+**Core Functionality:** A comprehensive Linux and FOSS learning platform with multiple content formats: guides, interactive games (builder, hangman), quizzes, blog posts, term references, and project tutorials.
+**Target Users:** Beginners to advanced users learning Linux, DevOps, web development, and privacy-focused computing
 
 ---
 
-## 2. UI/UX Specification
+## 2. Technology Stack
+
+- **Frontend:** Vanilla HTML, CSS, JavaScript
+- **Styling:** Custom CSS with CSS variables for theming
+- **Fonts:** IBM Plex Mono, IBM Plex Sans (self-hosted)
+- **Storage:** localStorage for user progress/preferences
+- **No backend required**
+
+---
+
+## 3. UI/UX Specification
 
 ### Layout Structure
 
-**Header:**
-- Fixed navigation bar with site title "REBEL WITH LINUX"
-- Navigation links: Lessons, About, Resources
-- Tagline: "Free your mind. Own your data."
+**Navigation:**
+- Fixed top navigation bar with site title "REBEL WITH LINUX"
+- Theme toggle (dark/light mode)
+- Hamburger menu for mobile with links: Search, Login, Account
+- Section links: Manifesto, Distros, Games, Guides, Resources, Blog, About, Contact, Tests, Stats, Rebels, Footer
 
-**Hero Section:**
-- Large bold typography
-- Manifesto-style introduction about FOSS and privacy
-- Call-to-action button to start learning
-
-**Content Areas:**
-- Lesson cards in a grid layout (3 columns desktop, 1 column mobile)
-- Each lesson has: title, description, difficulty badge, lesson content area
-- Quiz section below each lesson
+**Main Sections:**
+- Manifesto/Hero section with call-to-action
+- Distros section with distribution cards
+- Games section with learning games
+- Guides section with lesson cards in grid layout
+- Resources section with privacy tool recommendations
+- Blog section with categorized posts
+- About section
+- Contact section
+- Tests section with quizzes
+- Stats section
+- Rebels section
 
 **Footer:**
 - Links to FOSS resources
 - Copyleft notice
 - "Free software is freedom, not just free beer"
+- Hidden Tor service link
+
+### Color Palette (Dark Mode - Default)
+- `--ivory: #1a1a1a` (dark background)
+- `--white: #1a1a1a` (card backgrounds)
+- `--black: #e0e0e0` (text)
+- `--charcoal: #c0c0c0` (secondary text)
+- `--beige: #3a3a3a` (borders/highlights)
+- `--nav-color: #FFFFFF` (navigation)
+
+**Light Mode:**
+- `--ivory: #FFFFFF`
+- `--white: #FFFFFF`
+- `--black: #000000`
+- `--charcoal: #666666`
+- `--beige: #FFFFFF`
+
+### Typography
+- **Headings:** IBM Plex Mono, monospace
+- **Body:** IBM Plex Sans, sans-serif
+- **Code/Terminal:** IBM Plex Mono, monospace
 
 ### Responsive Breakpoints
-- Mobile: < 768px (single column)
-- Tablet: 768px - 1024px (2 columns)
-- Desktop: > 1024px (3 columns)
-
-### Visual Design
-
-**Color Palette:**
-- Primary Background: `#FFFFF0` (Ivory)
-- Secondary Background: `#FFFFFF` (White)
-- Primary Text: `#0A0A0A` (Near Black)
-- Accent: `#1A1A1A` (Dark Black)
-- Border/Lines: `#2A2A2A` (Charcoal)
-- Highlight: `#F5F5DC` (Beige)
-- Error/Wrong: `#8B0000` (Dark Red)
-- Success: `#006400` (Dark Green)
-
-**Typography:**
-- Headings: "IBM Plex Mono", monospace - Bold
-- Body: "IBM Plex Sans", sans-serif
-- Code/Terminal: "IBM Plex Mono", monospace
-- H1: 3rem, H2: 2rem, H3: 1.5rem
-- Body: 1rem, Small: 0.875rem
-
-**Spacing System:**
-- Base unit: 8px
-- Section padding: 64px vertical, 32px horizontal
-- Card padding: 24px
-- Element gaps: 16px
-
-**Visual Effects:**
-- Sharp corners (no border-radius) - brutalist aesthetic
-- Heavy black borders (3px solid)
-- Hover: invert colors (black bg, white text)
-- Box shadows: offset black shadows (8px 8px 0 #0A0A0A)
-- Transitions: none or very fast (0.1s)
-
-### Components
-
-**Navigation Bar:**
-- Black background, white text
-- Heavy bottom border
-- Links with underline on hover
-
-**Lesson Cards:**
-- White background with black border
-- Title, description, difficulty indicator
-- Click to expand/open lesson modal
-
-**Lesson Modal/Content:**
-- Full-width content area
-- Terminal-style code blocks
-- Clear headings and structured content
-
-**Quiz Component:**
-- Question with blank underlined
-- Input field for answer
-- Submit button
-- Feedback (correct/incorrect with explanation)
-
-**Buttons:**
-- Black background, white text
-- Heavy border
-- Offset shadow on hover
-
-**Badges:**
-- Beginner: Ivory background, black border
-- Intermediate: Black background, white text
-- Advanced: Inverted (white bg, black text, black border)
+- Mobile: < 768px
+- Tablet: 768px - 1024px
+- Desktop: > 1024px
 
 ---
 
-## 3. Functionality Specification
+## 4. Content Categories
 
-### Core Features
+### Programming & Scripting
+| Subject | Guide | Hangman | Builder | Test | Blog |
+|---------|-------|---------|---------|------|------|
+| Linux | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Bash | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Python | ✓ | ✓ | ✓ | ✓ | ✓ |
+| JavaScript | ✓ | ✓ | ✓ | ✓ | ✓ |
+| TypeScript | ✓ | ✓ | ✓ | - | ✓ |
+| Go | ✓ | ✓ | ✓ | ✓ | ✓ |
+| PHP | ✓ | ✓ | ✓ | ✓ | ✓ |
+| SQL | - | ✓ | ✓ | ✓ | ✓ |
 
-**Lesson System:**
-1. Lesson 1: Introduction to Linux & FOSS Philosophy
-2. Lesson 2: The Terminal - Your Command Center
-3. Lesson 3: File System Navigation
-4. Lesson 4: File Permissions & Ownership
-5. Lesson 5: Process Management
-6. Lesson 6: Text Manipulation & Pipelines
-7. Lesson 7: User & Group Management
-8. Lesson 8: Package Management
-9. Lesson 9: Networking Basics
-10. Lesson 10: Shell Scripting Basics
-11. Lesson 11: Security & Encryption Fundamentals
-12. Lesson 12: Systemd & Services
+### Web Development
+| Subject | Guide | Hangman | Builder | Test | Blog |
+|---------|-------|---------|---------|------|------|
+| HTML | ✓ | ✓ | ✓ | ✓ | ✓ |
+| CSS | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Nginx | ✓ | ✓ | - | ✓ | ✓ |
+| Apache | ✓ | - | - | ✓ | ✓ |
 
-**Quiz System:**
-- 5-8 fill-in-the-blank questions per lesson
-- Case-insensitive matching
-- Hint system (reveal after 2 wrong attempts)
-- Score tracking per lesson
-- Progress indicator
+### DevOps & Cloud
+| Subject | Guide | Hangman | Builder | Test | Blog |
+|---------|-------|---------|---------|------|------|
+| Docker | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Kubernetes | ✓ | ✓ | - | ✓ | ✓ |
+| Jenkins | ✓ | ✓ | - | ✓ | ✓ |
+| CI/CD | ✓ | ✓ | - | ✓ | ✓ |
+| Ansible | - | ✓ | - | ✓ | ✓ |
+| Terraform | - | ✓ | - | ✓ | ✓ |
+| AWS | ✓ | ✓ | - | ✓ | ✓ |
 
-**Navigation:**
-- Smooth scroll to sections
-- Lesson completion tracking (localStorage)
-- Progress bar in header
+### Networking & Security
+| Subject | Guide | Hangman | Builder | Test | Blog |
+|---------|-------|---------|---------|------|------|
+| Networking | ✓ | ✓ | ✓ | ✓ | ✓ |
+| DNS | ✓ | - | ✓ | - | ✓ |
+| VPS | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Hardening | ✓ | ✓ | ✓ | ✓ | ✓ |
+| GPG | ✓ | ✓ | ✓ | ✓ | ✓ |
+| WireGuard | ✓ | ✓ | - | ✓ | ✓ |
 
-### User Interactions
-- Click lesson card → Open lesson content
-- Read lesson → Scroll to quiz section
-- Type answer in blank → Submit → Get feedback
-- Complete lesson → Mark as done → Show next lesson
+### Databases
+| Subject | Guide | Hangman | Builder | Test | Blog |
+|---------|-------|---------|---------|------|------|
+| MariaDB | ✓ | ✓ | ✓ | ✓ | ✓ |
+| PostgreSQL | ✓ | ✓ | ✓ | - | ✓ |
 
-### Data Handling
-- localStorage for progress tracking
-- Quiz answers validated client-side
-- No backend required
+### Observability
+| Subject | Guide | Hangman | Builder | Test | Blog |
+|---------|-------|---------|---------|------|------|
+| Monitoring | ✓ | ✓ | - | ✓ | ✓ |
+| Grafana | ✓ | ✓ | - | ✓ | ✓ |
+| Prometheus | - | ✓ | - | ✓ | ✓ |
+| Logging | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Vault | - | ✓ | - | - | ✓ |
 
-### Edge Cases
-- Empty input on quiz → Show "Please enter an answer"
-- Wrong answer → Show correct answer with explanation
-- All questions correct → Show completion message
+### Privacy & Self-Hosting
+| Subject | Guide | Hangman | Builder | Test | Blog |
+|---------|-------|---------|---------|------|------|
+| FOSS | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Monero | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Homelab | ✓ | ✓ | - | ✓ | ✓ |
+| Pi-hole | ✓ | ✓ | - | ✓ | ✓ |
+
+### Version Control & Automation
+| Subject | Guide | Hangman | Builder | Test | Blog |
+|---------|-------|---------|---------|------|------|
+| Git | ✓ | ✓ | ✓ | ✓ | ✓ |
+| GitHub | - | ✓ | - | - | ✓ |
+| Helm | - | ✓ | - | - | - |
 
 ---
 
-## 4. Acceptance Criteria
+## 5. Content Type Specifications
 
-### Visual Checkpoints
-- [ ] Black, white, ivory color scheme strictly followed
-- [ ] Brutalist aesthetic with heavy borders and offset shadows
-- [ ] Monospace fonts for headings and code
-- [ ] Responsive layout works on all breakpoints
-- [ ] Hover states invert colors properly
+### Guides (37 total)
+Comprehensive written tutorials covering theory and practical examples.
 
-### Functional Checkpoints
-- [ ] All 12 lessons are accessible
-- [ ] Each lesson has 5+ fill-in-the-blank questions
-- [ ] Quiz input accepts answers and provides feedback
-- [ ] Progress is saved in localStorage
-- [ ] Navigation works smoothly
+### Builders (56 files)
+Multi-part drag-and-drop code building games. Some subjects have 3 parts (e.g., builder-bash.html, builder-bash-2.html, builder-bash-3.html).
 
-### Content Checkpoints
-- [ ] Each lesson covers its topic comprehensively
-- [ ] FOSS/privacy theme is woven throughout
-- [ ] Code examples are accurate and copyable
-- [ ] Quiz questions test understanding of lesson content
+### Hangman (45 total)
+Word-guessing games for learning commands and terms. Includes a main hub (hangman-main.html).
+
+### Tests (39 total)
+Interactive fill-in-the-blank quizzes with hints and scoring.
+
+### Blog (55 total)
+Quick guides and tips organized by category:
+- Foundations (Linux, Bash, Vim)
+- Web Basics (HTML, CSS, JavaScript, PHP)
+- Programming (Python, Go, TypeScript)
+- Version Control (Git)
+- Networking & DNS
+- Web Servers (Nginx, Apache2)
+- Databases (SQL, MariaDB, PostgreSQL)
+- Containers (Docker, Kubernetes)
+- Automation & IaC (Ansible, Jenkins)
+
+### Terms (13 total)
+Command reference pages: awk, bash, curl, git, jq, nix, py, regex, sed, sql, ssh, vim
+
+### Projects (9 total)
+Step-by-step project tutorials: blog, fileshare, homelab, i3, mail, matrix, onion, paste, wireguard
+
+### Games (6 total)
+Interactive learning games: debian, debian-2, debian-3, quiz, speed, turing
+
+---
+
+## 6. Page Templates
+
+### Guide Page
+- Title and category badge
+- Comprehensive content with code blocks
+- Related links
+
+### Builder Game Page
+- Drag-and-drop interface
+- Code building challenges
+- Multi-part format for advanced topics
+
+### Hangman Game Page
+- Word guessing interface
+- Category-based vocabulary
+
+### Test/Quiz Page
+- Fill-in-the-blank questions
+- Hint system
+- Score tracking
+
+### Blog Post Page
+- Article content
+- Related posts
+
+---
+
+## 7. Features
+
+- **Dark/Light Theme Toggle:** Persisted via localStorage
+- **Responsive Design:** Mobile-first approach
+- **Local Progress Tracking:** localStorage for quiz scores and completion
+- **Accessibility:** Skip links, ARIA labels
+- **SEO:** Meta tags, Open Graph, JSON-LD structured data
+- **Offline Support:** Service worker (sw.js)
+- **User Authentication:** Login/account system (account.html)
+- **Search:** Search functionality (search.html)
+- **Achievement System:** achievements.js
+
+---
+
+## 8. File Structure
+
+```
+/
+├── index.html          # Main landing page
+├── account.html        # User account page
+├── search.html         # Search functionality
+├── offline.html        # Offline page
+├── site-map.html       # Sitemap
+├── subject-chart.html  # Content coverage chart
+├── style.css           # Main stylesheet
+├── achievements.js     # Achievement system
+├── nav.js              # Navigation logic
+├── sw.js               # Service worker
+├── fonts.css           # Font definitions
+├── fonts/              # Self-hosted fonts
+├── guides/             # 37 comprehensive guides
+├── builders/           # 56 builder game files
+├── hangman/            # 45 hangman game files
+├── tests/              # 39 quiz files
+├── blog/               # 55 blog posts
+├── terms/              # 13 term reference pages
+├── projects/           # 9 project tutorials
+├── games/              # 6 learning games
+└── cgi-bin/            # CGI scripts
+```
