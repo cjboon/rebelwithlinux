@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terraform - Infrastructure as Code | REBEL WITH LINUX</title>
-    <meta name="description" content="Master Terraform for Infrastructure as Code. Learn HCL, providers, modules, state management, and multi-cloud deployments.">
-    <meta name="keywords" content="Terraform, Infrastructure as Code, IaC, HCL, HashiCorp, AWS, GCP, Azure, cloud provisioning, DevOps">
+    <meta name="description" content="Master Terraform. Learn infrastructure as code, provisioning cloud resources, and managing infrastructure at scale.">
+    <meta name="keywords" content="Terraform, infrastructure as code, IaC, DevOps, AWS, cloud, provisioning, HashiCorp">
     <meta name="author" content="cjboon">
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="../fonts.css">
@@ -18,18 +18,21 @@
         } else if (savedTheme === 'light') {
             document.documentElement.setAttribute('data-theme', 'light');
         }
+    </script>
+    <script src="../terminal-select.js"></script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
             const toggle = document.getElementById('themeToggle');
             if (toggle) {
                 toggle.checked = (savedTheme === 'dark' || !savedTheme);
             }
         });
     </script>
-
     <style>
-        :root { --nav-color: #5c4db5; }
-        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
-        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+        :root {
+            --nav-color: #5C4EE5;
+        }
     </style>
 </head>
 <body class="guide-page">
@@ -38,7 +41,7 @@
         <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
         <div class="nav-left">
             <div class="nav-title">
-                <a href="../index.html#guides" style="color: inherit; text-decoration: none;">TERRAFORM MASTERY</a>
+                <a href="../index.html" style="color: inherit; text-decoration: none;">TERRAFORM MASTERY</a>
             </div>
             <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
                 <span class="theme-toggle-icon">🌙</span>
@@ -59,118 +62,104 @@
                     <a href="../index.html#guides">GUIDES</a>
                     <a href="../index.html#blog">BLOG</a>
                     <a href="../index.html#about">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-    </div>
-
     <section class="hero">
         <h1>INFRASTRUCTURE<br>AS CODE</h1>
-        <p class="tagline">// Define your infrastructure. Deploy with confidence.</p>
+        <p class="tagline">// Your cloud, version controlled.</p>
         
         <div class="manifesto">
-            <p><strong>TERRAFORM CHANGED THE GAME.</strong></p>
-            <p>Manual server provisioning is a relic of the past. In a world where infrastructure can scale instantly, where cloud resources spin up and down by the minute, you need a way to define your entire infrastructure in code. You need Terraform.</p>
-            <p><strong>WHY TERRAFORM?</strong></p>
-            <p>Terraform uses a declarative approach—you describe what you want, not how to get there. It figures out the implementation. This means reproducible, version-controlled, auditable infrastructure that you can deploy to AWS, GCP, Azure, or your own on-premises servers with the same configuration language.</p>
-            <p><strong>BECOME INFRASTRUCTURE-AS-CODE NATIVE.</strong></p>
-            <p>Learn HCL (HashiCorp Configuration Language), understand providers and modules, master state management, and build production-grade infrastructure that scales. Whether you're managing one VPS or ten thousand servers, Terraform gives you the power to control it all.</p>
+            <p><strong>SERVERS SHOULD BE LIKE CASSETTES.</strong></p>
+            <p>Provisioning infrastructure manually is error-prone and impossible to reproduce. Terraform treats your infrastructure as code—version it, review it, and deploy it automatically.</p>
+            <p><strong>WHY TERRAFORM</strong></p>
+            <p>Terraform uses a declarative approach. You define what you want, not how to get there. It figures out the right order, handles dependencies, and creates a plan before making changes.</p>
+            <p><strong>ONE CODEBASE, ANY CLOUD.</strong></p>
         </div>
 
-        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY →</a>
+        <a href="#guides" class="cta-button">START PROVISIONING →</a>
     </section>
 
     <section class="lessons-section" id="guides">
         <div class="section-header">
-            <h2>// Your Training Path</h2>
-            <p>Click a lesson to begin</p>
+            <h2>// The Infrastructure Path</h2>
+            <p>12 lessons. Complete Terraform mastery.</p>
         </div>
         <div class="lessons-grid">
-            <a href="#lesson1" class="lesson-card" data-lesson="1">
+            <a href="#lesson1" class="lesson-card">
                 <div class="lesson-number">LESSON 01</div>
                 <h3 class="lesson-title">Introduction to Terraform</h3>
-                <p class="lesson-desc">What is Infrastructure as Code? Installing Terraform and writing your first configuration.</p>
+                <p class="lesson-desc">What is IaC, how Terraform works, and why it matters</p>
                 <span class="badge badge-beginner">Beginner</span>
             </a>
-
-            <a href="#lesson2" class="lesson-card" data-lesson="2">
+            <a href="#lesson2" class="lesson-card">
                 <div class="lesson-number">LESSON 02</div>
-                <h3 class="lesson-title">HCL Fundamentals</h3>
-                <p class="lesson-desc">Syntax, variables, outputs, and the building blocks of Terraform configurations.</p>
+                <h3 class="lesson-title">Installing & Configuring</h3>
+                <p class="lesson-desc">Installing Terraform, providers, and authentication</p>
                 <span class="badge badge-beginner">Beginner</span>
             </a>
-
-            <a href="#lesson3" class="lesson-card" data-lesson="3">
+            <a href="#lesson3" class="lesson-card">
                 <div class="lesson-number">LESSON 03</div>
-                <h3 class="lesson-title">Providers & Resources</h3>
-                <p class="lesson-desc">Understanding providers, resources, and data sources. Working with AWS, GCP, Azure.</p>
+                <h3 class="lesson-title">Resources & Data Sources</h3>
+                <p class="lesson-desc">Creating resources and querying existing infrastructure</p>
                 <span class="badge badge-beginner">Beginner</span>
             </a>
-
-            <a href="#lesson4" class="lesson-card" data-lesson="4">
+            <a href="#lesson4" class="lesson-card">
                 <div class="lesson-number">LESSON 04</div>
                 <h3 class="lesson-title">Variables & Outputs</h3>
-                <p class="lesson-desc">Input variables, output values, and creating reusable configurations.</p>
+                <p class="lesson-desc">Making configurations flexible and reusable</p>
                 <span class="badge badge-intermediate">Intermediate</span>
             </a>
-
-            <a href="#lesson5" class="lesson-card" data-lesson="5">
+            <a href="#lesson5" class="lesson-card">
                 <div class="lesson-number">LESSON 05</div>
                 <h3 class="lesson-title">State Management</h3>
-                <p class="lesson-desc">Understanding Terraform state, backends, and remote state for teams.</p>
+                <p class="lesson-desc">How Terraform tracks resources and remote state</p>
                 <span class="badge badge-intermediate">Intermediate</span>
             </a>
-
-            <a href="#lesson6" class="lesson-card" data-lesson="6">
+            <a href="#lesson6" class="lesson-card">
                 <div class="lesson-number">LESSON 06</div>
                 <h3 class="lesson-title">Modules</h3>
-                <p class="lesson-desc">Creating reusable infrastructure modules. Modular design patterns.</p>
+                <p class="lesson-desc">Organizing and reusing infrastructure code</p>
                 <span class="badge badge-intermediate">Intermediate</span>
             </a>
-
-            <a href="#lesson7" class="lesson-card" data-lesson="7">
+            <a href="#lesson7" class="lesson-card">
                 <div class="lesson-number">LESSON 07</div>
                 <h3 class="lesson-title">Workspaces</h3>
-                <p class="lesson-desc">Managing multiple environments. Dev, staging, production isolation.</p>
+                <p class="lesson-desc">Managing multiple environments (dev, staging, prod)</p>
                 <span class="badge badge-intermediate">Intermediate</span>
             </a>
-
-            <a href="#lesson8" class="lesson-card" data-lesson="8">
+            <a href="#lesson8" class="lesson-card">
                 <div class="lesson-number">LESSON 08</div>
                 <h3 class="lesson-title">Provisioners</h3>
-                <p class="lesson-desc">Provisioners, remote-exec, cloud-init, and bootstrapping instances.</p>
-                <span class="badge badge-advanced">Advanced</span>
+                <p class="lesson-desc">Running scripts on created resources</p>
+                <span class="badge badge-intermediate">Intermediate</span>
             </a>
-
-            <a href="#lesson9" class="lesson-card" data-lesson="9">
+            <a href="#lesson9" class="lesson-card">
                 <div class="lesson-number">LESSON 09</div>
-                <h3 class="lesson-title">Testing & Security</h3>
-                <p class="lesson-desc">Terratest, tfsec, Sentinel policies, and secure configurations.</p>
+                <h3 class="lesson-title">Terraform in CI/CD</h3>
+                <p class="lesson-desc">Automating Terraform in your pipelines</p>
                 <span class="badge badge-advanced">Advanced</span>
             </a>
-
-            <a href="#lesson10" class="lesson-card" data-lesson="10">
+            <a href="#lesson10" class="lesson-card">
                 <div class="lesson-number">LESSON 10</div>
-                <h3 class="lesson-title">CI/CD Integration</h3>
-                <p class="lesson-desc">GitHub Actions, GitLab CI, Atlantis, and automated pipelines.</p>
+                <h3 class="lesson-title">Testing & Validation</h3>
+                <p class="lesson-desc">Terratest, sentinel, and infrastructure testing</p>
                 <span class="badge badge-advanced">Advanced</span>
             </a>
-
-            <a href="#lesson11" class="lesson-card" data-lesson="11">
+            <a href="#lesson11" class="lesson-card">
                 <div class="lesson-number">LESSON 11</div>
-                <h3 class="lesson-title">Terraform Cloud</h3>
-                <p class="lesson-desc">Terraform Cloud, remote execution, policy enforcement, and enterprise.</p>
+                <h3 class="lesson-title">Multi-Cloud Patterns</h3>
+                <p class="lesson-desc">Managing AWS, GCP, Azure with single config</p>
                 <span class="badge badge-advanced">Advanced</span>
             </a>
-
-            <a href="#lesson12" class="lesson-card" data-lesson="12">
+            <a href="#lesson12" class="lesson-card">
                 <div class="lesson-number">LESSON 12</div>
-                <h3 class="lesson-title">Advanced Patterns</h3>
-                <p class="lesson-desc">Dynamic blocks, for_each, splat expressions, and production architectures.</p>
+                <h3 class="lesson-title">Enterprise Patterns</h3>
+                <p class="lesson-desc">Policy as Code, Terragrunt, and scaling Terraform</p>
                 <span class="badge badge-advanced">Advanced</span>
             </a>
         </div>
@@ -179,35 +168,9 @@
     <section class="about-section" id="about">
         <div class="about-content">
             <h2>// Why Terraform</h2>
-            <p>Terraform was created by Mitchell Hashimoto in 2014 and has become the industry standard for Infrastructure as Code. Unlike cloud-specific tools, Terraform is provider-agnostic—you can manage AWS, GCP, Azure, Kubernetes, and on-premises infrastructure with the same language and workflow.</p>
-            <p>The declarative approach means you describe your desired state, and Terraform figures out how to achieve it. This makes infrastructure reproducible, versionable, and auditable.</p>
-            <p><strong>Infrastructure that scales. Code that lasts.</strong></p>
-        </div>
-    </section>
-
-    <section class="resources-section" id="resources">
-        <h2>// Tools & References</h2>
-        <div class="resources-grid">
-            <div class="resource-card">
-                <h3>Terraform Docs</h3>
-                <p>Official Documentation</p>
-                <a href="https://www.terraform.io/docs" target="_blank">terraform.io/docs</a>
-            </div>
-            <div class="resource-card">
-                <h3>Terraform Registry</h3>
-                <p>Providers & Modules</p>
-                <a href="https://registry.terraform.io/" target="_blank">registry.terraform.io</a>
-            </div>
-            <div class="resource-card">
-                <h3>HashiCorp Learn</h3>
-                <p>Tutorials</p>
-                <a href="https://learn.hashicorp.com/terraform" target="_blank">learn.hashicorp.com</a>
-            </div>
-            <div class="resource-card">
-                <h3>OpenTofu</h3>
-                <p>Open Source Fork</p>
-                <a href="https://opentofu.org/" target="_blank">opentofu.org</a>
-            </div>
+            <p>Terraform is the industry standard for infrastructure as code. It supports over 1000 providers and works across all major cloud platforms.</p>
+            <p><strong>What you'll master:</strong> AWS, GCP, Azure provisioning, state management, modules, workspaces, and enterprise patterns. By the end, you'll provision entire environments with a single command.</p>
+            <p><strong>Define once, deploy anywhere.</strong></p>
         </div>
     </section>
 
@@ -215,75 +178,58 @@
     <div class="lesson-modal" id="lesson1">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 01: Introduction to Terraform</h2>
+                <h2>// Lesson 1: Introduction to Terraform</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
                 <h3>What is Infrastructure as Code?</h3>
-                <p>Infrastructure as Code (IaC) is the practice of managing and provisioning computer data centers through machine-readable definition files, rather than physical hardware configuration or interactive configuration tools.</p>
+                <p>IaC is the practice of managing infrastructure through code rather than manual processes. Your servers, networks, and databases are defined in configuration files that can be versioned, reviewed, and automated.</p>
 
-                <h3>The Declarative Paradigm</h3>
-                <p>Terraform is declarative—you describe what you want, not how to get there:</p>
+                <h3>How Terraform Works</h3>
+                <pre><code># Terraform uses a declarative approach
+# You define the desired state, not the steps
+
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t3.micro"
+}</code></pre>
+
+                <h3>Terraform Workflow</h3>
+                <pre><code>1. Write   → Define infrastructure in .tf files
+2. Plan    → Terraform shows what will change
+3. Apply   → Terraform makes the changes
+4. Repeat  → Infrastructure evolves with code</code></pre>
+
+                <h3>Why Terraform?</h3>
                 <ul>
-                    <li><strong>Imperative:</strong> "Create a VPC, then create a subnet, then launch an EC2..."</li>
-                    <li><strong>Declarative:</strong> "I want an EC2 instance in a VPC with these specifications."</li>
+                    <li><strong>Declarative:</strong> Define what you want, not how to get it</li>
+                    <li><strong>Provider ecosystem:</strong> 1000+ providers for AWS, GCP, Azure, etc.</li>
+                    <li><strong>State:</strong> Tracks what it's created</li>
+                    <li><strong>Plan:</strong> See changes before applying</li>
                 </ul>
 
-                <h3>The Terraform Workflow</h3>
-                <ol>
-                    <li><strong>Write:</strong> Create configuration files describing your infrastructure</li>
-                    <li><strong>Init:</strong> Run <code>terraform init</code> to download providers</li>
-                    <li><strong>Plan:</strong> Run <code>terraform plan</code> to preview changes</li>
-                    <li><strong>Apply:</code> Run <code>terraform apply</code> to make changes</li>
-                    <li><strong>Destroy:</strong> Run <code>terraform destroy</code> to tear down</li>
-                </ol>
-
-                <h3>Installing Terraform</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># On Linux/macOS
-curl -fsSL https://get.terraform.io | sh
-
-# On macOS with Homebrew
-brew install terraform
-
-# Verify
-terraform version</pre>
-
-                <h3>Your First Configuration</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># main.tf
-resource "local_file" "hello" {
-  filename = "hello.txt"
-  content  = "Hello from Terraform!"
-}
-
-# Run the workflow
-terraform init
-terraform plan
-terraform apply</pre>
-
-                <h3>Quiz</h3>
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What command initializes Terraform and downloads providers?</p>
-                        <input type="text" class="quiz-input" data-answer="init" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What type of approach does Terraform use?</p>
+                        <input type="text" class="quiz-input" data-answer="declarative" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Define the ??? state</p>
                     </div>
                     <div class="quiz-question">
-                        <p class="question-text">2. What command previews changes without applying them?</p>
+                        <p>What command shows what Terraform will change?</p>
                         <input type="text" class="quiz-input" data-answer="plan" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: terraform ???</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>init</li><li>plan</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>declarative</li>
+                                <li>plan</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson2">Next: HCL Fundamentals →</a>
                 </div>
             </div>
         </div>
@@ -293,82 +239,71 @@ terraform apply</pre>
     <div class="lesson-modal" id="lesson2">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 02: HCL Fundamentals</h2>
+                <h2>// Lesson 2: Installing & Configuring</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>HashiCorp Configuration Language</h3>
-                <p>HCL is Terraform's domain-specific language. It's designed to be both human-readable and machine-parseable.</p>
+                <h3>Installing Terraform</h3>
+                <pre><code># macOS with Homebrew
+brew install terraform
 
-                <h3>Blocks and Arguments</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># This is a block
-resource "aws_instance" "web" {
-  # These are arguments
-  ami           = "ami-0c55b159cbfafe1f0"
-  instance_type = "t2.micro"
+# Linux - download binary
+wget https://releases.hashicorp.com/terraform/1.7.0/terraform_1.7.0_linux_amd64.zip
+unzip terraform_1.7.0_linux_amd64.zip
+sudo mv terraform /usr/local/bin/
+
+# Verify installation
+terraform --version</code></pre>
+
+                <h3>Provider Configuration</h3>
+                <pre><code># main.tf
+terraform {
+  required_version = ">= 1.0"
   
-  tags = {
-    Name = "HelloWorld"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
   }
-}</pre>
-
-                <h3>Data Types</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Strings
-name = "web-server"
-
-# Numbers
-count = 5
-
-# Booleans
-enable_monitoring = true
-
-# Lists
-ports = [80, 443, 8080]
-
-# Maps
-tags = {
-  Name = "web-server"
-  Environment = "production"
-}</pre>
-
-                <h3>References</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">resource "aws_security_group" "web" {
-  name = "web-sg"
 }
 
-resource "aws_instance" "web" {
-  ami           = "ami-0c55b159cbfafe1f0"
-  vpc_security_group_ids = [aws_security_group.web.id]
-}</pre>
+provider "aws" {
+  region = "us-east-1"
+  
+  # Can use environment variables
+  # AWS_ACCESS_KEY_ID
+  # AWS_SECRET_ACCESS_KEY
+}</code></pre>
 
-                <h3>Expressions</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># String interpolation
-name = "server-${var.environment}"
+                <h3>Initializing Terraform</h3>
+                <pre><code># Initialize providers and modules
+terraform init
 
-# Conditionals
-instance_type = var.is_production ? "t3.large" : "t3.micro"
+# Downloaded providers are stored in .terraform/</code></pre>
 
-# Functions
-upper_name = upper(var.name)</pre>
-
-                <h3>Quiz</h3>
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What HCL data type uses curly braces with key-value pairs?</p>
-                        <input type="text" class="quiz-input" data-answer="map" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What command initializes Terraform?</p>
+                        <input type="text" class="quiz-input" data-answer="init" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: terraform ???</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>Where are Terraform providers downloaded?</p>
+                        <input type="text" class="quiz-input" data-answer=".terraform" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Hidden folder</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>map (or object)</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>init</li>
+                                <li>.terraform</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson3">Next: Providers & Resources →</a>
                 </div>
             </div>
         </div>
@@ -378,63 +313,92 @@ upper_name = upper(var.name)</pre>
     <div class="lesson-modal" id="lesson3">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 03: Providers & Resources</h2>
+                <h2>// Lesson 3: Resources & Data Sources</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Providers</h3>
-                <p>Providers are plugins that Terraform uses to interact with cloud platforms and services.</p>
-
-                <h3>Provider Configuration</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">provider "aws" {
-  region = "us-east-1"
-  # Credentials from env vars, shared config, etc.
-}</pre>
-
-                <h3>Resources</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">resource "aws_instance" "web" {
+                <h3>Creating Resources</h3>
+                <pre><code>resource "aws_instance" "web" {
   ami           = "ami-0c55b159cbfafe1f0"
-  instance_type = "t2.micro"
+  instance_type = "t3.micro"
   
   tags = {
     Name = "web-server"
-  }
-}</pre>
-
-                <h3>Data Sources</h3>
-                <p>Data sources let you fetch information from existing infrastructure:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">data "aws_ami" "ubuntu" {
-  most_recent = true
-  owners      = ["099720109477"]
-  
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-*"]
+    Environment = "production"
   }
 }
 
-resource "aws_instance" "web" {
-  ami = data.aws_ami.ubuntu.id
-}</pre>
+resource "aws_security_group" "web" {
+  name = "web-sg"
+  
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}</code></pre>
 
-                <h3>Quiz</h3>
+                <h3>Data Sources</h3>
+                <pre><code># Query existing infrastructure without creating it
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-*-22.04-amd64-server-*"]
+  }
+  
+  owners = ["099720109477"] # Canonical
+}
+
+# Use the data source
+resource "aws_instance" "server" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+}</code></pre>
+
+                <h3>Resource Dependencies</h3>
+                <pre><code># Terraform automatically handles dependencies
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t3.micro"
+  # This depends on aws_security_group.web implicitly
+}
+
+resource "aws_security_group" "web" {
+  name = "web-sg"
+}</code></pre>
+
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What Terraform block fetches existing infrastructure information?</p>
+                        <p>What block queries existing infrastructure?</p>
                         <input type="text" class="quiz-input" data-answer="data" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: ??? source</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What block creates new infrastructure?</p>
+                        <input type="text" class="quiz-input" data-answer="resource" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: ??? block</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>data</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>data</li>
+                                <li>resource</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson4">Next: Variables & Outputs →</a>
                 </div>
             </div>
         </div>
@@ -444,69 +408,80 @@ resource "aws_instance" "web" {
     <div class="lesson-modal" id="lesson4">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 04: Variables & Outputs</h2>
+                <h2>// Lesson 4: Variables & Outputs</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
                 <h3>Input Variables</h3>
-                <p>Variables make configurations reusable:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">variable "instance_type" {
-  description = "EC2 instance type"
+                <pre><code># variables.tf
+variable "instance_type" {
   type        = string
-  default     = "t2.micro"
+  default     = "t3.micro"
+  description = "EC2 instance type"
 }
 
 variable "environment" {
-  description = "Environment name"
   type        = string
-}</pre>
+  description = "Environment name"
+  
+  validation {
+    condition     = contains(["dev", "staging", "prod"], var.environment)
+    error_message = "Must be dev, staging, or prod"
+  }
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "Tags to apply to resources"
+}</code></pre>
 
                 <h3>Using Variables</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">resource "aws_instance" "web" {
+                <pre><code># Using variables in resources
+resource "aws_instance" "web" {
   instance_type = var.instance_type
-  # ...
-}</pre>
-
-                <h3>Passing Variables</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Via command line
-terraform apply -var="environment=prod"
-
-# Via file
-terraform apply -var-file="prod.tfvars"
-
-# Via environment variable
-export TF_VAR_environment=prod</pre>
+  ami           = "ami-0c55b159cbfafe1f0"
+  
+  tags = merge(var.tags, {
+    Environment = var.environment
+  })
+}</code></pre>
 
                 <h3>Output Values</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">output "instance_id" {
-  description = "The ID of the EC2 instance"
+                <pre><code># outputs.tf
+output "instance_id" {
+  description = "ID of the EC2 instance"
   value       = aws_instance.web.id
+  sensitive   = false
 }
 
 output "instance_public_ip" {
   description = "Public IP address"
   value       = aws_instance.web.public_ip
-  sensitive   = true
-}</pre>
+}</code></pre>
 
-                <h3>Quiz</h3>
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What keyword defines an input variable in Terraform?</p>
+                        <p>What block defines configurable values?</p>
                         <input type="text" class="quiz-input" data-answer="variable" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: ??? block</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What exposes resource values to the user?</p>
+                        <input type="text" class="quiz-input" data-answer="output" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: ??? block</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>variable</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>variable</li>
+                                <li>output</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson5">Next: State Management →</a>
                 </div>
             </div>
         </div>
@@ -516,23 +491,20 @@ output "instance_public_ip" {
     <div class="lesson-modal" id="lesson5">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 05: State Management</h2>
+                <h2>// Lesson 5: State Management</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>What is State?</h3>
-                <p>Terraform uses state to map your configuration to real-world resources. It stores resource identifiers and attributes.</p>
+                <h3>How State Works</h3>
+                <p>Terraform uses state to map real-world resources to your configuration. It tracks resource IDs and properties so it knows what to update or delete.</p>
 
                 <h3>Local State</h3>
-                <p>By default, Terraform stores state in <code>terraform.tfstate</code>:</p>
-                <ul>
-                    <li>Works for individual development</li>
-                    <li>No collaboration support</li>
-                    <li>Risk of corruption</li>
-                </ul>
+                <pre><code># Default - stored in terraform.tfstate
+# Not recommended for teams</code></pre>
 
-                <h3>Remote Backends</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">terraform {
+                <h3>Remote State</h3>
+                <pre><code># Configure remote state in S3
+terraform {
   backend "s3" {
     bucket         = "my-terraform-state"
     key            = "prod/terraform.tfstate"
@@ -540,39 +512,52 @@ output "instance_public_ip" {
     encrypt        = true
     dynamodb_table = "terraform-locks"
   }
-}</pre>
+}</code></pre>
+
+                <h3>State Locking</h3>
+                <pre><code># DynamoDB table for state locking
+# Prevents concurrent modifications
+
+resource "aws_dynamodb_table" "terraform_locks" {
+  name         = "terraform-locks"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
+  
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}</code></pre>
 
                 <h3>State Commands</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># List resources
-terraform state list
+                <pre><code>terraform show                # Show current state
+terraform state list         # List resources
+terraform state show RESOURCE # Show resource details
+terraform state mv           # Move resource
+terraform state rm           # Remove from state</code></pre>
 
-# Show resource
-terraform state show aws_instance.web
-
-# Move resource
-terraform state mv aws_instance.web aws_instance.app
-
-# Remove from state
-terraform state rm aws_instance.old</pre>
-
-                <h3>Quiz</h3>
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What S3 feature prevents concurrent Terraform operations?</p>
-                        <input type="text" class="quiz-input" data-answer="dynamodb" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>Where does Terraform store resource mapping?</p>
+                        <input type="text" class="quiz-input" data-answer="state" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: terraform.???</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What prevents concurrent Terraform runs?</p>
+                        <input type="text" class="quiz-input" data-answer="locking" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: State ???</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>dynamodb (or state locking)</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>state</li>
+                                <li>locking</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson6">Next: Modules →</a>
                 </div>
             </div>
         </div>
@@ -582,70 +567,83 @@ terraform state rm aws_instance.old</pre>
     <div class="lesson-modal" id="lesson6">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 06: Modules</h2>
+                <h2>// Lesson 6: Modules</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Why Modules?</h3>
-                <p>Modules group related resources and enable reuse:</p>
-                <ul>
-                    <li>Organize code by component</li>
-                    <li>Create reusable infrastructure</li>
-                    <li>Version control infrastructure</li>
-                </ul>
+                <h3>Why Use Modules?</h3>
+                <p>Modules are reusable Terraform configurations. They let you group resources, hide complexity, and share infrastructure patterns.</p>
 
                 <h3>Creating a Module</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># modules/ec2/main.tf
+                <pre><code># modules/ec2/main.tf
 variable "instance_type" {
   type    = string
-  default = "t2.micro"
+  default = "t3.micro"
+}
+
+variable "name" {
+  type = string
 }
 
 resource "aws_instance" "this" {
+  ami           = "ami-0c55b159cbfafe1f0"
   instance_type = var.instance_type
+  
+  tags = {
+    Name = var.name
+  }
 }
 
 output "instance_id" {
   value = aws_instance.this.id
-}</pre>
+}</code></pre>
 
                 <h3>Using a Module</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">module "web_server" {
+                <pre><code># main.tf
+module "web_server" {
   source = "./modules/ec2"
   
-  instance_type = "t3.small"
-}</pre>
-
-                <h3>Module Sources</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># From Terraform Registry
-module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "3.0.0"
+  instance_type = "t3.medium"
+  name          = "web-server"
 }
 
-# From GitHub
-module "example" {
-  source = "github.com/user/repo//path/to/module"
-}</pre>
+# Reference module output
+output "server_id" {
+  value = module.web_server.instance_id
+}</code></pre>
 
-                <h3>Quiz</h3>
+                <h3>Module Sources</h3>
+                <pre><code># Local
+source = "./modules/vpc"
+
+# Public registry
+source = "terraform-aws-modules/vpc/aws"
+
+# Private registry
+source = "app.terraform.io/org-name/vpc/aws"</code></pre>
+
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What block calls a module in Terraform?</p>
-                        <input type="text" class="quiz-input" data-answer="module" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What allows reusing Terraform configurations?</p>
+                        <input type="text" class="quiz-input" data-answer="modules" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: ???</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What attribute references module outputs?</p>
+                        <input type="text" class="quiz-input" data-answer="source" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: module.???.output</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>module</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>modules</li>
+                                <li>source</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson7">Next: Workspaces →</a>
                 </div>
             </div>
         </div>
@@ -655,66 +653,78 @@ module "example" {
     <div class="lesson-modal" id="lesson7">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 07: Workspaces</h2>
+                <h2>// Lesson 7: Workspaces</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>What are Workspaces?</h3>
-                <p>Workspaces let you manage multiple environments with a single configuration. Each workspace has its own state.</p>
+                <h3>What Are Workspaces?</h3>
+                <p>Workspaces let you manage multiple environments from the same configuration. Each workspace has its own state file.</p>
 
-                <h3>Managing Workspaces</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># List workspaces
+                <h3>Creating Workspaces</h3>
+                <pre><code># List workspaces
 terraform workspace list
 
-# Create workspace
-terraform workspace new staging
+# Create new workspace
+terraform workspace new dev
 
 # Switch workspace
-terraform workspace select production
+terraform workspace select prod
 
 # Delete workspace
-terraform workspace delete dev</pre>
+terraform workspace delete staging</code></pre>
 
-                <h3>Workspace-Specific Configuration</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">locals {
-  environment = terraform.workspace
+                <h3>Using Workspaces in Code</h3>
+                <pre><code># Use workspace in resource names
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = var.instance_type
   
-  configs = {
-    dev = { instance_type = "t3.micro" }
-    staging = { instance_type = "t3.small" }
-    production = { instance_type = "t3.large" }
+  tags = {
+    Name = "web-${terraform.workspace}"
   }
 }
 
-resource "aws_instance" "web" {
-  instance_type = local.configs[local.environment].instance_type
-}</pre>
+# Conditional based on workspace
+resource "aws_instance" "prod_db" {
+  count = terraform.workspace == "prod" ? 1 : 0
+  # ...
+}</code></pre>
 
-                <h3>When to Use Workspaces</h3>
-                <ul>
-                    <li>Development vs production</li>
-                    <li>Feature branches</li>
-                    <li>Short-lived environments</li>
-                </ul>
+                <h3>Workspace Best Practices</h3>
+                <pre><code># Each workspace should have separate state
+# dev/terraform.tfstate
+# prod/terraform.tfstate
 
-                <h3>Quiz</h3>
+# Use separate state backends
+terraform {
+  backend "s3" {
+    bucket = "my-terraform-state"
+    key    = "${terraform.workspace}/terraform.tfstate"
+  }
+}</code></pre>
+
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What variable provides access to the current workspace name?</p>
-                        <input type="text" class="quiz-input" data-answer="terraform.workspace" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What separates state between environments?</p>
+                        <input type="text" class="quiz-input" data-answer="workspace" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: terraform.???</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What command creates a new workspace?</p>
+                        <input type="text" class="quiz-input" data-answer="new" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: terraform workspace ???</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>terraform.workspace</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>workspace</li>
+                                <li>new</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson8">Next: Provisioners →</a>
                 </div>
             </div>
         </div>
@@ -724,75 +734,73 @@ resource "aws_instance" "web" {
     <div class="lesson-modal" id="lesson8">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 08: Provisioners</h2>
+                <h2>// Lesson 8: Provisioners</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>What are Provisioners?</h3>
-                <p>Provisioners let you execute commands on created resources for bootstrapping.</p>
+                <h3>Running Scripts After Creation</h3>
+                <p>Provisioners let you execute scripts on local or remote machines after resource creation.</p>
 
-                <h3>local-exec</h3>
-                <p>Runs commands on the machine running Terraform:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">resource "aws_instance" "web" {
+                <h3>Local Provisioner</h3>
+                <pre><code>resource "aws_instance" "web" {
   ami           = "ami-0c55b159cbfafe1f0"
-  instance_type = "t2.micro"
+  instance_type = "t3.micro"
   
   provisioner "local-exec" {
-    command = "echo 'Instance ${self.public_ip} created!'"
+    command = "echo ${self.private_ip} > inventory.txt"
   }
-}</pre>
+}</code></pre>
 
-                <h3>remote-exec</h3>
-                <p>Runs commands on the created resource via SSH:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">resource "aws_instance" "web" {
-  # ...
+                <h3>Remote Provisioner</h3>
+                <pre><code>resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t3.micro"
   
   connection {
-    type        = "ssh"
-    host        = self.public_ip
-    user        = "ubuntu"
+    type     = "ssh"
+    user     = "ubuntu"
     private_key = file("~/.ssh/id_rsa")
+    host     = self.public_ip
   }
   
   provisioner "remote-exec" {
     inline = [
       "sudo apt-get update",
-      "sudo apt-get install -y nginx"
+      "sudo apt-get install -y nginx",
+      "sudo systemctl enable nginx",
+      "sudo systemctl start nginx"
     ]
   }
-}</pre>
+}</code></pre>
 
-                <h3>Cloud-Init</h3>
-                <p>Better alternative for cloud instances:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">resource "aws_instance" "web" {
-  ami           = "ami-0c55b159cbfafe1f0"
-  instance_type = "t2.micro"
-  
-  user_data = <<-EOF
-              #!/bin/bash
-              apt-get update
-              apt-get install -y nginx
-              EOF
-}</pre>
+                <h3>File Provisioner</h3>
+                <pre><code>provisioner "file" {
+  content     = templatefile("nginx.conf.tpl", { domain = var.domain })
+  destination = "/etc/nginx/sites-available/${var.domain}"
+}</code></pre>
 
-                <h3>Quiz</h3>
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What provisioner type runs commands on the created cloud instance?</p>
+                        <p>What runs a script on the machine running Terraform?</p>
+                        <input type="text" class="quiz-input" data-answer="local-exec" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: ??? provisioner</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What runs a script on the created resource?</p>
                         <input type="text" class="quiz-input" data-answer="remote-exec" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: ??? provisioner</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>remote-exec</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>local-exec</li>
+                                <li>remote-exec</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson9">Next: Testing & Security →</a>
                 </div>
             </div>
         </div>
@@ -802,88 +810,15 @@ resource "aws_instance" "web" {
     <div class="lesson-modal" id="lesson9">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 09: Testing & Security</h2>
+                <h2>// Lesson 9: Terraform in CI/CD</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Static Analysis</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Validate syntax
-terraform validate
+                <h3>Automating Terraform</h3>
+                <p>Use CI/CD pipelines to automate Terraform runs with proper approvals and security.</p>
 
-# Security scanning with tfsec
-tfsec .
-
-# Security scanning with checkov
-checkov -d .</pre>
-
-                <h3>Automated Testing with Terratest</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">package test
-
-import (
-    "testing"
-    "github.com/gruntwork-io/terratest/modules/terraform"
-    "github.com/stretchr/testify/assert"
-)
-
-func TestTerraformWebServer(t *testing.T) {
-    terraformOptions := &terraform.Options{
-        TerraformDir: "../examples/web-server",
-    }
-    
-    defer terraform.Destroy(t, terraformOptions)
-    terraform.InitAndApply(t, terraformOptions)
-    
-    instanceID := terraform.Output(t, terraformOptions, "instance_id")
-    assert.NotEmpty(t, instanceID)
-}</pre>
-
-                <h3>Sensitive Variables</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">variable "db_password" {
-  description = "Database password"
-  type        = string
-  sensitive   = true  # Hides from CLI output
-}</pre>
-
-                <h3>Secrets in State</h3>
-                <ul>
-                    <li>Use remote backends with encryption</li>
-                    <li>Restrict access to state files</li>
-                    <li>Consider using Vault for secrets</li>
-                </ul>
-
-                <h3>Quiz</h3>
-                <div class="quiz-section">
-                    <div class="quiz-question">
-                        <p class="question-text">1. What tool is used for automated Terraform testing in Go?</p>
-                        <input type="text" class="quiz-input" data-answer="terratest" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
-                    </div>
-                    <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
-                        <div class="quiz-answers-display">
-                            <ol><li>terratest</li></ol>
-                        </div>
-                    </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson10">Next: CI/CD Integration →</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Lesson 10 -->
-    <div class="lesson-modal" id="lesson10">
-        <div class="lesson-content">
-            <div class="lesson-header">
-                <h2>// Lesson 10: CI/CD Integration</h2>
-                <a href="#guides" class="close-btn">×</a>
-            </div>
-            <div class="lesson-body">
-                <h3>GitHub Actions</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">name: Terraform
+                <h3>GitHub Actions Workflow</h3>
+                <pre><code>name: Terraform
 
 on:
   push:
@@ -895,57 +830,135 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - uses: hashicorp/setup-terraform@v2
-      
+        
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          
       - name: Terraform Init
         run: terraform init
-      
+        
       - name: Terraform Plan
         run: terraform plan
-      
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve</pre>
+        run: terraform apply -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}</code></pre>
 
-                <h3>Atlantis</h3>
-                <p>Self-hosted Terraform CI/CD:</p>
-                <ul>
-                    <li>Runs on pull requests</li>
-                    <li>Posts plan results as comments</li>
-                    <li>Requires /apply to proceed</li>
-                </ul>
+                <h3>Protected Environments</h3>
+                <pre><code># Require approval for production
+- name: Terraform Apply
+  if: github.ref == 'refs/heads/main' && needs.plan.outputs.approved == 'true'
+  run: terraform apply -auto-approve</code></pre>
 
-                <h3>Repository Structure</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">infrastructure/
-├── .gitignore
-├── .terraform-version
-├── main.tf
-├── variables.tf
-├── outputs.tf
-├── environments/
-│   ├── dev/
-│   └── prod/
-└── modules/</pre>
-
-                <h3>Quiz</h3>
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What tool provides self-hosted Terraform CI/CD with PR comments?</p>
-                        <input type="text" class="quiz-input" data-answer="atlantis" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What action sets up Terraform in GitHub Actions?</p>
+                        <input type="text" class="quiz-input" data-answer="setup-terraform" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: hashicorp/???</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What flag auto-approves Terraform changes?</p>
+                        <input type="text" class="quiz-input" data-answer="-auto-approve" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: terraform apply ???</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>atlantis</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>setup-terraform</li>
+                                <li>-auto-approve</li>
+                            </ol>
                         </div>
                     </details>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="lesson-nav">
-                    <a href="#lesson11">Next: Terraform Cloud →</a>
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: Testing & Validation</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Terraform Validation</h3>
+                <pre><code># Syntax validation
+terraform validate
+
+# Format check
+terraform fmt -check
+
+# Check for breaking changes
+terraform plan -detailed-exitcode</code></pre>
+
+                <h3>Terratest</h3>
+                <pre><code>// Example Terratest in Go
+package test
+
+import (
+    "testing"
+    "github.com/gruntwork-io/terratest/modules/terraform"
+)
+
+func TestTerraformWebServer(t *testing.T) {
+    terraformOptions := &terraform.Options{
+        TerraformDir: "../examples/web-server",
+        Vars: map[string]interface{}{
+            "instance_type": "t3.micro",
+        },
+    }
+    
+    defer terraform.Destroy(t, terraformOptions)
+    terraform.InitAndApply(t, terraformOptions)
+    
+    instanceID := terraform.Output(t, terraformOptions, "instance_id")
+    t.Logf("Instance ID: %s", instanceID)
+}</code></pre>
+
+                <h3>Sentinel (Enterprise)</h3>
+                <pre><code># Sentinel policy example
+import "tfrun"
+
+# Prevent production deployments on Fridays
+main = rule {
+    tfrun.workspace.name != "prod" or
+    time.now.weekday != "Friday"
+}</code></pre>
+
+                <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
+                    <div class="quiz-question">
+                        <p>What command validates Terraform syntax?</p>
+                        <input type="text" class="quiz-input" data-answer="validate" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: terraform ???</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What testing framework uses Go?</p>
+                        <input type="text" class="quiz-input" data-answer="terratest" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: ???</p>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary class="reveal-answers-link">Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>validate</li>
+                                <li>terratest</li>
+                            </ol>
+                        </div>
+                    </details>
                 </div>
             </div>
         </div>
@@ -955,69 +968,80 @@ jobs:
     <div class="lesson-modal" id="lesson11">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 11: Terraform Cloud</h2>
+                <h2>// Lesson 11: Multi-Cloud Patterns</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Terraform Cloud Features</h3>
-                <ul>
-                    <li>Remote execution</li>
-                    <li>Secure variable storage (encrypted)</li>
-                    <li>Policy as Code (Sentinel)</li>
-                    <li>Cost estimation</li>
-                    <li>Private module registry</li>
-                    <li>Run history and audit logs</li>
-                </ul>
+                <h3>Multi-Cloud with Terraform</h3>
+                <p>Terraform's provider-agnostic approach lets you manage multiple clouds with the same tool.</p>
 
-                <h3>Remote Backend</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">terraform {
-  backend "remote" {
-    organization = "my-org"
-    workspaces {
-      name = "prod"
+                <h3>Multiple Providers</h3>
+                <pre><code>terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 4.0"
+    }
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0"
     }
   }
-}</pre>
+}
 
-                <h3>Policy Enforcement</h3>
-                <p>Sentinel policies enforce governance:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Example: Require tags on all resources
-import "tfplan/v2" as tfplan
+provider "aws" {
+  region = "us-east-1"
+}
 
-main = rule {
-  all tfplan.resource_changes as _, rc {
-    all rc.change.after as key, value {
-      key == "tags" or key == "Name"
-    }
-  }
-}</pre>
+provider "google" {
+  region = "us-central1"
+}
 
-                <h3>When to Use Terraform Cloud</h3>
-                <ul>
-                    <li>Team collaboration</li>
-                    <li>Enterprise compliance</li>
-                    <li>Managed state</li>
-                    <li>Policy governance</li>
-                </ul>
+provider "azurerm" {
+  features {}
+}</code></pre>
 
-                <h3>Quiz</h3>
+                <h3>Abstracting Providers</h3>
+                <pre><code># Use variables for cloud-agnostic configs
+variable "cloud_provider" {
+  type    = string
+  default = "aws"
+}
+
+locals {
+  vm_settings = var.cloud_provider == "aws" ? {
+    ami = "ami-0c55b159cbfafe1f0"
+  } : var.cloud_provider == "gcp" ? {
+    source_image = "ubuntu-2204"
+  } : {}
+}</code></pre>
+
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What feature in Terraform Cloud enforces governance policies?</p>
-                        <input type="text" class="quiz-input" data-answer="sentinel" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What lets Terraform work with multiple clouds?</p>
+                        <input type="text" class="quiz-input" data-answer="providers" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: ???</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What block creates cloud-agnostic configurations?</p>
+                        <input type="text" class="quiz-input" data-answer="locals" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: ??? block</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>sentinel</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>providers</li>
+                                <li>locals</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson12">Next: Advanced Patterns →</a>
                 </div>
             </div>
         </div>
@@ -1027,85 +1051,118 @@ main = rule {
     <div class="lesson-modal" id="lesson12">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 12: Advanced Patterns</h2>
+                <h2>// Lesson 12: Enterprise Patterns</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Dynamic Blocks</h3>
-                <p>Create multiple similar blocks programmatically:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">resource "aws_security_group" "web" {
-  name = "web-sg"
-  
-  dynamic "ingress" {
-    for_each = var.ports
-    content {
-      from_port   = ingress.value
-      to_port     = ingress.value
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  }
-}</pre>
+                <h3>Terragrunt</h3>
+                <pre><code># terragrunt.hcl
+terraform {
+  source = "git::https://github.com/org/modules//web-app?ref=v1.0.0"
+}
 
-                <h3>for_each</h3>
-                <p>Create multiple resources from a map or set:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">resource "aws_instance" "server" {
-  for_each = {
-    web = { ami = "ami-1", type = "t3.small" }
-    api = { ami = "ami-2", type = "t3.medium" }
-  }
-  
-  ami           = each.value.ami
-  instance_type = each.value.type
-  tags          = { Name = each.key }
-}</pre>
+inputs = {
+  instance_type = "t3.medium"
+  desired_capacity = 3
+}
 
-                <h3>Splat Expressions</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Get all instance IDs
-instance_ids = aws_instance.web[*].id
+dependency "vpc" {
+  config_path = "../vpc"
+}</code></pre>
 
-# Use in for_each
-for_each = toset(aws_instance.server[*].id)</pre>
+                <h3>Policy as Code</h3>
+                <pre><code># OPA Rego policy
+package terraform
 
-                <h3>The Road Ahead</h3>
-                <p>You've completed Terraform mastery! Continue with:</p>
+deny[msg] {
+  input.resource.aws_instance.type == "t2.micro"
+  msg = "Use t3 instances instead of t2"
+}
+
+deny[msg] {
+  input.resource.aws_s3_bucket.public_read
+  msg = "S3 buckets must not be public"
+}</code></pre>
+
+                <h3>Terraform Cloud/Enterprise</h3>
                 <ul>
-                    <li>Helm for Kubernetes</li>
-                    <li>Terraform CDK (Python/TypeScript)</li>
-                    <li>OpenTofu (open-source fork)</li>
-                    <li> Pulumi (infrastructure as actual code)</li>
+                    <li><strong>Remote State:</strong> Secure state storage</li>
+                    <li><strong>Policy Enforcement:</strong> Sentinel policies</li>
+                    <li><strong>Cost Estimation:</strong> Before apply</li>
+                    <li><strong>Private Registry:</strong> Share modules</li>
+                    <li><strong>Role-Based Access:</strong> Team permissions</li>
                 </ul>
 
-                <h3>Quiz</h3>
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What expression gets all attributes from a list of resources?</p>
-                        <input type="text" class="quiz-input" data-answer="splat" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What tool wraps Terraform for better organization?</p>
+                        <input type="text" class="quiz-input" data-answer="terragrunt" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: ???</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What enforces policies in Terraform Enterprise?</p>
+                        <input type="text" class="quiz-input" data-answer="sentinel" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: ??? policies</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>splat (*)</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>terragrunt</li>
+                                <li>sentinel</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#guides">← Back to Lessons</a>
                 </div>
             </div>
         </div>
     </div>
 
-<footer id="site-footer">
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>📖 Terraform Docs</h3>
+                <p>Official Terraform documentation</p>
+                <a href="https://developer.hashicorp.com/terraform/docs" target="_blank">developer.hashicorp.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>☁️ AWS Provider</h3>
+                <p>AWS resources in Terraform</p>
+                <a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs" target="_blank">registry.terraform.io</a>
+            </div>
+            <div class="resource-card">
+                <h3>🧪 Terratest</h3>
+                <p>Testing infrastructure code</p>
+                <a href="https://terratest.gruntwork.io/" target="_blank">terratest.gruntwork.io</a>
+            </div>
+            <div class="resource-card">
+                <h3>📦 Terragrunt</h3>
+                <p>Terraform wrapper for DRY</p>
+                <a href="https://terragrunt.gruntwork.io/" target="_blank">terragrunt.gruntwork.io</a>
+            </div>
+            <div class="resource-card">
+                <h3>📜 Terraform Book</h3>
+                <p>Infrastructure as Code book</p>
+                <a href="https://www.oreilly.com/library/view/terraform-up/9781491977071/" target="_blank">oreilly.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>🔧 Terraform Cloud</h3>
+                <p>Managed Terraform service</p>
+                <a href="https://www.terraform.io/cloud" target="_blank">terraform.io/cloud</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="site-footer">
         <div class="footer-content">
             <div class="footer-brand">
                 <span class="copyleft">⟲</span>
                 <span>REBEL WITH LINUX</span>
             </div>
-            <p class="footer-tagline">Learn Linux the hard way.</p>
+            <p class="footer-tagline">Learn Terraform the hard way.</p>
             <div class="footer-links">
                 <a href="../site-map.html">Site Map</a>
                 <span class="footer-divider">|</span>
@@ -1118,40 +1175,23 @@ for_each = toset(aws_instance.server[*].id)</pre>
     </footer>
 
     <script>
-        const lessonCards = document.querySelectorAll('.lesson-card');
-        const progressBar = document.getElementById('progressBar');
+        // Set initial state on page load
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.getElementById('themeToggle').checked = true;
+        }
         
-        lessonCards.forEach(card => {
-            card.addEventListener('click', (e) => {
-                e.preventDefault();
-                const lessonId = card.getAttribute('href');
-                document.querySelector(lessonId).scrollIntoView({ behavior: 'smooth' });
-            });
-        });
-        
-        window.addEventListener('scroll', () => {
-            const scrolled = window.scrollY;
-            const max = document.documentElement.scrollHeight - window.innerHeight;
-            const progress = (scrolled / max) * 100;
-            progressBar.style.width = progress + '%';
-        });
-
-        document.querySelectorAll('.quiz-submit').forEach(button => {
-            button.addEventListener('click', function() {
-                const input = this.previousElementSibling;
-                const feedback = this.nextElementSibling;
-                const answer = input.dataset.answer.toLowerCase().trim();
-                const userAnswer = input.value.toLowerCase().trim();
-                
-                if (userAnswer === answer) {
-                    feedback.textContent = '✓ Correct!';
-                    feedback.className = 'quiz-feedback correct';
-                } else {
-                    feedback.textContent = '✗ Try again';
-                    feedback.className = 'quiz-feedback incorrect';
-                }
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
             });
         });
     </script>
+    <script src="../nav.js" defer></script>
 </body>
 </html>

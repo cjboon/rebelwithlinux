@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CI/CD - Continuous Integration & Deployment | REBEL WITH LINUX</title>
-    <meta name="description" content="Master CI/CD pipelines. Learn GitHub Actions, GitLab CI, Jenkins, and build automated deployment workflows.">
-    <meta name="keywords" content="CI/CD, Continuous Integration, Continuous Deployment, DevOps, GitHub Actions, GitLab CI, Jenkins, automation, pipelines">
+    <meta name="description" content="Master CI/CD pipelines. Learn continuous integration, continuous deployment, Jenkins, GitHub Actions, and automate your software delivery.">
+    <meta name="keywords" content="CI/CD, continuous integration, continuous deployment, Jenkins, GitHub Actions, DevOps, automation, pipeline">
     <meta name="author" content="cjboon">
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="../fonts.css">
@@ -18,18 +18,21 @@
         } else if (savedTheme === 'light') {
             document.documentElement.setAttribute('data-theme', 'light');
         }
+    </script>
+    <script src="../terminal-select.js"></script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
             const toggle = document.getElementById('themeToggle');
             if (toggle) {
                 toggle.checked = (savedTheme === 'dark' || !savedTheme);
             }
         });
     </script>
-
     <style>
-        :root { --nav-color: #326ce5; }
-        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
-        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+        :root {
+            --nav-color: #00D4AA;
+        }
     </style>
 </head>
 <body class="guide-page">
@@ -38,7 +41,7 @@
         <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
         <div class="nav-left">
             <div class="nav-title">
-                <a href="../index.html#guides" style="color: inherit; text-decoration: none;">CI/CD MASTERY</a>
+                <a href="../index.html" style="color: inherit; text-decoration: none;">CI/CD MASTERY</a>
             </div>
             <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
                 <span class="theme-toggle-icon">🌙</span>
@@ -59,118 +62,104 @@
                     <a href="../index.html#guides">GUIDES</a>
                     <a href="../index.html#blog">BLOG</a>
                     <a href="../index.html#about">ABOUT</a>
+                    <a href="#" id="loginLink" class="auth-link" onclick="showAuthModal(event); return false;">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-    </div>
-
     <section class="hero">
-        <h1>Automate<br>Your Pipeline</h1>
-        <p class="tagline">// From code commit to production deployment.</p>
+        <h1>AUTOMATE<br>EVERTHING</h1>
+        <p class="tagline">// From code to production, on autopilot.</p>
         
         <div class="manifesto">
-            <p><strong>CI/CD CHANGED SOFTWARE DEVELOPMENT.</strong></p>
-            <p>Remember manually deploying applications? Uploading files via FTP, running commands on production servers, hoping nothing breaks? Those days are over. CI/CD pipelines automate the entire process from code commit to production deployment.</p>
-            <p><strong>WHY CI/CD?</strong></p>
-            <p>Continuous Integration means every code change triggers automated tests and builds. Continuous Deployment means your code automatically reaches production after passing all checks. The result: faster releases, fewer bugs, happier users.</p>
-            <p><strong>BECOME A DEVOPS ENGINEER.</strong></p>
-            <p>Learn to build robust CI/CD pipelines with GitHub Actions, GitLab CI, and Jenkins. Understand deployment strategies, testing automation, and infrastructure as code. Ship software with confidence.</p>
+            <p><strong>MANUAL DEPLOYMENTS ARE A RELIC.</strong></p>
+            <p>In today's fast-paced development environment, waiting for manual testing and deployment is unacceptable. CI/CD transforms your workflow from error-prone manual processes into reliable, repeatable automated pipelines.</p>
+            <p><strong>WHY CI/CD MATTERS</strong></p>
+            <p>Every commit should be tested. Every change should be deployed. With automated pipelines, you get faster feedback, fewer bugs in production, and the confidence to ship multiple times per day.</p>
+            <p><strong>SHIP FAST. SHIP OFTEN. SHIP CONFIDENT.</strong></p>
         </div>
 
-        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY →</a>
+        <a href="#guides" class="cta-button">START AUTOMATING →</a>
     </section>
 
     <section class="lessons-section" id="guides">
         <div class="section-header">
-            <h2>// Your Training Path</h2>
-            <p>Click a lesson to begin</p>
+            <h2>// The Pipeline Path</h2>
+            <p>12 lessons. Complete CI/CD mastery.</p>
         </div>
         <div class="lessons-grid">
-            <a href="#lesson1" class="lesson-card" data-lesson="1">
+            <a href="#lesson1" class="lesson-card">
                 <div class="lesson-number">LESSON 01</div>
                 <h3 class="lesson-title">Introduction to CI/CD</h3>
-                <p class="lesson-desc">What is CI/CD? Understanding the software delivery pipeline.</p>
+                <p class="lesson-desc">What is CI/CD, why it matters, and the modern DevOps workflow</p>
                 <span class="badge badge-beginner">Beginner</span>
             </a>
-
-            <a href="#lesson2" class="lesson-card" data-lesson="2">
+            <a href="#lesson2" class="lesson-card">
                 <div class="lesson-number">LESSON 02</div>
-                <h3 class="lesson-title">Version Control</h3>
-                <p class="lesson-desc">Git workflows, branching strategies, and trunk-based development.</p>
+                <h3 class="lesson-title">Version Control & Git Workflows</h3>
+                <p class="lesson-desc">Git branching strategies, PR workflows, and commit conventions</p>
                 <span class="badge badge-beginner">Beginner</span>
             </a>
-
-            <a href="#lesson3" class="lesson-card" data-lesson="3">
+            <a href="#lesson3" class="lesson-card">
                 <div class="lesson-number">LESSON 03</div>
-                <h3 class="lesson-title">Automated Testing</h3>
-                <p class="lesson-desc">Unit tests, integration tests, end-to-end tests, and test coverage.</p>
+                <h3 class="lesson-title">Jenkins - The Automation Server</h3>
+                <p class="lesson-desc">Installing Jenkins, creating jobs, and building your first pipeline</p>
                 <span class="badge badge-beginner">Beginner</span>
             </a>
-
-            <a href="#lesson4" class="lesson-card" data-lesson="4">
+            <a href="#lesson4" class="lesson-card">
                 <div class="lesson-number">LESSON 04</div>
                 <h3 class="lesson-title">GitHub Actions</h3>
-                <p class="lesson-desc">Building your first workflow with GitHub Actions.</p>
+                <p class="lesson-desc">Workflows, runners, and native GitHub CI/CD</p>
                 <span class="badge badge-intermediate">Intermediate</span>
             </a>
-
-            <a href="#lesson5" class="lesson-card" data-lesson="5">
+            <a href="#lesson5" class="lesson-card">
                 <div class="lesson-number">LESSON 05</div>
-                <h3 class="lesson-title">GitLab CI</h3>
-                <p class="lesson-desc">GitLab CI pipelines, .gitlab-ci.yml, and runners.</p>
+                <h3 class="lesson-title">Deployment Strategies</h3>
+                <p class="lesson-desc">Blue-green, canary, rolling deployments, and feature flags</p>
                 <span class="badge badge-intermediate">Intermediate</span>
             </a>
-
-            <a href="#lesson6" class="lesson-card" data-lesson="6">
+            <a href="#lesson6" class="lesson-card">
                 <div class="lesson-number">LESSON 06</div>
-                <h3 class="lesson-title">Jenkins</h3>
-                <p class="lesson-desc">Jenkins pipelines, Jenkinsfile, and configuration.</p>
+                <h3 class="lesson-title">Docker in CI/CD</h3>
+                <p class="lesson-desc">Containerizing applications and using Docker in pipelines</p>
                 <span class="badge badge-intermediate">Intermediate</span>
             </a>
-
-            <a href="#lesson7" class="lesson-card" data-lesson="7">
+            <a href="#lesson7" class="lesson-card">
                 <div class="lesson-number">LESSON 07</div>
-                <h3 class="lesson-title">Build Automation</h3>
-                <p class="lesson-desc">Makefiles, Gradle, Maven, and build tools.</p>
+                <h3 class="lesson-title">Building & Testing</h3>
+                <p class="lesson-desc">Automated builds, unit tests, integration tests, and test reporting</p>
                 <span class="badge badge-intermediate">Intermediate</span>
             </a>
-
-            <a href="#lesson8" class="lesson-card" data-lesson="8">
+            <a href="#lesson8" class="lesson-card">
                 <div class="lesson-number">LESSON 08</div>
                 <h3 class="lesson-title">Artifact Management</h3>
-                <p class="lesson-desc">Managing build artifacts with registries.</p>
+                <p class="lesson-desc">Storing build artifacts, versioning, and artifact repositories</p>
                 <span class="badge badge-intermediate">Intermediate</span>
             </a>
-
-            <a href="#lesson9" class="lesson-card" data-lesson="9">
+            <a href="#lesson9" class="lesson-card">
                 <div class="lesson-number">LESSON 09</div>
-                <h3 class="lesson-title">Deployment Strategies</h3>
-                <p class="lesson-desc">Blue-green, canary, rolling deployments, and feature flags.</p>
-                <span class="badge badge-advanced">Advanced</span>
-            </a>
-
-            <a href="#lesson10" class="lesson-card" data-lesson="10">
-                <div class="lesson-number">LESSON 10</div>
-                <h3 class="lesson-title">Container CI/CD</h3>
-                <p class="lesson-desc">Docker, multi-platform builds, and security scanning.</p>
-                <span class="badge badge-advanced">Advanced</span>
-            </a>
-
-            <a href="#lesson11" class="lesson-card" data-lesson="11">
-                <div class="lesson-number">LESSON 11</div>
                 <h3 class="lesson-title">Infrastructure as Code</h3>
-                <p class="lesson-desc">Terraform, Ansible, and immutable infrastructure.</p>
+                <p class="lesson-desc">Terraform, Ansible, and programmable infrastructure</p>
                 <span class="badge badge-advanced">Advanced</span>
             </a>
-
-            <a href="#lesson12" class="lesson-card" data-lesson="12">
+            <a href="#lesson10" class="lesson-card">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">DevSecOps & Pipeline Security</h3>
+                <p class="lesson-desc">SAST, DAST, secrets management, and secure pipelines</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson11" class="lesson-card">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Monitoring & Feedback</h3>
+                <p class="lesson-desc">Pipeline metrics, alerting, and continuous feedback loops</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+            <a href="#lesson12" class="lesson-card">
                 <div class="lesson-number">LESSON 12</div>
-                <h3 class="lesson-title">GitOps & Production</h3>
-                <p class="lesson-desc">ArgoCD, Flux, observability, and enterprise patterns.</p>
+                <h3 class="lesson-title">Advanced Patterns</h3>
+                <p class="lesson-desc">GitOps, microservices, and enterprise CI/CD</p>
                 <span class="badge badge-advanced">Advanced</span>
             </a>
         </div>
@@ -179,35 +168,10 @@
     <section class="about-section" id="about">
         <div class="about-content">
             <h2>// Why CI/CD</h2>
-            <p>CI/CD pipelines have revolutionized software development. Companies like Google, Amazon, and Netflix deploy hundreds of times per day using automated pipelines.</p>
-            <p>Continuous Integration catches bugs early. Continuous Deployment automates releases. Together, they enable teams to ship faster with more confidence.</p>
-            <p><strong>Ship fast, ship often, ship safely.</strong></p>
-        </div>
-    </section>
-
-    <section class="resources-section" id="resources">
-        <h2>// Tools & References</h2>
-        <div class="resources-grid">
-            <div class="resource-card">
-                <h3>GitHub Actions</h3>
-                <p>CI/CD Platform</p>
-                <a href="https://github.com/features/actions" target="_blank">github.com/features/actions</a>
-            </div>
-            <div class="resource-card">
-                <h3>GitLab CI</h3>
-                <p>CI/CD Platform</p>
-                <a href="https://docs.gitlab.com/ee/ci/" target="_blank">docs.gitlab.com/ee/ci</a>
-            </div>
-            <div class="resource-card">
-                <h3>Jenkins</h3>
-                <p>Open Source CI/CD</p>
-                <a href="https://www.jenkins.io/" target="_blank">jenkins.io</a>
-            </div>
-            <div class="resource-card">
-                <h3>ArgoCD</h3>
-                <p>GitOps for Kubernetes</p>
-                <a href="https://argoproj.github.io/cd/" target="_blank">argoproj.github.io/cd</a>
-            </div>
+            <p>CI/CD is the backbone of modern software development. It transforms chaotic release processes into predictable, automated workflows that scale with your team.</p>
+            <p><strong>The numbers don't lie:</strong> Teams with mature CI/CD practices deploy multiple times per day, have 60% fewer bugs in production, and recover from issues 200x faster.</p>
+            <p><strong>What you'll master:</strong> Jenkins, GitHub Actions, Docker, Kubernetes deployments, and enterprise-grade patterns. By the end, you'll design pipelines that rival those at top tech companies.</p>
+            <p><strong>Automate everything. Sleep better at night.</strong></p>
         </div>
     </section>
 
@@ -215,61 +179,65 @@
     <div class="lesson-modal" id="lesson1">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 01: Introduction to CI/CD</h2>
+                <h2>// Lesson 1: Introduction to CI/CD</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
                 <h3>What is CI/CD?</h3>
-                <p>CI/CD stands for Continuous Integration and Continuous Delivery (or Deployment). It's a methodology and set of practices that automate the building, testing, and deployment of software.</p>
+                <p>CI/CD stands for Continuous Integration and Continuous Delivery (or Deployment). It's a methodology that automates the process of integrating code changes, testing them, and delivering them to production.</p>
 
                 <h3>The Three Pillars</h3>
-                <h4>Continuous Integration (CI)</h4>
-                <p>Developers merge code changes frequently, typically several times a day:</p>
                 <ul>
-                    <li>Code is automatically compiled</li>
-                    <li>Automated tests run</li>
-                    <li>Code quality is analyzed</li>
-                    <li>Build artifacts are created</li>
+                    <li><strong>Continuous Integration (CI):</strong> Developers merge code changes frequently, usually multiple times per day. Each merge triggers automated builds and tests.</li>
+                    <li><strong>Continuous Delivery (CD):</strong> Code changes are automatically prepared for release to production. A human manually approves the final deployment.</li>
+                    <li><strong>Continuous Deployment:</strong> Every change that passes tests is automatically deployed to production. No human intervention needed.</li>
                 </ul>
 
-                <h4>Continuous Delivery (CD)</h4>
-                <p>Code changes are automatically prepared for release:</p>
-                <ul>
-                    <li>Artifacts are stored</li>
-                    <li>Staging environments are updated</li>
-                    <li>Release is ready at any time</li>
-                    <li>Human approval may be required</li>
-                </ul>
+                <h3>Why Does It Matter?</h3>
+                <pre><code># Without CI/CD:
+Write code → Manually test → Hope it works → Deploy manually → 
+Fix production bugs → Repeat
 
-                <h4>Continuous Deployment</h4>
-                <p>Every change that passes tests is automatically deployed to production.</p>
+# With CI/CD:
+Write code → Auto-test → Auto-deploy → Monitor → Fix if needed → Repeat</code></pre>
 
-                <h3>Benefits of CI/CD</h3>
+                <h3>The CI/CD Pipeline</h3>
+                <pre><code>┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐
+│  CODE   │──▶│  BUILD  │──▶│  TEST   │──▶│ STAGING │──▶│PRODUCtn │
+│ COMMIT  │   │ COMPILE │   │   UNIT  │   │  DEPLOY │   │ DEPLOY  │
+└─────────┘   └─────────┘   └─────────┘   └─────────┘   └─────────┘</code></pre>
+
+                <h3>Key Benefits</h3>
                 <ul>
-                    <li><strong>Faster releases:</strong> Deploy multiple times per day</li>
+                    <li><strong>Faster releases:</strong> From weeks to hours or minutes</li>
                     <li><strong>Fewer bugs:</strong> Automated testing catches issues early</li>
-                    <li><strong>Better collaboration:</strong> Teams work with confidence</li>
-                    <li><strong>Rollback capability:</strong> Quick recovery from issues</li>
+                    <li><strong>Consistency:</strong> Same process every time, no human error</li>
+                    <li><strong>Feedback loops:</strong> Know immediately when something breaks</li>
+                    <li><strong>Confidence:</strong> Deploy anytime, even on Fridays</li>
                 </ul>
 
-                <h3>Quiz</h3>
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What does CI stand for in CI/CD?</p>
-                        <input type="text" class="quiz-input" data-answer="continuous integration" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What does CD stand for in CI/CD?</p>
+                        <input type="text" class="quiz-input" data-answer="continuous deployment" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: It means automatic deployment to production</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What is the first step in any CI/CD pipeline?</p>
+                        <input type="text" class="quiz-input" data-answer="commit" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: It starts with pushing code</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>Continuous Integration</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>continuous deployment</li>
+                                <li>commit</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson2">Next: Version Control →</a>
                 </div>
             </div>
         </div>
@@ -279,62 +247,80 @@
     <div class="lesson-modal" id="lesson2">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 02: Version Control & Git Workflows</h2>
+                <h2>// Lesson 2: Version Control & Git Workflows</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
+                <h3>The Foundation of CI/CD</h3>
+                <p>Every CI/CD pipeline starts with version control. Your Git workflow directly impacts how effective your automation can be. Let's build on solid foundations.</p>
+
                 <h3>Branching Strategies</h3>
                 
-                <h4>Trunk-Based Development</h4>
-                <p>Developers work in short-lived branches (less than 2 days) or directly on main.</p>
-
-                <h4>GitHub Flow</h4>
-                <p>Simple, branch-based workflow:</p>
+                <h4>Git Flow</h4>
+                <pre><code>main ──────┬─────────────────────────────
+           ▲                         ▲
+           │ merge                   │ merge
+develop ──┴──────┬──────┬──────┬────┴────
+                 feature feature feature</code></pre>
                 <ul>
-                    <li>Branch from main</li>
-                    <li>Work and commit</li>
-                    <li>Open pull request</li>
-                    <li>Review and discuss</li>
-                    <li>Merge to main</li>
-                    <li>Deploy immediately</li>
+                    <li><strong>main:</strong> Production-ready code</li>
+                    <li><strong>develop:</strong> Integration branch</li>
+                    <li><strong>feature/*:</strong> New features</li>
                 </ul>
 
-                <h4>Git Flow</h4>
-                <p>More structured with dedicated branches for develop, release, and hotfix.</p>
+                <h4>GitHub Flow</h4>
+                <pre><code>main ────▶───▶───▶───▶───▶───▶───▶
+         ▲   ▲   ▲   ▲   ▲   ▲   ▲
+         │   │   │   │   │   │   │
+         PR  PR  PR  PR  PR  PR  PR</code></pre>
+                <ul>
+                    <li>Everything from main can be deployed</li>
+                    <li>Create feature branches from main</li>
+                    <li>Open Pull Requests for discussion</li>
+                    <li>Merge after review and CI passes</li>
+                </ul>
 
-                <h3>Commit Message Best Practices</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Good commit messages
-feat: add user authentication
-fix: resolve memory leak in cache
-docs: update API documentation
-refactor: simplify user service
-test: add unit tests for auth module</pre>
+                <h3>Commit Messages That Matter</h3>
+                <pre><code># Bad commits:
+- fixed it
+- updates
 
-                <h3>Conventional Commits</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">&lt;type&gt;(&lt;scope&gt;): &lt;description&gt;
+# Good commits (Conventional):
+- feat: add user authentication
+- fix: resolve memory leak in cache
+- docs: update API documentation
+- test: add unit tests for auth module</code></pre>
 
-[optional body]
+                <h3>Pull Request Best Practices</h3>
+                <ul>
+                    <li><strong>Small PRs:</strong> Under 400 lines. Easier to review.</li>
+                    <li><strong>Clear description:</strong> What, why, how</li>
+                    <li><strong>Link issues:</strong> Connect to tracking</li>
+                    <li><strong>CI must pass:</strong> Don't merge broken code</li>
+                </ul>
 
-[optional footer]</pre>
-
-                <h3>Quiz</h3>
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What branching strategy uses short-lived branches less than 2 days?</p>
+                        <p>What type of branch is used to propose changes in GitHub Flow?</p>
+                        <input type="text" class="quiz-input" data-answer="pull request" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: PR</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What is a short-lived branch strategy called?</p>
                         <input type="text" class="quiz-input" data-answer="trunk-based" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Based on main/trunk</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>Trunk-based development</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>pull request</li>
+                                <li>trunk-based</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson3">Next: Automated Testing →</a>
                 </div>
             </div>
         </div>
@@ -344,49 +330,91 @@ test: add unit tests for auth module</pre>
     <div class="lesson-modal" id="lesson3">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 03: Automated Testing</h2>
+                <h2>// Lesson 3: Jenkins - The Automation Server</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Testing Pyramid</h3>
-                
-                <h4>Unit Tests</h4>
-                <p>Test individual functions and methods in isolation:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">def test_calculate_discount():
-    assert calculate_discount(100, 10) == 10
-    assert calculate_discount(100, 0) == 0</pre>
-                <p>Characteristics: Fast, isolated, many per feature</p>
+                <h3>What is Jenkins?</h3>
+                <p>Jenkins is the most popular open-source automation server. It automates the building, testing, and deployment of software. With over 1,800 plugins, it integrates with virtually every tool in your stack.</p>
 
-                <h4>Integration Tests</h4>
-                <p>Test how components work together:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">def test_create_user():
-    response = client.post('/api/users', {'name': 'John'})
-    assert response.status_code == 201</pre>
+                <h3>Installing Jenkins</h3>
+                <pre><code># On Ubuntu/Debian:
+sudo apt update
+sudo apt install openjdk-11-jdk -y
+wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+sudo apt update
+sudo apt install jenkins -y
+sudo systemctl start jenkins
 
-                <h4>End-to-End Tests</h4>
-                <p>Test complete user workflows with tools like Cypress or Playwright.</p>
+# Access at: http://your-server:8080</code></pre>
 
-                <h3>Test Coverage</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">pytest --cov=src --cov-report=html</pre>
+                <h3>Your First Jenkins Pipeline</h3>
+                <pre><code>pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/your-org/your-app.git'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh 'npm install'
+                sh 'npm run build'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                sh 'npm test'
+            }
+        }
+        
+        stage('Deploy') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh './deploy.sh production'
+            }
+        }
+    }
+}</code></pre>
 
-                <h3>Quiz</h3>
+                <h3>Pipeline Structure</h3>
+                <ul>
+                    <li><strong>pipeline:</strong> Top-level block defining the entire pipeline</li>
+                    <li><strong>agent:</strong> Where to execute (any, specific node, Docker)</li>
+                    <li><strong>stages:</strong> Collection of stages</li>
+                    <li><strong>stage:</strong> Logical unit of work (Build, Test, Deploy)</li>
+                    <li><strong>steps:</strong> Actual commands to execute</li>
+                </ul>
+
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. Which tests are fastest and most isolated?</p>
-                        <input type="text" class="quiz-input" data-answer="unit" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What file contains a Jenkins pipeline definition?</p>
+                        <input type="text" class="quiz-input" data-answer="jenkinsfile" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Named after Jenkins</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What keyword defines a stage in Jenkins pipeline?</p>
+                        <input type="text" class="quiz-input" data-answer="stage" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Logical unit of work</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>Unit tests</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>jenkinsfile</li>
+                                <li>stage</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson4">Next: GitHub Actions →</a>
                 </div>
             </div>
         </div>
@@ -396,17 +424,20 @@ test: add unit tests for auth module</pre>
     <div class="lesson-modal" id="lesson4">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 04: GitHub Actions</h2>
+                <h2>// Lesson 4: GitHub Actions</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Basic Workflow</h3>
-                <p>Create a workflow file in <code>.github/workflows/ci.yml</code>:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">name: CI
+                <h3>Native CI/CD for GitHub</h3>
+                <p>GitHub Actions lets you automate, customize, and execute your software development workflows right in your repository. No external servers needed.</p>
+
+                <h3>Basic Workflow Structure</h3>
+                <pre><code># .github/workflows/ci.yml
+name: CI Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
     branches: [main]
 
@@ -417,57 +448,85 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.11'
+          node-version: '20'
+          cache: 'npm'
       
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: npm ci
       
       - name: Run tests
-        run: pytest</pre>
+        run: npm test
+      
+      - name: Build
+        run: npm run build</code></pre>
 
-                <h3>Workflow Syntax</h3>
-                <h4>Triggers</h4>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">on:
-  push:
-    branches: [main]
-    tags: ['v*']
-  pull_request:
-  workflow_dispatch:  # Manual trigger
-  schedule:
-    - cron: '0 0 * * *'  # Daily</pre>
-
-                <h4>Jobs and Matrix</h4>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">jobs:
+                <h3>Matrix Builds</h3>
+                <pre><code>jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12']
+        node-version: [16, 18, 20]
     steps:
       - uses: actions/checkout@v4
-      - run: echo "Testing with ${{ matrix.python-version }}"</pre>
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test</code></pre>
 
-                <h3>Quiz</h3>
+                <h3>Deployment with Secrets</h3>
+                <pre><code>name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /var/www/app
+            git pull origin main
+            docker-compose up -d --build</code></pre>
+
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. Where do you store GitHub Actions workflow files?</p>
+                        <p>Where are GitHub Actions workflows stored?</p>
                         <input type="text" class="quiz-input" data-answer=".github/workflows" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Hidden folder in repository</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What syntax references secrets in GitHub Actions?</p>
+                        <input type="text" class="quiz-input" data-answer="secrets" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: ${{ secrets.??? }}</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>.github/workflows</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>.github/workflows</li>
+                                <li>secrets</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson5">Next: GitLab CI →</a>
                 </div>
             </div>
         </div>
@@ -477,76 +536,87 @@ jobs:
     <div class="lesson-modal" id="lesson5">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 05: GitLab CI</h2>
+                <h2>// Lesson 5: Deployment Strategies</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Basic Pipeline</h3>
-                <p>Create <code>.gitlab-ci.yml</code> in your repository:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">stages:
-  - build
-  - test
-  - deploy
+                <h3>Choosing Your Strategy</h3>
+                <p>How you deploy affects your availability, risk, and rollback capability. Let's explore the main strategies and when to use each.</p>
 
-build:
-  stage: build
-  image: python:3.11
-  script:
-    - pip install -r requirements.txt
-    - python -m compileall src
-  artifacts:
-    paths:
-      - build/
+                <h3>Blue-Green Deployment</h3>
+                <pre><code># Traffic switches instantly between two identical environments
 
-test:
-  stage: test
-  image: python:3.11
-  script:
-    - pip install pytest
-    - pytest
+[Load Balancer]──▶ [Blue: Production v1]    [Green: Idle v2]
+                  
+After testing green:
+[Load Balancer]──────────▶ [Blue: Idle]    [Green: Production v2]</code></pre>
+                <ul>
+                    <li>Instant rollback possible</li>
+                    <li>Zero downtime deployments</li>
+                    <li>Requires double infrastructure</li>
+                </ul>
 
-deploy:
-  stage: deploy
-  script:
-    - echo "Deploying to production"
-  only:
-    - main</pre>
+                <h3>Canary Deployment</h3>
+                <pre><code># Gradually shift traffic
 
-                <h3>GitLab Runner</h3>
-                <p>Runners execute pipeline jobs:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Register a runner
-gitlab-runner register \
-  --url https://gitlab.com \
-  --token REGISTRATION_TOKEN \
-  --executor docker \
-  --docker-image ubuntu:latest</pre>
+10% ──────────▶ [New Version]
+90% ──────────▶ [Old Version]
 
-                <h3>Advanced Features</h3>
-                <h4>Rules</h4>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">deploy:
-  script: echo "Deploying"
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"</pre>
+If metrics look good:
+50% ──────────▶ [New Version]
+50% ──────────▶ [Old Version]
 
-                <h3>Quiz</h3>
+Finally:
+100% ─────────▶ [New Version]</code></pre>
+                <ul>
+                    <li>Test with real production traffic</li>
+                    <li>Gradual risk exposure</li>
+                    <li>Requires traffic management</li>
+                </ul>
+
+                <h3>Rolling Deployment</h3>
+                <pre><code># Update instances one at a time
+
+[v1] [v1] [v1] [v1]  →  [v2] [v1] [v1] [v1]
+                       →  [v2] [v2] [v1] [v1]
+                       →  [v2] [v2] [v2] [v1]
+                       →  [v2] [v2] [v2] [v2]</code></pre>
+                <ul>
+                    <li>No additional infrastructure</li>
+                    <li>Simple to implement</li>
+                    <li>Rollback takes time</li>
+                </ul>
+
+                <h3>Feature Flags</h3>
+                <pre><code># Toggle features without deploying new code
+if (featureFlags.isEnabled('new-checkout')) {
+    return renderNewCheckout();
+} else {
+    return renderOldCheckout();
+}</code></pre>
+
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What file defines a GitLab CI pipeline?</p>
-                        <input type="text" class="quiz-input" data-answer=".gitlab-ci.yml" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What deployment uses two identical environments?</p>
+                        <input type="text" class="quiz-input" data-answer="blue-green" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Two colors</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What lets you toggle features without deploying?</p>
+                        <input type="text" class="quiz-input" data-answer="feature flags" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Flags to toggle features</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>.gitlab-ci.yml</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>blue-green</li>
+                                <li>feature flags</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson6">Next: Jenkins →</a>
                 </div>
             </div>
         </div>
@@ -556,87 +626,91 @@ gitlab-runner register \
     <div class="lesson-modal" id="lesson6">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 06: Jenkins</h2>
+                <h2>// Lesson 6: Docker in CI/CD</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Installing Jenkins</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Using Docker
-docker run -d -p 8080:8080 -p 50000:50000 \
-  -v jenkins_home:/var/jenkins_home \
-  jenkins/jenkins:lts
+                <h3>Containerizing Your Pipeline</h3>
+                <p>Docker provides consistent environments across development, testing, and production. Learn to leverage containers throughout your CI/CD pipeline.</p>
 
-# Using apt (Ubuntu)
-wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
-sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
-sudo apt update && sudo apt install jenkins</pre>
+                <h3>Dockerfile Best Practices</h3>
+                <pre><code># BAD: Large base image, multiple RUN commands
+FROM ubuntu:20.04
+RUN apt-get update
+RUN apt-get install -y nodejs npm git
+RUN git clone /repo
+RUN npm install
+RUN npm build
 
-                <h3>Jenkinsfile (Declarative Pipeline)</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">pipeline {
-    agent any
-    
-    stages {
-        stage('Build') {
-            steps {
-                sh 'pip install -r requirements.txt'
-            }
-        }
+# GOOD: Minimal, layered, cached
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build
+CMD ["node", "index.js"]</code></pre>
+
+                <h3>Multi-Stage Builds</h3>
+                <pre><code># Build stage - heavy tools
+FROM golang:1.21 AS builder
+WORKDIR /src
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o app .
+
+# Runtime stage - minimal
+FROM alpine:3.18
+RUN apk --no-cache add ca-certificates
+COPY --from=builder /src/app /app
+CMD ["/app"]</code></pre>
+
+                <h3>Building in CI</h3>
+                <pre><code>jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
         
-        stage('Test') {
-            steps {
-                sh 'pytest'
-            }
-            post {
-                always {
-                    junit 'reports/*.xml'
-                }
-            }
-        }
+      - name: Build image
+        run: docker build -t myapp:${{ github.sha }} .
         
-        stage('Deploy') {
-            when {
-                branch 'main'
-            }
-            steps {
-                sh 'kubectl apply -f k8s/'
-            }
-        }
-    }
-}</pre>
+      - name: Run tests in container
+        run: docker run myapp:${{ github.sha }} npm test</code></pre>
 
-                <h3>Scripted Pipeline</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">node {
-    stage('Checkout') {
-        checkout scm
-    }
-    
-    stage('Build') {
-        sh 'make build'
-    }
-    
-    stage('Test') {
-        sh 'make test'
-    }
-}</pre>
+                <h3>Image Scanning</h3>
+                <pre><code># Trivy container scanning
+- name: Run Trivy
+  uses: aquasecurity/trivy-action@master
+  with:
+    image-ref: 'myapp:${{ github.sha }}'
+    format: 'sarif'
+    output: 'trivy-results.sarif'</code></pre>
 
-                <h3>Quiz</h3>
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What is the name of the file that defines a Jenkins pipeline?</p>
-                        <input type="text" class="quiz-input" data-answer="jenkinsfile" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What is the benefit of multi-stage Docker builds?</p>
+                        <input type="text" class="quiz-input" data-answer="smaller" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Final image is ???</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What tool scans Docker images for vulnerabilities?</p>
+                        <input type="text" class="quiz-input" data-answer="trivy" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: T for Tiny</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>Jenkinsfile</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>smaller</li>
+                                <li>trivy</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson7">Next: Build Automation →</a>
                 </div>
             </div>
         </div>
@@ -646,63 +720,77 @@ sudo apt update && sudo apt install jenkins</pre>
     <div class="lesson-modal" id="lesson7">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 07: Build Automation</h2>
+                <h2>// Lesson 7: Building & Testing</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Makefiles</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">.PHONY: build test clean
+                <h3>The Build Phase</h3>
+                <p>The build phase transforms your source code into a deployable artifact. This includes compiling, bundling, and preparing your application for testing and deployment.</p>
 
-build:
-	go build -o bin/app
+                <h3>Multi-Stage Docker Builds</h3>
+                <pre><code># Dockerfile for a Node.js app
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
 
-test:
-	go test -v ./...
+FROM node:20-alpine AS runner
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+EXPOSE 3000
+CMD ["node", "dist/index.js"]</code></pre>
 
-clean:
-	rm -rf bin/
+                <h3>Types of Tests</h3>
+                <ul>
+                    <li><strong>Unit Tests:</strong> Test individual functions/modules in isolation</li>
+                    <li><strong>Integration Tests:</strong> Test how components work together</li>
+                    <li><strong>End-to-End Tests:</strong> Test the entire application flow</li>
+                    <li><strong>Performance Tests:</strong> Load testing and benchmarking</li>
+                </ul>
 
-docker:
-	docker build -t myapp:latest .</pre>
+                <h3>Running Tests in CI</h3>
+                <pre><code>- name: Run tests
+  run: npm test -- --coverage
+  
+- name: Upload test results
+  uses: actions/upload-artifact@v4
+  if: always()
+  with:
+    name: test-results
+    path: coverage/</code></pre>
 
-                <h3>npm Scripts</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">{
-  "scripts": {
-    "start": "node server.js",
-    "test": "jest --coverage",
-    "build": "webpack --mode production",
-    "lint": "eslint src/"
-  }
-}</pre>
+                <h3>Test Reporting</h3>
+                <pre><code># JUnit XML format is widely supported
+npm test -- --junit-xml results.xml
 
-                <h3>Maven (Java)</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">mvn clean package    # Build
-mvn test            # Test
-mvn spring-boot:run # Run</pre>
+# Coverage reports
+npm test -- --coverage --json coverage-final.json</code></pre>
 
-                <h3>Gradle (Kotlin/Groovy)</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">gradle build       # Build
-gradle test        # Test
-gradle run         # Run</pre>
-
-                <h3>Quiz</h3>
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What build tool uses build.gradle files?</p>
-                        <input type="text" class="quiz-input" data-answer="gradle" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What tests verify individual functions in isolation?</p>
+                        <input type="text" class="quiz-input" data-answer="unit" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Single component tests</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What builds separate the build environment from runtime?</p>
+                        <input type="text" class="quiz-input" data-answer="multi-stage" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Multiple ??? builds</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>Gradle</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>unit</li>
+                                <li>multi-stage</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson8">Next: Artifact Management →</a>
                 </div>
             </div>
         </div>
@@ -712,55 +800,73 @@ gradle run         # Run</pre>
     <div class="lesson-modal" id="lesson8">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 08: Artifact Management</h2>
+                <h2>// Lesson 8: Artifact Management</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Artifact Types</h3>
+                <h3>What Are Artifacts?</h3>
+                <p>Build artifacts are the output of your build process—compiled binaries, Docker images, npm packages, or any file you need to deploy. Artifact management ensures you can reproduce any build.</p>
+
+                <h3>Artifact Repositories</h3>
                 <ul>
-                    <li><strong>JAR/WAR:</strong> Java archives</li>
-                    <li><strong>Docker Images:</strong> Container images</li>
-                    <li><strong>NPM Packages:</strong> JavaScript/TypeScript</li>
-                    <li><strong>Python Wheels:</strong> Python packages</li>
-                    <li><strong>Binary Executables:</strong> Compiled programs</li>
+                    <li><strong>JFrog Artifactory:</strong> Universal artifact repository</li>
+                    <li><strong>GitHub Packages:</strong> GitHub's native package registry</li>
+                    <li><strong>AWS S3:</strong> Simple object storage</li>
+                    <li><strong>Docker Hub:</strong> For container images</li>
                 </ul>
 
-                <h3>Container Registries</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># GitHub Container Registry
-docker build -t ghcr.io/user/image:latest .
-echo $CR_PAT | docker login ghcr.io -u USER --password-stdin
-docker push ghcr.io/user/image:latest
+                <h3>Semantic Versioning</h3>
+                <pre><code>MAJOR.MINOR.PATCH
+1.2.3
 
-# AWS ECR
-aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_REGISTRY
-docker build -t $ECR_REGISTRY/myapp:latest .
-docker push $ECR_REGISTRY/myapp:latest</pre>
+- 1.2.3 → 1.2.4 (patch: bug fixes)
+- 1.2.3 → 1.3.0 (minor: new features)
+- 1.2.3 → 2.0.0 (major: breaking changes)</code></pre>
 
-                <h3>GitHub Packages</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># .npmrc for NPM
-@myorg:registry=https://npm.pkg.github.com/
+                <h3>Publishing Docker Images</h3>
+                <pre><code>- name: Login to Docker Hub
+  uses: docker/login-action@v3
+  with:
+    username: ${{ secrets.DOCKERHUB_USERNAME }}
+    password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+- name: Build and push
+  uses: docker/build-push-action@v5
+  with:
+    push: true
+    tags: myuser/myapp:latest</code></pre>
 
-# Publish
-npm publish</pre>
+                <h3>Artifact Retention</h3>
+                <pre><code># GitHub Actions artifact retention
+- name: Upload artifact
+  uses: actions/upload-artifact@v4
+  with:
+    name: build
+    path: dist/
+    retention-days: 30</code></pre>
 
-                <h3>Quiz</h3>
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What registry is hosted by GitHub for container images?</p>
-                        <input type="text" class="quiz-input" data-answer="ghcr" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What versioning scheme uses MAJOR.MINOR.PATCH?</p>
+                        <input type="text" class="quiz-input" data-answer="semantic" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: ??? versioning</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>Where do you store built Docker images?</p>
+                        <input type="text" class="quiz-input" data-answer="registry" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Docker ???</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>GHCR (GitHub Container Registry)</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>semantic</li>
+                                <li>registry</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson9">Next: Deployment Strategies →</a>
                 </div>
             </div>
         </div>
@@ -770,57 +876,95 @@ npm publish</pre>
     <div class="lesson-modal" id="lesson9">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 09: Deployment Strategies</h2>
+                <h2>// Lesson 9: Infrastructure as Code</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Rolling Deployment</h3>
-                <p>Gradually replace old instances with new ones:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Kubernetes rolling update
-kubectl rollout restart deployment/myapp</pre>
-                <p>Pros: Simple, no downtime. Cons: Can't easily roll back instantly.</p>
+                <h3>Code Your Infrastructure</h3>
+                <p>IaC treats your infrastructure the same way you treat your application code: version control, code review, and automation. No more snowflake servers.</p>
 
-                <h3>Blue-Green Deployment</h3>
-                <p>Two identical environments—swap traffic at once:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Switch traffic
-kubectl patch service myapp -p '{"spec":{"selector":{"version":"green"}}}'</pre>
-                <p>Pros: Instant rollback. Cons: Requires double resources.</p>
+                <h3>Terraform Basics</h3>
+                <pre><code># main.tf
+terraform {
+  required_version = ">= 1.0"
+}
 
-                <h3>Canary Deployment</h3>
-                <p>Gradually shift traffic to new version:</p>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Istio canary
-- route:
-    - destination:
-        host: myapp-v1
-      weight: 90
-    - destination:
-        host: myapp-v2
-      weight: 10</pre>
-                <p>Pros: Test with real traffic. Cons: More complex setup.</p>
+provider "aws" {
+  region = "us-east-1"
+}
 
-                <h3>Feature Flags</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">if (featureFlags.isEnabled('new-feature')) {
-    return renderNewFeature();
-}</pre>
+resource "aws_instance" "web" {
+  ami           = "ami-0c55b159cbfafe1f0"
+  instance_type = "t3.micro"
+  
+  tags = {
+    Name = "web-server"
+  }
+}</code></pre>
 
-                <h3>Quiz</h3>
+                <h3>Terraform in CI/CD</h3>
+                <pre><code>- name: Setup Terraform
+  uses: hashicorp/setup-terraform@v2
+  
+- name: Terraform Init
+  run: terraform init
+  
+- name: Terraform Plan
+  run: terraform plan -out=tfplan
+  
+- name: Terraform Apply
+  if: github.ref == 'refs/heads/main'
+  run: terraform apply tfplan</code></pre>
+
+                <h3>Ansible for Configuration</h3>
+                <pre><code># playbook.yml
+---
+- name: Configure web servers
+  hosts: webservers
+  become: yes
+  
+  tasks:
+    - name: Ensure nginx is installed
+      apt:
+        name: nginx
+        state: present
+        
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started</code></pre>
+
+                <h3>GitOps Workflow</h3>
+                <pre><code># Infrastructure repository structure
+infrastructure/
+├── terraform/
+│   ├── prod/
+│   └── staging/
+└── ansible/
+    └── playbooks/</code></pre>
+
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What deployment strategy uses two identical environments?</p>
-                        <input type="text" class="quiz-input" data-answer="blue-green" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What tool defines infrastructure as code?</p>
+                        <input type="text" class="quiz-input" data-answer="terraform" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: HashiCorp</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What tool configures servers after provisioning?</p>
+                        <input type="text" class="quiz-input" data-answer="ansible" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Agentless config management</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>Blue-green</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>terraform</li>
+                                <li>ansible</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson10">Next: Container CI/CD →</a>
                 </div>
             </div>
         </div>
@@ -830,72 +974,72 @@ kubectl patch service myapp -p '{"spec":{"selector":{"version":"green"}}}'</pre>
     <div class="lesson-modal" id="lesson10">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 10: Container CI/CD</h2>
+                <h2>// Lesson 10: DevSecOps & Pipeline Security</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Building Containers</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">name: Build and Push
+                <h3>Shift Left on Security</h3>
+                <p>Security should be integrated throughout your pipeline, not added at the end. Let's build secure pipelines that catch vulnerabilities early.</p>
 
-on: [push]
+                <h3>SAST - Static Application Security Testing</h3>
+                <pre><code># SonarCloud in GitHub Actions
+- name: SonarCloud Scan
+  uses: SonarSource/sonarcloud-github-action@master
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}</code></pre>
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      
-      - name: Login to Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ghcr.io/${{ github.repository }}:${{ github.sha }}</pre>
+                <h3>Secrets Scanning</h3>
+                <pre><code># Gitleaks - Scan for secrets in code
+- name: Run Gitleaks
+  uses: gitleaks/gitleaks-action@v2
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}</code></pre>
 
-                <h3>Multi-Platform Builds</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">- name: Build multi-platform
-  uses: docker/build-push-action@v5
-  with:
-    platforms: linux/amd64,linux/arm64
-    push: true</pre>
+                <h3>Dependency Scanning</h3>
+                <pre><code># npm audit in CI
+- name: Security Audit
+  run: |
+    npm audit --audit-level=high</code></pre>
 
-                <h3>Security Scanning</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">- name: Run Trivy vulnerability scanner
+                <h3>Container Scanning</h3>
+                <pre><code># Trivy container scanning
+- name: Run Trivy
   uses: aquasecurity/trivy-action@master
   with:
-    scan-type: 'fs'
-    scan-ref: .
+    image-ref: 'myapp:${{ github.sha }}'
     format: 'sarif'
-    output: 'trivy-results.sarif'</pre>
+    output: 'trivy-results.sarif'</code></pre>
 
-                <h3>Quiz</h3>
+                <h3>Secret Management</h3>
+                <pre><code># Using HashiCorp Vault in CI
+- name: Fetch secrets from Vault
+  uses: hashicorp/vault-action@v2
+  with:
+    url: ${{ secrets.VAULT_ADDR }}
+    token: ${{ secrets.VAULT_TOKEN }}</code></pre>
+
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What tool is used for container vulnerability scanning?</p>
+                        <p>What does "Shift Left" mean in security?</p>
+                        <input type="text" class="quiz-input" data-answer="earlier" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Move testing ??? in pipeline</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What tool scans Docker images for vulnerabilities?</p>
                         <input type="text" class="quiz-input" data-answer="trivy" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: T for Tiny</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>Trivy</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>earlier</li>
+                                <li>trivy</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson11">Next: Infrastructure as Code →</a>
                 </div>
             </div>
         </div>
@@ -905,69 +1049,70 @@ jobs:
     <div class="lesson-modal" id="lesson11">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 11: Infrastructure as Code</h2>
+                <h2>// Lesson 11: Monitoring & Feedback</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>Terraform in CI/CD</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">name: Terraform
+                <h3>Observability in CI/CD</h3>
+                <p>A pipeline isn't complete without observability. Track metrics, set up alerts, and create feedback loops that help your team improve.</p>
 
-on:
-  push:
-    paths:
-      - 'infra/**'
-
-jobs:
-  terraform:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - uses: hashicorp/setup-terraform@v3
-      
-      - name: Terraform Format
-        run: terraform fmt -check
-      
-      - name: Terraform Plan
-        run: terraform plan
-      
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve</pre>
-
-                <h3>Ansible in CI/CD</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">- name: Run Ansible Playbook
-  run: ansible-playbook -i inventory/prod deploy.yml
-  env:
-    ANSIBLE_HOST_KEY_CHECKING: false</pre>
-
-                <h3>Immutable Infrastructure</h3>
-                <p>Instead of updating servers in place, replace them entirely:</p>
+                <h3>Key Pipeline Metrics</h3>
                 <ul>
-                    <li>Build new AMI with changes</li>
-                    <li>Deploy new instances from new AMI</li>
-                    <li>Destroy old instances</li>
-                    <li>More predictable, easier to reproduce</li>
+                    <li><strong>Build Success Rate:</strong> % of builds that pass</li>
+                    <li><strong>Build Time:</strong> Average time from commit to artifact</li>
+                    <li><strong>Deployment Frequency:</strong> How often you deploy</li>
+                    <li><strong>Lead Time:</strong> Time from commit to production</li>
+                    <li><strong>MTTR:</strong> Mean Time To Recovery</li>
                 </ul>
 
-                <h3>Quiz</h3>
+                <h3>Alerting on Pipeline Failures</h3>
+                <pre><code># Slack notification on failure
+- name: Notify on failure
+  if: failure()
+  uses: 8398a7/action-slack@v3
+  with:
+    status: failure
+  env:
+    SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}</code></pre>
+
+                <h3>Deployment Tracking</h3>
+                <pre><code># Annotations in Datadog/Grafana
+- name: Annotate deployment
+  run: |
+    curl -X POST "https://api.datadoghq.com/api/v1/monitor" \
+      -H "DD-API-KEY: ${{ secrets.DD_API_KEY }}" \
+      -d '{"title": "Deployed to production"}'</code></pre>
+
+                <h3>Continuous Feedback Loop</h3>
+                <pre><code>1. Automated tests run in staging
+2. Canary deployment to 10% traffic
+3. Monitor error rates and latency
+4. If metrics look good → expand to 100%
+5. If issues → automatic rollback
+6. Alert team of all events</code></pre>
+
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What practice replaces entire servers instead of updating them in place?</p>
-                        <input type="text" class="quiz-input" data-answer="immutable infrastructure" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p>What metric measures time from commit to production?</p>
+                        <input type="text" class="quiz-input" data-answer="lead time" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: ??? time</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What measures how fast you recover from failures?</p>
+                        <input type="text" class="quiz-input" data-answer="mttr" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Mean Time To ???</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>Immutable infrastructure</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>lead time</li>
+                                <li>mttr</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#lesson12">Next: GitOps & Production →</a>
                 </div>
             </div>
         </div>
@@ -977,86 +1122,141 @@ jobs:
     <div class="lesson-modal" id="lesson12">
         <div class="lesson-content">
             <div class="lesson-header">
-                <h2>// Lesson 12: GitOps & Production</h2>
+                <h2>// Lesson 12: Advanced Patterns</h2>
                 <a href="#guides" class="close-btn">×</a>
             </div>
             <div class="lesson-body">
-                <h3>GitOps</h3>
-                <p>GitOps uses Git as the single source of truth for infrastructure and applications:</p>
-                <ol>
-                    <li>Developer commits code</li>
-                    <li>CI builds and tests</li>
-                    <li>CD updates Git with new image tag</li>
-                    <li>GitOps operator (ArgoCD/Flux) syncs to cluster</li>
-                </ol>
+                <h3>Enterprise-Grade CI/CD</h3>
+                <p>Now let's explore advanced patterns used by high-performing engineering organizations. Take your pipeline to the next level.</p>
 
-                <h3>ArgoCD Example</h3>
-                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">apiVersion: argoproj.io/v1alpha1
+                <h3>Selective Pipeline Triggers</h3>
+                <pre><code># Only run affected parts of pipeline
+- name: Detect changes
+  id: changes
+  uses: dorny/paths-filter@v2
+  with:
+    filters: |
+      api:
+        - 'api/**'
+      ui:
+        - 'ui/**'
+
+jobs:
+  test-api:
+    if: steps.changes.outputs.api == 'true'
+    steps:
+      - run: npm test --workspace=api</code></pre>
+
+                <h3>GitOps with ArgoCD</h3>
+                <pre><code># ArgoCD continuously monitors your Git repo
+apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: myapp
+  name: production-app
 spec:
-  project: default
   source:
-    repoURL: https://github.com/user/repo.git
-    targetRevision: HEAD
-    path: k8s
+    repoURL: https://github.com/org/manifests
+    targetRevision: main
+    path: production
   destination:
     server: https://kubernetes.default.svc
     namespace: production
   syncPolicy:
     automated:
       prune: true
-      selfHeal: true</pre>
+      selfHeal: true</code></pre>
 
-                <h3>Observability</h3>
-                <p>Monitor your CI/CD pipelines:</p>
-                <ul>
-                    <li><strong>Pipeline metrics:</strong> Build times, success rates</li>
-                    <li><strong>Deployment frequency:</strong> How often you ship</li>
-                    <li><strong>Change failure rate:</strong> What percentage of deploys fail</li>
-                    <li><strong>Mean time to recovery:</strong> How fast you fix issues</li>
-                </ul>
+                <h3>Self-Service Platforms</h3>
+                <pre><code># Internal Developer Platform (IDP)
+# Developers can provision resources via PR
 
-                <h3>The Road Ahead</h3>
-                <p>Congratulations on completing CI/CD mastery! Continue with:</p>
-                <ul>
-                    <li>ArgoCD or Flux for GitOps</li>
-                    <li>Spinnaker for advanced deployments</li>
-                    <li>Tekton for Kubernetes-native CI/CD</li>
-                    <li>Service meshes for traffic management</li>
-                </ul>
+# Backstage catalog example
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: my-service
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team</code></pre>
 
-                <h3>Quiz</h3>
+                <h3>The CI/CD Maturity Model</h3>
+                <pre><code>Level 1: Manual - No automation
+Level 2: Basic - Automated builds
+Level 3: Intermediate - Automated tests
+Level 4: Advanced - Automated deployments
+Level 5: Elite - Self-healing, data-driven</code></pre>
+
                 <div class="quiz-section">
+                    <h3>// Knowledge Check</h3>
                     <div class="quiz-question">
-                        <p class="question-text">1. What tool uses Git as the single source of truth for Kubernetes?</p>
+                        <p>What tool uses Git as single source of truth for deployments?</p>
                         <input type="text" class="quiz-input" data-answer="argocd" placeholder="Your answer...">
-                        <button class="quiz-submit">Check</button>
-                        <span class="quiz-feedback"></span>
+                        <p class="quiz-hint">Hint: Argo???</p>
+                    </div>
+                    <div class="quiz-question">
+                        <p>What is the highest level of CI/CD maturity?</p>
+                        <input type="text" class="quiz-input" data-answer="elite" placeholder="Your answer...">
+                        <p class="quiz-hint">Hint: Self-healing, data-driven</p>
                     </div>
                     <details class="quiz-answers-reveal">
-                        <summary>Show Answers</summary>
+                        <summary class="reveal-answers-link">Show Answers</summary>
                         <div class="quiz-answers-display">
-                            <ol><li>ArgoCD</li></ol>
+                            <h4>Answers</h4>
+                            <ol>
+                                <li>argocd</li>
+                                <li>elite</li>
+                            </ol>
                         </div>
                     </details>
-                </div>
-
-                <div class="lesson-nav">
-                    <a href="#guides">← Back to Lessons</a>
                 </div>
             </div>
         </div>
     </div>
 
-<footer id="site-footer">
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>🔧 Jenkins</h3>
+                <p>Open source automation server</p>
+                <a href="https://www.jenkins.io/" target="_blank">jenkins.io</a>
+            </div>
+            <div class="resource-card">
+                <h3>🐙 GitHub Actions</h3>
+                <p>CI/CD built into GitHub</p>
+                <a href="https://docs.github.com/en/actions" target="_blank">github.com/actions</a>
+            </div>
+            <div class="resource-card">
+                <h3>🐈 GitLab CI</h3>
+                <p>GitLab's CI/CD platform</p>
+                <a href="https://docs.gitlab.com/ee/ci/" target="_blank">docs.gitlab.com/ci</a>
+            </div>
+            <div class="resource-card">
+                <h3>🐳 Docker</h3>
+                <p>Container platform</p>
+                <a href="https://docs.docker.com/" target="_blank">docs.docker.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>☸️ ArgoCD</h3>
+                <p>GitOps continuous delivery</p>
+                <a href="https://argo-cd.readthedocs.io/" target="_blank">argo-cd.readthedocs.io</a>
+            </div>
+            <div class="resource-card">
+                <h3>📜 CI/CD Book</h3>
+                <p>Pipeline infrastructure patterns</p>
+                <a href="https://www.manning.com/books/ci-cd-with-docker-and-kubernetes" target="_blank">manning.com</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="site-footer">
         <div class="footer-content">
             <div class="footer-brand">
                 <span class="copyleft">⟲</span>
                 <span>REBEL WITH LINUX</span>
             </div>
-            <p class="footer-tagline">Learn Linux the hard way.</p>
+            <p class="footer-tagline">Learn CI/CD the hard way.</p>
             <div class="footer-links">
                 <a href="../site-map.html">Site Map</a>
                 <span class="footer-divider">|</span>
@@ -1069,40 +1269,23 @@ spec:
     </footer>
 
     <script>
-        const lessonCards = document.querySelectorAll('.lesson-card');
-        const progressBar = document.getElementById('progressBar');
+        // Set initial state on page load
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.getElementById('themeToggle').checked = true;
+        }
         
-        lessonCards.forEach(card => {
-            card.addEventListener('click', (e) => {
-                e.preventDefault();
-                const lessonId = card.getAttribute('href');
-                document.querySelector(lessonId).scrollIntoView({ behavior: 'smooth' });
-            });
-        });
-        
-        window.addEventListener('scroll', () => {
-            const scrolled = window.scrollY;
-            const max = document.documentElement.scrollHeight - window.innerHeight;
-            const progress = (scrolled / max) * 100;
-            progressBar.style.width = progress + '%';
-        });
-
-        document.querySelectorAll('.quiz-submit').forEach(button => {
-            button.addEventListener('click', function() {
-                const input = this.previousElementSibling;
-                const feedback = this.nextElementSibling;
-                const answer = input.dataset.answer.toLowerCase().trim();
-                const userAnswer = input.value.toLowerCase().trim();
-                
-                if (userAnswer === answer) {
-                    feedback.textContent = '✓ Correct!';
-                    feedback.className = 'quiz-feedback correct';
-                } else {
-                    feedback.textContent = '✗ Try again';
-                    feedback.className = 'quiz-feedback incorrect';
-                }
+        // Close hamburger menu when clicking a link
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
             });
         });
     </script>
+    <script src="../nav.js" defer></script>
 </body>
 </html>
