@@ -445,7 +445,16 @@
         // Keyboard support
         document.addEventListener('keydown', function(e) {
             const key = e.key.toLowerCase();
-            if (key.length === 1 && key >= 'a' && key <= 'z') {
+            if (key === 'backspace') {
+                for (let i = placedLetters.length - 1; i >= 0; i--) {
+                    if (placedLetters[i] !== null) {
+                        placedLetters[i] = null;
+                        renderLetterSlots();
+                        renderLetterPool();
+                        break;
+                    }
+                }
+            } else if (key.length === 1 && /[a-z0-9_-]/.test(key)) {
                 const emptyIndex = placedLetters.indexOf(null);
                 if (emptyIndex !== -1) {
                     const poolItems = document.querySelectorAll('.letter-tile');
