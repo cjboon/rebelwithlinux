@@ -180,7 +180,7 @@ Quick guides and tips organized by category:
 Interactive terminal command learning games: awk, bash, chmod, curl, docker, find, git, grep, jq, kubectl, nix, py, regex, sed, sql, ssh, systemctl, tar, vim
 
 ### Projects (9 total)
-Step-by-step project tutorials: blog, fileshare, homelab, i3, mail, matrix, onion, paste, wireguard
+Step-by-step tutorials for building self-hosted infrastructure: homelab dashboard, VPN, email, Matrix, hidden services, blog, fileshare, pastebin, i3 WM
 
 ### Games (6 total)
 Interactive learning games: debian, debian-2, debian-3, quiz, speed, turing
