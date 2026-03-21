@@ -524,6 +524,19 @@
                 const userAnswer = input.value.trim();
                 if (!userAnswer) return;
                 
+                if (userAnswer === '--beginner') {
+                    currentLevel = 0;
+                    showIntro(0, false);
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--intermediate') {
+                    currentLevel = beginnerLevels.length;
+                    showIntro(0, true);
+                    input.value = '';
+                    return;
+                }
+                
                 const isExpert = currentLevel >= beginnerLevels.length;
                 const levels = isExpert ? intermediateLevels : beginnerLevels;
                 const adjustedLevel = isExpert ? currentLevel - beginnerLevels.length : currentLevel;
@@ -557,23 +570,6 @@
                 showMessage("Type --beginner or --intermediate to start", 'hint', 500);
             }, 1000);
         }
-        
-        input.addEventListener('keydown', async function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                const userAnswer = input.value.trim();
-                if (userAnswer === '--beginner') {
-                    currentLevel = 0;
-                    showIntro(0, false);
-                    input.value = '';
-                    return;
-                }
-                if (userAnswer === '--intermediate') {
-                    currentLevel = beginnerLevels.length;
-                    showIntro(0, true);
-                    input.value = '';
-                    return;
-                }
-            }
         });
         
         init();
