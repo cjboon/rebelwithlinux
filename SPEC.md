@@ -237,7 +237,6 @@ Interactive learning games: debian, debian-2, debian-3, quiz, speed, turing
 ├── search.html         # Search functionality
 ├── offline.html        # Offline page
 ├── site-map.html       # Sitemap
-├── subject-chart.html  # Content coverage chart
 ├── style.css           # Main stylesheet
 ├── achievements.js     # Achievement system
 ├── nav.js              # Navigation logic
