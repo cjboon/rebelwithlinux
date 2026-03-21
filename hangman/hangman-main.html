@@ -11,7 +11,10 @@
     <script src="../nav.js" defer></script>
     <script src="../achievements.js" defer></script>
     <script>
-        // Auto-open sections when navigating via hash from another page
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
         document.addEventListener('DOMContentLoaded', function() {
             const hash = window.location.hash.substring(1);
             if (hash) {
@@ -23,12 +26,11 @@
                     }
                 }
             }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.checked = savedTheme !== 'light';
+            }
         });
-
-        const savedTheme = localStorage.getItem('theme');
-        if (!savedTheme || savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
     </script>
     <noscript>
         <style>
