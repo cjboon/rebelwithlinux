@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-ln.html" />
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ln Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid #444444; }
+        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
+        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
+        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
+        .ln-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .ln-output-line { color: #aaaaaa; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .ln-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .ln-success-line { color: #b5bd68; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1e; }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .ln-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .ln-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .ln-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid #444444; }
+            .left-pane { border-right: none; border-top: 2px solid #444444; }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">ln Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type ln command:</div>
+                <textarea id="command-input" placeholder="ln -s original link" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="ln-output-area" id="ln-output">
+                <div class="ln-output-line" style="color: #586e75;">ln output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const lnOutput = document.getElementById('ln-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=ln');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'ln', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addLnLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'ln-error-line' : type === 'success' ? 'ln-success-line' : 'ln-output-line';
+            line.textContent = text;
+            lnOutput.appendChild(line);
+            lnOutput.scrollTop = lnOutput.scrollHeight;
+        }
+        
+        function clearLnOutput() { lnOutput.innerHTML = ''; }
+        
+        function runLn(cmd) {
+            addLnLine('$ ' + cmd);
+            
+            const responses = {
+                "ln -s": "Symbolic link created",
+                "ln -s file link": "Symbolic link 'link' created to 'file'",
+                "ln -s original.txt link.txt": "link.txt -> original.txt",
+                "ln file link": "Hard link created",
+                "ln original hardlink": "Hard link 'hardlink' created for 'original'",
+                "ln -s /absolute/path link": "Absolute symbolic link created",
+                "ln -s relative/path link": "Relative symbolic link created",
+                "ln -s existing_file symlink": "symlink -> existing_file",
+                "ls -la": "total 8\n-rw-r--r-- 2 user user 4096 Jan 15 10:00 original.txt\nlrwxrwxrwx 1 user user   18 Jan 15 10:00 symlink.txt -> original.txt",
+                "ls -l": "Shows file details with link count and -> for symlinks",
+                "readlink": "/path/to/target",
+                "readlink symlink": "original.txt",
+                "file symlink": "symlink: symbolic link to original.txt",
+                "file hardlink": "hardlink.txt: regular file",
+                "unlink": "Link removed",
+                "unlink symlink": "Symbolic link removed",
+                "stat": "Shows inode information",
+                "stat file": "File: original.txt\nSize: 1024\nBlocks: 8\nLinks: 2",
+                "inode": "Inode: 1234567",
+                "-s": "Create symbolic link",
+                "-f": "Force - remove existing destination",
+                "-i": "Interactive - prompt before overwrite",
+                "-n": "Treat link as file (don't follow symlinks)",
+                "-v": "Verbose - print link names",
+                "ln -sf": "Existing link replaced",
+                "ln -snf": "Symbolic link forcefully replaced",
+                "broken link": "No such file or directory",
+                "relative symlink": "Link created with relative path",
+                "absolute symlink": "Link created with absolute path"
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addLnLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.toLowerCase().includes('ln')) {
+                    addLnLine('Link created');
+                    matched = true;
+                } else {
+                    addLnLine('Try: ln -s file link', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "Link Larry",
+            greeting: "Yo! I'm Link Larry - filesystem linking expert! ln creates links - shortcuts to files. Hard links vs symbolic links - I'll show you when to use each. One file, many names - let's connect!",
+            encourage: ["Excellent!", "Link created!", "You're a linking legend!", "Keep connecting!", "Files linked!", "Brilliant!"],
+            getEncouragement: function() { return this.encourage[Math.floor(Math.random() * this.encourage.length)]; }
+        };
+        
+        const beginnerLevels = [
+            { id: 1, title: "What is a Link?", intro: "Welcome! A link is a pointer to a file. Think of it like a shortcut or alias.", content: "Check file:\nls -l file.txt", hint: "Type: ls -l file.txt", answer: "ls -l", success: "See file details! Notice the link count (number after permissions). Links share the same data!", type: "contains" },
+            { id: 2, title: "Create Symbolic Link -s", intro: "ln -s creates a symbolic (soft) link. It points to another file's path.", content: "Create symlink:\nln -s file.txt link.txt", hint: "Type: ln -s file.txt link.txt", answer: "ln -s", success: "Symbolic link created! link.txt points to file.txt. ls -l shows link -> target!", type: "contains" },
+            { id: 3, title: "Symlink Target Display", intro: "ls -l shows symlinks with '->' pointing to target.", content: "Check symlink:\nls -la | grep link", hint: "Type: ls -la", answer: "ls -la", success: "Link shown! lrwxrwxrwx means symbolic link. -> shows target path!", type: "contains" },
+            { id: 4, title: "Absolute Path Symlinks", intro: "Use absolute paths (starting with /) for reliable symlinks.", content: "Absolute symlink:\nln -s /home/user/data /mnt/data", hint: "Type: ln -s /home/user", answer: "ln -s /", success: "Absolute symlink! Full path specified. Won't break if you move the link!", type: "contains" },
+            { id: 5, title: "Relative Path Symlinks", intro: "Relative symlinks use paths relative to link location.", content: "Relative symlink:\nln -s ../src ./src", hint: "Type: ln -s ../src", answer: "ln -s ../", success: "Relative symlink! Points to ../src. Works if both stay in same relative position!", type: "contains" },
+            { id: 6, title: "Directory Symlinks", intro: "Symlinks can point to directories too!", content: "Link to directory:\nln -s /home/user/projects ./projects", hint: "Type: ln -s /home/user/projects", answer: "ln -s /home", success: "Directory symlink! Now ./projects accesses /home/user/projects. Convenient shortcut!", type: "contains" },
+            { id: 7, title: "Verify with readlink", intro: "readlink shows where a symbolic link points.", content: "Read the link:\nreadlink symlink", hint: "Type: readlink symlink", answer: "readlink", success: "Target shown! readlink reveals where symlink actually points!", type: "contains" },
+            { id: 8, title: "file Command", intro: "file shows link type - symbolic link vs regular file.", content: "Check file type:\nfile symlink", hint: "Type: file symlink", answer: "file symlink", success: "Type shown! 'symbolic link to x' vs 'regular file'. Distinguishes link types!", type: "contains" },
+            { id: 9, title: "Broken Links", intro: "If target doesn't exist, symlink is 'broken' - shown in red!", content: "Broken link:\nls -la broken-link", hint: "Type: ls -la broken-link", answer: "ls -la", success: "Broken link shown! No such file or directory. Target must exist for link to work!", type: "contains" },
+            { id: 10, title: "Remove Link unlink", intro: "unlink removes a link. rm also works!", content: "Remove link:\nunlink link.txt", hint: "Type: unlink link.txt", answer: "unlink", success: "Link removed! unlink is for links specifically. rm also deletes links!", type: "contains" },
+            { id: 11, title: "ln -v Verbose", intro: "ln -v shows what was created - helpful for confirmation.", content: "Verbose link:\nln -v -s file.txt link.txt", hint: "Type: ln -v -s", answer: "ln -v", success: "Verbose output! Shows 'link.txt -> file.txt'. Confirms what was created!", type: "contains" },
+            { id: 12, title: "Beginner Finale", intro: "Final challenge! Create absolute symlink to a directory and verify!", content: "Challenge:\nln -s /var/log ./log-link && ls -la log-link", hint: "Type: ln -s /var/log", answer: "ln -s /var/log", success: "BEGINNER COMPLETE! You master: symlinks, absolute/relative paths, readlink, file! Linking legend!", type: "starts" }
+        ];
+        
+        const intermediateLevels = [
+            { id: 1, title: "Hard Links Basics", intro: "INTERMEDIATE! Hard links - same inode, same data, same partition.", content: "Create hard link:\nln file.txt hardlink.txt", hint: "Type: ln file.txt hardlink.txt", answer: "ln file.txt", success: "Hard link created! Both point to same data. Link count goes to 2!", type: "contains" },
+            { id: 2, title: "Hard Links Same Inode", intro: "Hard links share the same inode - they're the same file!", content: "Check inodes:\nls -li file.txt hardlink.txt", hint: "Type: ls -li", answer: "ls -li", success: "Same inode! Both show same number. Delete one, other still works!", type: "contains" },
+            { id: 3, title: "Hard Link Restrictions", intro: "Hard links can't cross partitions or point to directories.", content: "Cross partition:\nln /partition1/file /partition2/link", hint: "Try cross-partition link", answer: "Invalid cross-device", success: "Cross-device error! Hard links must be same filesystem. Use symlinks instead!", type: "contains" },
+            { id: 4, title: "ln -f Force Replace", intro: "ln -f removes existing destination before creating new link.", content: "Force replace:\nln -sf newfile.txt link.txt", hint: "Type: ln -sf", answer: "ln -sf", success: "Forced! Existing link replaced with new target. No prompt!", type: "contains" },
+            { id: 5, title: "ln -i Interactive", intro: "ln -i prompts before overwriting existing link.", content: "Interactive link:\nln -si file.txt existing-link", hint: "Type: ln -si", answer: "ln -si", success: "Interactive mode! Prompts 'replace existing link?' y/n. Safer than -f!", type: "contains" },
+            { id: 6, title: "ln -n Don't Follow", intro: "ln -n treats link destination as file (not following symlinks).", content: "No follow:\nln -snf /path/to/dir ./link", hint: "Type: ln -snf", answer: "ln -snf", success: "No following! -n treats destination as file. Essential for symlink to symlink!", type: "contains" },
+            { id: 7, title: "stat Command", intro: "stat shows detailed file info including link count and inode.", content: "Full stats:\nstat file.txt", hint: "Type: stat file.txt", answer: "stat", success: "Full stats! Links: 2 (two hard links share this inode). Shows size, access times!", type: "contains" },
+            { id: 8, title: "inode Explained", intro: "inode stores file metadata - permissions, times, data blocks.", content: "inode concept:\nEach file = one inode number + data blocks", hint: "inode = file ID number", answer: "inode", success: "inode is file ID! Same inode = same file. Directories store filename -> inode mappings!", type: "contains" },
+            { id: 9, title: "Backups with Hard Links", intro: "Hard links let you 'copy' without using space - same data!", content: "Backup structure:\ncp -l file backup/file", hint: "Type: cp -l", answer: "cp -l", success: "Linked copy! -l creates hardlink instead of copying data. Same content, zero extra space!", type: "contains" },
+            { id: 10, title: "rsync with Hard Links", intro: "rsync --hard-links preserves hard links during sync.", content: "Sync with links:\nrsync -av --hard-links source/ dest/", hint: "Type: rsync --hard-links", answer: "--hard-links", success: "Hard links preserved! Backup sees same inode, uses less space!", type: "contains" },
+            { id: 11, title: "When to Use Which", intro: "Symlinks: cross filesystem, directories, relative paths. Hard links: same partition, no symlink overhead.", content: "Choose wisely:\nSymlinks: flexibility\nHard links: efficiency", hint: "Symlink for dirs, hardlink for same fs", answer: "ln -s", success: "Choose correctly! Symlinks for most cases. Hard links for backup efficiency!", type: "contains" },
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Create hard link, check inode matches, then create symlink to same file!", content: "Challenge:\nln original hard && ln -s original sym && ls -li original hard sym", hint: "Type: ln original hard", answer: "ln original hard", success: "INTERMEDIATE COMPLETE! You master: hard links, inodes, -f/-i/-n flags! Linking MASTER!", type: "starts" }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') return user === answer;
+            else if (level.type === 'contains') return user.includes(answer);
+            else if (level.type === 'starts') return user.startsWith(answer);
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! ln levels complete! You're a linking legend!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: ln -s symlinks, absolute/relative paths. I'll make you a linking legend!"); }
+            else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Advanced: hard links, inodes, -f/-i/-n flags!"); }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) { document.exitFullscreen(); }
+            else { document.documentElement.requestFullscreen(); }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=updateTheme&theme=' + newTheme, credentials: 'include' });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels[currentLevel];
+                clearLnOutput();
+                runLn(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels[currentLevel];
+                clearLnOutput();
+                runLn(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) { currentLevel = savedLevel - 1; }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basics: ln -s, symlinks, paths (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Advanced: hard links, inodes, -f/-i (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Type --beginner or --intermediate to start! Click options or use --fullscreen, --darkmode, --exit anytime!");
+        }
+        init();
+    </script>
+</body>
+</html>

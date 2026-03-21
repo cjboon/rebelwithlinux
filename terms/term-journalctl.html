@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-journalctl.html" />
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>journalctl Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid #444444; }
+        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
+        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
+        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
+        .journal-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .journal-output-line { color: #aaaaaa; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .journal-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .journal-success-line { color: #b5bd68; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1e; }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .journal-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .journal-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .journal-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid #444444; }
+            .left-pane { border-right: none; border-top: 2px solid #444444; }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">journalctl Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type journalctl command:</div>
+                <textarea id="command-input" placeholder="journalctl -xe" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="journal-output-area" id="journal-output">
+                <div class="journal-output-line" style="color: #586e75;">journalctl output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const journalOutput = document.getElementById('journal-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=journalctl');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'journalctl', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addJournalLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'journal-error-line' : type === 'success' ? 'journal-success-line' : 'journal-output-line';
+            line.textContent = text;
+            journalOutput.appendChild(line);
+            journalOutput.scrollTop = journalOutput.scrollHeight;
+        }
+        
+        function clearJournalOutput() { journalOutput.innerHTML = ''; }
+        
+        function runJournal(cmd) {
+            addJournalLine('$ ' + cmd);
+            
+            const responses = {
+                "journalctl": "Jan 15 10:00:00 server sshd[1234]: Accepted publickey for user\nJan 15 10:01:00 server systemd[1]: Started Daily Cleanup.",
+                "journalctl -xe": "Jan 15 10:00:00 server nginx[5678]: Starting nginx web server...",
+                "journalctl -u": "Jan 15 10:00:00 server nginx[5678]: nginx started",
+                "journalctl -u nginx": "Jan 15 10:00:00 nginx[5678]: Starting nginx...\nJan 15 10:00:01 nginx[5678]: nginx started successfully",
+                "journalctl -f": "Watching logs in real-time...\nJan 15 10:00:00 server sshd[1234]: Accepted publickey",
+                "journalctl -n": "Showing last 20 lines",
+                "journalctl --since": "Logs since specified time",
+                "journalctl --until": "Logs until specified time",
+                "journalctl -b": "Logs since last boot",
+                "journalctl -b -1": "Logs from previous boot",
+                "journalctl -p": "Priority filter applied",
+                "journalctl -p err": "Error messages shown",
+                "journalctl -p warning": "Warning and above shown",
+                "journalctl -o": "Output format specified",
+                "journalctl -o json": "{\"PRIORITY\":3,\"UNIT\":\"nginx.service\"}",
+                "journalctl --disk-usage": "Archived: 500.0M",
+                "journalctl --vacuum-size": "Size limit set",
+                "journalctl --vacuum-time": "Time limit set",
+                "journalctl -g": "Grep pattern matched",
+                "journalctl -k": "Kernel messages only",
+                "journalctl -d": "Device specified",
+                "journalctl -m": "Include merged journal entries",
+                "--list-boots": "0 boot Jan 15 10:00:00 - Present\n-1 boot Jan 14 08:00:00 - Jan 15 10:00:00",
+                "systemd-cat": "Tagged log entry created"
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addJournalLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.toLowerCase().includes('journalctl')) {
+                    addJournalLine('Log entry displayed');
+                    matched = true;
+                } else {
+                    addJournalLine('Try: journalctl -u nginx', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "Log Analyst Linda",
+            greeting: "Hey! I'm Log Analyst Linda - systemd's journal is my domain! Every system event, every error, every debug message - they all end up in the journal. When things break, I find the answers in the logs. Let's dig deep!",
+            encourage: ["Excellent!", "Log found!", "You're a log detective!", "Keep analyzing!", "Debugging master!", "Brilliant!"],
+            getEncouragement: function() { return this.encourage[Math.floor(Math.random() * this.encourage.length)]; }
+        };
+        
+        const beginnerLevels = [
+            { id: 1, title: "Basic journalctl", intro: "Welcome! journalctl reads the systemd journal - all system logs.", content: "View all logs:\njournalctl", hint: "Type: journalctl", answer: "journalctl", success: "All logs shown! Newest at bottom. Every system event recorded!", type: "contains" },
+            { id: 2, title: "Follow Logs -f", intro: "journalctl -f follows logs in real-time - like tail -f for systemd!", content: "Follow logs:\njournalctl -f", hint: "Type: journalctl -f", answer: "journalctl -f", success: "Real-time follow! New entries appear live. Essential for monitoring!", type: "contains" },
+            { id: 3, title: "Last N Lines -n", intro: "journalctl -n shows last N lines instead of everything.", content: "Last 50 lines:\njournalctl -n 50", hint: "Type: journalctl -n", answer: "journalctl -n", success: "Last 50! Default is 10. Specify any number. Quick snapshot!", type: "contains" },
+            { id: 4, title: "Specific Unit -u", intro: "journalctl -u filters by service/unit name - nginx, ssh, etc.", content: "Nginx logs:\njournalctl -u nginx", hint: "Type: journalctl -u nginx", answer: "journalctl -u", success: "Nginx logs! -u is essential for service debugging. Combine with -f!", type: "contains" },
+            { id: 5, title: "Since Time --since", intro: "--since shows logs since a time. Many formats work!", content: "Since today:\njournalctl --since today", hint: "Type: --since today", answer: "--since", success: "Since today! Can use 'yesterday', '1 hour ago', '2024-01-15 10:00'!", type: "contains" },
+            { id: 6, title: "Until Time --until", intro: "--until shows logs up to a time.", content: "Until midnight:\njournalctl --until midnight", hint: "Type: --until midnight", answer: "--until", success: "Until midnight! Combine --since and --until for time ranges!", type: "contains" },
+            { id: 7, title: "Time Range", intro: "Combine --since and --until for a specific time window.", content: "Today 9am to now:\njournalctl --since \"09:00\" --until now", hint: "Type: --since \"09:00\"", answer: "--since", success: "Morning logs! Useful for debugging issues during specific periods!", type: "contains" },
+            { id: 8, title: "Current Boot -b", intro: "-b shows only logs from current boot session.", content: "Current boot:\njournalctl -b", hint: "Type: journalctl -b", answer: "journalctl -b", success: "Current boot only! Excludes old logs. Great after crashes!", type: "contains" },
+            { id: 9, title: "Previous Boot -b -1", intro: "-b -1 shows logs from the previous boot - investigate past crashes.", content: "Previous boot:\njournalctl -b -1", hint: "Type: journalctl -b -1", answer: "-b -1", success: "Previous boot! -b -1 = last boot, -b -2 = two boots ago!", type: "contains" },
+            { id: 10, title: "List Boots --list-boots", intro: "--list-boots shows all recorded boot sessions with their IDs.", content: "List boots:\njournalctl --list-boots", hint: "Type: --list-boots", answer: "--list-boots", success: "Boots listed! See boot ID, time range. Use with -b [ID]!", type: "contains" },
+            { id: 11, title: "Priority Filter -p", intro: "-p filters by priority: emerg (0), alert (1), crit (2), err (3), warning (4), notice (5), info (6), debug (7).", content: "Errors only:\njournalctl -p err", hint: "Type: journalctl -p err", answer: "journalctl -p", success: "Errors only! err, warning, notice, info - find what matters!", type: "contains" },
+            { id: 12, title: "Beginner Finale", intro: "Final challenge! Get nginx errors since today!", content: "Challenge:\njournalctl -u nginx -p err --since today", hint: "Type: journalctl -u nginx -p err", answer: "journalctl -u", success: "BEGINNER COMPLETE! You master: basic view, -u unit, --since/--until, -b boot, -p priority! Log pro!", type: "starts" }
+        ];
+        
+        const intermediateLevels = [
+            { id: 1, title: "Kernel Messages -k", intro: "INTERMEDIATE! -k shows only kernel messages - hardware, driver issues.", content: "Kernel logs:\njournalctl -k", hint: "Type: journalctl -k", answer: "journalctl -k", success: "Kernel messages! -k = kernel ring buffer. Hardware/driver issues!", type: "contains" },
+            { id: 2, title: "Output Formats -o", intro: "-o controls output format: short, short-iso, json, json-pretty.", content: "JSON output:\njournalctl -u nginx -o json", hint: "Type: -o json", answer: "-o json", success: "JSON format! Perfect for parsing. json-pretty for readability!", type: "contains" },
+            { id: 3, title: "Full Details -a", intro: "-a shows all columns with full content, even long lines.", content: "All details:\njournalctl -a", hint: "Type: journalctl -a", answer: "journalctl -a", success: "Full details! No truncation. Essential for long log lines!", type: "contains" },
+            { id: 4, title: "Grep Logs -g", intro: "-g searches log entries by pattern (regex).", content: "Search for error:\njournalctl -g error", hint: "Type: journalctl -g", answer: "journalctl -g", success: "Grepped! -g uses regex. Powerful search within logs!", type: "contains" },
+            { id: 5, title: "Follow Unit -fu", intro: "journalctl -fu nginx follows nginx logs in real-time - like -f and -u combined!", content: "Follow nginx live:\njournalctl -fu nginx", hint: "Type: -fu nginx", answer: "-fu", success: "Follow unit! -fu = -f + -u. Watch service in real-time!", type: "contains" },
+            { id: 6, title: "Disk Usage", intro: "journalctl --disk-usage shows how much space the journal uses.", content: "Check usage:\njournalctl --disk-usage", hint: "Type: --disk-usage", answer: "--disk-usage", success: "500MB used! Journals can grow large. Time to vacuum!", type: "contains" },
+            { id: 7, title: "Vacuum by Size", intro: "--vacuum-size removes old logs to free space.", content: "Vacuum to 100MB:\njournalctl --vacuum-size=100M", hint: "Type: --vacuum-size=", answer: "--vacuum-size=", success: "Vacuumed! Old logs deleted. Keep what you need!", type: "contains" },
+            { id: 8, title: "Vacuum by Time", intro: "--vacuum-time removes logs older than specified time.", content: "Vacuum 1 week:\njournalctl --vacuum-time=1weeks", hint: "Type: --vacuum-time=", answer: "--vacuum-time=", success: "Vacuumed! Keep only last week. Combine with --vacuum-size!", type: "contains" },
+            { id: 9, title: "Boot ID Specific", intro: "Use -b with boot ID to view specific boot's logs.", content: "Specific boot:\njournalctl -b abc12345", hint: "Type: -b abc12345", answer: "-b abc12345", success: "Specific boot! Use --list-boots to find the ID!", type: "contains" },
+            { id: 10, title: "No Pagination", intro: "By default, journalctl pages. --no-pager outputs everything at once.", content: "No pager:\njournalctl --no-pager", hint: "Type: --no-pager", answer: "--no-pager", success: "No pager! All output at once. Pipe to grep/awk for analysis!", type: "contains" },
+            { id: 11, title: "Fields with -o verbose", intro: "-o verbose shows all systemd fields - extremely detailed!", content: "Verbose output:\njournalctl -o verbose", hint: "Type: -o verbose", answer: "-o verbose", success: "Verbose! Every field shown. _SYSTEMD_UNIT, _PID, _UID - all details!", type: "contains" },
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Vacuum old logs, then follow nginx errors!", content: "Challenge:\njournalctl --vacuum-time=2weeks && journalctl -fu nginx -p err", hint: "Type: --vacuum-time=", answer: "--vacuum-time=", success: "INTERMEDIATE COMPLETE! You master: kernel, JSON, vacuum, grep, boot IDs! Journal MASTER!", type: "starts" }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') return user === answer;
+            else if (level.type === 'contains') return user.includes(answer);
+            else if (level.type === 'starts') return user.startsWith(answer);
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! journalctl levels complete! You're a log analysis master!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: -u unit, --since/--until, -b boot, -p priority. I'll make you a log detective!"); }
+            else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Advanced: kernel, JSON, vacuum, grep, verbose!"); }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) { document.exitFullscreen(); }
+            else { document.documentElement.requestFullscreen(); }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=updateTheme&theme=' + newTheme, credentials: 'include' });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels[currentLevel];
+                clearJournalOutput();
+                runJournal(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels[currentLevel];
+                clearJournalOutput();
+                runJournal(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) { currentLevel = savedLevel - 1; }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basics: -u, --since, -b, -p (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Advanced: -k, -o json, vacuum (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Type --beginner or --intermediate to start! Click options or use --fullscreen, --darkmode, --exit anytime!");
+        }
+        init();
+    </script>
+</body>
+</html>

@@ -231,7 +231,22 @@
             { id: 9, title: "Compare Directories", intro: "rsync can compare directories without syncing using N without output.", content: "Compare dirs:\nrsync -avun source/ dest/", hint: "Type: rsync -avun", answer: "rsync -avun", success: "Compared! -u skips updating newer files, -n is dry run. See differences!", type: "contains" },
             { id: 10, title: "Iconv Conversion", intro: "--iconv converts file names between character encodings.", content: "Convert encoding:\nrsync --iconv=UTF-8,ISO-8859-1 source/ dest/", hint: "Type: --iconv", answer: "--iconv", success: "Converted! --iconv handles charset conversion. Useful for cross-system sync!", type: "contains" },
             { id: 11, title: "Remote rsync Daemon", intro: "rsync:// protocol access remote rsync daemon directly.", content: "Rsync daemon:\nrsync -av rsync://host/module/path dest/", hint: "Type: rsync://", answer: "rsync://", success: "Daemon access! rsync:// bypasses SSH. Fast for public mirrors!", type: "contains" },
-            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Create incremental backup with hardlinks and progress!", content: "Challenge:\nrsync -avzP --link-dest=/backup/yesterday -e ssh source/ user@host:/backup/today/", hint: "Type: rsync -avzP --link-dest", answer: "--link-dest", success: "INTERMEDIATE COMPLETE! You master: --bwlimit, --partial, -W, --link-dest, -e ssh! Backup MASTER!", type: "starts" }
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Create incremental backup with hardlinks and progress!", content: "Challenge:\nrsync -avzP --link-dest=/backup/yesterday -e ssh source/ user@host:/backup/today/", hint: "Type: rsync -avzP --link-dest", answer: "--link-dest", success: "INTERMEDIATE COMPLETE! You master: --bwlimit, --partial, -W, --link-dest, -e ssh! Backup MASTER! Type --expert for advanced sync strategies!", type: "starts" }
+        ];
+        
+        const expertLevels = [
+            { id: 25, title: "SSH Key-Based Auth", intro: "EXPERT MODE! Set up passwordless SSH for automated rsync!", content: "Sync with key:\nrsync -avz -e \"ssh -i key.pem\" source/ user@host:/backup/", hint: "Type: -e \"ssh -i", answer: "-e \"ssh -i", success: "Key auth! No passwords. -i specifies identity file. Automate without security holes!", type: "contains" },
+            { id: 26, title: "rsync Daemon Mode", intro: "Run rsync as a daemon for faster local network transfers!", content: "Connect to daemon:\nrsync -av rsync://host/module/path dest/", hint: "Type: rsync://", answer: "rsync://", success: "Daemon access! Bypasses SSH overhead. Fast for local networks!", type: "contains" },
+            { id: 27, title: "ACL and Xattr Support", intro: "Preserve ACLs and extended attributes with rsync!", content: "Preserve ACLs:\nrsync -avA source/ dest/", hint: "Type: rsync -avA", answer: "rsync -avA", success: "ACLs preserved! -A keeps access control lists. -X for extended attributes!", type: "contains" },
+            { id: 28, title: "Backup Script with Retention", intro: "Create a backup script with automatic old backup cleanup!", content: "Retention script:\n#!/bin/bash\nrsync -avz source/ /backup/current/\nrm -rf /backup/old\nmv /backup/daily /backup/old", hint: "Type: #!/bin/bash", answer: "#!/bin/bash", success: "Retention policy! Keep daily, weekly, monthly. Script automation is key!", type: "contains" },
+            { id: 29, title: "Dry Run Validation", intro: "Always test with -n before real sync - mandatory best practice!", content: "Validate before sync:\nrsync -avzn source/ dest/ | head -20", hint: "Type: rsync -avzn", answer: "rsync -avzn", success: "Validated! -n shows what would happen. ALWAYS dry-run first! Essential!", type: "contains" },
+            { id: 30, title: "File Filtering Rules", intro: "Use filter rules for complex include/exclude logic!", content: "Filter rules:\nrsync -avF --include='*/' --include='*.txt' --exclude='*' source/ dest/", hint: "Type: --include='*/'", answer: "--include='*/'", success: "Filter rules! Order matters: include dirs first, then files, exclude rest. Complex but powerful!", type: "contains" },
+            { id: 31, title: "Rsync for Website Deploy", intro: "Deploy website with rsync - exclude cache and temp files!", content: "Deploy website:\nrsync -avz --delete --exclude='.git' --exclude='node_modules' ./ user@host:/var/www/", hint: "Type: --delete --exclude", answer: "--delete --exclude", success: "Deployed! --delete removes old files. Exclude cache. Production website deployment!", type: "contains" },
+            { id: 32, title: "System Migration", intro: "Use rsync for full system migration with permissions!", content: "Migrate system:\nrsync -avzHAX source/ dest/ --fake-super", hint: "Type: rsync -avzHAX", answer: "rsync -avzHAX", success: "Migrated! -H=hardlinks, -A=ACLs, -X=xattrs, --fake-super preserves on non-root!", type: "contains" },
+            { id: 33, title: "Continuous Sync with inotify", intro: "Watch for changes and sync automatically!", content: "Watch and sync:\nwhile inotifywait -r -e modify,create,delete /path; do rsync -avz /path/ dest/; done", hint: "Type: inotifywait", answer: "inotifywait", success: "Continuous sync! inotifywait watches, rsync syncs on changes. Real-time backup!", type: "contains" },
+            { id: 34, title: "Rsync over Slow Links", intro: "Optimize rsync for low bandwidth connections!", content: "Slow link optimization:\nrsync -avz --compress --bwlimit=50 source/ dest/", hint: "Type: --compress --bwlimit", answer: "--compress --bwlimit", success: "Optimized! --compress reduces bandwidth, --bwlimit limits speed. Good for WAN!", type: "contains" },
+            { id: 35, title: "Verify Sync Integrity", intro: "Compare source and dest after sync to verify integrity!", content: "Verify after sync:\nrsync -avnc source/ dest/ | wc -l", hint: "Type: rsync -avnc", answer: "rsync -avnc", success: "Verified! -n dry-run, -c checksums. wc -l shows differences. Ensure perfect sync!", type: "contains" },
+            { id: 36, title: "Expert Finale - Sync Master", intro: "You've mastered rsync! Let's combine everything - SSH, ACLs, filtering!", content: "Ultimate rsync:\nrsync -avzHAX --delete -e \"ssh -i key.pem\" --filter='- .git/' --filter='- node_modules/' ./ user@host:/backup/", hint: "Type: rsync -avzHAX --delete", answer: "rsync -avzHAX --delete", success: "EXPERT COMPLETE! SSH keys, ACLs, hardlinks, filtering! You're a TRUE backup master! Rsync Ryan is thrilled - go forth and sync everything perfectly!", type: "starts" }
         ];
         
         let levels = beginnerLevels;
@@ -304,6 +319,7 @@
         async function startTrack(trackName) {
             if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: -a, -v, -z, -P. I'll make you a sync pro!"); }
             else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Advanced: --bwlimit, --partial, -W, --link-dest, -e ssh!"); }
+            else if (trackName === 'expert') { levels = expertLevels; await showMessage(character.name, "Welcome to EXPERT mode! SSH keys, ACLs, inotify, filtering! Time to become a true backup master!"); }
             currentLevel = 0;
             showLevel();
         }
@@ -332,6 +348,13 @@
                 e.preventDefault();
                 const userAnswer = input.value.trim();
                 if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--expert') { startTrack('expert'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
                 
                 const level = levels[currentLevel];
                 clearRsyncOutput();
@@ -391,20 +414,25 @@
             
             const menuDiv3 = document.createElement('div');
             menuDiv3.className = 'output-line choice';
-            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'expert\')">--expert</span> - Master: SSH keys, ACLs, inotify (lessons 25-36)';
             history.appendChild(menuDiv3);
             
             const menuDiv4 = document.createElement('div');
             menuDiv4.className = 'output-line choice';
-            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
             history.appendChild(menuDiv4);
             
             const menuDiv5 = document.createElement('div');
             menuDiv5.className = 'output-line choice';
-            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
             history.appendChild(menuDiv5);
             
-            await showMessage(character.name, "Choose your path - click above or type --beginner, --intermediate, --fullscreen, --darkmode, or --exit", '', true);
+            const menuDiv6 = document.createElement('div');
+            menuDiv6.className = 'output-line choice';
+            menuDiv6.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv6);
+            
+            await showMessage(character.name, "Type --beginner, --intermediate, or --expert to start! Or click the options above. Use --fullscreen, --darkmode, or --exit anytime!", '', true);
         }
         init();
     </script>

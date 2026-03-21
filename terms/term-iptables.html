@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-iptables.html" />
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iptables Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid #444444; }
+        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
+        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
+        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
+        .iptables-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .iptables-output-line { color: #aaaaaa; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .iptables-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .iptables-success-line { color: #b5bd68; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1e; }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .iptables-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .iptables-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .iptables-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid #444444; }
+            .left-pane { border-right: none; border-top: 2px solid #444444; }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">iptables Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type iptables command:</div>
+                <textarea id="command-input" placeholder="iptables -L" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="iptables-output-area" id="iptables-output">
+                <div class="iptables-output-line" style="color: #586e75;">iptables output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const iptablesOutput = document.getElementById('iptables-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=iptables');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'iptables', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addIptablesLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'iptables-error-line' : type === 'success' ? 'iptables-success-line' : 'iptables-output-line';
+            line.textContent = text;
+            iptablesOutput.appendChild(line);
+            iptablesOutput.scrollTop = iptablesOutput.scrollHeight;
+        }
+        
+        function clearIptablesOutput() { iptablesOutput.innerHTML = ''; }
+        
+        function runIptables(cmd) {
+            addIptablesLine('$ ' + cmd);
+            
+            const responses = {
+                "iptables -L": "Chain INPUT (policy ACCEPT)\ntarget     prot opt source               destination\nACCEPT     all  --  anywhere             anywhere\n\nChain FORWARD (policy ACCEPT)\ntarget     prot opt source               destination\n\nChain OUTPUT (policy ACCEPT)\ntarget     prot opt source               destination",
+                "iptables -L -n": "Chain INPUT (policy ACCEPT)\ntarget     prot opt source               destination\nACCEPT     all  --  0.0.0.0/0            0.0.0.0/0\n\nChain FORWARD (policy ACCEPT)\ntarget     prot opt source               destination\n\nChain OUTPUT (policy ACCEPT)\ntarget     prot opt source               destination",
+                "iptables -A INPUT": "Rule added",
+                "iptables -A OUTPUT": "Rule added",
+                "iptables -A FORWARD": "Rule added",
+                "-p tcp": "Protocol tcp specified",
+                "-p udp": "Protocol udp specified",
+                "-p icmp": "Protocol icmp specified",
+                "-s 192.168.1.0/24": "Source network specified",
+                "-d 10.0.0.1": "Destination IP specified",
+                "--dport 22": "Destination port specified",
+                "--sport 80": "Source port specified",
+                "-j ACCEPT": "Target set to ACCEPT",
+                "-j DROP": "Target set to DROP",
+                "-j REJECT": "Target set to REJECT",
+                "-j LOG": "Target set to LOG",
+                "-i eth0": "Input interface eth0",
+                "-o eth0": "Output interface eth0",
+                "-m state": "State match specified",
+                "--state ESTABLISHED": "ESTABLISHED state match",
+                "--state RELATED": "RELATED state match",
+                "--state NEW": "NEW state match",
+                "-m conntrack": "Conntrack match specified",
+                "-I INPUT": "Rule inserted at top",
+                "-I OUTPUT 1": "Rule inserted at position 1",
+                "-D INPUT": "Rule deleted",
+                "-F INPUT": "Flushed INPUT chain",
+                "-F": "All chains flushed",
+                "-X": "User-defined chain deleted",
+                "-P INPUT DROP": "INPUT policy set to DROP",
+                "-P FORWARD DROP": "FORWARD policy set to DROP",
+                "-L -n -v": "Verbose listing with numbers",
+                "-Z": "Packet and byte counters zeroed",
+                "-C INPUT": "Check if rule exists",
+                "-N custom": "Chain custom created",
+                "-E custom oldname": "Chain renamed",
+                "-t nat": "Using nat table",
+                "-t filter": "Using filter table",
+                "-t mangle": "Using mangle table",
+                "-A PREROUTING": "Rule added to PREROUTING",
+                "-A POSTROUTING": "Rule added to POSTROUTING",
+                "-A OUTPUT": "Rule added to OUTPUT",
+                "-j MASQUERADE": "Target set to MASQUERADE",
+                "-j SNAT": "Target set to SNAT",
+                "-j DNAT": "Target set to DNAT",
+                "-m comment": "Comment match specified",
+                "--comment": "Rule comment added"
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addIptablesLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.toLowerCase().includes('iptables')) {
+                    addIptablesLine('Rule applied');
+                    matched = true;
+                } else {
+                    addIptablesLine('Try: iptables -L', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "Firewall Fiona",
+            greeting: "Hey! I'm Firewall Fiona - packet filtering expert! iptables is Linux's powerful firewall. Every packet that enters or leaves passes through me. I'll teach you to block, allow, and redirect traffic like a security pro!",
+            encourage: ["Excellent!", "Packet filtered!", "You're a security hero!", "Keep blocking!", "Firewall secured!", "Brilliant!"],
+            getEncouragement: function() { return this.encourage[Math.floor(Math.random() * this.encourage.length)]; }
+        };
+        
+        const beginnerLevels = [
+            { id: 1, title: "List Current Rules", intro: "Welcome! iptables -L shows all current firewall rules.", content: "List rules:\niptables -L", hint: "Type: iptables -L", answer: "iptables -L", success: "Rules listed! See INPUT, FORWARD, OUTPUT chains. Policy shows default action!", type: "contains" },
+            { id: 2, title: "List with Line Numbers", intro: "iptables -L -n shows IPs and ports as numbers, with --line-numbers for rule numbers.", content: "Numbered rules:\niptables -L -n --line-numbers", hint: "Type: iptables -L -n --line-numbers", answer: "--line-numbers", success: "Numbered! Now you can reference rules by number for deletion!", type: "contains" },
+            { id: 3, title: "Block Incoming Ping", intro: "Block ICMP (ping) with: iptables -A INPUT -p icmp -j DROP", content: "Block ping:\niptables -A INPUT -p icmp -j DROP", hint: "Type: iptables -A INPUT -p icmp -j DROP", answer: "-p icmp -j DROP", success: "Ping blocked! Now server won't respond to ping. -A adds, -j sets action!", type: "contains" },
+            { id: 4, title: "Allow SSH", intro: "Allow port 22 (SSH) with: iptables -A INPUT -p tcp --dport 22 -j ACCEPT", content: "Allow SSH:\niptables -A INPUT -p tcp --dport 22 -j ACCEPT", hint: "Type: --dport 22 -j ACCEPT", answer: "--dport 22 -j ACCEPT", success: "SSH allowed! Port 22 can now connect. Always allow SSH before blocking!yoself!", type: "contains" },
+            { id: 5, title: "Block IP Address", intro: "Block specific IP: iptables -A INPUT -s 192.168.1.100 -j DROP", content: "Block IP:\niptables -A INPUT -s 192.168.1.100 -j DROP", hint: "Type: -s 192.168.1.100 -j DROP", answer: "-s 192.168.1.100 -j DROP", success: "IP blocked! All traffic from 192.168.1.100 denied. Use -s for source IP!", type: "contains" },
+            { id: 6, title: "Allow HTTP/HTTPS", intro: "Allow web traffic on ports 80 and 443.", content: "Allow web:\niptables -A INPUT -p tcp --dport 80 -j ACCEPT", hint: "Type: --dport 80 -j ACCEPT", answer: "--dport 80 -j ACCEPT", success: "HTTP allowed! Port 80 open. Add 443 for HTTPS too!", type: "contains" },
+            { id: 7, title: "Drop All Other Input", intro: "Set default policy to DROP: iptables -P INPUT DROP", content: "Drop all input:\niptables -P INPUT DROP", hint: "Type: iptables -P INPUT DROP", answer: "-P INPUT DROP", success: "Default policy DROP! Only allowed ports pass now. Careful with SSH!", type: "contains" },
+            { id: 8, title: "Allow Established Connections", intro: "Allow return traffic for established connections.", content: "Allow established:\niptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT", hint: "Type: -m state --state ESTABLISHED", answer: "ESTABLISHED,RELATED", success: "Return traffic allowed! Outgoing connections get responses. Essential!", type: "contains" },
+            { id: 9, title: "Insert Rule at Top", intro: "-I inserts at the top of the chain instead of -A appending.", content: "Insert at top:\niptables -I INPUT -p tcp --dport 2222 -j ACCEPT", hint: "Type: -I INPUT", answer: "-I INPUT", success: "Rule inserted at top! -I adds at beginning, -A adds at end!", type: "contains" },
+            { id: 10, title: "Delete Rule by Number", intro: "Delete rule using -D with chain and rule number.", content: "Delete rule 1:\niptables -D INPUT 1", hint: "Type: iptables -D INPUT 1", answer: "-D INPUT", success: "Rule deleted! Use -D chain number. Combine with --line-numbers!", type: "contains" },
+            { id: 11, title: "Flush Chain", intro: "Flush (delete all rules) in a chain: iptables -F INPUT", content: "Flush INPUT:\niptables -F INPUT", hint: "Type: iptables -F INPUT", answer: "-F INPUT", success: "Chain flushed! All rules in INPUT deleted. Policies stay!", type: "contains" },
+            { id: 12, title: "Beginner Finale", intro: "Final challenge! Allow SSH, block ping, list rules!", content: "Challenge:\niptables -A INPUT -p tcp --dport 22 -j ACCEPT && iptables -A INPUT -p icmp -j DROP && iptables -L -n", hint: "Type: --dport 22", answer: "--dport 22 -j ACCEPT", success: "BEGINNER COMPLETE! You master: -L list, -A add, -I insert, -D delete, -P policy! Firewall pro!", type: "starts" }
+        ];
+        
+        const intermediateLevels = [
+            { id: 1, title: "Match Interface -i", intro: "INTERMEDIATE! Match incoming interface with -i (e.g., -i eth0).", content: "From eth0 only:\niptables -A INPUT -i eth0 -p tcp --dport 80 -j ACCEPT", hint: "Type: -i eth0", answer: "-i eth0", success: "Interface matched! Only traffic on eth0 matches. Useful for multi-NIC servers!", type: "contains" },
+            { id: 2, title: "Output Interface -o", intro: "Match outgoing interface with -o for traffic leaving an interface.", content: "Out eth1 only:\niptables -A OUTPUT -o eth1 -j DROP", hint: "Type: -o eth1", answer: "-o eth1", success: "Output matched! Traffic leaving eth1 blocked. -o is for output!", type: "contains" },
+            { id: 3, title: "Source Port --sport", intro: "Match source port with --sport instead of destination.", content: "From port 80:\niptables -A INPUT -p tcp --sport 80 -j ACCEPT", hint: "Type: --sport 80", answer: "--sport 80", success: "Source port matched! Traffic from source port 80 allowed!", type: "contains" },
+            { id: 4, title: "Reject with ICMP", intro: "REJECT sends back an ICMP error, unlike DROP which silently discards.", content: "Reject instead:\niptables -A INPUT -p tcp --dport 23 -j REJECT", hint: "Type: -j REJECT", answer: "-j REJECT", success: "Rejected! Client gets connection refused. DROP is stealthier, REJECT is friendlier!", type: "contains" },
+            { id: 5, title: "Log Packets -j LOG", intro: "LOG action logs packets without matching (must be last in chain).", content: "Log dropped:\niptables -A INPUT -m limit --limit 5/min -j LOG", hint: "Type: -j LOG", answer: "-j LOG", success: "Logging enabled! -m limit prevents log flood. Check /var/log/kern.log!", type: "contains" },
+            { id: 6, title: "Rate Limiting", intro: "Limit connection rate with -m limit for DoS protection.", content: "Rate limit:\niptables -A INPUT -p tcp --dport 22 -m limit --limit 3/min -j ACCEPT", hint: "Type: -m limit --limit", answer: "-m limit --limit", success: "Rate limited! Only 3 SSH attempts per minute. Brute force protection!", type: "contains" },
+            { id: 7, title: "NAT Table Basics", intro: "NAT table (-t nat) for port forwarding and masquerading.", content: "Port forward 80 to 8080:\niptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080", hint: "Type: -t nat -A PREROUTING", answer: "-t nat", success: "Port forwarded! Traffic on 80 redirected to 8080. Great for internal services!", type: "contains" },
+            { id: 8, title: "Masquerade for Sharing", intro: "Masquerade makes server act as gateway - IP sharing!", content: "Share connection:\niptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE", hint: "Type: -j MASQUERADE", answer: "-j MASQUERADE", success: "Masquerading! Server now shares internet. All outbound looks like server!", type: "contains" },
+            { id: 9, title: "Create Custom Chain", intro: "Create custom chain for organizing rules: -N custom_name", content: "Create chain:\niptables -N CUSTOM_BLOCK", hint: "Type: iptables -N", answer: "-N", success: "Chain created! Custom chains let you group and reference rules!", type: "contains" },
+            { id: 10, title: "Jump to Custom Chain", intro: "Jump to custom chain from built-in chain.", content: "Jump to custom:\niptables -A INPUT -j CUSTOM_BLOCK", hint: "Type: -j CUSTOM_BLOCK", answer: "-j CUSTOM_BLOCK", success: "Jumped! Rules in CUSTOM_BLOCK now processed. Modular firewall design!", type: "contains" },
+            { id: 11, title: "Comment Rules", intro: "Add comments to rules for documentation with -m comment --comment.", content: "Commented rule:\niptables -A INPUT -p tcp --dport 22 -m comment --comment \"SSH Access\" -j ACCEPT", hint: "Type: --comment", answer: "--comment", success: "Commented! Rules now documented. Essential for production firewalls!", type: "contains" },
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! NAT port forward, rate limit SSH, log blocked!", content: "Challenge:\niptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080 && iptables -A INPUT -p tcp --dport 22 -m limit --limit 3/min -j ACCEPT", hint: "Type: -t nat -A PREROUTING", answer: "-t nat", success: "INTERMEDIATE COMPLETE! You master: interfaces, NAT, rate limiting, logging, custom chains! Firewall MASTER!", type: "starts" }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollTop;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') return user === answer;
+            else if (level.type === 'contains') return user.includes(answer);
+            else if (level.type === 'starts') return user.startsWith(answer);
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! iptables levels complete! You're a firewall master!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: -L list, -A add, -j ACCEPT/DROP. I'll make you a firewall pro!"); }
+            else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Advanced: NAT, rate limiting, logging, custom chains!"); }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) { document.exitFullscreen(); }
+            else { document.documentElement.requestFullscreen(); }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=updateTheme&theme=' + newTheme, credentials: 'include' });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels[currentLevel];
+                clearIptablesOutput();
+                runIptables(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels[currentLevel];
+                clearIptablesOutput();
+                runIptables(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) { currentLevel = savedLevel - 1; }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basics: -L, -A, -j ACCEPT/DROP (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Advanced: NAT, rate limit, logging (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Type --beginner or --intermediate to start! Click options or use --fullscreen, --darkmode, --exit anytime!");
+        }
+        init();
+    </script>
+</body>
+</html>

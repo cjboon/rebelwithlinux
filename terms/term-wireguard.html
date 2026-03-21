@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-wireguard.html" />
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WireGuard Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid #444444; }
+        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
+        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
+        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
+        .wg-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .wg-output-line { color: #aaaaaa; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .wg-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .wg-success-line { color: #b5bd68; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1e; }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .wg-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .wg-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .wg-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid #444444; }
+            .left-pane { border-right: none; border-top: 2px solid #444444; }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">WireGuard Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type wg command:</div>
+                <textarea id="command-input" placeholder="wg show" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="wg-output-area" id="wg-output">
+                <div class="wg-output-line" style="color: #586e75;">WireGuard output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const wgOutput = document.getElementById('wg-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=wireguard');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'wireguard', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addWgLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'wg-error-line' : 'wg-output-line';
+            line.textContent = text;
+            wgOutput.appendChild(line);
+            wgOutput.scrollTop = wgOutput.scrollHeight;
+        }
+        
+        function clearWgOutput() { wgOutput.innerHTML = ''; }
+        
+        function runWg(cmd) {
+            addWgLine('$ ' + cmd);
+            
+            const responses = {
+                'wg show': 'interface: wg0\n  public key: YWJjZDEyMzQ1Njc4OTBhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ejEyMw==\n  private key: (hidden)\n  listening port: 51820\n\npeer: c3VwZXI1MTI0Nzg5MGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6MTI=\n  endpoint: 203.0.113.2:51820\n  allowed ips: 10.0.0.2/32\n  latest handshake: 45 seconds ago\n  transfer: 5.43 MiB received, 12.87 MiB sent',
+                'wg-quick up': 'Warning: cannot close db,alehnsrta.,hnsrt: Operation not permitted\n[#] ip link add wg0 type wireguard\n[#] wg setconf wg0 /dev/fd/63\n[#] ip address add 10.0.0.1/24 dev wg0\n[#] ip link set mtu 1420 up dev wg0\n[#] ip route add 10.0.0.0/24 dev wg0',
+                'wg-quick down': '[#] ip link del dev wg0',
+                'wg genkey': 'YMxCzDEyMzQ1Njc4OTBhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ejEyMw==',
+                'wg pubkey': 'WNPtDEyMzQ1Njc4OTBhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ejEyMw==',
+                'systemctl start wg-quick@wg0': '',
+                'systemctl enable wg-quick@wg0': '',
+                'cat /etc/wireguard/wg0.conf': '[Interface]\nPrivateKey = YMxCzDEyMzQ1Njc4OTBhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ejEyMw==\nAddress = 10.0.0.1/24\nListenPort = 51820\n\n[Peer]\nPublicKey = WNPtDEyMzQ1Njc4OTBhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ejEyMw==\nEndpoint = 203.0.113.2:51820\nAllowedIPs = 10.0.0.2/32',
+                'ip link show wg0': 'wg0: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1420 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000\n    link/none',
+                'ip addr show wg0': 'wg0: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1420 qdisc noqueue state UNKNOWN group default qlen 1000\n    link/none\n    inet 10.0.0.1/24 scope global wg0\n       valid_lft forever preferred_lft forever',
+                'ping 10.0.0.2': 'PING 10.0.0.2 (10.0.0.2) 56(84) bytes of data.\n64 bytes from 10.0.0.2: icmp_seq=1 ttl=64 time=23.5 ms',
+                'wg show wg0': 'interface: wg0\n  public key: YWJjZDEyMzQ1Njc4OTBhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ejEyMw==\n  private key: (hidden)\n  listening port: 51820\n\npeer: c3VwZXI1MTI0Nzg5MGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6MTI=\n  endpoint: 203.0.113.2:51820\n  allowed ips: 10.0.0.2/32\n  latest handshake: 45 seconds ago'
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addWgLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.toLowerCase().includes('wg') || cmd.toLowerCase().includes('wireguard')) {
+                    addWgLine('Command executed (simulated)');
+                    matched = true;
+                } else {
+                    addWgLine('Try: wg show', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "WireGuard Walter",
+            greeting: "Greetings! I'm WireGuard Walter - your VPN setup guide! WireGuard is the fast, modern VPN protocol. Simple config, crypto-native, and blazing fast. Let's build your private network!",
+            encourage: ["VPN virtuoso!", "Tunnel builder!", "Encrypted excellence!", "Private network pro!", "Secure tunnel!", "Crypto-native!"],
+            getEncouragement: function() { return this.encourage[Math.floor(Math.random() * this.encourage.length)]; }
+        };
+        
+        const beginnerLevels = [
+            { id: 1, title: "Generate Private Key", intro: "Welcome! Every WireGuard tunnel needs keys. Start by generating a private key!", content: "Generate private key:\nwg genkey", hint: "Type: wg genkey", answer: "wg genkey", success: "Private key generated! Keep this secret - it's your tunnel identity!", type: "contains" },
+            { id: 2, title: "Generate Public Key", intro: "The public key is derived from private key. Share this with peers!", content: "Generate public key:\necho 'PRIVATE_KEY' | wg pubkey", hint: "Type: wg pubkey", answer: "wg pubkey", success: "Public key created! Share this with anyone who needs to connect to your VPN!", type: "contains" },
+            { id: 3, title: "Install WireGuard", intro: "Install WireGuard package on your system!", content: "Install on Debian/Ubuntu:\napt install wireguard", hint: "Type: apt install wireguard", answer: "apt install wireguard", success: "WireGuard installed! Most distros have it in their repos!", type: "contains" },
+            { id: 4, title: "Create Config Directory", intro: "WireGuard configs live in /etc/wireguard/ - root only access!", content: "Create config dir:\nmodprobe wireguard\nls /etc/wireguard/", hint: "Type: ls /etc/wireguard", answer: "/etc/wireguard", success: "Config directory ready! umask 077 keeps your keys private!", type: "contains" },
+            { id: 5, title: "Basic Interface Config", intro: "The [Interface] section defines your end of the tunnel!", content: "Config format:\n[Interface]\nPrivateKey = <your-private-key>\nAddress = 10.0.0.1/24\nListenPort = 51820", hint: "Type: [Interface]", answer: "[Interface]", success: "Interface section! PrivateKey and Address are required!", type: "contains" },
+            { id: 6, title: "Add Peer Section", intro: "The [Peer] section defines who can connect to you!", content: "Add peer:\n[Peer]\nPublicKey = <peer-public-key>\nAllowedIPs = 10.0.0.2/32", hint: "Type: [Peer]", answer: "[Peer]", success: "Peer added! PublicKey identifies the peer, AllowedIPs controls routing!", type: "contains" },
+            { id: 7, title: "Bring Interface Up", intro: "wg-quick up brings the tunnel up with your config!", content: "Start tunnel:\nsudo wg-quick up wg0", hint: "Type: wg-quick up", answer: "wg-quick up", success: "Tunnel up! Your VPN is now active!", type: "contains" },
+            { id: 8, title: "Bring Interface Down", intro: "wg-quick down cleanly shuts down the tunnel!", content: "Stop tunnel:\nsudo wg-quick down wg0", hint: "Type: wg-quick down", answer: "wg-quick down", success: "Tunnel down! Clean shutdown preserves your config!", type: "contains" },
+            { id: 9, title: "Show Interface Status", intro: "wg show displays current tunnel status and peers!", content: "Show tunnel status:\nsudo wg show", hint: "Type: wg show", answer: "wg show", success: "Status shown! See public key, peers, handshake times!", type: "contains" },
+            { id: 10, title: "Show Specific Interface", intro: "wg show wg0 shows status for just that interface!", content: "Show wg0 status:\nsudo wg show wg0", hint: "Type: wg show wg0", answer: "wg show wg0", success: "Interface status! Transfer stats, peer info, encryption details!", type: "contains" },
+            { id: 11, title: "Enable on Boot", intro: "systemctl enable starts WireGuard automatically at boot!", content: "Enable at boot:\nsudo systemctl enable wg-quick@wg0", hint: "Type: systemctl enable wg-quick", answer: "systemctl enable wg-quick", success: "Enabled on boot! Your VPN starts automatically!", type: "contains" },
+            { id: 12, title: "Beginner Finale", intro: "Final challenge! Create keys, bring up tunnel, verify status!", content: "Complete setup:\nwg genkey | tee privatekey | wg pubkey > publickey\nsudo wg-quick up wg0 && wg show", hint: "Type: wg-quick up", answer: "wg-quick up", success: "BEGINNER COMPLETE! You master: key generation, config, up/down, show! VPN hero!", type: "starts" }
+        ];
+        
+        const intermediateLevels = [
+            { id: 1, title: "Persistent Peers", intro: "INTERMEDIATE! Peers can be set with PersistentKeepalive to maintain NAT mappings!", content: "Add keepalive:\n[Peer]\nPublicKey = <peer-key>\nAllowedIPs = 10.0.0.2/32\nPersistentKeepalive = 25", hint: "Type: PersistentKeepalive", answer: "PersistentKeepalive", success: "Keepalive added! 25 seconds keeps connection through NAT alive!", type: "contains" },
+            { id: 2, title: "DNS in WireGuard", intro: "Add DNS servers to your interface for DNS leak protection!", content: "Add DNS:\n[Interface]\nPrivateKey = <key>\nAddress = 10.0.0.1/24\nDNS = 10.0.0.53", hint: "Type: DNS =", answer: "DNS =", success: "DNS set! Route all DNS through the tunnel - no leaks!", type: "contains" },
+            { id: 3, title: "Full Tunnel vs Split", intro: "0.0.0.0/0 routes ALL traffic through VPN. Peer-specific IPs = split tunnel!", content: "Full tunnel:\nAllowedIPs = 0.0.0.0/0, ::/0", hint: "Type: 0.0.0.0/0", answer: "0.0.0.0/0", success: "Full tunnel! All traffic goes through VPN. Great for public WiFi!", type: "contains" },
+            { id: 4, title: "PostUp and PreDown", intro: "PostUp runs commands after tunnel up. PreDown before tunnel down!", content: "Add PostUp:\n[Interface]\nPostUp = iptables -A FORWARD -i wg0 -j ACCEPT", hint: "Type: PostUp", answer: "PostUp", success: "PostUp added! Configure routing, firewall rules automatically!", type: "contains" },
+            { id: 5, title: "NAT Routing", intro: "Enable IP forwarding and NAT for peer-to-peer connectivity!", content: "Enable routing:\nsysctl -w net.ipv4.ip_forward=1", hint: "Type: sysctl -w net.ipv4.ip_forward", answer: "ip_forward", success: "IP forwarding enabled! Essential for routing between peers!", type: "contains" },
+            { id: 6, title: "Check Handshake", intro: "Handshake establishes the encrypted session. Recent handshake = active connection!", content: "Check handshake:\nsudo wg show | grep handshake", hint: "Type: handshake", answer: "handshake", success: "Handshake info! Recent = connected. Old = reconnection needed!", type: "contains" },
+            { id: 7, title: "Transfer Statistics", intro: "wg show displays bytes sent/received through the tunnel!", content: "View transfer stats:\nsudo wg show | grep transfer", hint: "Type: transfer", answer: "transfer", success: "Transfer stats! Monitor VPN usage and peer activity!", type: "contains" },
+            { id: 8, title: "Add Peer Dynamically", intro: "wg set adds peers without editing config file!", content: "Add peer dynamically:\nsudo wg set wg0 peer <key> allowed-ips 10.0.0.5/32", hint: "Type: wg set wg0 peer", answer: "wg set wg0 peer", success: "Peer added dynamically! No restart needed!", type: "contains" },
+            { id: 9, title: "Remove Peer", intro: "wg set with no endpoint removes a peer from the interface!", content: "Remove peer:\nsudo wg set wg0 peer <key> remove", hint: "Type: wg set wg0 peer remove", answer: "remove", success: "Peer removed! Use when decommissioning a client!", type: "contains" },
+            { id: 10, title: "Firewall Rules", intro: "WireGuard needs proper firewall rules to forward packets!", content: "Setup forwarding:\niptables -A FORWARD -i wg0 -o wg0 -j ACCEPT", hint: "Type: iptables -A FORWARD", answer: "iptables -A FORWARD", success: "Forwarding rule added! Allow traffic between VPN peers!", type: "contains" },
+            { id: 11, title: "MTU Considerations", intro: "WireGuard MTU is typically 1420 - accounts for IP/UDP headers!", content: "Set MTU:\nMTU = 1420", hint: "Type: MTU =", answer: "MTU =", success: "MTU set! 1420 is default - handles most network configurations!", type: "contains" },
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Full config with DNS, PostUp, and persistent peer!", content: "Complete config:\n[Interface]\nPrivateKey = <key>\nAddress = 10.0.0.1/24\nDNS = 1.1.1.1\n\n[Peer]\nPublicKey = <peer-key>\nAllowedIPs = 10.0.0.2/32\nPersistentKeepalive = 25", hint: "Type: PersistentKeepalive", answer: "PersistentKeepalive", success: "INTERMEDIATE COMPLETE! You master: DNS, keepalive, PostUp, NAT, dynamic peers! VPN MASTER!", type: "starts" }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            textDiv.textContent = text;
+            div.appendChild(textDiv);
+            
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') return user === answer;
+            else if (level.type === 'contains') return user.includes(answer);
+            else if (level.type === 'starts') return user.startsWith(answer);
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! WireGuard levels complete! You're a VPN master!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: key generation, config, up/down, show. I'll make you a VPN pro!"); }
+            else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Advanced: DNS, keepalive, PostUp, NAT, dynamic peers!"); }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) { document.exitFullscreen(); }
+            else { document.documentElement.requestFullscreen(); }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=updateTheme&theme=' + newTheme, credentials: 'include' });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                await showMessage(character.name, "Press Ctrl+Enter to run. Use --beginner, --intermediate, --fullscreen, --darkmode, or --exit", 'hint');
+                input.value = '';
+                return;
+            }
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearWgOutput();
+                runWg(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearWgOutput();
+                runWg(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) { currentLevel = savedLevel - 1; }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basics: keys, config, up/down, show (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Advanced: DNS, keepalive, NAT, dynamic peers (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Choose your path - click above or type --beginner, --intermediate, --fullscreen, --darkmode, or --exit", '', true);
+        }
+        init();
+    </script>
+</body>
+</html>

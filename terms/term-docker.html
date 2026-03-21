@@ -233,7 +233,22 @@
             { id: 9, title: "Network Create", intro: "docker network creates isolated networks for containers.", content: "Create network:\ndocker network create mynet", hint: "Type: docker network create", answer: "docker network create", success: "Network created! Containers on the same network can communicate by name!", type: "contains" },
             { id: 10, title: "Connect to Network", intro: "Connect containers to networks for inter-container communication.", content: "Run on network:\ndocker run --network mynet -d nginx", hint: "Type: --network", answer: "--network", success: "On the network! Containers can now reach each other by name - like a private LAN!", type: "contains" },
             { id: 11, title: "Docker Compose Intro", intro: "docker-compose manages multi-container applications with a YAML file.", content: "Compose up:\ndocker-compose up -d", hint: "Type: docker-compose up", answer: "docker-compose", success: "Composed! One command starts everything defined in docker-compose.yml!", type: "contains" },
-            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Create a network, run containers on it, and verify connectivity!", content: "Challenge:\ndocker network create net && docker run --network net --name app -d alpine sh", hint: "Type: docker network create", answer: "docker network create", success: "INTERMEDIATE COMPLETE! You master: rm/rmi, exec, cp, inspect, stats, build, volumes, networks, compose! Docker MASTER!", type: "starts" }
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Create a network, run containers on it, and verify connectivity!", content: "Challenge:\ndocker network create net && docker run --network net --name app -d alpine sh", hint: "Type: docker network create", answer: "docker network create", success: "INTERMEDIATE COMPLETE! You master: rm/rmi, exec, cp, inspect, stats, build, volumes, networks, compose! Docker MASTER! Type --expert when ready for advanced orchestration!", type: "starts" }
+        ];
+        
+        const expertLevels = [
+            { id: 25, title: "Dockerfile Best Practices", intro: "EXPERT MODE! Learn to write efficient, secure Dockerfiles!", content: "Multi-stage build:\nFROM golang:1.21 AS builder\nWORKDIR /src\nCOPY . .\nRUN go build -o app\n\nFROM alpine\nCOPY --from=builder /src/app /app\nCMD /app", hint: "Type: FROM golang AS builder", answer: "FROM golang AS builder", success: "Multi-stage build! Build in golang, copy binary to small alpine. Smaller final image!", type: "contains" },
+            { id: 26, title: "Healthchecks in Dockerfile", intro: "HEALTHCHECK tells Docker how to test if your container is healthy!", content: "Add healthcheck:\nHEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/ || exit 1", hint: "Type: HEALTHCHECK", answer: "HEALTHCHECK", success: "Healthcheck added! Docker pings your app every 30s. Essential for production!", type: "contains" },
+            { id: 27, title: "Resource Limits", intro: "Limit CPU and memory for containers with docker run options!", content: "Set resource limits:\ndocker run -d --name limited -m 512m --cpus 0.5 nginx", hint: "Type: -m 512m --cpus", answer: "-m 512m --cpus", success: "Resources limited! 512MB RAM, 0.5 CPU. Prevents containers from hogging resources!", type: "contains" },
+            { id: 28, title: "Docker Secrets", intro: "Docker Swarm secrets securely store sensitive data!", content: "Create secret:\necho \"mypassword\" | docker secret create db_pass -", hint: "Type: docker secret create", answer: "docker secret create", success: "Secret created! Secrets are encrypted at rest and in transit. Safer than env vars!", type: "contains" },
+            { id: 29, title: "Docker Config", intro: "Docker Config for non-sensitive configuration!", content: "Create config:\ndocker config create nginx.conf nginx.conf", hint: "Type: docker config create", answer: "docker config create", success: "Config created! Similar to secrets but for config files. Decrypted at runtime!", type: "contains" },
+            { id: 30, title: "Docker Stack Deploy", intro: "Deploy entire stack with docker stack deploy!", content: "Deploy stack:\ndocker stack deploy -c docker-compose.yml myapp", hint: "Type: docker stack deploy", answer: "docker stack deploy", success: "Stack deployed! docker stack manages services, secrets, configs all at once!", type: "contains" },
+            { id: 31, title: "Docker Service Scaling", intro: "Scale services up/down with docker service scale!", content: "Scale service:\ndocker service scale myapp_web=5", hint: "Type: docker service scale", answer: "docker service scale", success: "Service scaled! 5 replicas now running. Swarm distributes across nodes!", type: "contains" },
+            { id: 32, title: "Docker System Prune", intro: "Clean up unused Docker resources with docker system prune!", content: "Prune everything:\ndocker system prune -a --volumes", hint: "Type: docker system prune", answer: "docker system prune", success: "Clean slate! -a removes all images, --volumes removes volumes too. Free up disk space!", type: "contains" },
+            { id: 33, title: "Docker History", intro: "See how an image was built with docker history!", content: "View image layers:\ndocker history nginx:latest", hint: "Type: docker history", answer: "docker history", success: "Layers shown! See each layer size and creation. Optimize your Dockerfiles!", type: "contains" },
+            { id: 34, title: "Docker Inspect", intro: "Deep dive into container/image details with docker inspect!", content: "Inspect container:\ndocker inspect --format='{{.NetworkSettings.IPAddress}}' web", hint: "Type: docker inspect --format", answer: "docker inspect --format", success: "Specific field! --format templates extract exactly what you need. No more grepping JSON!", type: "contains" },
+            { id: 35, title: "Docker Events", intro: "Monitor Docker events in real-time!", content: "Watch events:\ndocker events --filter 'type=container'", hint: "Type: docker events", answer: "docker events", success: "Events streaming! See create, start, stop, die in real-time. Debugging essential!", type: "contains" },
+            { id: 36, title: "Expert Finale - Master Containerizer", intro: "You've mastered Docker! Let's combine everything - multi-stage, secrets, scaling!", content: "Ultimate challenge:\ndocker build -t myapp . && docker run -d -p 8080:80 --health-cmd='curl localhost' --memory=256m --cpus=0.5 myapp", hint: "Type: docker build -t", answer: "docker build -t", success: "EXPERT COMPLETE! Multi-stage builds, healthchecks, resource limits, Compose! You're a TRUE Docker captain! Docker Dave is impressed - go forth and containerize the world!", type: "starts" }
         ];
         
         let levels = beginnerLevels;
@@ -306,6 +321,7 @@
         async function startTrack(trackName) {
             if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: run, ps, images, pull, ports. I'll make you a container hero!"); }
             else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Advanced: rm/rmi, exec, networks, volumes, build, compose!"); }
+            else if (trackName === 'expert') { levels = expertLevels; await showMessage(character.name, "Welcome to EXPERT mode! Multi-stage builds, secrets, healthchecks, Swarm! Time to become a container captain!"); }
             currentLevel = 0;
             showLevel();
         }
@@ -334,6 +350,13 @@
                 e.preventDefault();
                 const userAnswer = input.value.trim();
                 if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--expert') { startTrack('expert'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
                 
                 const level = levels[currentLevel];
                 clearDockerOutput();
@@ -393,20 +416,25 @@
             
             const menuDiv3 = document.createElement('div');
             menuDiv3.className = 'output-line choice';
-            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'expert\')">--expert</span> - Master: multi-stage, secrets, Swarm (lessons 25-36)';
             history.appendChild(menuDiv3);
             
             const menuDiv4 = document.createElement('div');
             menuDiv4.className = 'output-line choice';
-            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
             history.appendChild(menuDiv4);
             
             const menuDiv5 = document.createElement('div');
             menuDiv5.className = 'output-line choice';
-            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
             history.appendChild(menuDiv5);
             
-            await showMessage(character.name, "Choose your path - click above or type --beginner, --intermediate, --fullscreen, --darkmode, or --exit", '', true);
+            const menuDiv6 = document.createElement('div');
+            menuDiv6.className = 'output-line choice';
+            menuDiv6.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv6);
+            
+            await showMessage(character.name, "Type --beginner, --intermediate, or --expert to start! Or click the options above. Use --fullscreen, --darkmode, or --exit anytime!", '', true);
         }
         init();
     </script>
