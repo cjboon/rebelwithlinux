@@ -340,7 +340,7 @@
         };
         
         input.addEventListener('keydown', async function(e) {
-            if (e.key === 'Enter' && e.ctrlKey) {
+            if (e.key === 'Enter' && !e.ctrlKey) {
                 e.preventDefault();
                 const userAnswer = input.value.trim();
                 if (!userAnswer) return;
@@ -350,6 +350,15 @@
                 if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
                 if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
                 if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                await showMessage(character.name, "Press Ctrl+Enter to run ps commands. Use --beginner, --intermediate, --fullscreen, --darkmode, or --exit", 'hint');
+                input.value = '';
+                return;
+            }
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
                 
                 const level = levels[currentLevel];
                 clearPsOutput();

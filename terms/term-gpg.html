@@ -336,6 +336,21 @@
         };
         
         input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                await showMessage(character.name, "Press Ctrl+Enter to run gpg commands. Use --beginner, --intermediate, --fullscreen, --darkmode, or --exit", 'hint');
+                input.value = '';
+                return;
+            }
             if (e.key === 'Enter' && e.ctrlKey) {
                 e.preventDefault();
                 const userAnswer = input.value.trim();
