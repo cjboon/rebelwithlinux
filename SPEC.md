@@ -152,7 +152,7 @@
 
 ## 5. Content Type Specifications
 
-### Guides (40 total)
+### Guides (46 total)
 Comprehensive written tutorials covering theory and practical examples.
 
 ### Builders (97 files)
@@ -176,8 +176,8 @@ Quick guides and tips organized by category:
 - Containers (Docker, Kubernetes)
 - Automation & IaC (Ansible, Jenkins)
 
-### Terms (42 total)
-Interactive terminal command learning games: awk, bash, chmod, cron, curl, df, docker, find, git, gpg, grep, html, iptables, journalctl, jq, kubectl, ln, mount, nginx, nix, ps, py, regex, rsync, sed, sql, ssh, systemctl, tar, vim, wget, wireguard
+### Terms (45 total)
+Interactive terminal command learning games: apache2, awk, bash, chmod, cron, curl, df, docker, find, foss, git, gpg, grep, html, iptables, journalctl, jq, kubectl, ln, monero, mount, nginx, nix, ps, py, regex, rsync, sed, sql, ssh, systemctl, tar, vim, wget, wireguard
 
 ### Projects (9 total)
 Step-by-step tutorials for building self-hosted infrastructure: homelab dashboard, VPN, email, Matrix, hidden services, blog, fileshare, pastebin, i3 WM

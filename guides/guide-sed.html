@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-sed.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sed - Stream Editor | REBEL WITH LINUX</title>
+    <meta name="description" content="Master sed stream editor. Learn to find and replace text, delete lines, and transform text files from the command line.">
+    <meta name="keywords" content="sed, stream editor, find replace, text transformation, linux, command line, regex">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.checked = (savedTheme === 'dark' || !savedTheme);
+            }
+        });
+    </script>
+
+    <style>
+        :root { --nav-color: #C0C0C0; }
+        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
+        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../search.html">SEARCH</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>sed<br>MASTERY</h1>
+        <p class="tagline">// Transform. Replace. Edit.</p>
+        
+        <div class="manifesto">
+            <p><strong>TEXT IS EVERYTHING.</strong></p>
+            <p>On Linux, everything is text—config files, logs, code. sed is your scalpel for precise text surgery. Find, replace, insert, delete—on entire files or specific lines.</p>
+            <p><strong>AUTOMATE EDITS.</strong></p>
+            <p>Why edit 100 files manually when sed can do it in seconds? Master sed and you'll automate text transformations that would take hours manually.</p>
+        </div>
+        
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// Your Training Path</h2>
+            <p>Click a lesson to begin</p>
+        </div>
+
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to sed</h3>
+                <p class="lesson-desc">What is sed? Basic concepts and usage.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Substitution Command</h3>
+                <p class="lesson-desc">The s command for find and replace.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Flags and Options</h3>
+                <p class="lesson-desc">g, i, p flags and more.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Addresses</h3>
+                <p class="lesson-desc">Apply commands to specific lines.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Delete Lines</h3>
+                <p class="lesson-desc">Use d to delete lines.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Insert and Append</h3>
+                <p class="lesson-desc">i, a, c commands for adding text.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Read and Write</h3>
+                <p class="lesson-desc">r and w commands for file operations.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Regex with sed</h3>
+                <p class="lesson-desc">Use regex patterns in sed.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Backreferences</h3>
+                <p class="lesson-desc">Capture groups with \1 \2.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">In-place Editing</h3>
+                <p class="lesson-desc">Edit files directly with -i.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Multi-line Processing</h3>
+                <p class="lesson-desc">Work with multiple lines using N.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">sed in Scripts</h3>
+                <p class="lesson-desc">Automate sed in bash scripts.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Lesson 1 -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: Introduction to sed</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is sed?</h3>
+                <p>sed (stream editor) reads text from input, transforms it, and outputs the result. It's perfect for batch text operations like find-and-replace.</p>
+
+                <h3>Basic Syntax</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">sed [OPTIONS] 'COMMAND' [FILE...]
+sed [OPTIONS] -f SCRIPTFILE [FILE...]</pre>
+
+                <h3>Simple Example</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Replace first 'hello' with 'world' in file.txt
+sed 's/hello/world/' file.txt
+
+# Use pipe
+echo "hello world" | sed 's/hello/goodbye/'</pre>
+
+                <h3>sed vs Editor</h3>
+                <ul>
+                    <li><strong>Non-interactive:</strong> Works in scripts and pipelines</li>
+                    <li><strong>Stream-based:</strong> Processes line by line</li>
+                    <li><strong>Powerful:</strong> Regex support, substitutions, deletion</li>
+                    <li><strong>Fast:</strong> Can process huge files efficiently</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does sed stand for?</p>
+                        <input type="text" class="quiz-input" data-answer="stream editor" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Stream Editor</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: Substitution Command</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>The s Command</h3>
+                <p>The substitution command `s` finds a pattern and replaces it:</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">s/pattern/replacement/</pre>
+
+                <h3>Basic Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Replace 'error' with 'ERROR'
+sed 's/error/ERROR/' file.log
+
+# Replace all occurrences on each line (default is first only)
+sed 's/error/ERROR/' file.log
+
+# Delimiter can be any character
+sed 's|/bin/bash|/bin/zsh|' /etc/passwd</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is the sed substitution command syntax?</p>
+                        <input type="text" class="quiz-input" data-answer="s/pattern/replacement" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>s/pattern/replacement/</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Flags and Options</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Common Flags</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">g  Replace all occurrences on each line (global)
+i  Case insensitive matching
+p  Print the modified line
+I  Case insensitive (GNU extension)
+E  Extended regex (ERE)</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Replace ALL occurrences (not just first)
+sed 's/error/ERROR/g' file.log
+
+# Case insensitive
+sed 's/error/ERROR/gi' file.log
+
+# Print only changed lines (-n suppresses unless p)
+sed -n 's/error/ERROR/p' file.log
+
+# Only print modified lines
+sed -n 's/root/ADMIN/p' /etc/passwd</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What flag makes sed replace ALL occurrences on a line?</p>
+                        <input type="text" class="quiz-input" data-answer="g" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>g (global flag)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: Addresses</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Addresses?</h3>
+                <p>Addresses specify which lines to operate on. Without an address, sed operates on all lines.</p>
+
+                <h3>Address Types</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">N          Line number N
+$          Last line
+N,M        Lines N through M
+/pattern/  Lines matching pattern
+/pat1/,/pat2/  From first match to next match</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Replace on line 5 only
+sed '5s/old/new/' file.txt
+
+# Replace on lines 10-20
+sed '10,20s/old/new/' file.txt
+
+# Replace on last line
+sed '$s/old/new/' file.txt
+
+# Replace on lines containing 'error'
+sed '/error/s/old/new/' file.txt
+
+# From line matching 'start' to 'end'
+sed '/^start/,/^end/s/old/new/' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you replace on line 10 only?</p>
+                        <input type="text" class="quiz-input" data-answer="10" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>sed '10s/old/new/' file.txt</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Delete Lines</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>The d Command</h3>
+                <p>The delete command removes lines from the output (or file with -i).</p>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Delete line 5
+sed '5d' file.txt
+
+# Delete lines 1-10
+sed '1,10d' file.txt
+
+# Delete last line
+sed '$d' file.txt
+
+# Delete empty lines
+sed '/^$/d' file.txt
+
+# Delete lines containing 'error'
+sed '/error/d' file.txt
+
+# Delete lines NOT containing 'error' (invert)
+sed '/error/!d' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What command deletes empty lines?</p>
+                        <input type="text" class="quiz-input" data-answer="/^$/d" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>sed '/^$/d' file.txt</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Insert and Append</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Text Addition Commands</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">i\  Insert text BEFORE line
+a\  Append text AFTER line
+c\  Change (replace) entire line</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Insert before line 3
+sed '3i\New line here' file.txt
+
+# Append after line 3
+sed '3a\New line here' file.txt
+
+# Append at end of file
+sed '$a\Last line added' file.txt
+
+# Change (replace) line 5
+sed '5c\This replaces the entire line' file.txt
+
+# Insert at beginning of file
+sed '1i\Header line' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Which command inserts text before a line?</p>
+                        <input type="text" class="quiz-input" data-answer="i" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>i\ (insert)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: Read and Write</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>File Operations</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">r FILE  Read file and insert after line
+w FILE  Write lines to file</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Insert contents of header.txt after line 1
+sed '1r header.txt' file.txt
+
+# Insert footer at end of file
+sed '$r footer.txt' file.txt
+
+# Write all lines containing 'error' to errors.log
+sed -n '/error/w errors.log' file.txt
+
+# Write lines 1-10 to newfile.txt
+sed -n '1,10w newfile.txt' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does r FILE do in sed?</p>
+                        <input type="text" class="quiz-input" data-answer="read" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Reads the file and inserts its contents after a line</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Regex with sed</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>sed and Regex</h3>
+                <p>sed uses basic regular expressions (BRE) by default. Use -E for extended regex (ERE).</p>
+
+                <h3>Regex Metacharacters</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">.   Any character
+*   Zero or more of preceding
+^   Beginning of line
+$   End of line
+[]  Character class
+\(\) Group (BRE)
+\|  OR (ERE with -E)</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Replace lines starting with 'error'
+sed 's/^error/ERROR/' file.log
+
+# Replace lines ending with '.log'
+sed 's/\.log$/LOG_FILE/' file.txt
+
+# Replace any digit
+sed 's/[0-9]/X/g' file.txt
+
+# Extended regex (-E)
+sed -E 's/(error|warning|critical)/[ALERT]/gi' file.log
+
+# Remove leading whitespace
+sed 's/^[[:space:]]*//' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What regex metacharacter matches any character?</p>
+                        <input type="text" class="quiz-input" data-answer="." placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>. (dot)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Backreferences</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Capture Groups</h3>
+                <p>Use \( \) to group patterns and \1, \2, etc. to reference them in the replacement.</p>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Swap first two words
+echo "hello world" | sed 's/\(hello\) \(world\)/\2 \1/'
+# Output: world hello
+
+# Remove duplicate words
+sed 's/\([a-z]*\) \1/\1/g' file.txt
+
+# Add quotes around words
+echo "one two three" | sed 's/\([a-z]*\)/"\1"/g'
+# Output: "one" "two" "three"
+
+# Extract and reorder
+echo "John:Doe:123" | sed 's/\([^:]*\):\([^:]*\):\(.*\)/\2, \1 (\3)/'
+# Output: Doe, John (123)</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you reference the first capture group?</p>
+                        <input type="text" class="quiz-input" data-answer="\\1" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>\1 (backslash one)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: In-place Editing</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>The -i Option</h3>
+                <p>The -i flag edits files in place (modifies the original file). Use -i.bak to create a backup.</p>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Edit file.txt in place
+sed -i 's/old/new/g' file.txt
+
+# Create backup before editing
+sed -i.bak 's/old/new/g' file.txt
+# Creates file.txt.bak as backup
+
+# Edit multiple files
+sed -i 's/old/new/g' file1.txt file2.txt file3.txt
+
+# Edit only .conf files
+for f in *.conf; do sed -i 's/port 80/port 8080/g' "$f"; done
+
+# In-place with regex
+sed -i -E 's/[0-9]{4}-[0-9]{2}-[0-9]{2}/YYYY-MM-DD/g' log.txt</pre>
+
+                <h3>WARNING</h3>
+                <p>Always create backups or test with redirection first!</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Test first (redirect to new file)
+sed 's/old/new/g' file.txt > newfile.txt
+
+# When satisfied, use -i
+sed -i.bak 's/old/new/g' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does sed -i.bak do?</p>
+                        <input type="text" class="quiz-input" data-answer="edit in place with backup" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Edits in place and creates .bak backup</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: Multi-line Processing</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>The N Command</h3>
+                <p>N appends the next line to the pattern space, allowing multi-line operations.</p>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Join lines (replace newlines with space)
+sed ':a; N; s/\n/ /g; ba' file.txt
+
+# Delete blank lines
+sed '/^$/d' file.txt
+# Or
+sed -n '/./p' file.txt
+
+# Print lines 1-5 only
+sed -n '1,5p' file.txt
+
+# Find lines containing 'error' and the next line
+sed -n '/error/{p; n; p}' file.txt</pre>
+
+                <h3>Practical Example</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Convert DOS line endings to Unix
+sed -i 's/\r$//' file.txt
+
+# Remove ^M characters (DOS line endings)
+sed -i 's/\r//g' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does the N command do?</p>
+                        <input type="text" class="quiz-input" data-answer="next line" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Appends the next line to pattern space</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: sed in Scripts</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Script Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">#!/bin/bash
+# Replace URLs in config file
+
+sed -i.bak \
+    -e 's|http://old.com|http://new.com|g' \
+    -e 's|8080|80|g' \
+    -e 's|/var/data|/var/www|g' \
+    config.txt
+
+echo "Config updated. Backup: config.txt.bak"</pre>
+
+                <h3>Log Processing</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">#!/bin/bash
+# Extract and format errors from log
+
+sed -n 's/.*\(ERROR\).*/\1/p' app.log | \
+    sed 's/ERROR/\[ERROR\]/g' | \
+    sort | uniq -c | sort -rn</pre>
+
+                <h3>Multiple Transformations</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Multiple -e options
+sed -e 's/a/A/g' \
+    -e 's/e/E/g' \
+    -e 's/i/I/g' \
+    -e 's/o/O/g' \
+    -e 's/u/U/g' \
+    file.txt
+
+# Use semicolons
+sed 's/a/A/g; s/e/E/g; s/i/I/g; s/o/O/g; s/u/U/g' file.txt</pre>
+
+                <h3>Congratulations!</h3>
+                <p>You've mastered sed! You now understand:</p>
+                <ul>
+                    <li>Substitution with s command</li>
+                    <li>Flags: g, i, p</li>
+                    <li>Addressing lines and patterns</li>
+                    <li>Deleting, inserting, appending lines</li>
+                    <li>Regex patterns in sed</li>
+                    <li>Backreferences</li>
+                    <li>In-place editing</li>
+                    <li>Multi-line processing</li>
+                </ul>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why sed</h2>
+            <p>sed is the power tool for text transformation. When you need to make the same change across hundreds of files, sed does it instantly.</p>
+            <p>Master sed and you'll automate text editing tasks that would take hours manually. Combined with regex, it's incredibly powerful.</p>
+            <p><strong>Transform. Replace. Automate.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>sed Man Page</h3>
+                <p>Official documentation</p>
+                <a href="https://man7.org/linux/man-pages/man1/sed.1.html" target="_blank">man sed</a>
+            </div>
+            <div class="resource-card">
+                <h3>sed Tutorial</h3>
+                <p>GNU sed guide</p>
+                <a href="https://www.gnu.org/software/sed/manual/sed.html" target="_blank">GNU sed</a>
+            </div>
+            <div class="resource-card">
+                <h3>sed One-liners</h3>
+                <p>Common sed commands</p>
+                <a href="https://quickref.me/sed" target="_blank">QuickRef</a>
+            </div>
+            <div class="resource-card">
+                <h3>sed FAQ</h3>
+                <p>sed users guide</p>
+                <a href="https://sed.sourceforge.net/sedfaq.html" target="_blank">sed FAQ</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="copyleft">⟲</span>
+                <span>REBEL WITH LINUX</span>
+            </div>
+            <p class="footer-tagline">Learn Linux the hard way.</p>
+            <div class="footer-links">
+                <a href="../site-map.html">Site Map</a>
+                <span class="footer-divider">|</span>
+                <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion">Onion Site</a>
+                <span class="footer-divider">|</span>
+                <a href="https://github.com/cjboon/rebelwithlinux">GitHub</a>
+            </div>
+            <p class="footer-copyright">COPYRIGHT © 2026 — ALL RIGHTS RESERVED</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-regex.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regular Expressions - Pattern Matching | REBEL WITH LINUX</title>
+    <meta name="description" content="Master regular expressions (regex). Learn pattern matching for grep, sed, awk, and programming. From beginner to advanced patterns.">
+    <meta name="keywords" content="regex, regular expression, pattern matching, grep, sed, awk, tutorial, linux">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.checked = (savedTheme === 'dark' || !savedTheme);
+            }
+        });
+    </script>
+
+    <style>
+        :root { --nav-color: #C0C0C0; }
+        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
+        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../search.html">SEARCH</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>REGEX<br>MASTERY</h1>
+        <p class="tagline">// Match. Extract. Validate.</p>
+        
+        <div class="manifesto">
+            <p><strong>PATTERNS ARE EVERYWHERE.</strong></p>
+            <p>Email addresses, phone numbers, URLs, log entries—all have patterns. Regex is the universal language for describing and matching those patterns.</p>
+            <p><strong>MASTER THE PATTERN.</strong></p>
+            <p>Once you understand regex, you'll find patterns everywhere. Validation, extraction, search and replace—regex makes it all effortless.</p>
+        </div>
+        
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// Your Training Path</h2>
+            <p>Click a lesson to begin</p>
+        </div>
+
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to Regex</h3>
+                <p class="lesson-desc">What are regular expressions?</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Literal Characters</h3>
+                <p class="lesson-desc">Match exact characters.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Metacharacters</h3>
+                <p class="lesson-desc">. ^ $ * + ? { } [ ] \ | ( )</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Character Classes</h3>
+                <p class="lesson-desc">[abc], [a-z], [^abc], \d \w \s</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Quantifiers</h3>
+                <p class="lesson-desc">* + ? {n} {n,m}</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Anchors</h3>
+                <p class="lesson-desc">^ $ \b \B word boundaries.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Groups</h3>
+                <p class="lesson-desc">Capturing groups and backreferences.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Alternation</h3>
+                <p class="lesson-desc">OR matching with |.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Escaping</h3>
+                <p class="lesson-desc">Match special characters literally.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Lookahead/Lookbehind</h3>
+                <p class="lesson-desc">Zero-width assertions.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Common Patterns</h3>
+                <p class="lesson-desc">Email, URL, IP, date validation.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Regex in Tools</h3>
+                <p class="lesson-desc">grep, sed, awk, and more.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Lesson 1 -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: Introduction to Regex</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What are Regular Expressions?</h3>
+                <p>Regular expressions (regex) are patterns used to match text. They're used in programming, command line tools, and text editors to find and manipulate text based on patterns.</p>
+
+                <h3>Where Regex is Used</h3>
+                <ul>
+                    <li><strong>grep:</strong> Search files for patterns</li>
+                    <li><strong>sed:</strong> Find and replace text</li>
+                    <li><strong>awk:</strong> Extract and process text</li>
+                    <li><strong>Programming:</strong> Python, JavaScript, PHP, etc.</li>
+                    <li><strong>Editors:</strong> Vim, VSCode, Sublime</li>
+                </ul>
+
+                <h3>Regex Flavors</h3>
+                <ul>
+                    <li><strong>BRE:</strong> Basic Regular Expressions (basic grep)</li>
+                    <li><strong>ERE:</strong> Extended Regular Expressions (grep -E)</li>
+                    <li><strong>PCRE:</strong> Perl Compatible (most powerful)</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does regex stand for?</p>
+                        <input type="text" class="quiz-input" data-answer="regular expression" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Regular Expression</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: Literal Characters</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Match Exactly</h3>
+                <p>Most characters in regex match themselves. If you write "hello", it matches the string "hello".</p>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># grep for literal "error"
+grep 'error' logfile.txt
+
+# Matches "error", "Error", "ERROR"? Only if case-insensitive flag used
+grep -i 'error' logfile.txt
+
+# Match "127.0.0.1"
+grep '127.0.0.1' /etc/hosts</pre>
+
+                <h3>Case Sensitivity</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Default is case-sensitive
+grep 'Error' file.txt  # only matches "Error"
+
+# Use -i for case-insensitive
+grep -i 'error' file.txt  # matches "Error", "ERROR", "error"</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. By default, is regex case-sensitive?</p>
+                        <input type="text" class="quiz-input" data-answer="yes" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Yes</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Metacharacters</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Special Characters</h3>
+                <p>These characters have special meaning in regex:</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">.   Match any single character
+^   Match at start of string
+$   Match at end of string
+*   Match 0 or more of preceding
++   Match 1 or more of preceding
+?   Match 0 or 1 of preceding
+{ } Match specific number
+[ ] Match character class
+\   Escape special character
+|   Alternation (OR)
+( ) Group
+$1  Backreference</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># . matches any character
+grep 'c.t' file.txt  # matches "cat", "cot", "cut"
+
+# * matches 0 or more
+grep 'ab*c' file.txt  # matches "ac", "abc", "abbc"
+
+# + matches 1 or more
+grep 'ab+c' file.txt  # matches "abc", "abbc" but NOT "ac"</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does . (dot) match in regex?</p>
+                        <input type="text" class="quiz-input" data-answer="any character" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Any single character</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: Character Classes</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Character Class Syntax</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">[abc]    Match a, b, or c
+[^abc]   NOT a, b, or c
+[a-z]    Any lowercase letter
+[A-Z]    Any uppercase letter
+[0-9]    Any digit
+[a-zA-Z] Any letter
+[a-zA-Z0-9] Any alphanumeric</pre>
+
+                <h3>Shorthand Classes</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">\d   Digit [0-9]
+\D   Non-digit [^0-9]
+\w   Word character [a-zA-Z0-9_]
+\W   Non-word character
+\s   Whitespace (space, tab, newline)
+\S   Non-whitespace</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Match any digit
+grep '[0-9]' file.txt
+grep '\d' file.txt
+
+# Match not a digit
+grep '[^0-9]' file.txt
+
+# Match vowel
+grep '[aeiou]' file.txt
+
+# Match not a vowel
+grep '[^aeiouAEIOU]' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does \d match?</p>
+                        <input type="text" class="quiz-input" data-answer="digit" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Any digit [0-9]</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Quantifiers</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Quantifier Syntax</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">*      0 or more
++      1 or more
+?      0 or 1 (optional)
+{n}    Exactly n times
+{n,}   n or more times
+{n,m}  Between n and m times</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Match US phone number
+grep '[0-9]{3}-[0-9]{3}-[0-9]{4}' file.txt
+
+# Match IP address (simplified)
+grep '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' file.txt
+
+# Match optional s
+grep 'colors?' file.txt  # matches "color" and "colors"
+
+# 1 or more digits
+grep '[0-9]+' file.txt
+
+# Whitespace
+grep '\s+' file.txt</pre>
+
+                <h3>Greedy vs Non-Greedy</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Greedy (matches as much as possible)
+grep '<.+>' file.txt  # matches entire <div>...</div>
+
+# Non-greedy (matches as little as possible)
+grep '<.+?>' file.txt  # matches <div> and </div> separately</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does {3,5} mean?</p>
+                        <input type="text" class="quiz-input" data-answer="3 to 5 times" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Between 3 and 5 times (inclusive)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Anchors</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Anchors</h3>
+                <p>Anchors don't match characters—they match positions.</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">^   Start of string (or line with -E)
+$   End of string (or line with -E)
+\b  Word boundary
+\B  Non-word boundary</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Lines starting with "error"
+grep '^error' logfile.txt
+
+# Lines ending with "failed"
+grep 'failed$' logfile.txt
+
+# Entire line is "error"
+grep '^error$' logfile.txt
+
+# Word "the" (not in "there")
+grep '\bthe\b' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does ^ match?</p>
+                        <input type="text" class="quiz-input" data-answer="start" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Start of string (or line)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: Groups</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Capturing Groups</h3>
+                <p>Parentheses () create groups that capture matched text.</p>
+
+                <h3>Basic Groups</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Basic group
+grep '(ab)+' file.txt  # matches "ab", "abab", "ababab"
+
+# Capture group reference
+# sed replacement: \1 refers to first group
+sed 's/\(capture\) \1/\1/g' file.txt</pre>
+
+                <h3>Backreferences</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Find repeated words
+grep '\b\([a-zA-Z]+\) \1\b' file.txt
+
+# Replace with single word (sed)
+sed 's/\([a-zA-Z]+\) \1/\1/g' file.txt</pre>
+
+                <h3>Named Groups</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># PCRE (grep -P) named groups
+grep -P '(?<word>[a-zA-Z]+) \k<word>' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What do parentheses create in regex?</p>
+                        <input type="text" class="quiz-input" data-answer="groups" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Capturing groups</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Alternation</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>The OR Operator</h3>
+                <p>The | operator matches either the expression before or after it.</p>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Match "error" or "warning"
+grep -E 'error|warning' logfile.txt
+
+# Match "cat" or "dog" or "bird"
+grep -E 'cat|dog|bird' file.txt
+
+# With grouping
+grep -E 'gr(e|a)y' file.txt  # matches "grey" or "gray"</pre>
+
+                <h3>Precedence</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Without parens (matches "abc" OR "xyz")
+grep -E 'abc|xyz'
+
+# With parens (matches "abc123" OR "xyz123")
+grep -E '(abc|xyz)123'</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does | match in regex?</p>
+                        <input type="text" class="quiz-input" data-answer="or" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>OR (either/or)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Escaping</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Escaping Special Characters</h3>
+                <p>Use backslash \ to match special characters literally.</p>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Match literal dot
+grep 'example\.com' file.txt
+
+# Match literal asterisk
+grep '\*' file.txt
+
+# Match literal dollar sign
+grep '\$' file.txt
+
+# Match literal backslash
+grep '\\' file.txt
+
+# Match [ literally
+grep '\[' file.txt</pre>
+
+                <h3>When to Escape</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># In grep, escape these: . ^ $ * + ? { } [ ] \ |
+# With -E (extended), fewer escapes needed
+grep -E '\.' file.txt  # still escape . in BRE</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you match a literal dot?</p>
+                        <input type="text" class="quiz-input" data-answer="\." placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>\.</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: Lookahead/Lookbehind</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Zero-Width Assertions</h3>
+                <p>Lookahead and lookbehind check for patterns without consuming characters.</p>
+
+                <h3>Syntax</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">(?=pattern)   Positive lookahead
+(?!pattern)   Negative lookahead
+(?<=pattern)  Positive lookbehind
+(?<!pattern)  Negative lookbehind</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Positive lookahead: password followed by =
+grep -P 'password(?==)' file.txt
+
+# Negative lookahead: not followed by =
+grep -P 'password(?!=)' file.txt
+
+# Positive lookbehind: preceded by Mr.
+grep -P '(?<=Mr\.)\w+' file.txt
+
+# Practical: extract domain from URLs (lookbehind)
+grep -oP '(?<=@)[^@]+' file.txt  # email after @</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Do lookahead assertions consume characters?</p>
+                        <input type="text" class="quiz-input" data-answer="no" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>No (they're zero-width)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: Common Patterns</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Email Address</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}</pre>
+
+                <h3>URL</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">https?://[^\s]+</pre>
+
+                <h3>IP Address (simplified)</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}</pre>
+
+                <h3>Date Formats</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># YYYY-MM-DD
+[0-9]{4}-[0-9]{2}-[0-9]{2}
+
+# MM/DD/YYYY
+[0-9]{2}/[0-9]{2}/[0-9]{4}
+
+# DD.MM.YYYY
+[0-9]{2}\.[0-9]{2}\.[0-9]{4}</pre>
+
+                <h3>Phone Numbers</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># US format
+[0-9]{3}-[0-9]{3}-[0-9]{4}
+
+# International
+\+[0-9]{1,3}[0-9]{4,14}</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is a common email regex pattern for the @ domain?</p>
+                        <input type="text" class="quiz-input" data-answer="@\.[a-z]{2,}" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: Regex in Tools</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>grep</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Basic grep (BRE)
+grep 'pattern' file.txt
+
+# Extended grep (ERE) - less escaping needed
+grep -E 'pattern+' file.txt
+
+# Perl-compatible (most features)
+grep -P 'pattern' file.txt
+
+# Case insensitive
+grep -i 'pattern' file.txt
+
+# Invert match
+grep -v 'pattern' file.txt
+
+# Line numbers
+grep -n 'pattern' file.txt</pre>
+
+                <h3>sed</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Find and replace
+sed 's/old/new/g' file.txt
+
+# Extended regex
+sed -E 's/(capture) this/\1 that/' file.txt</pre>
+
+                <h3>awk</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; max-width: 900px; margin: 20px auto; display: block;"># Match pattern
+awk '/pattern/ { print }' file.txt
+
+# With condition on field
+awk '$3 ~ /pattern/ { print }' file.txt</pre>
+
+                <h3>Congratulations!</h3>
+                <p>You've mastered regex! You now understand:</p>
+                <ul>
+                    <li>Literal and metacharacters</li>
+                    <li>Character classes [abc] and \d \w \s</li>
+                    <li>Quantifiers * + ? {n,m}</li>
+                    <li>Anchors ^ $ \b</li>
+                    <li>Groups and backreferences</li>
+                    <li>Alternation |</li>
+                    <li>Escaping special characters</li>
+                    <li>Lookahead/lookbehind</li>
+                    <li>Common patterns for email, URL, IP</li>
+                </ul>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why Regex</h2>
+            <p>Regex is the universal language for pattern matching. Once you understand it, you'll find patterns everywhere—in validation, extraction, search, and replace operations.</p>
+            <p>Master regex and you'll handle text processing tasks that would otherwise require complex programming.</p>
+            <p><strong>Match. Extract. Validate.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>regex101</h3>
+                <p>Online regex tester</p>
+                <a href="https://regex101.com/" target="_blank">regex101.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>QuickRef</h3>
+                <p>Regex cheatsheet</p>
+                <a href="https://quickref.me/regex" target="_blank">QuickRef</a>
+            </div>
+            <div class="resource-card">
+                <h3>RegexOne</h3>
+                <p>Interactive tutorial</p>
+                <a href="https://regexone.com/" target="_blank">RegexOne</a>
+            </div>
+            <div class="resource-card">
+                <h3>Regular-Expressions.info</h3>
+                <p>Comprehensive guide</p>
+                <a href="https://www.regular-expressions.info/" target="_blank">Regex Info</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="copyleft">⟲</span>
+                <span>REBEL WITH LINUX</span>
+            </div>
+            <p class="footer-tagline">Learn Linux the hard way.</p>
+            <div class="footer-links">
+                <a href="../site-map.html">Site Map</a>
+                <span class="footer-divider">|</span>
+                <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion">Onion Site</a>
+                <span class="footer-divider">|</span>
+                <a href="https://github.com/cjboon/rebelwithlinux">GitHub</a>
+            </div>
+            <p class="footer-copyright">COPYRIGHT © 2026 — ALL RIGHTS RESERVED</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+</body>
+</html>

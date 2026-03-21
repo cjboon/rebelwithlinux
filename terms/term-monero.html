@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-monero.html" />
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monero Tutor - Rebel with Linux</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid #444444; }
+        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #666666; }
+        .dot-yellow { background: #888888; }
+        .dot-green { background: #aaaaaa; }
+        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
+        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
+        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        #command-input::placeholder { color: #666666; }
+        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1a; }
+        .bash-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .bash-output-line { color: #aaaaaa; font-size: 0.85rem; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .bash-error-line { color: #ff6b6b; font-size: 0.85rem; margin-bottom: 0.25rem; }
+        .bash-success-line { color: #b5bd68; font-size: 0.85rem; margin-bottom: 0.25rem; }
+        .right-pane { flex: 1; }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
+        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
+        [data-theme="light"] .terminal-header { background: #e0e0e0; }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
+        [data-theme="light"] .pane-label { background: #e0e0e0; }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .bash-output-area { background: #ffffff; color: #1a1a1a; }
+        [data-theme="light"] .bash-output-area { background: #f5f5f5; border-top-color: #cccccc; }
+        [data-theme="light"] #command-input { color: #1a1a1a; }
+        [data-theme="light"] .input-label { color: #444444; }
+        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
+        [data-theme="light"] .hint { color: #666666; }
+        [data-theme="light"] .bash-output-line { color: #333333; }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid #444444; }
+            .left-pane { border-right: none; border-top: 2px solid #444444; }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">Monero Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type monero-wallet-cli command:</div>
+                <textarea id="command-input" placeholder="balance" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Enter for new line, Ctrl+Enter to run</div>
+            </div>
+            <div class="bash-output-area" id="bash-output">
+                <div class="bash-output-line" style="color: #586e75;">Monero output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const bashOutput = document.getElementById('bash-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) {
+                    userId = data.email;
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+        
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=monero');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        return Math.max(...data.map(p => p.lesson_id));
+                    }
+                }
+            } catch (e) {}
+            return null;
+        }
+        
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'monero', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addBashLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'bash-error-line' : 'bash-output-line';
+            line.textContent = text;
+            bashOutput.appendChild(line);
+            bashOutput.scrollTop = bashOutput.scrollHeight;
+        }
+        
+        function clearBashOutput() {
+            bashOutput.innerHTML = '';
+        }
+        
+        async function runBashCode(cmd) {
+            addBashLine('$ ' + cmd);
+            const responses = {
+                'balance': 'Available balance: 0.5 XMR\nLocked balance: 0.0 XMR',
+                'address': '4Addre55KsssXsssXXssKssssAddrssssss\nHeight: 1234567\n監護: View key: 8b41234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678',
+                'seed': 'word1 word2 word3 word4 word5 word6 word7 word8 word9 word10 word11 word12 word13 word14 word15 word16 word17 word18 word19 word20 word21 word22 word23 word24\nNOTE: Write down your 25 word seed and store it safely!',
+                'help': 'Commands:\n  balance\n  address\n  seed\n  transfer\n  incoming_transfers\n  outgoing_transfers\n  height\n  refresh\n  start_mining\n  stop_mining\n  help <command>',
+                'transfer': 'Transaction successfully submitted.\nTransaction ID: a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0\nFunds are locked for approximately 10 minutes.',
+                'incoming': 'Incoming transfers:\n- 0.5 XMR from 4SrcXXXX... (confirmed, ringct)\n- 0.25 XMR from 4DstYYYY... (unconfirmed)',
+                'outgoing': 'Outgoing transfers:\n- 0.1 XMR to 4PayZZZZ... (confirmed)',
+                'height': 'Current blockchain height: 1234567',
+                'refresh': 'Starting refresh...\nBlocks fetched: 0\nHeight: 1234567 -> 1234568\nRefresh done',
+                'start_mining': 'Mining started in background.\nYou can check status with the status command.',
+                'stop_mining': 'Mining stopped.'
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addBashLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.toLowerCase().includes('monero') || cmd.toLowerCase().includes('xmr') || cmd.toLowerCase().includes('wallet')) {
+                    addBashLine('Command executed (simulated)');
+                    matched = true;
+                } else {
+                    addBashLine('Try: balance, address, help', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "Monero Max",
+            greeting: "Yo! I'm Monero Max - your privacy coin guide! Monero is the king of private cryptocurrency. Unlike Bitcoin, Monero hides everything: amounts, sender, and receiver. Let's learn fungibility!",
+            encourage: ["Privacy champion!", "Crypto keeper!", "Untraceable!", "Fungibility forever!", "Hiding in plain sight!", "Decentralized defense!"],
+            getEncouragement: function() {
+                return this.encourage[Math.floor(Math.random() * this.encourage.length)];
+            }
+        };
+        
+        const beginnerLevels = [
+            {
+                id: 1,
+                title: "Check Your Balance",
+                intro: "Let's start with 'balance' - it shows how much XMR you have. Privacy doesn't mean empty pockets!",
+                content: "Run: balance",
+                hint: "Type: balance",
+                answer: "balance",
+                success: "Balance shows your available and locked XMR! Monero hides amounts using ring signatures - even the wallet server can't see your balance!",
+                type: "contains"
+            },
+            {
+                id: 2,
+                title: "Your Secret Address",
+                intro: "'address' shows your public address - it's stealth, meaning no one can link it to you like Bitcoin addresses.",
+                content: "Run: address",
+                hint: "Type: address",
+                answer: "address",
+                success: "Your Monero address starts with '4' - it's a stealth address generated for each transaction! No two payments can be linked to the same address.",
+                type: "contains"
+            },
+            {
+                id: 3,
+                title: "Your View Key",
+                intro: "The view key lets you show proofs of payment without revealing your full balance - selective disclosure!",
+                content: "Run: address",
+                hint: "Type: address (includes view key)",
+                answer: "address",
+                success: "The view key is for proving payments to third parties! Unlike your private view key, the public one can't spend funds - only view.",
+                type: "contains"
+            },
+            {
+                id: 4,
+                title: "Your Recovery Seed",
+                intro: "'seed' reveals your 25-word recovery seed - your ultimate backup. Write it down somewhere safe!",
+                content: "Run: seed",
+                hint: "Type: seed",
+                answer: "seed",
+                success: "Your 25-word seed is your wallet's DNA! Anyone with these words can recreate your wallet and steal your funds. Store it offline, multiple copies, different locations.",
+                type: "contains"
+            },
+            {
+                id: 5,
+                title: "Send Private XMR",
+                intro: "'transfer' sends XMR privately. Unlike Bitcoin, Monero hides the amount and both addresses!",
+                content: "Run: transfer <address> <amount>",
+                hint: "Type: transfer",
+                answer: "transfer",
+                success: "Monero transfers use ring signatures - your transaction is mixed with others, making it untraceable! Even the blockchain doesn't reveal sender or receiver.",
+                type: "contains"
+            },
+            {
+                id: 6,
+                title: "See Incoming Payments",
+                intro: "'incoming_transfers' shows what you've received. Monero hides incoming amounts from prying eyes!",
+                content: "Run: incoming_transfers",
+                hint: "Type: incoming_transfers",
+                answer: "incoming",
+                success: "Incoming transfers show your receipts! The blockchain shows 'ringct' - ring *confidential* transaction, hiding the actual amount.",
+                type: "contains"
+            },
+            {
+                id: 7,
+                title: "Track Outgoing Payments",
+                intro: "'outgoing_transfers' shows what you've sent - and the network can't link them to you!",
+                content: "Run: outgoing_transfers",
+                hint: "Type: outgoing_transfers",
+                answer: "outgoing",
+                success: "Monero's outgoing transfers also use ring signatures! The recipient can't tell it came from you - true privacy!",
+                type: "contains"
+            },
+            {
+                id: 8,
+                title: "Blockchain Height",
+                intro: "'height' shows the current blockchain state - your sync status with the network.",
+                content: "Run: height",
+                hint: "Type: height",
+                answer: "height",
+                success: "Blockchain height is like a timestamp! Higher means more confirmations. Monero's difficulty adjusts automatically - no miners fighting!",
+                type: "contains"
+            },
+            {
+                id: 9,
+                title: "Sync Your Wallet",
+                intro: "'refresh' syncs your wallet with the blockchain. Unlike Bitcoin, Monero's view blockchain can be pruned!",
+                content: "Run: refresh",
+                hint: "Type: refresh",
+                answer: "refresh",
+                success: "Monero uses EEE (encrypted, effiicient, experimental) stealth addresses! Your wallet scans the blockchain privately - no server knows what you're looking for.",
+                type: "contains"
+            },
+            {
+                id: 10,
+                title: "Help is Always There",
+                intro: "'help' shows all available commands - every Monero feature at your fingertips!",
+                content: "Run: help",
+                hint: "Type: help",
+                answer: "help",
+                success: "The help system is comprehensive! Type 'help <command>' for details. Monero values education - learn every feature!",
+                type: "contains"
+            },
+            {
+                id: 11,
+                title: "Mine Your Own XMR",
+                intro: "'start_mining' lets your computer help secure the network and earn rewards!",
+                content: "Run: start_mining",
+                hint: "Type: start_mining",
+                answer: "start_mining",
+                success: "Monero uses RandomX - CPU-friendly proof of work! Unlike GPU-heavy coins, anyone with a CPU can mine. Mining helps secure privacy!",
+                type: "contains"
+            },
+            {
+                id: 12,
+                title: "Stop Mining",
+                intro: "'stop_mining' when you're done - or your computer gets too hot!",
+                content: "Run: stop_mining",
+                hint: "Type: stop_mining",
+                answer: "stop_mining",
+                success: "Mining is optional! You can stop anytime. Remember: even when not mining, your transactions are private by default!",
+                type: "contains"
+            }
+        ];
+        
+        const intermediateLevels = [
+            {
+                id: 1,
+                title: "Prove a Payment",
+                intro: "Sometimes you need to prove you paid someone. Monero has built-in proof generation!",
+                content: "To prove payment, use: get_tx_proof <txid> <address>",
+                hint: "Type: get_tx_proof",
+                answer: "get_tx_proof",
+                success: "Monero's tx proofs let you prove a transaction without revealing your balance! The recipient can verify you paid without knowing your other transactions.",
+                type: "contains"
+            },
+            {
+                id: 2,
+                title: "Verify a Payment Proof",
+                intro: "If someone sends you a payment proof, you can verify it with 'check_tx_proof'!",
+                content: "To verify: check_tx_proof <txid> <address> <signature>",
+                hint: "Type: check_tx_proof",
+                answer: "check_tx_proof",
+                success: "With Monero, you can verify payments cryptographically! No banks, no intermediaries - just math proving the transfer happened.",
+                type: "contains"
+            },
+            {
+                id: 3,
+                title: "Rescan the Blockchain",
+                intro: "'rescan_spent' checks for spent outputs - useful after restoring from seed!",
+                content: "Run: rescan_spent",
+                hint: "Type: rescan_spent",
+                answer: "rescan_spent",
+                success: "After restoring a wallet, rescan_spent finds your spent outputs! Monero's privacy doesn't prevent you from recovering your own funds.",
+                type: "contains"
+            },
+            {
+                id: 4,
+                title: "Export Key Images",
+                intro: "Key images prove you've spent funds - essential for multisig and accounting!",
+                content: "Run: export_key_images <filename>",
+                hint: "Type: export_key_images",
+                answer: "export_key_images",
+                success: "Key images are cryptographic proofs that you've spent! They're spendable without revealing which output you spent. Privacy-preserving accounting!",
+                type: "contains"
+            },
+            {
+                id: 5,
+                title: "Import Key Images",
+                intro: "After exporting, import to reconcile your wallet state!",
+                content: "Run: import_key_images <filename>",
+                hint: "Type: import_key_images",
+                answer: "import_key_images",
+                success: "Importing key images syncs your wallet's spent status! Essential when switching between wallet instances.",
+                type: "contains"
+            },
+            {
+                id: 6,
+                title: "View Your Subaddresses",
+                intro: "Subaddresses let you receive to different addresses from one wallet - improves privacy!",
+                content: "Run: address all",
+                hint: "Type: address all",
+                answer: "address all",
+                success: "Subaddresses are numbered 0, 1, 2... Each is a stealth address! Using different subaddresses for different purposes makes tracking harder.",
+                type: "contains"
+            },
+            {
+                id: 7,
+                title: "Create New Subaddress",
+                intro: "Generate fresh subaddresses for each payment - Monero's privacy scales with usage!",
+                content: "Run: address new",
+                hint: "Type: address new",
+                answer: "address new",
+                success: "Every subaddress is completely independent! No one can tell they're from the same wallet. Use a new one for each transaction for maximum privacy!",
+                type: "contains"
+            },
+            {
+                id: 8,
+                title: "Set a Transaction Note",
+                intro: "Add notes to transactions - private labeling without leaking to the blockchain!",
+                content: "Run: set_tx_notes <txid> <notes>",
+                hint: "Type: set_tx_notes",
+                answer: "set_tx_notes",
+                success: "Transaction notes are stored locally! The blockchain never sees your notes. Label transactions for your own records without sacrificing privacy.",
+                type: "contains"
+            },
+            {
+                id: 9,
+                title: "Sweep a Single Output",
+                intro: "'sweep_single' sends exactly one output - useful for mixing or splitting funds!",
+                content: "Run: sweep_single <address> <key_image>",
+                hint: "Type: sweep_single",
+                answer: "sweep_single",
+                success: "Sweeping sends one specific output! This is useful when you need to separate specific funds without combining outputs.",
+                type: "contains"
+            },
+            {
+                id: 10,
+                title: "Sweep All Funds",
+                intro: "'sweep_all' sends everything to an address - like cleaning out your wallet!",
+                content: "Run: sweep_all <address>",
+                hint: "Type: sweep_all",
+                answer: "sweep_all",
+                success: "Sweep_all sends all your funds! Great for consolidating outputs or moving everything to cold storage.",
+                type: "contains"
+            },
+            {
+                id: 11,
+                title: "Account Management",
+                intro: "Monero has hierarchical accounts - like different bank accounts in one wallet!",
+                content: "Run: account",
+                hint: "Type: account",
+                answer: "account",
+                success: "Accounts let you organize funds! Each account has independent balance. Main account is 0, subaccounts are 1, 2, etc.",
+                type: "contains"
+            },
+            {
+                id: 12,
+                title: "Purge Old Transactions",
+                intro: "'purge' removes failed transactions from your local wallet - cleanup without blockchain changes!",
+                content: "Run: purge",
+                hint: "Type: purge",
+                answer: "purge",
+                success: "Purge cleans your wallet's local transaction history! Failed or stuck transactions can be removed. The blockchain doesn't change.",
+                type: "contains"
+            }
+        ];
+        
+        function showMessage(text, type = 'text', delay = 0) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const msg = document.createElement('div');
+                    msg.className = 'message';
+                    if (type === 'title') {
+                        msg.innerHTML = '<div class="level-title">' + text + '</div>';
+                    } else if (type === 'speaker') {
+                        msg.innerHTML = '<div class="speaker">' + character.name + ':</div><div class="text ' + type + '">' + text + '</div>';
+                    } else {
+                        msg.innerHTML = '<div class="text ' + type + '">' + text + '</div>';
+                    }
+                    output.appendChild(msg);
+                    output.scrollTop = output.scrollHeight;
+                    resolve();
+                }, delay);
+            });
+        }
+        
+        function showIntro(level, isExpert = false) {
+            const prefix = isExpert ? 'intermediateLevels' : 'beginnerLevels';
+            const levelData = window[prefix][level];
+            history.innerHTML = '';
+            output.innerHTML = '';
+            clearBashOutput();
+            
+            showMessage(levelData.title, 'title');
+            showMessage(levelData.intro, 'text', 200);
+            setTimeout(() => {
+                showMessage(levelData.content, 'hint', 400);
+                showMessage("Hint: " + levelData.hint, 'hint', 600);
+            }, 800);
+        }
+        
+        function showCompletion(isExpert = false) {
+            history.innerHTML = '';
+            showMessage("🎉 Congratulations! 🎉", 'title');
+            showMessage("You've completed the " + (isExpert ? "intermediate" : "beginner") + " Monero course!", 'success', 200);
+            showMessage("Remember: Monero is about fungibility - every XMR is equal, no matter its history. Privacy isn't about hiding - it's about equality!", 'text', 500);
+            showMessage("Thank you for learning with me! " + character.getEncouragement(), 'speaker', 800);
+        }
+        
+        function checkAnswer(userAnswer, correctAnswer, type) {
+            if (type === 'contains') {
+                return userAnswer.toLowerCase().includes(correctAnswer.toLowerCase());
+            }
+            return userAnswer.toLowerCase().trim() === correctAnswer.toLowerCase().trim();
+        }
+        
+        async function nextLevel() {
+            currentLevel++;
+            const levels = currentLevel < beginnerLevels.length ? beginnerLevels : intermediateLevels;
+            const isExpert = currentLevel >= beginnerLevels.length;
+            const adjustedLevel = isExpert ? currentLevel - beginnerLevels.length : currentLevel;
+            
+            if (adjustedLevel >= levels.length) {
+                if (!isExpert && beginnerLevels.length < beginnerLevels.length + intermediateLevels.length) {
+                    currentLevel = beginnerLevels.length;
+                    showIntro(0, true);
+                } else {
+                    showCompletion(isExpert);
+                }
+                return;
+            }
+            showIntro(adjustedLevel, isExpert);
+        }
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const isExpert = currentLevel >= beginnerLevels.length;
+                const levels = isExpert ? intermediateLevels : beginnerLevels;
+                const adjustedLevel = isExpert ? currentLevel - beginnerLevels.length : currentLevel;
+                const level = levels[adjustedLevel];
+                
+                await showMessage(userAnswer, 'text');
+                input.value = '';
+                
+                await runBashCode(userAnswer);
+                
+                if (checkAnswer(userAnswer, level.answer, level.type)) {
+                    await showMessage(level.success, 'success', 300);
+                    await showMessage(character.getEncouragement(), 'speaker', 300);
+                    await saveProgress(level.id);
+                    setTimeout(nextLevel, 1500);
+                } else {
+                    await showMessage("Not quite! " + level.hint, 'hint', 300);
+                }
+            }
+        });
+        
+        async function init() {
+            await checkLogin();
+            const saved = await loadProgress();
+            if (saved) {
+                currentLevel = saved;
+            }
+            
+            showMessage(character.greeting, 'text');
+            setTimeout(() => {
+                showMessage("Type --beginner or --intermediate to start", 'hint', 500);
+            }, 1000);
+        }
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                const userAnswer = input.value.trim();
+                if (userAnswer === '--beginner') {
+                    currentLevel = 0;
+                    showIntro(0, false);
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--intermediate') {
+                    currentLevel = beginnerLevels.length;
+                    showIntro(0, true);
+                    input.value = '';
+                    return;
+                }
+            }
+        });
+        
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-grep.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>grep - Global Regular Expression Print | REBEL WITH LINUX</title>
+    <meta name="description" content="Master grep command. Learn to search files for patterns using regular expressions. Essential skill for Linux sysadmins and developers.">
+    <meta name="keywords" content="grep, regex, regular expression, search, linux, command line, pattern matching, text search">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.checked = (savedTheme === 'dark' || !savedTheme);
+            }
+        });
+    </script>
+
+    <style>
+        :root { --nav-color: #C0C0C0; }
+        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
+        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../search.html">SEARCH</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>grep<br>MASTERY</h1>
+        <p class="tagline">// Find. Match. Extract.</p>
+        
+        <div class="manifesto">
+            <p><strong>PATTERNS ARE POWER.</strong></p>
+            <p>In a world of terabytes of text logs, configuration files, and code—grep is your flashlight. It finds exactly what you need in seconds.</p>
+            <p><strong>KNOW YOUR TOOLS.</strong></p>
+            <p>Master grep and you'll navigate any Linux system like a pro. Searching logs, finding config values, filtering output—all become effortless.</p>
+        </div>
+        
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// Your Training Path</h2>
+            <p>Click a lesson to begin</p>
+        </div>
+
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to grep</h3>
+                <p class="lesson-desc">What is grep? Basic syntax and usage.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Basic Pattern Matching</h3>
+                <p class="lesson-desc">Search for simple strings and words.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Regular Expressions</h3>
+                <p class="lesson-desc">Use regex metacharacters for powerful matching.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">grep Options</h3>
+                <p class="lesson-desc">-i, -v, -r, -n, -c and more.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Extended grep</h3>
+                <p class="lesson-desc">egrep and grep -E for extended regex.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Fixed Strings</h3>
+                <p class="lesson-desc">grep -F for literal matching (fgrep).</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Context Lines</h3>
+                <p class="lesson-desc">Show lines before, after, or around matches.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Recursive Search</h3>
+                <p class="lesson-desc">Search directories and subdirectories.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Output Control</h3>
+                <p class="lesson-desc">Quiet mode, count, only match.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Combining with Pipes</h3>
+                <p class="lesson-desc">Chain grep with other commands.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">grep in Scripts</h3>
+                <p class="lesson-desc">Use grep in bash scripts for automation.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">Advanced Patterns</h3>
+                <p class="lesson-desc">Word boundaries, anchors, and complex regex.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Lesson 1 -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: Introduction to grep</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is grep?</h3>
+                <p>grep (Global Regular Expression Print) searches input files for lines containing a match to a specified pattern. It's one of the most useful commands on Linux.</p>
+
+                <h3>Basic Syntax</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">grep [OPTIONS] PATTERN [FILE...]</pre>
+
+                <h3>Simple Example</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Search for 'error' in a log file
+grep error /var/log/syslog
+
+# Search in multiple files
+grep "failed login" /var/log/auth.log /var/log/secure</pre>
+
+                <h3>Why grep Matters</h3>
+                <ul>
+                    <li><strong>Speed:</strong> Search millions of lines in seconds</li>
+                    <li><strong>Precision:</strong> Find exact patterns in vast amounts of text</li>
+                    <li><strong>Flexibility:</strong> Combine with regex for complex searches</li>
+                    <li><strong>Ubiquity:</strong> Available on every Linux system</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does grep stand for?</p>
+                        <input type="text" class="quiz-input" data-answer="global regular expression print" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Global Regular Expression Print</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: Basic Pattern Matching</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Simple String Search</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Search for a word in a file
+grep root /etc/passwd
+
+# Search in stdin
+echo "The quick brown fox" | grep quick</pre>
+
+                <h3>Case-Insensitive Search</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># The -i flag makes search case-insensitive
+grep -i error /var/log/syslog</pre>
+
+                <h3>Match Whole Words</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Only match 'cat' as a whole word
+grep -w cat file.txt
+
+# Without -w, would also match 'cat' in 'category'</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Which flag makes grep case-insensitive?</p>
+                        <input type="text" class="quiz-input" data-answer="-i" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>-i</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Regular Expressions</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Basic Regex Metacharacters</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">.  - Match any single character
+^  - Match at beginning of line
+$  - Match at end of line
+*  - Match zero or more of preceding
+[] - Match any character in brackets</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Lines starting with 'error'
+grep ^error /var/log/syslog
+
+# Lines ending with '.conf'
+grep '\.conf$' /var/log/app.log
+
+# 'warn' or 'error'
+grep 'warn|error' /var/log/syslog
+
+# Lines with a number
+grep '[0-9]' file.txt</pre>
+
+                <h3>Escape Special Characters</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Search for a literal dot
+grep '\.' file.txt
+
+# Or use -F for fixed strings
+grep -F 'example.com' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does ^ match?</p>
+                        <input type="text" class="quiz-input" data-answer="beginning of line" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Beginning of line (anchor)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: grep Options</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Common Options</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-i  Case insensitive
+-v  Invert match (lines NOT matching)
+-r  Recursive search
+-n  Show line numbers
+-c  Count matching lines only
+-l  Show only filenames with matches
+--color=auto  Highlight matches</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Show line numbers
+grep -n " Port " /etc/ssh/sshd_config
+
+# Count occurrences
+grep -c "error" /var/log/syslog
+
+# Invert match (lines WITHOUT 'error')
+grep -v "error" /var/log/syslog
+
+# Only show filenames
+grep -l "configuration" /etc/*</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Which flag shows line numbers?</p>
+                        <input type="text" class="quiz-input" data-answer="-n" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>-n</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Extended grep (grep -E)</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Extended Regex</h3>
+                <p>Extended regex (ERE) doesn't require escaping special characters.</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Use -E or egrep
+grep -E 'error|warning|critical' /var/log/syslog
+egrep 'error|warning|critical' /var/log/syslog</pre>
+
+                <h3>Extended Metacharacters</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">+  One or more of preceding
+?  Zero or one of preceding
+() Grouping
+{a,b} Between a and b repetitions</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># One or more digits
+grep -E '[0-9]+' file.txt
+
+# Optional character
+grep -E 'colou?r' file.txt  # matches color or colour
+
+# IP address pattern
+grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' access.log</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. In extended regex, what does + mean?</p>
+                        <input type="text" class="quiz-input" data-answer="one or more" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>One or more of the preceding character</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Fixed Strings (grep -F)</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>When to Use -F</h3>
+                <p>Use <code>grep -F</code> (or <code>fgrep</code>) when you need to search for literal strings, not regex patterns. No escaping needed.</p>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Search for literal string (no regex)
+grep -F 'example.com' access.log
+
+# With fgrep (same as grep -F)
+fgrep '127.0.0.1' /etc/hosts
+
+# Search for a phrase with special chars
+grep -F 'error.code = 500' app.log</pre>
+
+                <h3>Why Not Escape?</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Without -F, you must escape dots
+grep 'error\.log' app.log
+
+# With -F, no escaping needed
+grep -F 'error.log' app.log</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. When should you use grep -F?</p>
+                        <input type="text" class="quiz-input" data-answer="literal string" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>When searching for literal strings (not regex)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: Context Lines</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Show Lines Around Match</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Show 3 lines after match (default)
+grep -A 3 "error" app.log
+
+# Show 3 lines before match
+grep -B 3 "error" app.log
+
+# Show 2 lines before AND after
+grep -C 2 "error" app.log</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Find error with context in logs
+grep -C 5 "CRITICAL" syslog.log
+
+# Before context for debugging
+grep -B 10 "Segmentation fault" dmesg</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Which flag shows context lines around match?</p>
+                        <input type="text" class="quiz-input" data-answer="-C" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>-C (context)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Recursive Search</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Search Directories</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Recursive search in directory
+grep -r "function" /var/www/html/
+
+# Don't show line numbers with recursive
+grep -rl "config" /etc/
+
+# Include only certain files
+grep -r --include="*.js" "api" /var/www/</pre>
+
+                <h3>Useful Recursive Options</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">--include=PATTERN  Only match files matching PATTERN
+--exclude=PATTERN  Skip files matching PATTERN
+--exclude-dir=DIR   Skip directories matching DIR</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Search only PHP files
+grep -r --include="*.php" "mysql_connect" /var/www/
+
+# Exclude log files
+grep -r --exclude="*.log" "TODO" /project/
+
+# Exclude node_modules
+grep -r --exclude-dir=node_modules "export" /project/</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Which option limits search to specific files?</p>
+                        <input type="text" class="quiz-input" data-answer="--include" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>--include=PATTERN</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Output Control</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Quiet Mode</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># -q returns exit status only (for scripts)
+grep -q "running" /var/run/app.pid && echo "App is running"</pre>
+
+                <h3>Show Only Matches</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># -o shows only matched parts
+echo "root:x:0:0:root:/root:/bin/bash" | grep -o 'root'
+
+# Multiple matches on same line
+echo "error error error" | grep -o 'error'</pre>
+
+                <h3>Quiet and Exit Codes</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># grep returns:
+# 0 = match found
+# 1 = no match
+# 2 = error
+
+if grep -q "127.0.0.1" /etc/hosts; then
+    echo "Localhost configured"
+fi</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does -o do in grep?</p>
+                        <input type="text" class="quiz-input" data-answer="only matching" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Shows only the matched parts, not the whole line</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: Combining with Pipes</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Power Combinations</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># ps with grep (find processes)
+ps aux | grep nginx
+
+# Exclude the grep process itself
+ps aux | grep nginx | grep -v grep
+
+# dmesg with grep
+dmesg | grep -i error
+
+# Find largest files then grep
+find /var/log -type f -exec ls -lh {} \; | grep error</pre>
+
+                <h3>Advanced Piping</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Chain multiple greps
+cat access.log | grep "404" | grep -v "googlebot" | sort | uniq -c | sort -rn
+
+# grep with awk
+grep "error" app.log | awk '{print $1, $2, $NF}'
+
+# Use in if statement
+if cat /etc/os-release | grep -q "Ubuntu"; then
+    echo "This is Ubuntu"
+fi</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you exclude the grep process from results?</p>
+                        <input type="text" class="quiz-input" data-answer="grep -v grep" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>grep -v grep</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: grep in Scripts</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Script Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">#!/bin/bash
+# Check if service is running
+if ps aux | grep -q "[a]pache2"; then
+    echo "Apache is running"
+else
+    echo "Apache is not running"
+fi</pre>
+
+                <h3>Log Analysis Script</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">#!/bin/bash
+# Count errors by type
+ERRORS=$(grep -c "ERROR" /var/log/app.log)
+WARNINGS=$(grep -c "WARNING" /var/log/app.log)
+CRITICAL=$(grep -c "CRITICAL" /var/log/app.log)
+
+echo "Errors: $ERRORS"
+echo "Warnings: $WARNINGS"  
+echo "Critical: $CRITICAL"</pre>
+
+                <h3>Find and Replace Pattern</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Find files containing pattern and list them
+for f in $(find . -type f -name "*.conf"); do
+    if grep -q "Listen 80" "$f"; then
+        echo "Port 80 found in: $f"
+    fi
+done</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What exit code does grep return when no match is found?</p>
+                        <input type="text" class="quiz-input" data-answer="1" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>1 (zero means match found, 1 means no match)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: Advanced Patterns</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Word Boundaries</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># \b matches word boundary
+grep '\bcat\b' file.txt  # 'cat' only, not 'category'
+
+# Also use -w (same effect)
+grep -w 'cat' file.txt</pre>
+
+                <h3>Line Anchors</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">^  Beginning of line
+$  End of line
+
+# Empty lines
+grep '^$' file.txt
+
+# Lines with only whitespace
+grep '^[[:space:]]*$' file.txt</pre>
+
+                <h3>Complex Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Email pattern
+grep -E '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}' file.txt
+
+# IP address
+grep -E '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b' access.log
+
+# Date formats
+grep -E '[0-9]{4}-[0-9]{2}-[0-9]{2}' logfile</pre>
+
+                <h3>Congratulations!</h3>
+                <p>You've mastered grep! You now understand:</p>
+                <ul>
+                    <li>Basic and extended regex</li>
+                    <li>All important grep options</li>
+                    <li>Context lines and output control</li>
+                    <li>Recursive search</li>
+                    <li>Script integration</li>
+                    <li>Complex pattern matching</li>
+                </ul>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why grep</h2>
+            <p>grep is the Swiss Army knife of text searching on Linux. Every sysadmin, developer, and power user relies on it daily.</p>
+            <p>Master grep and you'll find answers in seconds instead of scrolling through thousands of lines manually.</p>
+            <p><strong>Find. Match. Extract. Automate.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>grep Man Page</h3>
+                <p>Official documentation</p>
+                <a href="https://man7.org/linux/man-pages/man1/grep.1.html" target="_blank">man grep</a>
+            </div>
+            <div class="resource-card">
+                <h3>regex101</h3>
+                <p>Online regex tester</p>
+                <a href="https://regex101.com/" target="_blank">regex101.com</a>
+            </div>
+            <div class="resource-card">
+                <h3>grep Tutorial</h3>
+                <p>Linuxize grep guide</p>
+                <a href="https://linuxize.com/post/grep-command-in-linux/" target="_blank">Linuxize</a>
+            </div>
+            <div class="resource-card">
+                <h3>Regex Cheatsheet</h3>
+                <p>Quick reference</p>
+                <a href="https://quickref.me/regex" target="_blank">QuickRef</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="copyleft">⟲</span>
+                <span>REBEL WITH LINUX</span>
+            </div>
+            <p class="footer-tagline">Learn Linux the hard way.</p>
+            <div class="footer-links">
+                <a href="../site-map.html">Site Map</a>
+                <span class="footer-divider">|</span>
+                <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion">Onion Site</a>
+                <span class="footer-divider">|</span>
+                <a href="https://github.com/cjboon/rebelwithlinux">GitHub</a>
+            </div>
+            <p class="footer-copyright">COPYRIGHT © 2026 — ALL RIGHTS RESERVED</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+</body>
+</html>

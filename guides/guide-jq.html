@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-jq.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jq - JSON Processor | REBEL WITH LINUX</title>
+    <meta name="description" content="Master jq command line JSON processor. Learn to parse, filter, and transform JSON data from the command line. Essential for APIs and config files.">
+    <meta name="keywords" content="jq, json, command line, json processor, api, rest, config files, linux">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.checked = (savedTheme === 'dark' || !savedTheme);
+            }
+        });
+    </script>
+
+    <style>
+        :root { --nav-color: #C0C0C0; }
+        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
+        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../search.html">SEARCH</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>jq<br>MASTERY</h1>
+        <p class="tagline">// Query. Transform. Extract.</p>
+        
+        <div class="manifesto">
+            <p><strong>JSON IS EVERYWHERE.</strong></p>
+            <p>APIs return JSON. Config files are JSON. NoSQL databases speak JSON. jq is your power tool for querying and transforming JSON data from the command line.</p>
+            <p><strong>JSON AT SPEED.</strong></p>
+            <p>Why write a Python script when jq can extract exactly what you need in one line? Filter complex JSON structures, reshape data, and build pipelines—all at terminal speed.</p>
+        </div>
+        
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// Your Training Path</h2>
+            <p>Click a lesson to begin</p>
+        </div>
+
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to jq</h3>
+                <p class="lesson-desc">What is jq? Installation and basics.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Basic Filters</h3>
+                <p class="lesson-desc">Identity, object, and array access.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Object Access</h3>
+                <p class="lesson-desc">Keys, values, and dot notation.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Array Access</h3>
+                <p class="lesson-desc">Indices, slices, and iteration.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Pipe Operator</h3>
+                <p class="lesson-desc">Chain jq filters together.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Constructors</h3>
+                <p class="lesson-desc">Create arrays and objects.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Conditionals</h3>
+                <p class="lesson-desc">if-then-else and comparisons.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Functions</h3>
+                <p class="lesson-desc">map, select, flatten, and more.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Working with Strings</h3>
+                <p class="lesson-desc">String operations and interpolation.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">jq with APIs</h3>
+                <p class="lesson-desc">curl, jq, and REST APIs.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Variables</h3>
+                <p class="lesson-desc">Binding and using variables.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">jq in Scripts</h3>
+                <p class="lesson-desc">Automate jq in bash scripts.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Lesson 1 -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: Introduction to jq</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is jq?</h3>
+                <p>jq is a lightweight command-line JSON processor. It lets you filter, transform, and extract data from JSON with a powerful, expressive syntax.</p>
+
+                <h3>Installation</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Debian/Ubuntu
+sudo apt install jq
+
+# macOS
+brew install jq
+
+# Check version
+jq --version</pre>
+
+                <h3>Basic Syntax</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">jq 'FILTER' [FILE...]
+echo 'JSON' | jq 'FILTER'</pre>
+
+                <h3>Simple Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Pretty print JSON
+echo '{"name":"Alice","age":30}' | jq '.'
+
+# Identity filter (.)
+cat data.json | jq '.'
+
+# Validate JSON
+cat data.json | jq . > /dev/null && echo "Valid JSON"</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does jq do?</p>
+                        <input type="text" class="quiz-input" data-answer="json processor" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Processes and filters JSON data</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: Basic Filters</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Identity Filter (.)</h3>
+                <p>The dot (.) filter returns the entire input unchanged. It's the most basic jq filter.</p>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Identity - output same as input
+echo '{"a":1,"b":2}' | jq '.'
+
+# Array
+echo '[1,2,3]' | jq '.'
+
+# Nested
+echo '{"user":{"name":"Bob"}}' | jq '.'</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does the identity filter (.) return?</p>
+                        <input type="text" class="quiz-input" data-answer="entire input" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>The entire input unchanged</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Object Access</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Dot Notation</h3>
+                <p>Access object properties with dot notation: `.key`</p>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Access property
+echo '{"name":"Alice","age":30}' | jq '.name'
+
+# Nested access
+echo '{"user":{"name":"Bob","email":"bob@example.com"}}' | jq '.user.email'
+
+# Multiple properties
+echo '{"name":"Alice","age":30}' | jq '.name, .age'
+
+# Optional: ? for missing keys
+echo '{"name":"Alice"}' | jq '.age?'</pre>
+
+                <h3>Bracket Notation</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Bracket notation (useful for special chars)
+echo '{"user-name":"Alice"}' | jq '.["user-name"]'
+
+# Keys with spaces
+echo '{"first name":"Alice"}' | jq '.["first name"]'</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you access a nested property in jq?</p>
+                        <input type="text" class="quiz-input" data-answer=".parent.child" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>.parent.child (e.g., jq '.user.name')</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: Array Access</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Array Indices</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># First element
+echo '[10,20,30]' | jq '.[0]'
+
+# Last element
+echo '[10,20,30]' | jq '.[-1]'
+
+# Second element
+echo '[10,20,30]' | jq '.[1]'
+
+# Array length
+echo '[10,20,30]' | jq 'length'</pre>
+
+                <h3>Slicing</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># First two elements
+echo '[10,20,30,40]' | jq '.[:2]'
+
+# Elements 1-3 (indices 1, 2, 3)
+echo '[10,20,30,40]' | jq '.[1:4]'
+
+# Last two elements
+echo '[10,20,30,40]' | jq '.[-2:]'</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you access the last element of an array?</p>
+                        <input type="text" class="quiz-input" data-answer=".[-1]" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>.[-1]</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Pipe Operator</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Chaining Filters</h3>
+                <p>The pipe (|) passes output of one filter as input to the next, just like shell pipes.</p>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Get array, then first element
+echo '{"items":[10,20,30]}' | jq '.items | .[0]'
+
+# Shorthand
+echo '{"items":[10,20,30]}' | jq '.items[0]'
+
+# Chain multiple
+echo '{"user":{"name":"Alice","posts":[{"title":"Hello"}]}}' | jq '.user.posts[0].title'
+
+# Get all titles
+echo '{"posts":[{"title":"A"},{"title":"B"}]}' | jq '.posts[].title'</pre>
+
+                <h3>Recursion Operator</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Recursively descend
+echo '{"a":{"b":{"c":1}}}' | jq '..'
+
+# Find all objects with key
+echo '{"name":"Alice"}' | jq '.. | objects'</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does the pipe operator (|) do in jq?</p>
+                        <input type="text" class="quiz-input" data-answer="chains filters" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Chains filters together, passing output to next filter</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Constructors</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Create Objects</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Object construction
+echo '{}' | jq '{name: "Alice", age: 30}'
+
+# From input
+echo '{"first":"John","last":"Doe"}' | jq '{fullname: .first, last: .last}'
+
+# With computed values
+echo '{"name":"Alice","age":30}' | jq '{name: .name, adult: .age >= 18}'</pre>
+
+                <h3>Create Arrays</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Array construction
+echo '[]' | jq '[.a, .b, .c]'
+
+# From array
+echo '[1,2,3]' | jq '[.[] | . * 2]'
+
+# Collecting
+echo '{"items":[1,2,3]}' | jq '[.items[] | select(. > 1)]'</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you create an object with computed values?</p>
+                        <input type="text" class="quiz-input" data-answer="{key: expression}" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>{key: expression} e.g., jq '{name: .name, adult: .age >= 18}'</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: Conditionals</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>if-then-else</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Basic if
+echo '{"age":25}' | jq 'if .age >= 18 then "adult" else "minor" end'
+
+# Multiple conditions
+echo '{"score":85}' | jq 'if .score >= 90 then "A" elif .score >= 80 then "B" else "C" end'</pre>
+
+                <h3>Comparisons</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">==    Equal
+!=    Not equal
+< >   Less, greater
+<= >=  Less or equal, greater or equal
+and   Boolean AND
+or     Boolean OR
+not   Boolean NOT</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What is the jq if-then-else syntax?</p>
+                        <input type="text" class="quiz-input" data-answer="if then else end" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>if CONDITION then VALUE else VALUE end</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Functions</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Common Functions</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">map(FILTER)     Apply filter to each element
+select(COND)    Keep elements matching condition
+flatten         Flatten nested arrays
+unique          Remove duplicates
+sort            Sort arrays
+keys            Get object keys
+values          Get object values
+type            Get value type</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Double each element
+echo '[1,2,3]' | jq 'map(. * 2)'
+
+# Select adults
+echo '[{"age":10},{"age":25},{"age":17}]' | jq 'map(select(.age >= 18))'
+
+# Get keys
+echo '{"a":1,"b":2}' | jq 'keys'
+
+# Unique and sort
+echo '[3,1,2,3,1]' | jq 'unique | sort'</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What function filters array elements?</p>
+                        <input type="text" class="quiz-input" data-answer="select" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>select()</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Working with Strings</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>String Functions</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">+        Concatenate strings
+*        Repeat string
+split(S)  Split into array
+join(S)   Join array with separator
+ascii_downcase  lowercase
+ascii_upcase    UPPERCASE
+ltrimstr(S)   Remove prefix
+rtrimstr(S)   Remove suffix</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Concatenate
+echo '"Hello"' | jq '. + " World"'
+
+# Uppercase
+echo '"hello"' | jq 'ascii_upcase'
+
+# Split
+echo '"a,b,c"' | jq 'split(",")'
+
+# String interpolation with +
+echo '{"name":"Alice"}' | jq '"Hello, " + .name'</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you convert a string to uppercase?</p>
+                        <input type="text" class="quiz-input" data-answer="ascii_upcase" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>jq 'ascii_upcase'</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: jq with APIs</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>curl + jq = Power</h3>
+                <p>Query APIs and extract exactly what you need with curl piped to jq.</p>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># GitHub API - get repo stars
+curl -s api.github.com/repos/torvalds/linux | jq '.stargazers_count'
+
+# Get all repo names
+curl -s api.github.com/users/torvalds/repos | jq '.[].name'
+
+# Get user's followers
+curl -s api.github.com/users/torvalds | jq '{login, followers, public_repos}'</pre>
+
+                <h3>Practical Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Weather API (example)
+curl -s wttr.in/London.json | jq '{temp: .current_condition.temp_C, condition: .current_condition.weatherDesc[0].value}'
+
+# Docker stats JSON
+docker stats --no-stream --format '{{json .}}' | jq '{name: .Name, cpu: .CPUPerc, mem: .MemPerc}'</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What command fetches JSON from an API?</p>
+                        <input type="text" class="quiz-input" data-answer="curl" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>curl -s (with -s for silent mode)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: Variables</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Variable Binding</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Assign to variable
+echo '{"name":"Alice"}' | jq '.name as $name | "Hello \($name)"'
+
+# Multiple variables
+echo '{"first":"John","last":"Doe"}' | jq '.first as $f | .last as $l | "\($f) \($l)"'</pre>
+
+                <h3>let keyword (jq 1.7+)</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Define constant
+echo '5' | jq 'let $x = 10; . + $x'</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you use a variable in jq string interpolation?</p>
+                        <input type="text" class="quiz-input" data-answer="\($var)" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>"\($varname)"</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: jq in Scripts</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Bash Script Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">#!/bin/bash
+# Fetch and parse API data
+USERNAME="torvalds"
+REPOS=$(curl -s "https://api.github.com/users/$USERNAME/repos" | jq -r '.[].name')
+
+echo "Repos for $USERNAME:"
+for repo in $REPOS; do
+    stars=$(curl -s "https://api.github.com/repos/$USERNAME/$repo" | jq '.stargazers_count')
+    echo "  $repo: $stars stars"
+done</pre>
+
+                <h3>Process JSON Logs</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">#!/bin/bash
+# Extract errors from JSON logs
+jq -r 'select(.level=="error") | "\(.timestamp) \(.message)"' app.log.json > errors.txt
+
+# Generate summary
+jq '{errors: map(select(.level=="error")) | length, warnings: map(select(.level=="warning")) | length}' app.log.json</pre>
+
+                <h3>Congratulations!</h3>
+                <p>You've mastered jq! You now understand:</p>
+                <ul>
+                    <li>Basic filters and object/array access</li>
+                    <li>Pipe chaining</li>
+                    <li>Object and array construction</li>
+                    <li>Conditionals and comparisons</li>
+                    <li>Built-in functions (map, select, keys)</li>
+                    <li>String operations</li>
+                    <li>API integration with curl</li>
+                    <li>Variables and string interpolation</li>
+                </ul>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why jq</h2>
+            <p>jq is essential for anyone working with APIs, configuration files, or any JSON data. It replaces complex Python or JavaScript scripts with elegant one-liners.</p>
+            <p>Master jq and you'll extract exactly what you need from any JSON data in seconds.</p>
+            <p><strong>Query. Transform. Extract.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>jq Manual</h3>
+                <p>Official documentation</p>
+                <a href="https://jqlang.github.io/jq/manual/" target="_blank">jq manual</a>
+            </div>
+            <div class="resource-card">
+                <h3>jq Playground</h3>
+                <p>Try jq online</p>
+                <a href="https://jqplay.org/" target="_blank">jqplay.org</a>
+            </div>
+            <div class="resource-card">
+                <h3>jq Recipes</h3>
+                <p>Common patterns</p>
+                <a href="https://github.com/stedolan/jq/wiki/jq-Recipes" target="_blank">jq Recipes</a>
+            </div>
+            <div class="resource-card">
+                <h3>jq Tutorial</h3>
+                <p>Learning jq</p>
+                <a href="https://stedolan.github.io/jq/tutorial/" target="_blank">Tutorial</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="copyleft">⟲</span>
+                <span>REBEL WITH LINUX</span>
+            </div>
+            <p class="footer-tagline">Learn Linux the hard way.</p>
+            <div class="footer-links">
+                <a href="../site-map.html">Site Map</a>
+                <span class="footer-divider">|</span>
+                <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion">Onion Site</a>
+                <span class="footer-divider">|</span>
+                <a href="https://github.com/cjboon/rebelwithlinux">GitHub</a>
+            </div>
+            <p class="footer-copyright">COPYRIGHT © 2026 — ALL RIGHTS RESERVED</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+</body>
+</html>

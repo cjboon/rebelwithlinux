@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-find.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>find - Search Files and Directories | REBEL WITH LINUX</title>
+    <meta name="description" content="Master the find command. Learn to search for files by name, type, size, date, and permissions. Essential Linux skill for sysadmins.">
+    <meta name="keywords" content="find, linux, command line, file search, sysadmin, directory search, locate files">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.checked = (savedTheme === 'dark' || !savedTheme);
+            }
+        });
+    </script>
+
+    <style>
+        :root { --nav-color: #C0C0C0; }
+        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
+        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../search.html">SEARCH</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>find<br>MASTERY</h1>
+        <p class="tagline">// Locate. Filter. Execute.</p>
+        
+        <div class="manifesto">
+            <p><strong>KNOW WHERE YOUR FILES ARE.</strong></p>
+            <p>On a Linux system with millions of files, find is your GPS. It locates anything instantly by name, type, size, date, or any criteria you specify.</p>
+            <p><strong>SEARCH LIKE A PRO.</strong></p>
+            <p>Whether finding a config file buried deep in /etc or locating large log files eating up disk space—find handles it all with ease.</p>
+        </div>
+        
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// Your Training Path</h2>
+            <p>Click a lesson to begin</p>
+        </div>
+
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to find</h3>
+                <p class="lesson-desc">What is find? Basic syntax and usage.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Search by Name</h3>
+                <p class="lesson-desc">Find files using -name and -iname.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Search by Type</h3>
+                <p class="lesson-desc">Find files, directories, symlinks, and more.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Search by Size</h3>
+                <p class="lesson-desc">Find files by size with -size option.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Search by Time</h3>
+                <p class="lesson-desc">Find by modification, access, change time.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Search by Permissions</h3>
+                <p class="lesson-desc">Find files by permission modes.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Search by Owner</h3>
+                <p class="lesson-desc">Find by user and group ownership.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Combining Tests</h3>
+                <p class="lesson-desc">Use -and, -or, -not to combine conditions.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Execute on Results</h3>
+                <p class="lesson-desc">-exec and -ok to run commands on results.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">Delete Found Files</h3>
+                <p class="lesson-desc">Safely delete files matching criteria.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">find in Scripts</h3>
+                <p class="lesson-desc">Use find in bash for automation.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">xargs Power</h3>
+                <p class="lesson-desc">Chain find results with xargs.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Lesson 1 -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: Introduction to find</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is find?</h3>
+                <p>The find command searches for files and directories in a directory hierarchy based on criteria you specify. It's one of the most powerful and essential commands on Linux.</p>
+
+                <h3>Basic Syntax</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">find [path] [options] [expression]</pre>
+
+                <h3>Simple Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Find all files in current directory
+find .
+
+# Find all files in /home
+find /home
+
+# Find specific file by name
+find / -name "myfile.txt"</pre>
+
+                <h3>Why find Matters</h3>
+                <ul>
+                    <li><strong>Precision:</strong> Search by any criteria imaginable</li>
+                    <li><strong>Speed:</strong> Real-time filesystem search</li>
+                    <li><strong>Power:</strong> Execute commands on results</li>
+                    <li><strong>Ubiquity:</strong> Available on every Linux system</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does the find command do?</p>
+                        <input type="text" class="quiz-input" data-answer="search for files" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Searches for files and directories based on criteria</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: Search by Name</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Find by Name</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Find file named exactly "error.log"
+find /var/log -name "error.log"
+
+# Find all .conf files
+find /etc -name "*.conf"
+
+# Find file regardless of case
+find /home -iname "readme.txt"</pre>
+
+                <h3>Wildcards</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">*  Matches any characters
+?  Matches any single character
+
+# Find files starting with "backup"
+find / -name "backup*"
+
+# Find files ending with ".log"
+find /var/log -name "*.log"
+
+# Find files with exactly 4 character name
+find /home -name "????.txt"</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Which option makes find case-insensitive?</p>
+                        <input type="text" class="quiz-input" data-answer="-iname" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>-iname (instead of -name)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Search by Type</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>File Types</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">f  Regular file
+d  Directory
+l  Symbolic link
+c  Character device
+b  Block device
+p  Named pipe (FIFO)
+s  Socket</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Find all directories
+find /home -type d
+
+# Find all regular files
+find /var/log -type f
+
+# Find all symbolic links
+find /usr/local -type l
+
+# Find all block devices
+find /dev -type b</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What type denotes a directory?</p>
+                        <input type="text" class="quiz-input" data-answer="d" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>d (use -type d)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: Search by Size</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Size Units</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">c  Bytes
+k  Kilobytes (1024 bytes)
+M  Megabytes
+G  Gigabytes
+b  512-byte blocks (default)</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Files exactly 100MB
+find / -size 100M
+
+# Files larger than 1GB
+find / -size +1G
+
+# Files smaller than 10KB
+find /tmp -size -10k
+
+# Files between 100MB and 500MB
+find /var -size +100M -size -500M</pre>
+
+                <h3>Find Large Files</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Find files larger than 100MB in /var
+find /var -type f -size +100M -exec ls -lh {} \;</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you find files larger than 1GB?</p>
+                        <input type="text" class="quiz-input" data-answer="+1G" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>find -size +1G</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Search by Time</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Time Options</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-mtime  Modified time (content change)
+-atime  Access time (last read)
+-ctime  Change time (metadata/sermissions change)
+-mmin   Modified time in minutes
+-amin   Access time in minutes
+-cmin   Change time in minutes</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Files modified in last 24 hours
+find /var/log -mtime -1
+
+# Files accessed more than 30 days ago
+find /home -atime +30
+
+# Files modified in last hour
+find /var/log -mmin -60
+
+# Files changed in last 7 days
+find /etc -ctime -7</pre>
+
+                <h3>Practical Use Case</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Find recently modified config files
+find /etc -name "*.conf" -mtime -7
+
+# Find all files accessed today
+find /home -atime 0</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Which time option checks when file content was modified?</p>
+                        <input type="text" class="quiz-input" data-answer="-mtime" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>-mtime (or -mmin for minutes)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Search by Permissions</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Permission Options</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-perm  Exact permission match
+-perm -  At least these permissions (AND)
+-perm /  Any of these permissions (OR)</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Files with exactly 644 permissions
+find /home -perm 644
+
+# Files readable by everyone
+find /home -perm -444
+
+# Files writable by owner
+find /home -perm -200
+
+# Files with execute permission
+find /home -perm -111
+
+# SUID files (security risk!)
+find / -perm -4000 2>/dev/null</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you find SUID files?</p>
+                        <input type="text" class="quiz-input" data-answer="-4000" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>find -perm -4000</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: Search by Owner</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Owner Options</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-user USERNAME   Files owned by USERNAME
+-group GROUPNAME Files owned by GROUPNAME
+-nouser          Files with no valid owner
+-nogroup         Files with no valid group</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Files owned by root
+find / -user root
+
+# Files owned by www-data
+find /var/www -user www-data
+
+# Files owned by a specific group
+find /home -group developers
+
+# Files with no valid owner (orphaned)
+find /home -nouser</pre>
+
+                <h3>Combined Search</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Large files owned by root
+find / -user root -size +100M</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you find files with no valid owner?</p>
+                        <input type="text" class="quiz-input" data-answer="-nouser" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>-nouser</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Combining Tests</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Logical Operators</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">-a  AND (default between conditions)
+-o  OR
+-not or !  NOT</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Files owned by www-data AND .log files
+find /var/www -user www-data -name "*.log"
+
+# .conf OR .ini files
+find /etc -name "*.conf" -o -name "*.ini"
+
+# Files NOT modified in last 30 days
+find /var/log -not -mtime -30
+
+# Files that are 0 bytes OR .tmp files
+find /tmp -size 0 -o -name "*.tmp"</pre>
+
+                <h3>Parenthesis for Grouping</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Must escape parenthesis \( \)
+find /var \( -name "*.log" -o -name "*.tmp" \) -mtime +7</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What operator combines conditions with OR?</p>
+                        <input type="text" class="quiz-input" data-answer="-o" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>-o (or -or)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Execute on Results</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>The -exec Option</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Execute command on each result
+find /path -name "*.log" -exec rm {} \;
+
+# {} is replaced with the filename
+# \; terminates the command</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># List details of all .conf files
+find /etc -name "*.conf" -exec ls -lh {} \;
+
+# Change permissions on results
+find /var/www -name "*.php" -exec chmod 644 {} \;
+
+# Copy all .txt files to backup
+find /home -name "*.txt" -exec cp {} /backup/ \;</pre>
+
+                <h3>The -ok Option</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Like -exec but asks for confirmation
+find / -name "core" -ok rm {} \;
+
+# Answer y for yes, n for no</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does {} represent in -exec?</p>
+                        <input type="text" class="quiz-input" data-answer="filename" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>The current filename being processed</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: Delete Found Files</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Delete Safely</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># First test with -ok (asks confirmation)
+find /tmp -name "*.tmp" -ok rm {} \;
+
+# Then use -delete directly
+find /tmp -name "*.tmp" -delete</pre>
+
+                <h3>Practical Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Delete core dumps older than 7 days
+find / -name "core.*" -mtime +7 -delete
+
+# Delete empty files
+find /tmp -type f -empty -delete
+
+# Delete .pyc files
+find . -name "*.pyc" -delete
+
+# Delete files owned by deleted user
+find /home -nouser -delete</pre>
+
+                <h3>WARNING</h3>
+                <p>Always test with ls first before deleting:</p>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Test first (list files)
+find /tmp -name "*.tmp" -ls
+
+# Then delete when confirmed
+find /tmp -name "*.tmp" -delete</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What should you do before deleting files?</p>
+                        <input type="text" class="quiz-input" data-answer="test first" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Test first with ls or -ok</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: find in Scripts</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Cleanup Script Example</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">#!/bin/bash
+# Clean old log files
+
+LOGDIR="/var/log/myapp"
+DAYS=30
+
+# Find and delete old .log files
+find "$LOGDIR" -name "*.log" -mtime +$DAYS -type f -delete
+
+echo "Cleaned log files older than $DAYS days"</pre>
+
+                <h3>Backup Script</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">#!/bin/bash
+# Backup all .sql files
+
+find /var/www -name "*.sql" -type f | while read -r file; do
+    backup_file="${file}.bak.$(date +%Y%m%d)"
+    cp "$file" "$backup_file"
+    echo "Backed up: $file"
+done</pre>
+
+                <h3>Disk Usage Report</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">#!/bin/bash
+# Find largest directories
+
+du -sh /var/* 2>/dev/null | sort -rh | head -10</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does the -delete option do?</p>
+                        <input type="text" class="quiz-input" data-answer="deletes files" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Deletes files that match the find criteria</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: xargs Power</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is xargs?</h3>
+                <p>xargs takes input from stdin and converts it into arguments for a command. Combined with find, it efficiently processes many files.</p>
+
+                <h3>Basic Usage</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Instead of -exec which runs per file:
+find . -name "*.txt" -exec rm {} \;
+
+# xargs can batch process:
+find . -name "*.txt" | xargs rm</pre>
+
+                <h3>Advantages of xargs</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># More efficient (fewer process spawns)
+# Better handling of filenames with spaces
+# Can control number of args per command
+
+# Limit to 10 files per command
+find / -name "*.log" | xargs -n 10 rm
+
+# Use null delimiter for safe filenames
+find . -name "*.txt" -print0 | xargs -0 rm
+
+# Show commands without executing
+find . -name "*.txt" | xargs -p rm</pre>
+
+                <h3>Congratulations!</h3>
+                <p>You've mastered find! You now understand:</p>
+                <ul>
+                    <li>Search by name, type, size, time</li>
+                    <li>Search by permissions and ownership</li>
+                    <li>Combining conditions with AND, OR, NOT</li>
+                    <li>Executing commands on results</li>
+                    <li>Safe deletion of files</li>
+                    <li>Using find in bash scripts</li>
+                    <li>Power of xargs for batch processing</li>
+                </ul>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why find</h2>
+            <p>find is the most powerful file search tool on Linux. It can locate any file based on any criteria you can imagine.</p>
+            <p>Master find and you'll never waste time hunting for files again. Combined with -exec and xargs, it becomes an automation powerhouse.</p>
+            <p><strong>Locate. Filter. Execute. Automate.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>find Man Page</h3>
+                <p>Official documentation</p>
+                <a href="https://man7.org/linux/man-pages/man1/find.1.html" target="_blank">man find</a>
+            </div>
+            <div class="resource-card">
+                <h3>find Tutorial</h3>
+                <p>Linuxize find guide</p>
+                <a href="https://linuxize.com/post/how-to-find-files-in-linux-using-the-command-line/" target="_blank">Linuxize</a>
+            </div>
+            <div class="resource-card">
+                <h3>xargs Man Page</h3>
+                <p>Official documentation</p>
+                <a href="https://man7.org/linux/man-pages/man1/xargs.1.html" target="_blank">man xargs</a>
+            </div>
+            <div class="resource-card">
+                <h3>Find Cheatsheet</h3>
+                <p>Quick reference</p>
+                <a href="https://quickref.me/find" target="_blank">QuickRef</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="copyleft">⟲</span>
+                <span>REBEL WITH LINUX</span>
+            </div>
+            <p class="footer-tagline">Learn Linux the hard way.</p>
+            <div class="footer-links">
+                <a href="../site-map.html">Site Map</a>
+                <span class="footer-divider">|</span>
+                <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion">Onion Site</a>
+                <span class="footer-divider">|</span>
+                <a href="https://github.com/cjboon/rebelwithlinux">GitHub</a>
+            </div>
+            <p class="footer-copyright">COPYRIGHT © 2026 — ALL RIGHTS RESERVED</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+</body>
+</html>

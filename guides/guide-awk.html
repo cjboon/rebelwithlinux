@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/guides/guide-awk.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>awk - Text Processing and Reporting | REBEL WITH LINUX</title>
+    <meta name="description" content="Master awk. Learn to extract, transform, and analyze text data. Create reports from structured text files like CSV and logs.">
+    <meta name="keywords" content="awk, text processing, data extraction, reporting, linux, command line, pattern scanning">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.checked = (savedTheme === 'dark' || !savedTheme);
+            }
+        });
+    </script>
+
+    <style>
+        :root { --nav-color: #C0C0C0; }
+        .lesson-modal .lesson-nav { background: var(--white); max-width: 900px; margin: 0 auto; padding: 16px; text-align: center; }
+        .lesson-modal .lesson-nav a { display: inline-block; background: var(--black); color: var(--white); padding: 12px 24px; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+    </style>
+</head>
+<body class="guide-page">
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../search.html">SEARCH</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <section class="hero">
+        <h1>awk<br>MASTERY</h1>
+        <p class="tagline">// Extract. Analyze. Report.</p>
+        
+        <div class="manifesto">
+            <p><strong>DATA IS POWER.</strong></p>
+            <p>Logs, CSVs, system outputs—awk transforms raw text into meaningful data. It's not just a command, it's a complete programming language for text processing.</p>
+            <p><strong>STRUCTURE FROM CHAOS.</strong></p>
+            <p>awk automatically splits text into fields and lets you process them individually. Need to extract column 3 from a CSV? One command. Done.</p>
+        </div>
+        
+        <a href="#guides" class="cta-button">BEGIN YOUR JOURNEY</a>
+    </section>
+
+    <section class="lessons-section" id="guides">
+        <div class="section-header">
+            <h2>// Your Training Path</h2>
+            <p>Click a lesson to begin</p>
+        </div>
+
+        <div class="lessons-grid">
+            <a href="#lesson1" class="lesson-card" data-lesson="1">
+                <div class="lesson-number">LESSON 01</div>
+                <h3 class="lesson-title">Introduction to awk</h3>
+                <p class="lesson-desc">What is awk? Fields and records.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson2" class="lesson-card" data-lesson="2">
+                <div class="lesson-number">LESSON 02</div>
+                <h3 class="lesson-title">Field Extraction</h3>
+                <p class="lesson-desc">$1, $2, $NF and field variables.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson3" class="lesson-card" data-lesson="3">
+                <div class="lesson-number">LESSON 03</div>
+                <h3 class="lesson-title">Patterns and Actions</h3>
+                <p class="lesson-desc">Pattern matching with conditions.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson4" class="lesson-card" data-lesson="4">
+                <div class="lesson-number">LESSON 04</div>
+                <h3 class="lesson-title">Built-in Variables</h3>
+                <p class="lesson-desc">NR, NF, FS, OFS, and more.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson5" class="lesson-card" data-lesson="5">
+                <div class="lesson-number">LESSON 05</div>
+                <h3 class="lesson-title">Print and Format</h3>
+                <p class="lesson-desc">printf for formatted output.</p>
+                <span class="badge badge-beginner">Beginner</span>
+            </a>
+
+            <a href="#lesson6" class="lesson-card" data-lesson="6">
+                <div class="lesson-number">LESSON 06</div>
+                <h3 class="lesson-title">Operators</h3>
+                <p class="lesson-desc">Arithmetic and string operators.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson7" class="lesson-card" data-lesson="7">
+                <div class="lesson-number">LESSON 07</div>
+                <h3 class="lesson-title">Variables</h3>
+                <p class="lesson-desc">User-defined variables and arrays.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson8" class="lesson-card" data-lesson="8">
+                <div class="lesson-number">LESSON 08</div>
+                <h3 class="lesson-title">Control Structures</h3>
+                <p class="lesson-desc">if, while, for loops.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson9" class="lesson-card" data-lesson="9">
+                <div class="lesson-number">LESSON 09</div>
+                <h3 class="lesson-title">Functions</h3>
+                <p class="lesson-desc">String, mathematical, time functions.</p>
+                <span class="badge badge-intermediate">Intermediate</span>
+            </a>
+
+            <a href="#lesson10" class="lesson-card" data-lesson="10">
+                <div class="lesson-number">LESSON 10</div>
+                <h3 class="lesson-title">awk with Pipes</h3>
+                <p class="lesson-desc">Combine awk with other commands.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson11" class="lesson-card" data-lesson="11">
+                <div class="lesson-number">LESSON 11</div>
+                <h3 class="lesson-title">Reports and Summaries</h3>
+                <p class="lesson-desc">Create reports from log files.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+
+            <a href="#lesson12" class="lesson-card" data-lesson="12">
+                <div class="lesson-number">LESSON 12</div>
+                <h3 class="lesson-title">awk in Scripts</h3>
+                <p class="lesson-desc">Use awk in bash scripts.</p>
+                <span class="badge badge-advanced">Advanced</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Lesson 1 -->
+    <div class="lesson-modal" id="lesson1">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 01: Introduction to awk</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>What is awk?</h3>
+                <p>awk is a powerful text processing language. It reads input line by line, splits each line into fields, and lets you process or extract data based on patterns.</p>
+
+                <h3>Basic Syntax</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">awk 'pattern { action }' file
+awk 'pattern { action }'</pre>
+
+                <h3>Simple Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Print all lines (default action when pattern matches)
+awk '1' file.txt
+awk '{ print }' file.txt
+
+# Print specific fields
+awk '{ print $1 }' file.txt
+
+# Work with pipes
+ps aux | awk '{ print $1, $11 }'</pre>
+
+                <h3>Fields and Records</h3>
+                <ul>
+                    <li><strong>Record:</strong> A line of text (separated by newline)</li>
+                    <li><strong>Field:</strong> A column within a record (separated by whitespace by default)</li>
+                    <li><strong>$0:</strong> The entire record (whole line)</li>
+                    <li><strong>$1, $2, ...:</strong> First, second, etc. fields</li>
+                    <li><strong>$NF:</strong> Last field (NF = number of fields)</li>
+                </ul>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does $0 represent in awk?</p>
+                        <input type="text" class="quiz-input" data-answer="entire line" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>The entire record (whole line)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 2 -->
+    <div class="lesson-modal" id="lesson2">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 02: Field Extraction</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Accessing Fields</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">$1     First field
+$2     Second field
+$3     Third field
+$NF    Last field (NF = number of fields)
+$(NF-1)  Second to last field
+$0     Entire line</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># /etc/passwd extraction
+awk -F: '{ print $1, $5 }' /etc/passwd
+
+# Print first and last fields
+ls -l | awk '{ print $1, $NF }'
+
+# Print last field of each line
+awk '{ print $NF }' file.txt
+
+# Print everything except first field
+awk '{ $1=""; print $0 }' file.txt</pre>
+
+                <h3>Changing Field Separator</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># -F sets field separator
+awk -F: '{ print $1 }' /etc/passwd
+
+# CSV processing
+awk -F, '{ print $2 }' data.csv
+
+# Space as separator (default)
+awk -F' ' '{ print $2 }' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you print the last field in awk?</p>
+                        <input type="text" class="quiz-input" data-answer="$NF" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>$NF</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 3 -->
+    <div class="lesson-modal" id="lesson3">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 03: Patterns and Actions</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Pattern Matching</h3>
+                <p>Patterns filter which lines are processed. Only lines matching the pattern get the action applied.</p>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Print lines containing 'root'
+awk '/root/ { print }' /etc/passwd
+
+# Print username and home for root
+awk -F: '/root/ { print $1, $6 }' /etc/passwd
+
+# Print lines where first field equals 'admin'
+awk '$1 == "admin" { print }' file.txt
+
+# Print lines where third field > 100
+awk '$3 > 100 { print }' file.txt
+
+# Print lines NOT containing 'nobody'
+awk '!/nobody/ { print }' /etc/passwd</pre>
+
+                <h3>Regex Patterns</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Lines starting with 'a'
+awk '/^a/ { print }' file.txt
+
+# Lines ending with '.log'
+awk '/\.log$/ { print }' file.txt
+
+# Lines with 4 or more fields
+awk 'NF >= 4 { print }' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you negate a pattern in awk?</p>
+                        <input type="text" class="quiz-input" data-answer="!" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Use ! before the pattern (e.g., !/pattern/)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 4 -->
+    <div class="lesson-modal" id="lesson4">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 04: Built-in Variables</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Common awk Variables</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">NR    Number of current Record (line number)
+NF    Number of Fields in current record
+FS    Field Separator (default: whitespace)
+RS    Record Separator (default: newline)
+OFS   Output Field Separator (default: space)
+ORS   Output Record Separator (default: newline)
+$0    Entire current record
+$1..$NF  Individual fields</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Add line numbers
+awk '{ print NR, $0 }' file.txt
+
+# Print number of fields per line
+awk '{ print NF, $0 }' file.txt
+
+# Change output separator to colon
+awk -F: '{ print $1":"$3 }' /etc/passwd
+
+# Same using OFS
+awk -F: -v OFS=":" '{ print $1, $3 }' /etc/passwd</pre>
+
+                <h3>BEGIN and END Blocks</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># BEGIN runs before processing
+awk 'BEGIN { print "Processing..." } /pattern/ { print } END { print "Done" }'
+
+# Initialize variables
+awk 'BEGIN { sum=0 } { sum+=$1 } END { print sum }' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does NR represent in awk?</p>
+                        <input type="text" class="quiz-input" data-answer="line number" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>Current record number (line number)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 5 -->
+    <div class="lesson-modal" id="lesson5">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 05: Print and Format</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>print Statement</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Basic print
+awk '{ print $1 }' file.txt
+
+# Print multiple items
+awk '{ print $1, $2, $3 }' file.txt
+
+# Concatenate without separator
+awk '{ print $1 $2 }' file.txt
+
+# Print literal text
+awk '{ print "User:", $1, "Home:", $6 }' /etc/passwd</pre>
+
+                <h3>printf for Formatting</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># printf doesn't add newline by default
+awk '{ printf "%s ", $1 }' file.txt
+awk '{ printf "%s\n", $1 }' file.txt
+
+# Format specifiers
+awk '{ printf "%-15s %10d\n", $1, $2 }' file.txt
+# %-15s = left-aligned string, 15 chars
+# %10d  = right-aligned integer, 10 chars</pre>
+
+                <h3>Format Specifiers</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">%s  String
+%d  Integer
+%f  Floating point
+%-10s  Left-aligned, 10 chars
+%10s  Right-aligned, 10 chars
+%.2f  2 decimal places</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What does printf add that print doesn't?</p>
+                        <input type="text" class="quiz-input" data-answer="newline" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>printf doesn't add newline by default</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 6 -->
+    <div class="lesson-modal" id="lesson6">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 06: Operators</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Arithmetic Operators</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">+  Addition
+-  Subtraction
+*  Multiplication
+/  Division
+%  Modulo
+++ Increment
+-- Decrement
++= Add and assign
+-= Subtract and assign</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Add 10 to first field
+awk '{ $1 = $1 + 10; print }' file.txt
+
+# Calculate average
+awk '{ sum+=$1; count++ } END { print sum/count }' file.txt
+
+# Integer division
+awk '{ print int($1 / $2) }' file.txt</pre>
+
+                <h3>String Operators</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">~   Matches regex
+!~  Does not match regex
+==  Equals
+!=  Not equals
+<   Less than
+>   Greater than
+<=  Less than or equal
+>=  Greater than or equal</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What operator checks regex match?</p>
+                        <input type="text" class="quiz-input" data-answer="~" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>~ (tilde)</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 7 -->
+    <div class="lesson-modal" id="lesson7">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 07: Variables</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>User Variables</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Initialize and use
+awk '{ sum = $1 + $2; print sum }' file.txt
+
+# String variables
+awk '{ name = $1; print "Hello " name }' file.txt
+
+# Arrays
+awk '{ arr[$1] = $2 } END { for (k in arr) print k, arr[k] }' file.txt</pre>
+
+                <h3>Array Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Count occurrences
+awk '{ count[$1]++ } END { for (item in count) print item, count[item] }' file.txt
+
+# Sum by category
+awk '{ sum[$2] += $3 } END { for (cat in sum) print cat, sum[cat] }' file.txt
+
+# Check if key exists
+if (key in array) print "exists"</pre>
+
+                <h3>Special getline</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Read from another file
+awk '{ getline line < "other.txt"; print $0, line }' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. How do you count occurrences with awk arrays?</p>
+                        <input type="text" class="quiz-input" data-answer="arr[$1]++" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>arr[$1]++</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 8 -->
+    <div class="lesson-modal" id="lesson8">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 08: Control Structures</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>if Statement</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">awk '{
+    if ($3 > 100) {
+        print "High:", $0
+    } else if ($3 > 50) {
+        print "Medium:", $0
+    } else {
+        print "Low:", $0
+    }
+}' file.txt</pre>
+
+                <h3>while Loop</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">awk '{
+    i = 1
+    while (i <= NF) {
+        if ($i ~ /error/) print "Error in field", i
+        i++
+    }
+}' file.txt</pre>
+
+                <h3>for Loop</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># C-style for loop
+awk '{
+    for (i = 1; i <= NF; i++) {
+        sum += $i
+    }
+    print sum/NF
+}' file.txt
+
+# For iterating arrays
+awk '{ for (k in arr) print k, arr[k] }' file.txt</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What loop structure does awk support?</p>
+                        <input type="text" class="quiz-input" data-answer="while and for" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>while and for loops</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 9 -->
+    <div class="lesson-modal" id="lesson9">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 09: Functions</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>String Functions</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">length(s)       Length of string
+substr(s,i,n)   Substring from position i, length n
+split(s,arr,sep)  Split string into array
+gsub(r,s,t)     Global substitute
+sub(r,s,t)      First substitute
+tolower(s)      Convert to lowercase
+toupper(s)      Convert to uppercase</pre>
+
+                <h3>Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Replace first occurrence
+awk '{ sub(/old/, "new"); print }' file.txt
+
+# Replace all occurrences
+awk '{ gsub(/old/, "new"); print }' file.txt
+
+# Get substring (chars 1-5)
+awk '{ print substr($1, 1, 5) }' file.txt
+
+# Length of each line
+awk '{ print length($0) }' file.txt</pre>
+
+                <h3>Math Functions</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">sin(x)   sine
+cos(x)   cosine
+sqrt(x)  square root
+int(x)   integer part
+rand()   random number 0-1
+srand(x) seed for rand</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. What function does global substitution?</p>
+                        <input type="text" class="quiz-input" data-answer="gsub" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>gsub()</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 10 -->
+    <div class="lesson-modal" id="lesson10">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 10: awk with Pipes</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Combining Commands</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># ps with awk
+ps aux | awk '{ print $1, $11 }' | sort | uniq
+
+# df with awk
+df -h | awk '{ print $5, $6 }' | sort -rn
+
+# du with awk
+du -sh /* | awk '{ print $1 }' | sort -h
+
+# log analysis
+cat app.log | awk '/ERROR/ { print $1, $2, $NF }'</pre>
+
+                <h3>Pipeline Examples</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># Find top consumers
+ps aux --sort=-%cpu | awk 'NR==1 { print } NR>1 && $3>10 { print }'
+
+# Extract IP addresses
+netstat -tuln | awk '/LISTEN/ { print $4 }'
+
+# Sum column from output
+grep "error" app.log | awk '{ sum+=$2 } END { print sum }'</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. Why combine awk with other commands?</p>
+                        <input type="text" class="quiz-input" data-answer="process data" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>To extract and process specific data from command output</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 11 -->
+    <div class="lesson-modal" id="lesson11">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 11: Reports and Summaries</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Log Report Example</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">awk 'BEGIN { print "=== Error Report ===" }
+     /ERROR/ { errors++ }
+     /WARNING/ { warnings++ }
+     /INFO/ { info++ }
+     END { 
+         print "Errors:", errors 
+         print "Warnings:", warnings
+         print "Info:", info
+     }' app.log</pre>
+
+                <h3>Sales Report</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;"># sales.csv: product,region,amount
+awk -F, '{
+    product[$1] += $3
+    region[$2] += $3
+    total += $3
+}
+END {
+    print "=== Sales by Product ==="
+    for (p in product) print p, product[p]
+    print "\n=== Sales by Region ==="
+    for (r in region) print r, region[r]
+    print "\nTotal:", total
+}' sales.csv</pre>
+
+                <h3>Quiz</h3>
+                <div class="quiz-section">
+                    <div class="quiz-question">
+                        <p class="question-text">1. When does the END block execute?</p>
+                        <input type="text" class="quiz-input" data-answer="after all input" placeholder="Your answer...">
+                        <button class="quiz-submit">Check</button>
+                        <span class="quiz-feedback"></span>
+                    </div>
+                    <details class="quiz-answers-reveal">
+                        <summary>Show Answers</summary>
+                        <div class="quiz-answers-display">
+                            <ol><li>After all input has been processed</li></ol>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson 12 -->
+    <div class="lesson-modal" id="lesson12">
+        <div class="lesson-content">
+            <div class="lesson-header">
+                <h2>// Lesson 12: awk in Scripts</h2>
+                <a href="#guides" class="close-btn">×</a>
+            </div>
+            <div class="lesson-body">
+                <h3>Standalone Scripts</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">#!/usr/bin/awk -f
+# Calculate statistics
+
+BEGIN {
+    FS=","
+    print "Processing data..."
+}
+
+{
+    sum += $2
+    count++
+    if ($2 > max) max = $2
+    if ($2 < min || min == 0) min = $2
+}
+
+END {
+    print "Records:", count
+    print "Average:", sum/count
+    print "Max:", max
+    print "Min:", min
+}</pre>
+
+                <h3>Bash Script Example</h3>
+                <pre style="background: var(--white); color: var(--black); padding: 16px; max-width: 900px; margin: 20px auto; display: block;">#!/bin/bash
+# Process log file
+
+LOGFILE=${1:-app.log}
+
+echo "=== Log Summary ==="
+awk '/ERROR/ {e++} /WARNING/ {w++} /INFO/ {i++} 
+     END {print "Errors:", e+0, "Warnings:", w+0, "Info:", i+0}' "$LOGFILE"
+
+echo "=== Top 5 Error Messages ==="
+awk '/ERROR/ {print $NF}' "$LOGFILE" | sort | uniq -c | sort -rn | head -5</pre>
+
+                <h3>Congratulations!</h3>
+                <p>You've mastered awk! You now understand:</p>
+                <ul>
+                    <li>Field and record processing</li>
+                    <li>Pattern matching and conditionals</li>
+                    <li>Built-in variables (NR, NF, FS, OFS)</li>
+                    <li>print and printf formatting</li>
+                    <li>Arithmetic and string operations</li>
+                    <li>Variables and arrays</li>
+                    <li>Control structures (if, while, for)</li>
+                    <li>String and math functions</li>
+                    <li>Creating reports and summaries</li>
+                </ul>
+
+                <div class="lesson-nav">
+                    <a href="#guides">← Back to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="about-section" id="about">
+        <div class="about-content">
+            <h2>// Why awk</h2>
+            <p>awk is a complete text processing language. When you need to extract data, create reports, or transform structured text, awk handles it elegantly.</p>
+            <p>Master awk and you'll turn raw log files and CSV data into meaningful insights instantly.</p>
+            <p><strong>Extract. Analyze. Report.</strong></p>
+        </div>
+    </section>
+
+    <section class="resources-section" id="resources">
+        <h2>// Tools & References</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <h3>awk Man Page</h3>
+                <p>Official documentation</p>
+                <a href="https://man7.org/linux/man-pages/man1/awk.1.html" target="_blank">man awk</a>
+            </div>
+            <div class="resource-card">
+                <h3>GAWK Manual</h3>
+                <p>GNU awk guide</p>
+                <a href="https://www.gnu.org/software/gawk/manual/" target="_blank">GAWK</a>
+            </div>
+            <div class="resource-card">
+                <h3>awk One-liners</h3>
+                <p>Common awk commands</p>
+                <a href="https://quickref.me/awk" target="_blank">QuickRef</a>
+            </div>
+            <div class="resource-card">
+                <h3>awk Tutorial</h3>
+                <p>Learning awk</p>
+                <a href="https://www.grymoire.com/Unix/Awk.html" target="_blank">Grymoire</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="copyleft">⟲</span>
+                <span>REBEL WITH LINUX</span>
+            </div>
+            <p class="footer-tagline">Learn Linux the hard way.</p>
+            <div class="footer-links">
+                <a href="../site-map.html">Site Map</a>
+                <span class="footer-divider">|</span>
+                <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion">Onion Site</a>
+                <span class="footer-divider">|</span>
+                <a href="https://github.com/cjboon/rebelwithlinux">GitHub</a>
+            </div>
+            <p class="footer-copyright">COPYRIGHT © 2026 — ALL RIGHTS RESERVED</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+    <script src="../nav.js" defer></script>
+</body>
+</html>
