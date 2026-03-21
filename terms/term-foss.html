@@ -506,24 +506,28 @@
             showIntro(adjustedLevel, isExpert);
         }
         
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) { document.exitFullscreen(); }
+            else { document.documentElement.requestFullscreen(); }
+        };
+        window.toggleDarkMode = function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        };
+        
         input.addEventListener('keydown', async function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 const userAnswer = input.value.trim();
                 if (!userAnswer) return;
                 
-                if (userAnswer === '--beginner') {
-                    currentLevel = 0;
-                    showIntro(0, false);
-                    input.value = '';
-                    return;
-                }
-                if (userAnswer === '--intermediate') {
-                    currentLevel = beginnerLevels.length;
-                    showIntro(0, true);
-                    input.value = '';
-                    return;
-                }
+                if (userAnswer === '--beginner') { currentLevel = 0; showIntro(0, false); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { currentLevel = beginnerLevels.length; showIntro(0, true); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
                 
                 const isExpert = currentLevel >= beginnerLevels.length;
                 const levels = isExpert ? intermediateLevels : beginnerLevels;
@@ -543,6 +547,37 @@
                 }
             }
         });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { currentLevel = 0; showIntro(0, false); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { currentLevel = beginnerLevels.length; showIntro(0, true); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const isExpert = currentLevel >= beginnerLevels.length;
+                const levels = isExpert ? intermediateLevels : beginnerLevels;
+                const adjustedLevel = isExpert ? currentLevel - beginnerLevels.length : currentLevel;
+                const level = levels[adjustedLevel];
+                
+                await showMessage(userAnswer, 'text');
+                input.value = '';
+                
+                if (checkAnswer(userAnswer, level.answer, level.type)) {
+                    await showMessage(level.success, 'success', 300);
+                    await showMessage(character.getEncouragement(), 'speaker', 300);
+                    await saveProgress(level.id);
+                    setTimeout(nextLevel, 1500);
+                } else {
+                    await showMessage("Not quite! " + level.hint, 'hint', 300);
+                }
+            });
+        }
         
         async function init() {
             await checkLogin();

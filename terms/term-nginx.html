@@ -520,8 +520,15 @@
         input.addEventListener('keydown', async function(e) {
             if (e.key === 'Enter' && e.ctrlKey) {
                 e.preventDefault();
-                const userAnswer = input.value;
-                if (!userAnswer.trim()) return;
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { showMessage(character.name, 'Starting BEGINNER track! 12 levels of nginx basics!'); showLevel(beginnerLevels[0]); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { showMessage(character.name, 'Starting INTERMEDIATE track! 12 levels of nginx mastery!'); showLevel(intermediateLevels[0]); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
                 const level = levels.find(l => l.id === currentLevel) || levels[0];
                 if (checkAnswer(level, userAnswer)) {
                     await runNginx(userAnswer);
@@ -532,11 +539,32 @@
                 }
                 input.value = '';
             }
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { showMessage(character.name, 'Starting BEGINNER track! 12 levels of nginx basics!'); showLevel(beginnerLevels[0]); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { showMessage(character.name, 'Starting INTERMEDIATE track! 12 levels of nginx mastery!'); showLevel(intermediateLevels[0]); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                showMessage(character.name, 'Press Ctrl+Enter to run nginx commands. Use --beginner, --intermediate, --fullscreen, --darkmode, or --exit');
+                input.value = '';
+            }
         });
 
         document.getElementById('runBtn').addEventListener('click', async function() {
-            const userAnswer = input.value;
-            if (!userAnswer.trim()) return;
+            const userAnswer = input.value.trim();
+            if (!userAnswer) return;
+            
+            if (userAnswer === '--beginner') { showMessage(character.name, 'Starting BEGINNER track! 12 levels of nginx basics!'); showLevel(beginnerLevels[0]); input.value = ''; return; }
+            if (userAnswer === '--intermediate') { showMessage(character.name, 'Starting INTERMEDIATE track! 12 levels of nginx mastery!'); showLevel(intermediateLevels[0]); input.value = ''; return; }
+            if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+            if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+            if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+            
             const level = levels.find(l => l.id === currentLevel) || levels[0];
             if (checkAnswer(level, userAnswer)) {
                 await runNginx(userAnswer);
@@ -562,24 +590,6 @@
                 showLevel(levels.find(l => l.id === savedLevel));
             }
         }
-
-        input.addEventListener('keydown', async function(e) {
-            if (e.key === 'Enter' && !e.ctrlKey) {
-                const userAnswer = input.value.trim();
-                if (userAnswer === '--beginner') {
-                    showMessage(character.name, 'Starting BEGINNER track! 12 levels of nginx basics!');
-                    showLevel(beginnerLevels[0]);
-                    input.value = '';
-                    return;
-                }
-                if (userAnswer === '--intermediate') {
-                    showMessage(character.name, 'Starting INTERMEDIATE track! 12 levels of nginx mastery!');
-                    showLevel(intermediateLevels[0]);
-                    input.value = '';
-                    return;
-                }
-            }
-        });
 
         init();
     </script>
