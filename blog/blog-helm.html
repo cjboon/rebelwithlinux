@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-helm.html" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Helm: Kubernetes Package Manager - REBEL WITH LINUX</title>
+    <meta name="description" content="Learn Helm, the package manager for Kubernetes. Deploy complex applications with a single command.">
+    <meta name="keywords" content="Helm, Kubernetes, K8s, package manager, charts, DevOps, deployment">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Helm: Kubernetes Package Manager">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rebelwithlinux.com/blog/blog-helm.html">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/blog/blog-helm.html">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme || savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                const saved = localStorage.getItem('theme');
+                toggle.checked = (saved === 'dark' || !saved);
+            }
+        });
+    </script>
+
+    <style>
+        .blog-header {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 32px 60px;
+            text-align: center;
+        }
+        .blog-header h1 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        .blog-header p {
+            font-family: 'IBM Plex Mono', monospace;
+            color: var(--gray);
+        }
+        .blog-nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 16px;
+            border-bottom: 2px solid var(--black);
+            background: var(--white);
+        }
+        .blog-nav a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--black);
+            text-decoration: none;
+        }
+        .blog-nav a:hover {
+            text-decoration: underline;
+        }
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+        .blog-meta {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 16px;
+        }
+        .blog-title {
+            font-size: 2rem;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+        .blog-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        .blog-content p {
+            margin-bottom: 24px;
+        }
+        .blog-content h2 {
+            font-size: 1.5rem;
+            margin: 40px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--black);
+        }
+        .blog-content h3 {
+            font-size: 1.2rem;
+            margin: 32px 0 12px;
+        }
+        .blog-content ul, .blog-content ol {
+            margin-bottom: 24px;
+            padding-left: 24px;
+        }
+        .blog-content li {
+            margin-bottom: 8px;
+        }
+        .blog-content blockquote {
+            border-left: 4px solid var(--black);
+            padding-left: 20px;
+            margin: 24px 0;
+            font-style: italic;
+            color: var(--gray);
+        }
+        .blog-content code {
+            background: var(--beige);
+            padding: 2px 6px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95rem;
+        }
+        .blog-content pre {
+            background: var(--black);
+            color: var(--ivory);
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            border: 3px solid var(--black);
+        }
+        .blog-content pre code {
+            background: transparent;
+            padding: 0;
+            color: var(--ivory);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            color: var(--black);
+            text-decoration: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        footer {
+            padding: 48px 32px;
+            background: var(--black);
+            color: var(--white);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="close" class="nav-close-target" aria-hidden="true"></div>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav>
+        <input type="checkbox" id="themeToggle" checked class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <div class="nav-left">
+            <div class="nav-title">
+                <a href="../index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>
+            </div>
+            <label for="themeToggle" class="theme-toggle-label" aria-label="Toggle dark mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-icon sun">☀️</span>
+            </label>
+        </div>
+        <div class="nav-right">
+            <div class="menu-details" id="nav-menu">
+                <a class="menu-toggle" href="#nav-menu" aria-label="Open navigation menu" aria-expanded="false">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a class="nav-close" href="#close" aria-label="Close navigation menu">× Close</a>
+                    <a href="../search.html">SEARCH</a>
+                    <a href="../index.html#games">GAMES</a>
+                    <a href="../index.html#guides">GUIDES</a>
+                    <a href="../index.html#blog">BLOG</a>
+                    <a href="../index.html#about">ABOUT</a>
+                    <a href="../index.html#login" id="loginLink" class="auth-link">LOGIN</a>
+                    <a href="account.html" id="accountLink" style="display:none">ACCOUNT</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="blog-header">
+        <h1>// THE REBEL BLOG</h1>
+        <p>Thoughts on free software, privacy, and taking back control</p>
+    </header>
+
+    <nav class="blog-nav">
+        <a href="../index.html#blog">← Back to Blog</a>
+    </nav>
+
+    <main class="blog-container" id="main-content">
+        <article>
+            <div class="blog-meta">
+                <span>2026-03-21</span> • <span>14 min read</span> • <span>DevOps</span>
+            </div>
+            <h1 class="blog-title">Helm: Kubernetes Package Manager</h1>
+
+            <div class="blog-content">
+                <p>You've deployed your application to Kubernetes. You've written the manifests for your Deployment, Service, ConfigMap, Secret, and all the other resources. It works. Now you need to deploy the same application to a different environment, or share it with your team. How do you manage all those YAML files?</p>
+
+                <p>Meet Helm—the package manager for Kubernetes. Helm lets you define, install, and upgrade even the most complex Kubernetes applications with a single command.</p>
+
+                <h2>Why Helm?</h2>
+
+                <p>Without Helm, managing Kubernetes applications means:</p>
+
+                <ul>
+                    <li>Copying and pasting YAML files between environments</li>
+                    <li>Manually editing values for each environment</li>
+                    <li>Tracking which version of each manifest is deployed where</li>
+                    <li>Rolling back changes by hand when something goes wrong</li>
+                </ul>
+
+                <p>Helm solves these problems by treating your Kubernetes manifests as a distributable package—a <strong>chart</strong>. With Helm you can:</p>
+
+                <ul>
+                    <li><strong>Package</strong> — Bundle all your manifests into a single deployable unit</li>
+                    <li><strong>Configure</strong> — Use templating to customize deployments per environment</li>
+                    <li><strong>Release</strong> — Track versions and roll back when needed</li>
+                    <li><strong>Share</strong> — Use charts from the community or your organization</li>
+                </ul>
+
+                <h2>Core Concepts</h2>
+
+                <h3>Charts</h3>
+
+                <p>A <strong>chart</strong> is a collection of files that describe a Kubernetes resourceset. It includes:</p>
+
+                <ul>
+                    <li><code>Chart.yaml</code> — Metadata about the chart (name, version, dependencies)</li>
+                    <li><code>values.yaml</code> — Default configuration values</li>
+                    <li><code>templates/</code> — Kubernetes manifest templates</li>
+                    <li><code>charts/</code> — Dependency charts (optional)</li>
+                </ul>
+
+                <h3>Releases</h3>
+
+                <p>A <strong>release</strong> is a running instance of a chart in a Kubernetes cluster. You can have multiple releases of the same chart in the same cluster (like deploying different versions for testing and production).</p>
+
+                <h3>Repositories</h3>
+
+                <p>A <strong>repository</strong> is a place where charts are stored and shared. Helm Hub (hub.helm.sh) is the central repository for community charts. You can also use private repositories.</p>
+
+                <h2>Installing Helm</h2>
+
+                <pre><code># Linux
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# Or via package manager
+sudo apt-get install helm    # Debian/Ubuntu
+brew install helm            # macOS
+
+# Verify
+helm version</code></pre>
+
+                <h2>Your First Chart</h2>
+
+                <p>Let's create a simple chart for a web application.</p>
+
+                <pre><code># Create a new chart
+helm create myapp
+
+# This creates the following structure:
+# myapp/
+#   Chart.yaml
+#   values.yaml
+#   charts/
+#   templates/
+#   .helmignore</code></pre>
+
+                <h3>Chart.yaml</h3>
+
+                <p>The Chart.yaml contains the chart's metadata:</p>
+
+                <pre><code>apiVersion: v2
+name: myapp
+description: My web application
+type: application
+version: 1.0.0
+appVersion: "1.0.0"</code></pre>
+
+                <h3>values.yaml</h3>
+
+                <p>Default values that can be overridden at install time:</p>
+
+                <pre><code>replicaCount: 2
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: myapp.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi</code></pre>
+
+                <h3>Templates</h3>
+
+                <p>Templates use Go templating to generate Kubernetes manifests:</p>
+
+                <pre><code># templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    version: {{ .Values.image.tag }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        version: {{ .Values.image.tag }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}</code></pre>
+
+                <h2>Installing and Upgrading</h2>
+
+                <pre><code># Install a chart
+helm install myapp ./myapp
+
+# Install with custom values
+helm install myapp ./myapp --set replicaCount=3
+
+# Install from a repository
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install myapp bitnami/nginx
+
+# Upgrade a release
+helm upgrade myapp ./myapp
+
+# Upgrade with new values
+helm upgrade myapp ./myapp --set replicaCount=5
+
+# Rollback to previous release
+helm rollback myapp</code></pre>
+
+                <h2>Managing Values</h2>
+
+                <p>Helm provides multiple ways to override values:</p>
+
+                <pre><code># Using a values file
+helm install myapp ./myapp -f production.yaml
+
+# Using --set (highest priority)
+helm install myapp ./myapp --set replicaCount=10
+
+# Combining files and --set
+helm install myapp ./myapp -f production.yaml --set replicaCount=10
+
+# Show computed values (including defaults)
+helm show values ./myapp
+
+# Get values from an existing release
+helm get values myapp</code></pre>
+
+                <h2>Debugging Charts</h2>
+
+                <pre><code># Dry run (see what would be created)
+helm install myapp ./myapp --dry-run
+
+# Dry run with debug (see template rendering)
+helm install myapp ./myapp --dry-run --debug
+
+# Lint a chart for errors
+helm lint ./myapp
+
+# Template locally (without installing)
+helm template myapp ./myapp</code></pre>
+
+                <h2>Dependencies</h2>
+
+                <p>Charts can depend on other charts. Add to Chart.yaml:</p>
+
+                <pre><code>dependencies:
+  - name: postgresql
+    version: "12.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled</code></pre>
+
+                <p>Then update and install dependencies:</p>
+
+                <pre><code># Update dependency charts
+helm dependency update ./myapp
+
+# This creates charts.lock and downloads charts to charts/
+
+# Install with dependency
+helm install myapp ./myapp</code></pre>
+
+                <h2>Release Management</h2>
+
+                <pre><code># List releases
+helm list
+
+# List releases in a namespace
+helm list -n mynamespace
+
+# See release history
+helm history myapp
+
+# See full release details
+helm get all myapp
+
+# Uninstall a release
+helm uninstall myapp</code></pre>
+
+                <h2>Helmfile and GitOps</h2>
+
+                <p>For managing multiple releases across environments, Helmfile provides a declarative way:</p>
+
+                <pre><code># helmfile.yaml
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+
+releases:
+  - name: myapp
+    chart: ./myapp
+    values:
+      - values/production.yaml
+    secrets:
+      - secrets/production.yaml.gpg</code></pre>
+
+                <blockquote>Helm + Helmfile + GitOps = Reproducible deployments across environments</blockquote>
+
+                <h2>Common Charts to Know</h2>
+
+                <ul>
+                    <li><strong>bitnami/nginx</strong> — Web server</li>
+                    <li><strong>bitnami/postgresql</strong> — Database</li>
+                    <li><strong>bitnami/redis</strong> — Cache</li>
+                    <li><strong>prometheus-community/prometheus</strong> — Monitoring</li>
+                    <li><strong>grafana/grafana</strong> — Dashboards</li>
+                    <li><strong>ingress-nginx/ingress-nginx</strong> — Ingress controller</li>
+                    <li><strong>cert-manager/cert-manager</strong> — TLS certificates</li>
+                </ul>
+
+                <h2>Best Practices</h2>
+
+                <ul>
+                    <li><strong>Use semantic versioning</strong> for chart versions</li>
+                    <li><strong>Template everything</strong> — Avoid hardcoded values</li>
+                    <li><strong>Use named templates</strong> for repeated blocks</li>
+                    <li><strong>Validate with --dry-run</strong> before installing</li>
+                    <li><strong>Store charts in Git</strong> — Treat them as code</li>
+                    <li><strong>Use environments</strong> — Separate values files per environment</li>
+                </ul>
+
+                <h2>What's Next?</h2>
+
+                <p>Once you're comfortable with Helm:</p>
+
+                <ul>
+                    <li><strong>Operator Framework</strong> — Build operators that use Helm internally</li>
+                    <li><strong>Flux/ArgoCD</strong> — GitOps with Helm charts</li>
+                    <li><strong>Carvel ytt</strong> — Alternative templating for Kubernetes</li>
+                </ul>
+
+                <p>Helm turns dozens of YAML files into a single deployable package. It makes Kubernetes accessible to teams, enables reproducible deployments, and lets you focus on shipping rather than managing manifests.</p>
+            </div>
+        </article>
+
+        <section style="padding: 48px 32px; max-width: 800px; margin: 0 auto; border-top: 2px solid var(--black);">
+            <h3 style="font-family: 'IBM Plex Mono', monospace; margin-bottom: 24px;">// Comments</h3>
+            <div id="comments-list" style="margin-bottom: 32px;"></div>
+            <div style="background: #f5f5f5; padding: 24px; border: 2px solid var(--black);">
+                <h4 style="margin-bottom: 16px;">Leave a Comment</h4>
+                <div style="display: grid; gap: 16px;">
+                    <input type="text" id="comment-author" placeholder="Name" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <input type="email" id="comment-email" placeholder="Email (not published)" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black);">
+                    <textarea id="comment-content" placeholder="Your comment..." rows="4" style="padding: 12px; font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--black); resize: vertical;"></textarea>
+                    <button onclick="submitComment('blog-helm')" style="padding: 12px 24px; background: var(--black); color: var(--white); font-family: 'IBM Plex Mono', monospace; border: none; cursor: pointer;">Post Comment</button>
+                    <div id="comment-error" style="color: #cc6666; font-size: 0.875rem;"></div>
+                    <div id="comment-success" style="color: #b5bd68; font-size: 0.875rem;"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="copyleft">⟲</span>
+                <span>REBEL WITH LINUX</span>
+            </div>
+            <p class="footer-tagline">Learn Linux the hard way.</p>
+            <div class="footer-links">
+                <a href="../site-map.html">Site Map</a>
+                <span class="footer-divider">|</span>
+                <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion">Onion Site</a>
+                <span class="footer-divider">|</span>
+                <a href="https://github.com/cjboon/rebelwithlinux">GitHub</a>
+            </div>
+            <p class="footer-copyright">COPYRIGHT © 2026 — ALL RIGHTS RESERVED</p>
+        </div>
+    </footer>
+    <script>
+        document.querySelectorAll('.menu-details .nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                const details = this.closest('.menu-details');
+                if (details) details.removeAttribute('open');
+            });
+        });
+    </script>
+
+    
+    <script src="../nav.js" defer></script>
+    <script src="../js/comments.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initComments('blog-helm');
+        });
+    </script>
+</body>
+</html>
