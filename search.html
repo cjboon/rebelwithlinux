@@ -16,7 +16,7 @@
     <script src="theme.js"></script>
     <style>
         body { padding-top: 80px; }
-        .search-container { max-width: 1100px; margin: 0 auto; padding: 32px; }
+        .search-container { max-width: 1100px; margin: 0 auto; padding: 32px; position: relative; }
         .search-box { 
             width: 100%; 
             padding: 16px 24px; 
@@ -32,12 +32,14 @@
             border-color: var(--charcoal);
         }
         #results { 
-            position: relative;
-            background: var(--black);
+            position: absolute;
+            width: 100%;
             max-height: 60vh;
             overflow-y: auto;
+            background: var(--black);
             border: 2px solid var(--charcoal);
-            margin-bottom: 32px;
+            z-index: 100;
+            display: none;
         }
         #results .search-link { 
             display: none; 
@@ -301,6 +303,7 @@
             var query = e.target.value.toLowerCase();
             var resultsDiv = document.getElementById('results');
             var links = resultsDiv.querySelectorAll('.search-link');
+            var hasResults = false;
             
             links.forEach(function(link) {
                 var text = link.textContent.toLowerCase();
@@ -310,10 +313,13 @@
                     link.style.display = 'none';
                 } else if (text.indexOf(query) !== -1 || href.indexOf(query) !== -1) {
                     link.style.display = 'block';
+                    hasResults = true;
                 } else {
                     link.style.display = 'none';
                 }
             });
+            
+            resultsDiv.style.display = hasResults ? 'block' : 'none';
         });
     </script>
 
