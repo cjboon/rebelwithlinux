@@ -2,20 +2,12 @@
 <html lang="en" data-theme="dark">
 <head>
     <script>
-        // Set initial theme before render to prevent flash
-        const savedTheme = localStorage.getItem('theme');
-        const isDark = !savedTheme || savedTheme === 'dark';
-        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggle = document.getElementById('themeToggle');
-            if (toggle) toggle.checked = isDark;
-        });
-
-        function handleThemeChange(isDark) {
-            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        }
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
     </script>
     <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" />
     <meta charset="UTF-8">
@@ -85,6 +77,7 @@
     <link rel="preload" href="fonts/ibmplexmono-700.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="fonts.css">
     <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
     <script src="achievements.js" defer></script>
 </head>
 
@@ -93,7 +86,7 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <nav>
-        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" checked onchange="handleThemeChange(this.checked)">
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" checked>
         <div class="nav-left">
             <a href="#top" class="nav-title" aria-label="Go to top">
                 REBEL WITH LINUX
@@ -150,7 +143,7 @@
         <div style="max-width: 1100px; margin:0 auto; padding: 0 32px;">
             <div id="manifesto-content">
                 <div class="section-header" style="display: flex !important; align-items: flex-start; justify-content: flex-start; gap: 130px;">
-                    <img src="machete_penguin.png" alt="Machete Penguin" style="height: 300px; width: auto;">
+                    <img src="machete_penguin.png" alt="Machete Penguin" loading="lazy" style="height: 300px; width: auto;">
                     <div class="section-title-wrap">
                         <h1><span class="title-fade">TAKE BACK</span><br><span class="title-fade">YOUR COMPUTER</span></h1>
                         <p class="tagline" style="font-family: 'IBM Plex Mono', monospace; font-size: 1.2rem; margin-top: 16px;">// Free your mind. Own your data.</p>
@@ -930,7 +923,7 @@
         <div class="section-header">
             <div class="section-title-wrap">
                 <h2 style="font-family: 'IBM Plex Mono', monospace; font-size: 2rem; margin-bottom: 8px;">// The Penguin's Blog</h2>
-                <p style="font-family: 'IBM Plex Mono', monospace; color: var(--charcoal);">Quick guides and tips</p>
+                <p style="font-family: 'IBM Plex Mono', monospace; color: var(--charcoal);">Technical deep-dives and practical tutorials</p>
             </div>
             <input type="checkbox" id="checkbox-blog" class="show-more-checkbox">
         </div>
@@ -1479,7 +1472,7 @@
         <div class="section-header">
             <div class="section-title-wrap">
                 <h2>// Why This Matters</h2>
-                <p style="font-family: 'IBM Plex Mono', monospace; color: var(--charcoal);">Rebel with me. Rebel against Surveillance and Censorship.</p>
+                <p style="font-family: 'IBM Plex Mono', monospace; color: var(--charcoal);">Learn Linux. Own Your Systems. Reclaim Your Freedom.</p>
             </div>
             <input type="checkbox" id="checkbox-about" class="show-more-checkbox">
             
@@ -1959,14 +1952,14 @@
     
     <!-- STATS + REBELS SECTION -->
     <section id="stats" style="padding: 32px; text-align: center; background: var(--ivory); max-width: 1200px; margin: 0 auto;">
-        <p style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 8px;">Last updated: 2026-03-22 08:04:03</p>
+        <p style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 8px;">Last updated: 2026-03-22 09:04:10</p>
         <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">316 rebelled today.</h3>
         <ul style="list-style: none; padding: 0; margin: 0;">
-            <li>macOS: 104 IPs</li>
-            <li>Windows: 97 IPs</li>
-            <li>Other: 52 IPs</li>
+            <li>macOS: 105 IPs</li>
+            <li>Windows: 96 IPs</li>
+            <li>Other: 51 IPs</li>
             <li>Android: 45 IPs</li>
-            <li>Linux: 18 IPs</li>
+            <li>Linux: 19 IPs</li>
         </ul>
         
         
@@ -1974,10 +1967,10 @@
             <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">// Live Server Stats</h3>
             <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;">
                 <div><strong>Location</strong><br><span class="stat-location">Ogden, Utah</span></div>
-                <div><strong>Uptime</strong><br><span class="stat-uptime">up 49 minutes</span></div>
-                <div><strong>Load</strong><br><span class="stat-load">1.68</span></div>
-                <div><strong>Memory</strong><br><span class="stat-memory">1.9Gi/1.9Gi</span></div>
-                <div><strong>Disk</strong><br><span class="stat-disk">6.8G/59G</span></div>
+                <div><strong>Uptime</strong><br><span class="stat-uptime">up 1 hour, 49 minutes</span></div>
+                <div><strong>Load</strong><br><span class="stat-load">2.40</span></div>
+                <div><strong>Memory</strong><br><span class="stat-memory">1.8Gi/1.9Gi</span></div>
+                <div><strong>Disk</strong><br><span class="stat-disk">7.0G/59G</span></div>
                 <div><strong>Top Proc</strong><br><span class="stat-proc">/root/.opencode/bin/opencode<br>29.2% CPU</span></div>
             </div>
         </div>

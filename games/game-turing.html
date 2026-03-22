@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/games/game-turing.html" />
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Turing Game - Guess What the Code Does | REBEL WITH LINUX</title>
     <link rel="stylesheet" href="../style.css">
-    <script>
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
-    </script>
+    <script src="../theme.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
         body {
-            background: #1a1a1a;
-            color: #cccccc;
+            background: var(--white);
+            color: var(--black);
             font-family: 'Courier New', monospace;
             font-size: 15px;
             display: flex;
@@ -27,32 +30,32 @@
             padding: 20px;
         }
         h1 { margin-bottom: 10px; font-size: 1.8rem; color: #00ff00; }
-        .subtitle { margin-bottom: 20px; color: #888888; }
+        .subtitle { margin-bottom: 20px; color: var(--charcoal); }
         
         .stats-bar {
             display: flex;
             gap: 30px;
             margin-bottom: 20px;
-            background: #333;
+            background: var(--charcoal);
             padding: 12px 24px;
             border-radius: 8px;
         }
         .stat { text-align: center; }
-        .stat-label { font-size: 11px; color: #888; text-transform: uppercase; }
+        .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; }
         .stat-value { font-size: 24px; font-weight: bold; color: #00ff00; }
         
         .game-container {
-            background: #222;
+            background: var(--charcoal);
             border-radius: 12px;
             padding: 30px;
             max-width: 800px;
             width: 100%;
-            border: 2px solid #444;
+            border: 2px solid var(--charcoal);
         }
         
         .code-box {
-            background: #0d0d0d;
-            border: 1px solid #333;
+            background: var(--black);
+            border: 1px solid var(--charcoal);
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
@@ -73,11 +76,11 @@
         }
         
         .option-btn {
-            background: #333;
-            border: 2px solid #444;
+            background: var(--charcoal);
+            border: 2px solid var(--charcoal);
             border-radius: 8px;
             padding: 15px;
-            color: #ccc;
+            color: var(--black);
             font-family: 'Courier New', monospace;
             font-size: 14px;
             cursor: pointer;
@@ -86,7 +89,7 @@
         }
         
         .option-btn:hover {
-            background: #444;
+            background: var(--charcoal);
             border-color: #00ff00;
         }
         
@@ -116,7 +119,7 @@
         .feedback.wrong { background: #4d1a1a; color: #ff4444; }
         
         .explanation {
-            background: #2a2a2a;
+            background: var(--charcoal);
             border-radius: 8px;
             padding: 15px;
             margin-top: 15px;
@@ -127,7 +130,7 @@
         
         .next-btn {
             background: #00ff00;
-            color: #000;
+            color: var(--black);
             border: none;
             padding: 12px 30px;
             font-family: 'Courier New', monospace;
@@ -147,9 +150,9 @@
         }
         
         .difficulty-select select {
-            background: #333;
-            color: #ccc;
-            border: 2px solid #444;
+            background: var(--charcoal);
+            color: var(--black);
+            border: 2px solid var(--charcoal);
             padding: 10px 20px;
             font-family: 'Courier New', monospace;
             font-size: 14px;
@@ -165,7 +168,7 @@
             position: fixed;
             top: 20px;
             left: 20px;
-            color: #888;
+            color: var(--charcoal);
             text-decoration: none;
             font-size: 14px;
         }

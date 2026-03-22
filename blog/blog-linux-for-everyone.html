@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
     <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-linux-for-everyone.html" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,19 +25,6 @@
     <link rel="icon" href="favicon.ico">
     <link rel="stylesheet" href="../fonts.css">
     <link rel="stylesheet" href="../style.css">
-    <script>
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggle = document.getElementById('themeToggle');
-            if (toggle) {
-                const saved = localStorage.getItem('theme');
-                toggle.checked = (saved === 'dark' || !saved);
-            }
-        });
-    </script>
     <style>
         .blog-header {
             background: var(--black);
@@ -132,6 +128,8 @@
             text-decoration: underline;
         }
     </style>
+
+    <script src="../theme.js"></script>
 </head>
 <body>
     <div id="close" class="nav-close-target" aria-hidden="true"></div>

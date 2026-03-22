@@ -11,26 +11,22 @@
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="../fonts.css">
     <link rel="stylesheet" href="../style.css">
-    <script>
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        } else if (savedTheme === 'light') {
-            document.documentElement.setAttribute('data-theme', 'light');
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggle = document.getElementById('themeToggle');
-            if (toggle) {
-                const saved = localStorage.getItem('theme');
-                toggle.checked = (saved === 'dark' || !saved);
-            }
-        });
-    <script src="../terminal-select.js"></script>
-    <style>
+    
+    <script src="../terminal-select.js"></script><style>
         :root {
             --nav-color: #FF6F00;
         }
     </style>
+
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <script src="../theme.js"></script>
 </head>
 <body class="guide-page">
     <div id="close" class="nav-close-target" aria-hidden="true"></div>

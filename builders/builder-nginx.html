@@ -1,6 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
     <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/builders/builder-nginx.html" />
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
@@ -59,8 +67,19 @@
         .progress-info { margin-top: 20px; text-align: center; color: var(--charcoal); font-size: 13px; }
         @media (max-width: 600px) { body { padding: 10px; } .header { padding: 15px; margin-bottom: 15px; } .header h1 { font-size: 20px; } .stats-bar { flex-wrap: wrap; gap: 15px; padding: 10px 15px; } .stat-value { font-size: 18px; } .game-container { padding: 15px; } .letter-slot, .letter-tile { width: 38px; height: 38px; font-size: 12px; } .modal-content { padding: 20px; margin: 10px; } }
     </style>
+    <script src="../theme.js"></script>
+
 </head>
 <body>
+    <nav style="display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; background: var(--ivory); border-bottom: 2px solid var(--charcoal);">
+        <a href="builder-main.html" style="font-family: 'IBM Plex Mono', monospace; font-size: 1rem; color: var(--black); text-decoration: none;">&lt;&lt; back to builders</a>
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <label for="themeToggle" class="theme-toggle-label" style="cursor: pointer;">
+            <span style="font-size: 1.5rem;">🌙</span>
+            <span class="sun" style="font-size: 1.5rem;">☀️</span>
+        </label>
+    </nav>
+
     <div class="header">
         <h1>🔄 NGINX BUILDER</h1>
         <p>Drag & drop to learn Nginx</p>

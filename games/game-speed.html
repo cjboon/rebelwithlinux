@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/games/game-speed.html" />
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Speed Typing - Linux Commands | REBEL WITH LINUX</title>
     <link rel="stylesheet" href="../style.css">
-    <script>
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
-    </script>
+    <script src="../theme.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
         body {
-            background: #1a1a1a;
-            color: #cccccc;
+            background: var(--white);
+            color: var(--black);
             font-family: 'Courier New', monospace;
             font-size: 15px;
             display: flex;
@@ -26,28 +29,28 @@
             align-items: center;
             padding: 20px;
         }
-        h1 { margin-bottom: 10px; font-size: 1.8rem; color: #f1fa8c; }
-        .subtitle { margin-bottom: 20px; color: #888888; }
+        h1 { margin-bottom: 10px; font-size: 1.8rem; color: var(--black); }
+        .subtitle { margin-bottom: 20px; color: var(--charcoal); }
         
         .stats-bar {
             display: flex;
             gap: 30px;
             margin-bottom: 20px;
-            background: #333;
+            background: var(--charcoal);
             padding: 12px 24px;
             border-radius: 8px;
         }
         .stat { text-align: center; }
-        .stat-label { font-size: 11px; color: #888; text-transform: uppercase; }
-        .stat-value { font-size: 24px; font-weight: bold; color: #f1fa8c; }
+        .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; }
+        .stat-value { font-size: 24px; font-weight: bold; color: var(--black); }
         
         .game-container {
-            background: #222;
+            background: var(--charcoal);
             border-radius: 12px;
             padding: 30px;
             max-width: 700px;
             width: 100%;
-            border: 2px solid #444;
+            border: 2px solid var(--charcoal);
         }
         
         .difficulty-select {
@@ -56,9 +59,9 @@
         }
         
         .difficulty-select select {
-            background: #333;
-            color: #ccc;
-            border: 2px solid #444;
+            background: var(--charcoal);
+            color: var(--black);
+            border: 2px solid var(--charcoal);
             padding: 10px 20px;
             font-family: 'Courier New', monospace;
             font-size: 14px;
@@ -67,8 +70,8 @@
         }
         
         .word-display {
-            background: #0d0d0d;
-            border: 2px solid #333;
+            background: var(--black);
+            border: 2px solid var(--charcoal);
             border-radius: 12px;
             padding: 40px;
             text-align: center;
@@ -78,14 +81,14 @@
         .current-word {
             font-size: 32px;
             font-weight: bold;
-            color: #f1fa8c;
+            color: var(--black);
             letter-spacing: 2px;
             margin-bottom: 10px;
         }
         
         .hint {
             font-size: 14px;
-            color: #666;
+            color: var(--charcoal);
         }
         
         .input-area {
@@ -97,17 +100,17 @@
             padding: 15px 20px;
             font-size: 24px;
             font-family: 'Courier New', monospace;
-            background: #0d0d0d;
-            border: 2px solid #333;
+            background: var(--white);
+            border: 2px solid var(--charcoal);
             border-radius: 8px;
-            color: #f1fa8c;
+            color: var(--black);
             text-align: center;
             letter-spacing: 2px;
         }
         
         .input-area input:focus {
             outline: none;
-            border-color: #f1fa8c;
+            border-color: var(--charcoal);
         }
         
         .input-area input.correct {
@@ -128,7 +131,7 @@
         
         .timer-bar {
             height: 8px;
-            background: #333;
+            background: var(--charcoal);
             border-radius: 4px;
             overflow: hidden;
             margin-bottom: 15px;
@@ -136,7 +139,7 @@
         
         .timer-fill {
             height: 100%;
-            background: #f1fa8c;
+            background: var(--black);
             transition: width 0.1s linear;
         }
         
@@ -160,8 +163,8 @@
         .game-screen.active { display: block; }
         
         .next-btn {
-            background: #f1fa8c;
-            color: #000;
+            background: var(--black);
+            color: var(--white);
             border: none;
             padding: 12px 30px;
             font-family: 'Courier New', monospace;
@@ -179,15 +182,15 @@
             position: fixed;
             top: 20px;
             left: 20px;
-            color: #888;
+            color: var(--charcoal);
             text-decoration: none;
             font-size: 14px;
         }
-        .back-link:hover { color: #f1fa8c; }
+        .back-link:hover { color: var(--black); }
         
         .streak-display {
             font-size: 14px;
-            color: #666;
+            color: var(--charcoal);
             margin-top: 10px;
         }
         
@@ -197,7 +200,7 @@
         }
         
         .results h2 {
-            color: #f1fa8c;
+            color: var(--black);
             margin-bottom: 20px;
         }
         
@@ -209,13 +212,13 @@
         }
         
         .result-item {
-            background: #333;
+            background: var(--charcoal);
             padding: 15px;
             border-radius: 8px;
         }
         
-        .result-label { font-size: 12px; color: #888; }
-        .result-value { font-size: 24px; color: #f1fa8c; }
+        .result-label { font-size: 12px; color: var(--charcoal); }
+        .result-value { font-size: 24px; color: var(--black); }
         
         /* Mobile optimizations */
         @media (max-width: 768px) {
@@ -235,8 +238,8 @@
             }
             .mobile-submit-btn {
                 display: block !important;
-                background: #f1fa8c;
-                color: #000;
+                background: var(--black);
+                color: var(--white);
                 border: none;
                 padding: 12px;
                 font-family: 'Courier New', monospace;

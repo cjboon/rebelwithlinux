@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/offline.html" />
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
@@ -9,14 +17,24 @@
     <link rel="stylesheet" href="fonts.css">
     <style>
         :root {
-            --ivory: #FFFFF0;
-            --black: #0A0A0A;
+            --ivory: #FFFFFF;
+            --black: #000000;
             --white: #FFFFFF;
+            --charcoal: #666666;
         }
-        [data-theme="light"] {
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ivory: #1a1a1a;
+                --black: #e0e0e0;
+                --white: #1a1a1a;
+                --charcoal: #c0c0c0;
+            }
+        }
+        [data-theme="dark"] {
             --ivory: #1a1a1a;
-            --white: #2a2a2a;
             --black: #e0e0e0;
+            --white: #1a1a1a;
+            --charcoal: #c0c0c0;
         }
         body {
             font-family: 'IBM Plex Mono', monospace;
@@ -58,11 +76,7 @@
             opacity: 0.9;
         }
     </style>
-    <script>
-        if (localStorage.getItem('theme') === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
-    </script>
+    <script src="theme.js"></script>
 </head>
 <body>
     <div class="icon">📡</div>

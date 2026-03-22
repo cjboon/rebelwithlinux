@@ -1,6 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/hangman/hangman-html.html" />
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
@@ -201,6 +209,7 @@
             h1 { font-size: 1.2rem; }
         }
     </style>
+    <script src="../theme.js"></script>
 </head>
 <body>
     <h1>HANGMAN: HTML</h1>
@@ -754,10 +763,6 @@
         });
 
         // Apply saved theme on page load
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
 
         init();
     </script>

@@ -2,24 +2,19 @@
 <html lang="en" data-theme="dark">
 <head>
     <script>
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        } else if (savedTheme === 'light') {
-            document.documentElement.setAttribute('data-theme', 'light');
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggle = document.getElementById('themeToggle');
-            if (toggle) {
-                toggle.checked = (savedTheme === 'dark' || !savedTheme);
-            }
-        });
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search - REBEL WITH LINUX</title>
     <link rel="stylesheet" href="fonts.css">
     <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
     <style>
         body { padding-top: 80px; }
         .search-container { max-width: 1100px; margin: 0 auto; padding: 32px; }

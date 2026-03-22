@@ -2,11 +2,12 @@
 <html lang="en" data-theme="dark">
 <head>
     <script>
-        // Apply saved theme immediately to prevent flash
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
     </script>
     <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/account.html" />
     <meta charset="UTF-8">
@@ -30,6 +31,7 @@
     <link rel="stylesheet" href="fonts.css">
     <link rel="stylesheet" href="style.css">
     <script src="achievements.js" defer></script>
+    <script src="theme.js"></script>
 </head>
 
 <body id="top">
@@ -37,7 +39,7 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <nav>
-        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
+        <input type="checkbox" id="themeToggle" class="theme-toggle-checkbox" checked onchange="document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light'); localStorage.setItem('theme', this.checked ? 'dark' : 'light');">
         <div class="nav-left">
             <div class="nav-title">
                 <a href="index.html" style="color: inherit; text-decoration: none;">REBEL WITH LINUX</a>

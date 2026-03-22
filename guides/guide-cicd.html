@@ -11,14 +11,6 @@
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="../fonts.css">
     <link rel="stylesheet" href="../style.css">
-    <script>
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        } else if (savedTheme === 'light') {
-            document.documentElement.setAttribute('data-theme', 'light');
-        }
-    </script>
     <script src="../terminal-select.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -34,6 +26,16 @@
             --nav-color: #00D4AA;
         }
     </style>
+
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <script src="../theme.js"></script>
 </head>
 <body class="guide-page">
     <div id="close" class="nav-close-target" aria-hidden="true"></div>

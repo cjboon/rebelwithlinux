@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/games/game-debian-2.html" />
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Debian SysAdmin Challenge 2: Advanced</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="../theme.js"></script>
     <style>
         * {
             margin: 0;
@@ -20,8 +29,8 @@
         }
         
         body {
-            background: #0d1117;
-            color: #c9d1d9;
+            background: var(--black);
+            color: var(--black);
             font-family: 'Courier New', monospace;
             font-size: 14px;
         }
@@ -33,34 +42,34 @@
         
         .sidebar {
             width: 300px;
-            background: #161b22;
-            border-right: 1px solid #30363d;
+            background: var(--white);
+            border-right: 1px solid var(--charcoal);
             display: flex;
             flex-direction: column;
         }
         
         .sidebar-header {
             padding: 20px;
-            border-bottom: 1px solid #30363d;
+            border-bottom: 1px solid var(--charcoal);
             text-align: center;
-            background: linear-gradient(135deg, #a80030 0%, #161b22 100%);
+            background: linear-gradient(135deg, #a80030 0%, var(--white) 100%);
         }
         
         .sidebar-header h1 {
             font-size: 14px;
-            color: #c9d1d9;
+            color: var(--black);
             letter-spacing: 1px;
             margin-bottom: 4px;
         }
         
         .sidebar-header h2 {
             font-size: 18px;
-            color: #58a6ff;
+            color: var(--black);
             letter-spacing: 2px;
         }
         
         .sidebar-header .part {
-            color: #8b949e;
+            color: var(--charcoal);
             font-size: 12px;
         }
         
@@ -71,8 +80,8 @@
         }
         
         .task-item {
-            background: #21262d;
-            border: 1px solid #30363d;
+            background: var(--charcoal);
+            border: 1px solid var(--charcoal);
             border-radius: 6px;
             padding: 12px;
             margin-bottom: 8px;
@@ -81,12 +90,12 @@
         }
         
         .task-item:hover {
-            border-color: #58a6ff;
+            border-color: var(--black);
         }
         
         .task-item.active {
-            border-color: #58a6ff;
-            background: #1c2128;
+            border-color: var(--black);
+            background: var(--charcoal);
         }
         
         .task-item.completed {
@@ -96,14 +105,14 @@
         
         .task-number {
             font-size: 11px;
-            color: #8b949e;
+            color: var(--charcoal);
             margin-bottom: 4px;
             display: flex;
             justify-content: space-between;
         }
         
         .task-title {
-            color: #c9d1d9;
+            color: var(--black);
             font-size: 13px;
             font-weight: bold;
         }
@@ -143,9 +152,9 @@
         }
         
         .top-bar {
-            background: #161b22;
+            background: var(--white);
             padding: 12px 20px;
-            border-bottom: 1px solid #30363d;
+            border-bottom: 1px solid var(--charcoal);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -163,7 +172,7 @@
         }
         
         .stat-label {
-            color: #8b949e;
+            color: var(--charcoal);
             font-size: 12px;
         }
         
@@ -184,18 +193,18 @@
         }
         
         .terminal-tabs {
-            background: #161b22;
+            background: var(--white);
             padding: 8px 16px;
             display: flex;
             gap: 8px;
-            border-bottom: 1px solid #30363d;
+            border-bottom: 1px solid var(--charcoal);
         }
         
         .terminal-tab {
             padding: 6px 12px;
             background: transparent;
-            border: 1px solid #30363d;
-            color: #8b949e;
+            border: 1px solid var(--charcoal);
+            color: var(--charcoal);
             cursor: pointer;
             font-family: 'Courier New', monospace;
             font-size: 12px;
@@ -203,16 +212,16 @@
         }
         
         .terminal-tab.active {
-            background: #21262d;
-            color: #c9d1d9;
-            border-color: #58a6ff;
+            background: var(--charcoal);
+            color: var(--black);
+            border-color: var(--black);
         }
         
         .terminal-content {
             flex: 1;
             padding: 16px;
             overflow-y: auto;
-            background: #0d1117;
+            background: var(--black);
             font-family: 'Courier New', monospace;
         }
         
@@ -226,7 +235,7 @@
         }
         
         .output {
-            color: #8b949e;
+            color: var(--charcoal);
             margin-left: 16px;
             white-space: pre-wrap;
         }
@@ -240,7 +249,7 @@
         }
         
         .output.info {
-            color: #58a6ff;
+            color: var(--black);
         }
         
         .output.warning {
@@ -249,7 +258,7 @@
         
         .output.code {
             color: #a5d6ff;
-            background: #161b22;
+            background: var(--white);
             padding: 8px 12px;
             margin: 8px 0;
             border-radius: 4px;
@@ -260,8 +269,8 @@
             align-items: center;
             gap: 8px;
             padding: 12px 16px;
-            background: #161b22;
-            border-top: 1px solid #30363d;
+            background: var(--white);
+            border-top: 1px solid var(--charcoal);
         }
         
         .input-line .prompt {
@@ -270,9 +279,9 @@
         
         #command-input {
             flex: 1;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            color: #c9d1d9;
+            background: var(--white);
+            border: 1px solid var(--charcoal);
+            color: var(--black);
             font-family: 'Courier New', monospace;
             font-size: 14px;
             padding: 8px 12px;
@@ -280,19 +289,19 @@
         }
         
         #command-input:focus {
-            border-color: #58a6ff;
+            border-color: var(--charcoal);
         }
         
         .help-panel {
-            background: #161b22;
-            border-top: 1px solid #30363d;
+            background: var(--white);
+            border-top: 1px solid var(--charcoal);
             padding: 12px 16px;
             max-height: 120px;
             overflow-y: auto;
         }
         
         .help-title {
-            color: #58a6ff;
+            color: var(--black);
             font-size: 11px;
             text-transform: uppercase;
             margin-bottom: 8px;
@@ -311,7 +320,7 @@
         }
         
         .help-desc {
-            color: #8b949e;
+            color: var(--charcoal);
         }
         
         .intro-overlay {
@@ -320,7 +329,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(13, 17, 23, 0.95);
+            background: rgba(0, 0, 0, 0.95);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -328,15 +337,15 @@
         }
         
         .intro-box {
-            background: #161b22;
-            border: 1px solid #30363d;
+            background: var(--white);
+            border: 1px solid var(--charcoal);
             padding: 40px;
             max-width: 620px;
             text-align: center;
         }
         
         .intro-box h2 {
-            color: #58a6ff;
+            color: var(--black);
             margin-bottom: 16px;
             font-size: 22px;
         }
@@ -348,7 +357,7 @@
         }
         
         .intro-box p {
-            color: #8b949e;
+            color: var(--charcoal);
             margin-bottom: 12px;
             line-height: 1.6;
             text-align: left;
@@ -371,8 +380,8 @@
         }
         
         .hint-box {
-            background: #1c2128;
-            border: 1px solid #30363d;
+            background: var(--charcoal);
+            border: 1px solid var(--charcoal);
             padding: 12px;
             margin: 12px 0;
         }
@@ -385,19 +394,19 @@
         }
         
         .hint-text {
-            color: #8b949e;
+            color: var(--charcoal);
             font-size: 12px;
         }
         
         .system-status {
-            background: #161b22;
-            border: 1px solid #30363d;
+            background: var(--white);
+            border: 1px solid var(--charcoal);
             padding: 16px;
             margin-bottom: 12px;
         }
         
         .status-title {
-            color: #58a6ff;
+            color: var(--black);
             font-size: 12px;
             margin-bottom: 8px;
         }
@@ -410,7 +419,7 @@
         }
         
         .status-item .label {
-            color: #8b949e;
+            color: var(--charcoal);
         }
         
         .status-item .value {
@@ -431,7 +440,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(13, 17, 23, 0.9);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -439,8 +448,8 @@
         }
         
         .result-box {
-            background: #161b22;
-            border: 1px solid #30363d;
+            background: var(--white);
+            border: 1px solid var(--charcoal);
             padding: 32px;
             text-align: center;
             max-width: 450px;
@@ -476,7 +485,7 @@
         }
         
         .result-box p {
-            color: #8b949e;
+            color: var(--charcoal);
             margin-bottom: 20px;
         }
         
@@ -491,36 +500,36 @@
         }
         
         .current-task-panel {
-            background: #21262d;
-            border: 1px solid #30363d;
+            background: var(--charcoal);
+            border: 1px solid var(--charcoal);
             padding: 16px;
             margin-bottom: 12px;
-            border-left: 3px solid #58a6ff;
+            border-left: 3px solid var(--black);
         }
         
         .current-task-label {
-            color: #58a6ff;
+            color: var(--black);
             font-size: 11px;
             text-transform: uppercase;
             margin-bottom: 8px;
         }
         
         .current-task-title {
-            color: #c9d1d9;
+            color: var(--black);
             font-size: 14px;
             font-weight: bold;
             margin-bottom: 8px;
         }
         
         .current-task-desc {
-            color: #8b949e;
+            color: var(--charcoal);
             font-size: 12px;
             line-height: 1.5;
         }
         
         .code-block {
-            background: #161b22;
-            border: 1px solid #30363d;
+            background: var(--white);
+            border: 1px solid var(--charcoal);
             padding: 12px;
             margin: 8px 0;
             font-size: 12px;
@@ -536,12 +545,12 @@
         }
         
         .code-block .comment {
-            color: #484f58;
+            color: var(--charcoal);
         }
         
         .progress-bar {
             height: 4px;
-            background: #21262d;
+            background: var(--charcoal);
             margin-top: 12px;
             border-radius: 2px;
         }
@@ -554,7 +563,7 @@
         }
         
         .achievement {
-            background: linear-gradient(135deg, #238636 0%, #161b22 100%);
+            background: linear-gradient(135deg, #238636 0%, var(--white) 100%);
             border: 1px solid #3fb950;
             padding: 12px;
             margin-top: 12px;
@@ -568,7 +577,7 @@
         }
         
         .achievement-desc {
-            color: #8b949e;
+            color: var(--charcoal);
             font-size: 11px;
             margin-top: 4px;
         }
@@ -583,7 +592,7 @@
                 height: auto;
                 max-height: 30vh;
                 border-right: none;
-                border-bottom: 1px solid #30363d;
+                border-bottom: 1px solid var(--charcoal);
             }
             .main-panel { flex: 1; }
             .terminal-area { padding: 10px; }

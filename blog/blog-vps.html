@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
     <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/blog/blog-vps.html" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,20 +28,6 @@
     <link rel="icon" href="../favicon.ico">
     <link rel="stylesheet" href="../fonts.css">
     <link rel="stylesheet" href="../style.css">
-    <script>
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggle = document.getElementById('themeToggle');
-            if (toggle) {
-                const saved = localStorage.getItem('theme');
-                toggle.checked = (saved === 'dark' || !saved);
-            }
-        });
-    </script>
-
     <style>
         .blog-header { background: var(--black); color: var(--white); padding: 80px 32px 60px; text-align: center; }
         .blog-header h1 { font-family: 'IBM Plex Mono', monospace; font-size: 2.5rem; margin-bottom: 16px; }
@@ -61,6 +56,8 @@
         .toc li { margin-bottom: 4px; }
         .toc a { text-decoration: none; }
     </style>
+
+    <script src="../theme.js"></script>
 </head>
 <body>
     <div id="close" class="nav-close-target" aria-hidden="true"></div>

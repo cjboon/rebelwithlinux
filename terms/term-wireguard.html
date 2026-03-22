@@ -3,11 +3,14 @@
 <head>
     <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-wireguard.html" />
     <script>
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        }
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
     </script>
+    <script src="../theme.js"></script>
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

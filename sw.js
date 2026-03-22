@@ -1,16 +1,20 @@
-const CACHE_NAME = 'rebel-linux-v10';
-const STATIC_CACHE = 'rebel-static-v10';
-const DYNAMIC_CACHE = 'rebel-dynamic-v10';
+const CACHE_NAME = 'rebel-linux-v11';
+const STATIC_CACHE = 'rebel-static-v11';
+const DYNAMIC_CACHE = 'rebel-dynamic-v11';
 
 const urlsToCache = [
     '/',
     '/index.html',
     '/offline.html',
+    '/404.html',
     '/style.css',
     '/fonts.css',
     '/favicon.ico',
     '/site-map.html',
     '/account.html',
+    '/theme.js',
+    '/nav.js',
+    '/achievements.js',
     '/terms/term-main.html',
     '/hangman/hangman-main.html',
     '/builders/builder-main.html',
@@ -33,7 +37,6 @@ const urlsToCache = [
     '/guides/guide-kubernetes.html',
     '/guides/guide-monitoring.html',
     '/guides/guide-vim.html',
-    '/blog.html',
     '/blog/blog-editing.html',
     '/blog/blog-foss.html',
     '/blog/blog-gpg.html',
@@ -63,8 +66,6 @@ const urlsToCache = [
     '/blog/blog-prometheus.html',
     '/blog/blog-vault.html',
     '/tests/test-linux.html',
-    '/tests/test-devops.html',
-    '/tests/test-advanced.html',
     '/projects/project-blog.html',
     '/projects/project-fileshare.html',
     '/projects/project-homelab.html',
@@ -127,9 +128,6 @@ const urlsToCache = [
     '/builders/builder-sql.html',
     '/builders/builder-sql-2.html',
     '/builders/builder-sql-3.html',
-    '/builders/builder-command.html',
-    '/builders/builder-command-2.html',
-    '/builders/builder-command-3.html',
 ];
 
 self.addEventListener("install", e => {
