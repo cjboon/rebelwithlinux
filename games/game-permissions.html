@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var theme = saved || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgadd.onion/games/game-permissions.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permissions Puzzle - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../theme.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow-x: hidden; }
+        body {
+            background: var(--white);
+            color: var(--black);
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 { margin-bottom: 10px; font-size: 1.8rem; color: var(--black); }
+        .subtitle { margin-bottom: 20px; color: var(--charcoal); text-align: center; }
+
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+            background: var(--charcoal);
+            padding: 12px 24px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .stat { text-align: center; }
+        .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; }
+        .stat-value { font-size: 24px; font-weight: bold; color: var(--black); }
+
+        .level-indicator {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .level-pip {
+            width: 40px;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--charcoal);
+        }
+        .level-pip.active { background: #22c55e; }
+
+        .game-container {
+            background: var(--charcoal);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            border: 2px solid var(--charcoal);
+        }
+
+        .start-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .start-screen h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--black);
+        }
+        .difficulty-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .diff-btn {
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            background: #e0e0e0;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1a1a1a;
+        }
+        .diff-btn:hover { background: #1a1a1a; color: #e0e0e0; }
+
+        .scenario-box {
+            background: var(--black);
+            border: 2px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .scenario-label { font-size: 11px; color: var(--gray); text-transform: uppercase; margin-bottom: 8px; }
+        .scenario-text { color: var(--white); line-height: 1.5; }
+
+        .permissions-display {
+            background: var(--black);
+            border: 2px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .perm-label { font-size: 11px; color: var(--gray); text-transform: uppercase; margin-bottom: 8px; }
+        .perm-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--white);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 4px;
+        }
+        .perm-value.correct { color: #22c55e; }
+        .perm-value.wrong { color: #ef4444; }
+
+        .perm-breakdown {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .perm-part { text-align: center; }
+        .perm-part-label { font-size: 10px; color: var(--gray); }
+        .perm-part-value { font-size: 1.2rem; color: var(--white); margin-top: 4px; }
+
+        .selector-group {
+            margin-bottom: 15px;
+        }
+        .selector-label {
+            font-size: 12px;
+            color: var(--charcoal);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .perm-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .perm-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+            font-family: 'Courier New', monospace;
+            background: #e0e0e0;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1a1a1a;
+        }
+        .perm-btn:hover { background: #1a1a1a; color: #e0e0e0; }
+        .perm-btn.selected { background: #1a1a1a; color: #e0e0e0; }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .action-btn {
+            padding: 12px 24px;
+            background: var(--black);
+            color: var(--white);
+            border: 2px solid var(--black);
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .feedback {
+            text-align: center;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .feedback.correct { background: #22c55e; color: white; }
+        .feedback.wrong { background: #ef4444; color: white; }
+
+        .explanation {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--charcoal);
+        }
+
+        .win-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .win-screen.active { display: block; }
+        .win-icon { font-size: 5rem; margin-bottom: 20px; }
+        .win-title { font-size: 2rem; margin-bottom: 10px; color: #22c55e; }
+        .win-subtitle { color: var(--charcoal); margin-bottom: 20px; }
+
+        .progress-info {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--charcoal);
+        }
+
+        .help-section {
+            margin-top: 30px;
+            text-align: left;
+            background: var(--black);
+            border: 2px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .help-section h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--black);
+            color: var(--white);
+        }
+        .help-section p, .help-section li {
+            font-size: 0.85rem;
+            color: var(--white);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        .help-section ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+        .help-section code {
+            background: var(--charcoal);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: var(--white);
+        }
+        .special-bits {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--charcoal);
+        }
+        .special-bits h4 {
+            font-size: 0.9rem;
+            color: var(--white);
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .stats-bar { gap: 15px; }
+            .perm-btn { width: 45px; height: 45px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <h1>// PERMISSIONS PUZZLE</h1>
+    <p class="subtitle">Set the correct chmod permissions for each scenario</p>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-label">Score</div>
+            <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Streak</div>
+            <div class="stat-value" id="streak">0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Level</div>
+            <div class="stat-value" id="level">1</div>
+        </div>
+    </div>
+
+    <div class="level-indicator" id="levelIndicator">
+        <div class="level-pip active" id="pip1"></div>
+        <div class="level-pip" id="pip2"></div>
+        <div class="level-pip" id="pip3"></div>
+    </div>
+
+    <div class="game-container">
+        <div class="start-screen" id="startScreen">
+            <h2>Select Difficulty</h2>
+            <div class="difficulty-btns">
+                <button class="diff-btn" onclick="startGame(1)">Easy</button>
+                <button class="diff-btn" onclick="startGame(2)">Medium</button>
+                <button class="diff-btn" onclick="startGame(3)">Hard</button>
+            </div>
+            <p class="progress-info" id="progressInfo"></p>
+
+            <div class="help-section">
+                <h3>How chmod Works</h3>
+                <p>Linux permissions use 3 digits: <code>Owner</code> <code>Group</code> <code>Other</code></p>
+                <ul>
+                    <li><code>4</code> = read (r)</li>
+                    <li><code>2</code> = write (w)</li>
+                    <li><code>1</code> = execute (x)</li>
+                </ul>
+                <p>Add them up: <code>7</code> = rwx, <code>6</code> = rw-, <code>5</code> = r-x, <code>4</code> = r--</p>
+                <p>Example: <code>755</code> = rwxr-xr-x (owner=rwx, group=r-x, other=r-x)</p>
+                
+                <div class="special-bits">
+                    <h4>Special Bits (4-digit permissions)</h4>
+                    <ul>
+                        <li><code>setuid (4)</code> - Run as the file's owner, not the user (e.g., <code>4755</code>)</li>
+                        <li><code>setgid (2)</code> - Run as file's group; on directories, new files inherit group (e.g., <code>2775</code>)</li>
+                        <li><code>sticky bit (1)</code> - On directories: users can only delete their own files (e.g., <code>1777</code> for /tmp)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="gameContent" style="display:none;">
+            <div class="scenario-box">
+                <div class="scenario-label">Scenario</div>
+                <div class="scenario-text" id="scenario">Set permissions</div>
+            </div>
+
+            <div class="permissions-display">
+                <div class="perm-label">Permissions</div>
+                <div class="perm-value" id="permDisplay">--- --- ---</div>
+                <div class="perm-breakdown">
+                    <div class="perm-part">
+                        <div class="perm-part-label">Owner</div>
+                        <div class="perm-part-value" id="ownerDisplay">-</div>
+                    </div>
+                    <div class="perm-part">
+                        <div class="perm-part-label">Group</div>
+                        <div class="perm-part-value" id="groupDisplay">-</div>
+                    </div>
+                    <div class="perm-part">
+                        <div class="perm-part-label">Other</div>
+                        <div class="perm-part-value" id="otherDisplay">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="selector-group">
+                <div class="selector-label">Owner Permissions</div>
+                <div class="perm-buttons" id="ownerBtns">
+                    <button class="perm-btn" data-value="0">0</button>
+                    <button class="perm-btn" data-value="1">1</button>
+                    <button class="perm-btn" data-value="2">2</button>
+                    <button class="perm-btn" data-value="3">3</button>
+                    <button class="perm-btn" data-value="4">4</button>
+                    <button class="perm-btn" data-value="5">5</button>
+                    <button class="perm-btn" data-value="6">6</button>
+                    <button class="perm-btn" data-value="7">7</button>
+                </div>
+            </div>
+
+            <div class="selector-group">
+                <div class="selector-label">Group Permissions</div>
+                <div class="perm-buttons" id="groupBtns">
+                    <button class="perm-btn" data-value="0">0</button>
+                    <button class="perm-btn" data-value="1">1</button>
+                    <button class="perm-btn" data-value="2">2</button>
+                    <button class="perm-btn" data-value="3">3</button>
+                    <button class="perm-btn" data-value="4">4</button>
+                    <button class="perm-btn" data-value="5">5</button>
+                    <button class="perm-btn" data-value="6">6</button>
+                    <button class="perm-btn" data-value="7">7</button>
+                </div>
+            </div>
+
+            <div class="selector-group">
+                <div class="selector-label">Other Permissions</div>
+                <div class="perm-buttons" id="otherBtns">
+                    <button class="perm-btn" data-value="0">0</button>
+                    <button class="perm-btn" data-value="1">1</button>
+                    <button class="perm-btn" data-value="2">2</button>
+                    <button class="perm-btn" data-value="3">3</button>
+                    <button class="perm-btn" data-value="4">4</button>
+                    <button class="perm-btn" data-value="5">5</button>
+                    <button class="perm-btn" data-value="6">6</button>
+                    <button class="perm-btn" data-value="7">7</button>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="action-btn" id="clearBtn">Clear</button>
+                <button class="action-btn" id="submitBtn" disabled>Submit</button>
+            </div>
+
+            <div class="feedback" id="feedback" style="display:none;"></div>
+            <div class="explanation" id="explanation" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div class="win-screen" id="winScreen">
+        <div class="win-icon">🏆</div>
+        <div class="win-title" id="winTitle">Victory!</div>
+        <div class="win-subtitle" id="winSubtitle">You've mastered Permissions!</div>
+        <button class="action-btn" onclick="location.reload()">Play Again</button>
+    </div>
+
+    <script>
+    const scenarios = [
+        // EASY (Level 1) - 10 questions
+        {
+            level: 1,
+            scenario: "A script that everyone can run, but only the owner can modify it",
+            answer: "755",
+            explanation: "755 = rwxr-xr-x (owner rwx, group/other rx)"
+        },
+        {
+            level: 1,
+            scenario: "A private file readable only by you",
+            answer: "600",
+            explanation: "600 = rw------- (owner read/write only)"
+        },
+        {
+            level: 1,
+            scenario: "A publicly readable file",
+            answer: "644",
+            explanation: "644 = rw-r--r-- (owner write, all read)"
+        },
+        {
+            level: 1,
+            scenario: "A directory where everyone can enter and list files",
+            answer: "755",
+            explanation: "755 on directories: rwxr-xr-x (execute=enter, read=list)"
+        },
+        {
+            level: 1,
+            scenario: "A script that only the owner can run",
+            answer: "700",
+            explanation: "700 = rwx------ (only owner has any access)"
+        },
+        {
+            level: 1,
+            scenario: "A shared file where owner and group can read/write",
+            answer: "660",
+            explanation: "660 = rw-rw---- (owner+group read/write)"
+        },
+        {
+            level: 1,
+            scenario: "An executable that everyone can run but nobody can modify",
+            answer: "111",
+            explanation: "111 = --x--x--x (execute for all, no read/write)"
+        },
+        {
+            level: 1,
+            scenario: "A readable directory for group members",
+            answer: "750",
+            explanation: "750 = rwxr-x--- (group can read and enter)"
+        },
+        {
+            level: 1,
+            scenario: "A configuration file readable by all",
+            answer: "644",
+            explanation: "644 = rw-r--r-- (standard config file permissions)"
+        },
+        {
+            level: 1,
+            scenario: "A new file created by default (owner full access)",
+            answer: "644",
+            explanation: "644 = rw-r--r-- is typical default for new files"
+        },
+
+        // MEDIUM (Level 2) - 10 questions
+        {
+            level: 2,
+            scenario: "A web server file that www-data group must be able to read",
+            answer: "640",
+            explanation: "640 = rw-r----- (owner read/write, group www-data read)"
+        },
+        {
+            level: 2,
+            scenario: "A script that owner and group can execute, others cannot access",
+            answer: "750",
+            explanation: "750 = rwxr-x--- (execute permission needed for scripts)"
+        },
+        {
+            level: 2,
+            scenario: "A database file that only the owner (root) can access",
+            answer: "600",
+            explanation: "600 = rw------- (only owner can read/write)"
+        },
+        {
+            level: 2,
+            scenario: "A directory where group can read and write, others can only read",
+            answer: "654",
+            explanation: "654 = rw-r-xr-- (owner rw, group r-x, other r--)"
+        },
+        {
+            level: 2,
+            scenario: "An executable script that group members can run",
+            answer: "750",
+            explanation: "750 = rwxr-x--- (group can execute scripts)"
+        },
+        {
+            level: 2,
+            scenario: "A log file that everyone can append to",
+            answer: "622",
+            explanation: "622 = -w--w--w- (everyone can write/appends)"
+        },
+        {
+            level: 2,
+            scenario: "A secure backup file only root can read",
+            answer: "600",
+            explanation: "600 = rw------- (only owner (root) access)"
+        },
+        {
+            level: 2,
+            scenario: "A directory where owner has full access, group can list",
+            answer: "750",
+            explanation: "750 = rwxr-x--- (group needs x to enter, r to list)"
+        },
+        {
+            level: 2,
+            scenario: "A shared document where owner can write, others can read",
+            answer: "644",
+            explanation: "644 = rw-r--r-- (owner write, all read)"
+        },
+        {
+            level: 2,
+            scenario: "A shell script that nobody can execute (just text)",
+            answer: "644",
+            explanation: "644 = rw-r--r-- (readable but not executable)"
+        },
+
+        // HARD (Level 3) - 10 questions
+        {
+            level: 3,
+            scenario: "A system binary that root can execute, others can only read",
+            answer: "755",
+            explanation: "755 = rwxr-xr-x (system binaries are typically 755)"
+        },
+        {
+            level: 3,
+            scenario: "A directory with full access for owner, traverse for group, none for others",
+            answer: "750",
+            explanation: "750 = rwxr-x--- (execute without read means can traverse but not list)"
+        },
+        {
+            level: 3,
+            scenario: "A read-only system file that even root cannot modify without sudo",
+            answer: "444",
+            explanation: "444 = r--r--r-- (immutable even for root unless using sudo)"
+        },
+        {
+            level: 3,
+            scenario: "A user executable in /usr/local/bin with full access for owner",
+            answer: "755",
+            explanation: "755 = rwxr-xr-x (user executables typically 755)"
+        },
+        {
+            level: 3,
+            scenario: "A game binary that all users can execute, only staff can modify",
+            answer: "775",
+            explanation: "775 = rwxrwxr-x (staff group can modify, all can run)"
+        },
+        {
+            level: 3,
+            scenario: "A hidden config file in home directory, owner full access only",
+            answer: "600",
+            explanation: "600 = rw------- (dotfiles should be private)"
+        },
+        {
+            level: 3,
+            scenario: "A shared development directory where group can fully collaborate",
+            answer: "770",
+            explanation: "770 = rwxrwx--- (owner and group full access, no access for others)"
+        },
+        {
+            level: 3,
+            scenario: "A public HTML directory where web server must read files",
+            answer: "755",
+            explanation: "755 = rwxr-xr-x (web server needs read+execute to serve files)"
+        },
+        {
+            level: 3,
+            scenario: "A daemon log file that the service writes, all can read",
+            answer: "644",
+            explanation: "644 = rw-r--r-- (service writes, all can read)"
+        },
+        {
+            level: 3,
+            scenario: "A sensitive backup file only owner can access",
+            answer: "600",
+            explanation: "600 = rw------- (completely private backup)"
+        }
+        }
+    ];
+
+    const permLabels = {
+        '0': '---',
+        '1': '--x',
+        '2': '-w-',
+        '3': '-wx',
+        '4': 'r--',
+        '5': 'r-x',
+        '6': 'rw-',
+        '7': 'rwx'
+    };
+
+    let currentScenario = null;
+    let selectedOwner = null;
+    let selectedGroup = null;
+    let selectedOther = null;
+    let score = 0;
+    let streak = 0;
+    let currentLevel = 1;
+    let gameStarted = false;
+    let completedQuestions = { 1: [], 2: [], 3: [] };
+
+    function shuffle(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function updateLevelPips() {
+        document.getElementById('pip1').className = 'level-pip' + (currentLevel >= 1 ? ' active' : '');
+        document.getElementById('pip2').className = 'level-pip' + (currentLevel >= 2 ? ' active' : '');
+        document.getElementById('pip3').className = 'level-pip' + (currentLevel >= 3 ? ' active' : '');
+        document.getElementById('level').textContent = currentLevel;
+    }
+
+    function updateProgressInfo() {
+        const total3 = scenarios.filter(s => s.level === 3).length;
+        const done3 = completedQuestions[3].length;
+        document.getElementById('progressInfo').textContent = 
+            `Level 3 Progress: ${done3}/${total3} completed | Win by getting streak of 7 or completing all Level 3 questions`;
+    }
+
+    function startGame(level) {
+        currentLevel = level;
+        gameStarted = true;
+        streak = 0;
+        score = 0;
+        completedQuestions = { 1: [], 2: [], 3: [] };
+        
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+        document.getElementById('startScreen').style.display = 'none';
+        document.getElementById('gameContent').style.display = 'block';
+        document.getElementById('winScreen').classList.remove('active');
+        
+        updateLevelPips();
+        initGame();
+    }
+
+    function getQuestionForLevel(level) {
+        const levelQuestions = scenarios.filter(s => s.level === level);
+        const available = levelQuestions.filter(q => !completedQuestions[level].includes(q.scenario));
+        
+        if (available.length === 0) {
+            return null;
+        }
+        
+        return available[Math.floor(Math.random() * available.length)];
+    }
+
+    function initGame() {
+        if (currentLevel === 3 && completedQuestions[3].length >= scenarios.filter(s => s.level === 3).length) {
+            showWin("Level 3 Mastered!", "You've completed all Level 3 questions!");
+            return;
+        }
+
+        currentScenario = getQuestionForLevel(currentLevel);
+        
+        if (!currentScenario) {
+            showWin("Level Complete!", `You've mastered Level ${currentLevel}!`);
+            return;
+        }
+
+        selectedOwner = null;
+        selectedGroup = null;
+        selectedOther = null;
+
+        document.getElementById('scenario').textContent = currentScenario.scenario;
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('explanation').style.display = 'none';
+        document.getElementById('permDisplay').textContent = '--- --- ---';
+        document.getElementById('permDisplay').className = 'perm-value';
+        document.getElementById('ownerDisplay').textContent = '-';
+        document.getElementById('groupDisplay').textContent = '-';
+        document.getElementById('otherDisplay').textContent = '-';
+
+        document.querySelectorAll('.perm-btn').forEach(btn => btn.classList.remove('selected'));
+        document.getElementById('submitBtn').disabled = true;
+    }
+
+    function updateDisplay() {
+        const ownerStr = selectedOwner !== null ? permLabels[selectedOwner] : '-';
+        const groupStr = selectedGroup !== null ? permLabels[selectedGroup] : '-';
+        const otherStr = selectedOther !== null ? permLabels[selectedOther] : '-';
+
+        document.getElementById('permDisplay').textContent = `${ownerStr} ${groupStr} ${otherStr}`;
+        document.getElementById('ownerDisplay').textContent = selectedOwner !== null ? selectedOwner : '-';
+        document.getElementById('groupDisplay').textContent = selectedGroup !== null ? selectedGroup : '-';
+        document.getElementById('otherDisplay').textContent = selectedOther !== null ? selectedOther : '-';
+
+        document.getElementById('submitBtn').disabled = !(selectedOwner !== null && selectedGroup !== null && selectedOther !== null);
+    }
+
+    function selectPerm(type, value) {
+        const buttons = document.querySelectorAll(`#${type}Btns .perm-btn`);
+        buttons.forEach(btn => btn.classList.remove('selected'));
+        buttons[value].classList.add('selected');
+
+        if (type === 'owner') selectedOwner = value;
+        if (type === 'group') selectedGroup = value;
+        if (type === 'other') selectedOther = value;
+
+        updateDisplay();
+    }
+
+    function clearSelection() {
+        selectedOwner = null;
+        selectedGroup = null;
+        selectedOther = null;
+        document.querySelectorAll('.perm-btn').forEach(btn => btn.classList.remove('selected'));
+        updateDisplay();
+    }
+
+    function showWin(title, subtitle) {
+        document.getElementById('gameContent').style.display = 'none';
+        document.getElementById('winScreen').classList.add('active');
+        document.getElementById('winTitle').textContent = title;
+        document.getElementById('winSubtitle').textContent = subtitle;
+    }
+
+    function checkAnswer() {
+        const userAnswer = `${selectedOwner}${selectedGroup}${selectedOther}`;
+        const isCorrect = userAnswer === currentScenario.answer;
+
+        const permDisplay = document.getElementById('permDisplay');
+
+        if (isCorrect) {
+            streak++;
+            const points = currentLevel * 10 + (streak > 3 ? 5 : 0);
+            score += points;
+            
+            completedQuestions[currentLevel].push(currentScenario.scenario);
+            
+            permDisplay.className = 'perm-value correct';
+            document.getElementById('feedback').className = 'feedback correct';
+            document.getElementById('feedback').innerHTML = `✓ Correct! +${points} points | Streak: ${streak}/7`;
+            document.getElementById('explanation').textContent = currentScenario.explanation;
+            document.getElementById('explanation').style.display = 'block';
+
+            if (streak >= 7) {
+                if (currentLevel < 3) {
+                    currentLevel++;
+                    streak = 0;
+                    updateLevelPips();
+                    document.getElementById('feedback').innerHTML += `<br><br>🎉 Level Up! Now on Level ${currentLevel}`;
+                    setTimeout(() => initGame(), 2500);
+                } else {
+                    showWin("🏆 PERMISSIONS MASTER!", `Final Score: ${score} | You've mastered all levels!`);
+                }
+            } else {
+                setTimeout(() => initGame(), 2000);
+            }
+        } else {
+            streak = 0;
+            permDisplay.className = 'perm-value wrong';
+            document.getElementById('feedback').className = 'feedback wrong';
+            document.getElementById('feedback').innerHTML = `✗ The correct answer was: ${currentScenario.answer}`;
+            document.getElementById('explanation').textContent = currentScenario.explanation;
+            document.getElementById('explanation').style.display = 'block';
+            setTimeout(() => initGame(), 3500);
+        }
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+        document.getElementById('feedback').style.display = 'block';
+    }
+
+    document.querySelectorAll('#ownerBtns .perm-btn').forEach(btn => {
+        btn.addEventListener('click', () => selectPerm('owner', parseInt(btn.dataset.value)));
+    });
+    document.querySelectorAll('#groupBtns .perm-btn').forEach(btn => {
+        btn.addEventListener('click', () => selectPerm('group', parseInt(btn.dataset.value)));
+    });
+    document.querySelectorAll('#otherBtns .perm-btn').forEach(btn => {
+        btn.addEventListener('click', () => selectPerm('other', parseInt(btn.dataset.value)));
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', clearSelection);
+    document.getElementById('submitBtn').addEventListener('click', checkAnswer);
+
+    updateLevelPips();
+    updateProgressInfo();
+    </script>
+</body>
+</html>

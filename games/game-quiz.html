@@ -17,10 +17,10 @@
     <script src="../theme.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
+        html, body { height: 100%; overflow-x: hidden; }
         body {
             background: var(--white);
-            color: var(--black);
+            color: #1a1a1a;
             font-family: 'Courier New', monospace;
             font-size: 15px;
             display: flex;
@@ -28,9 +28,9 @@
             align-items: center;
             padding: 20px;
         }
-        h1 { margin-bottom: 10px; font-size: 1.8rem; color: var(--black); }
-        .subtitle { margin-bottom: 20px; color: var(--charcoal); }
-        
+        h1 { margin-bottom: 10px; font-size: 1.8rem; color: #1a1a1a; }
+        .subtitle { margin-bottom: 20px; color: #1a1a1a; text-align: center; }
+
         .stats-bar {
             display: flex;
             gap: 30px;
@@ -38,11 +38,26 @@
             background: var(--charcoal);
             padding: 12px 24px;
             border-radius: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .stat { text-align: center; }
-        .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; }
-        .stat-value { font-size: 24px; font-weight: bold; color: var(--black); }
-        
+        .stat-label { font-size: 11px; color: #1a1a1a; text-transform: uppercase; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #1a1a1a; }
+
+        .level-indicator {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .level-pip {
+            width: 40px;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--charcoal);
+        }
+        .level-pip.active { background: #00ff00; }
+
         .game-container {
             background: var(--charcoal);
             border-radius: 12px;
@@ -51,586 +66,623 @@
             width: 100%;
             border: 2px solid var(--charcoal);
         }
-        
-        .category-select {
-            margin-bottom: 20px;
+
+        .start-screen {
             text-align: center;
+            padding: 40px 20px;
         }
-        
-        .category-select select {
-            background: var(--charcoal);
-            color: var(--black);
-            border: 2px solid var(--charcoal);
-            padding: 10px 20px;
+        .start-screen h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+        .difficulty-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .diff-btn {
+            padding: 15px 30px;
+            font-size: 1rem;
             font-family: 'Courier New', monospace;
-            font-size: 14px;
+            background: #e0e0e0;
+            border: 2px solid #1a1a1a;
             border-radius: 8px;
             cursor: pointer;
+            transition: all 0.2s;
+            color: #1a1a1a;
         }
-        
+        .diff-btn:hover { background: #1a1a1a; color: #e0e0e0; }
+
         .question-box {
-            background: var(--black);
+            background: #1a1a1a;
             border: 2px solid var(--charcoal);
             border-radius: 12px;
             padding: 25px;
             margin-bottom: 20px;
         }
-        
+
         .question-number {
             font-size: 12px;
-            color: var(--charcoal);
+            color: var(--gray);
             text-transform: uppercase;
             margin-bottom: 10px;
         }
-        
+
         .question-text {
             font-size: 18px;
-            color: var(--black);
+            color: #e0e0e0;
             line-height: 1.5;
         }
-        
+
         .options-list {
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
-        
+
         .option-btn {
             background: var(--charcoal);
             border: 2px solid var(--charcoal);
             border-radius: 8px;
             padding: 15px 20px;
-            color: var(--black);
+            color: #1a1a1a;
             font-family: 'Courier New', monospace;
             font-size: 15px;
             cursor: pointer;
             transition: all 0.2s;
             text-align: left;
         }
-        
+
         .option-btn:hover {
             background: var(--charcoal);
-            border-color: var(--black);
+            border-color: #1a1a1a;
         }
-        
+
         .option-btn.correct {
             background: #1a4d3a;
             border-color: #00ff00;
             color: #00ff00;
         }
-        
+
         .option-btn.wrong {
             background: #4d1a2a;
             border-color: #ff4444;
             color: #ff4444;
         }
-        
-        .option-btn.disabled {
-            pointer-events: none;
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
         }
-        
+        .action-btn {
+            padding: 12px 24px;
+            background: #00ff00;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
         .feedback {
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             margin-top: 15px;
             border-radius: 8px;
-            display: none;
+            font-weight: bold;
         }
-        
-        .feedback.show { display: block; }
         .feedback.correct { background: #1a4d3a; color: #00ff00; }
         .feedback.wrong { background: #4d1a2a; color: #ff4444; }
-        
+
         .explanation {
-            background: var(--charcoal);
+            background: #1a1a1a;
             border-radius: 8px;
             padding: 15px;
             margin-top: 15px;
-            display: none;
+            color: #e0e0e0;
             font-size: 14px;
             line-height: 1.5;
         }
-        
-        .explanation.show { display: block; }
-        
-        .next-btn {
-            background: var(--black);
-            color: var(--white);
-            border: none;
-            padding: 12px 30px;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 15px;
+
+        .win-screen {
             display: none;
+            text-align: center;
+            padding: 60px 20px;
         }
-        
-        .next-btn.show { display: inline-block; }
-        
-        .start-screen, .game-screen, .end-screen { width: 100%; }
-        .game-screen, .end-screen { display: none; }
-        .game-screen.active { display: block; }
-        
-        .back-link {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            color: var(--charcoal);
-            text-decoration: none;
-            font-size: 14px;
+        .win-screen.active { display: block; }
+        .win-icon { font-size: 5rem; margin-bottom: 20px; }
+        .win-title { font-size: 2rem; margin-bottom: 10px; color: #00ff00; }
+        .win-subtitle { color: #1a1a1a; margin-bottom: 20px; }
+
+        .progress-info {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #1a1a1a;
         }
-        .back-link:hover { color: var(--black); }
-        
-        .end-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .end-stat {
-            background: var(--charcoal);
+
+        .help-section {
+            margin-top: 30px;
+            text-align: left;
+            background: #1a1a1a;
+            border: 2px solid var(--charcoal);
+            border-radius: 12px;
             padding: 20px;
-            border-radius: 8px;
-            text-align: center;
         }
-        
-        .end-stat-label {
-            font-size: 12px;
-            color: var(--charcoal);
-            text-transform: uppercase;
+        .help-section h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: #e0e0e0;
         }
-        
-        .end-stat-value {
-            font-size: 32px;
-            color: var(--black);
-            font-weight: bold;
+        .help-section p, .help-section li {
+            font-size: 0.85rem;
+            color: #e0e0e0;
+            line-height: 1.6;
+            margin-bottom: 8px;
         }
-        
-        .final-message {
-            text-align: center;
-            font-size: 20px;
-            margin-bottom: 20px;
-            color: var(--black);
+        .help-section ul {
+            margin-left: 20px;
+            margin-top: 8px;
         }
-        
-        /* Mobile optimizations */
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            h1 { font-size: 1.4rem; }
-            .stats-bar {
-                gap: 15px;
-                padding: 8px 12px;
-            }
-            .stat-value { font-size: 18px; }
-            .game-container { padding: 15px; }
+
+        @media (max-width: 600px) {
+            .stats-bar { gap: 15px; }
             .question-box { padding: 15px; }
-            .question-text { font-size: 16px; }
-            .end-stats { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <a href="../index.html#games" class="back-link">← Back to Games</a>
-    
     <h1>❓ QUIZ TRIVIA</h1>
     <p class="subtitle">Test your Linux & FOSS knowledge!</p>
-    
+
     <div class="stats-bar">
         <div class="stat">
             <div class="stat-label">Score</div>
             <div class="stat-value" id="score">0</div>
         </div>
         <div class="stat">
-            <div class="stat-label">Correct</div>
-            <div class="stat-value" id="correct">0</div>
+            <div class="stat-label">Streak</div>
+            <div class="stat-value" id="streak">0</div>
         </div>
         <div class="stat">
-            <div class="stat-label">Question</div>
-            <div class="stat-value" id="questionNum">1/10</div>
+            <div class="stat-label">Level</div>
+            <div class="stat-value" id="level">1</div>
         </div>
     </div>
-    
+
+    <div class="level-indicator" id="levelIndicator">
+        <div class="level-pip active" id="pip1"></div>
+        <div class="level-pip" id="pip2"></div>
+        <div class="level-pip" id="pip3"></div>
+    </div>
+
     <div class="game-container">
         <div class="start-screen" id="startScreen">
-            <div class="category-select">
-                <select id="category">
-                    <option value="linux">Linux Basics</option>
-                    <option value="foss">FOSS History</option>
-                    <option value="privacy">Privacy & Security</option>
-                    <option value="mixed" selected>Mixed</option>
-                </select>
+            <h2>Select Difficulty</h2>
+            <div class="difficulty-btns">
+                <button class="diff-btn" onclick="startGame(1)">Easy</button>
+                <button class="diff-btn" onclick="startGame(2)">Medium</button>
+                <button class="diff-btn" onclick="startGame(3)">Hard</button>
             </div>
-            <p style="text-align: center; margin-bottom: 20px; color: #888;">
-                Answer 10 questions about Linux, open source, and digital privacy.<br>
-                Each correct answer: 10 points
-            </p>
-            <div style="text-align: center;">
-                <button class="next-btn show" onclick="startGame()">START QUIZ</button>
+            <p class="progress-info" id="progressInfo"></p>
+
+            <div class="help-section">
+                <h3>How It Works</h3>
+                <p>Answer questions about Linux, FOSS, and technology.</p>
+                <ul>
+                    <li>Get 10 questions correct to master a level</li>
+                    <li>Build a streak of 7 to advance to the next level</li>
+                    <li>The correct answer changes position each time</li>
+                </ul>
+
+                <h3 style="margin-top: 15px;">Difficulty Levels</h3>
+                <ul>
+                    <li><strong>Easy:</strong> Linux basics and commands</li>
+                    <li><strong>Medium:</strong> FOSS history, privacy & security</li>
+                    <li><strong>Hard:</strong> Advanced Linux, networking & DevOps</li>
+                </ul>
             </div>
         </div>
-        
-        <div class="game-screen" id="gameScreen">
+
+        <div id="gameContent" style="display:none;">
             <div class="question-box">
-                <div class="question-number" id="questionNumber">Question 1 of 10</div>
+                <div class="question-number" id="questionNumber">Question 1</div>
                 <div class="question-text" id="questionText"></div>
             </div>
-            
+
             <div class="options-list" id="optionsList"></div>
-            
-            <div class="feedback" id="feedback"></div>
-            <div class="explanation" id="explanation"></div>
-            
-            <div style="text-align: center;">
-                <button class="next-btn" id="nextBtn" onclick="nextQuestion()">NEXT QUESTION →</button>
+
+            <div class="btn-row">
+                <button class="action-btn" id="submitBtn" disabled>Submit</button>
             </div>
-        </div>
-        
-        <div class="end-screen" id="endScreen">
-            <div class="final-message" id="finalMessage"></div>
-            <div class="end-stats">
-                <div class="end-stat">
-                    <div class="end-stat-label">Final Score</div>
-                    <div class="end-stat-value" id="finalScore">0</div>
-                </div>
-                <div class="end-stat">
-                    <div class="end-stat-label">Correct Answers</div>
-                    <div class="end-stat-value" id="finalCorrect">0/10</div>
-                </div>
-            </div>
-            <div style="text-align: center;">
-                <button class="next-btn show" onclick="startGame()">PLAY AGAIN</button>
-            </div>
+
+            <div class="feedback" id="feedback" style="display:none;"></div>
+            <div class="explanation" id="explanation" style="display:none;"></div>
         </div>
     </div>
-    
+
+    <div class="win-screen" id="winScreen">
+        <div class="win-icon">🏆</div>
+        <div class="win-title" id="winTitle">Victory!</div>
+        <div class="win-subtitle" id="winSubtitle">You've mastered the Quiz!</div>
+        <button class="action-btn" onclick="location.reload()">Play Again</button>
+    </div>
+
     <script>
-        const allQuestions = {
-            linux: [
-                {
-                    question: "What does 'ls' stand for in Linux?",
-                    options: ["List", "Load", "Log", "Link"],
-                    correct: 0,
-                    explanation: "ls is short for 'list' - it lists directory contents."
-                },
-                {
-                    question: "Which directory contains the Linux kernel source code?",
-                    options: ["/bin", "/usr/src", "/etc", "/home"],
-                    correct: 1,
-                    explanation: "/usr/src typically contains kernel source and headers."
-                },
-                {
-                    question: "What does 'sudo' stand for?",
-                    options: ["Super User Do", "Switch User Do", "Standard User Do", "Single User Do"],
-                    correct: 0,
-                    explanation: "sudo stands for 'superuser do' - it runs commands with elevated privileges."
-                },
-                {
-                    question: "Which file contains the list of users on a Linux system?",
-                    options: ["/etc/passwd", "/etc/users", "/etc/shadow", "/etc/group"],
-                    correct: 0,
-                    explanation: "/etc/passwd contains user account information (not passwords)."
-                },
-                {
-                    question: "What is the default root directory on Linux?",
-                    options: ["/root", "/home", "/", "/var"],
-                    correct: 2,
-                    explanation: "The root directory (/) is the top-level directory on Linux."
-                },
-                {
-                    question: "Which command is used to change file permissions?",
-                    options: ["chown", "chmod", "chmodify", "chattr"],
-                    correct: 1,
-                    explanation: "chmod (change mode) modifies file read/write/execute permissions."
-                },
-                {
-                    question: "What does PID stand for?",
-                    options: ["Program ID", "Process ID", "Priority ID", "Parent ID"],
-                    correct: 1,
-                    explanation: "PID stands for Process ID - a unique number assigned to each running process."
-                },
-                {
-                    question: "Which shell is the default on most Linux distributions?",
-                    options: ["zsh", "fish", "bash", "sh"],
-                    correct: 2,
-                    explanation: "Bash (Bourne Again SHell) is the default shell on most Linux systems."
-                },
-                {
-                    question: "What does 'rm -rf' do?",
-                    options: ["Read memory", "Remove recursively with force", "Rename files", "Repair filesystem"],
-                    correct: 1,
-                    explanation: "rm -rf forcibly removes directories and their contents recursively."
-                },
-                {
-                    question: "Which init system do modern Debian/Ubuntu use?",
-                    options: ["systemd", "SysVinit", "OpenRC", "Upstart"],
-                    correct: 0,
-                    explanation: "systemd is the default init system for most modern Debian-based distributions."
-                },
-                {
-                    question: "What is the Linux mascot called?",
-                    options: ["Gnu", "Tux", "Pingu", "Linux"],
-                    correct: 1,
-                    explanation: "Tux is the Linux penguin mascot, designed by Larry Ewing."
-                },
-                {
-                    question: "Which command shows running processes?",
-                    options: ["ls", "dir", "ps", "cat"],
-                    correct: 2,
-                    explanation: "ps (process status) shows currently running processes."
-                }
-            ],
-            foss: [
-                {
-                    question: "Who created Linux?",
-                    options: ["Richard Stallman", "Linus Torvalds", "Dennis Ritchie", "Ken Thompson"],
-                    correct: 1,
-                    explanation: "Linus Torvalds created Linux in 1991 as a hobby project."
-                },
-                {
-                    question: "What does FOSS stand for?",
-                    options: ["Free Open Source Software", "Fast Online Security System", "File Open Source Standard", "Functional Operating System"],
-                    correct: 0,
-                    explanation: "FOSS stands for Free and Open Source Software."
-                },
-                {
-                    question: "What is the GPL license?",
-                    options: ["General Public License", "GNU Programming Language", "Global Privacy License", "Group Permission List"],
-                    correct: 0,
-                    explanation: "GPL (General Public License) is the most popular open source license."
-                },
-                {
-                    question: "Which company started the Apache web server project?",
-                    options: ["Microsoft", "IBM", "NCSA", "Google"],
-                    correct: 2,
-                    explanation: "Apache started as an NCSA HTTPd fork, developed by a group of webmasters."
-                },
-                {
-                    question: "What year was Git created?",
-                    options: ["2005", "2008", "2010", "2012"],
-                    correct: 0,
-                    explanation: "Git was created by Linus Torvalds in 2005 for Linux kernel development."
-                },
-                {
-                    question: "What is the most used database in the world (as of 2024)?",
-                    options: ["Oracle", "PostgreSQL", "MySQL/MariaDB", "SQLite"],
-                    correct: 2,
-                    explanation: "MySQL (and its fork MariaDB) is the most widely used database."
-                },
-                {
-                    question: "Who founded the Free Software Foundation?",
-                    options: ["Linus Torvalds", "Bill Gates", "Richard Stallman", "Steve Jobs"],
-                    correct: 2,
-                    explanation: "Richard Stallman founded the FSF in 1985 to promote free software."
-                },
-                {
-                    question: "What is the meaning of 'free' in 'free software'?",
-                    options: ["Zero cost", "Freedom", "Limited use", "Trial"],
-                    correct: 1,
-                    explanation: "'Free software' refers to freedom, not price (free as in speech, not beer)."
-                },
-                {
-                    question: "Which programming language was created by Guido van Rossum?",
-                    options: ["Ruby", "JavaScript", "Python", "Perl"],
-                    correct: 2,
-                    explanation: "Python was created by Guido van Rossum in 1991."
-                },
-                {
-                    question: "What does OSI stand for in 'Open Source Initiative'?",
-                    options: ["Open System Interconnect", "Open Source Initiative", "Operating System Interface", "Online Security Index"],
-                    correct: 1,
-                    explanation: "OSI is the Open Source Initiative, which defines open source."
-                }
-            ],
-            privacy: [
-                {
-                    question: "What does VPN stand for?",
-                    options: ["Virtual Private Network", "Very Private Network", "Visual Privacy Data", "Verified Public Domain"],
-                    correct: 0,
-                    explanation: "VPN stands for Virtual Private Network - it encrypts your internet traffic."
-                },
-                {
-                    question: "Which is considered more secure: HTTP or HTTPS?",
-                    options: ["HTTP", "HTTPS", "Same security", "Depends on browser"],
-                    correct: 1,
-                    explanation: "HTTPS is HTTP with TLS/SSL encryption, making it secure."
-                },
-                {
-                    question: "What is end-to-end encryption?",
-                    options: ["Password protection", "Only sender/recipient can read", "Two-factor auth", "Encrypted backups"],
-                    correct: 1,
-                    explanation: "E2EE ensures only the sender and recipient can read the message."
-                },
-                {
-                    question: "Which protocol does Tor use for anonymity?",
-                    options: ["HTTP", "SMTP", "Onion routing", "VPN"],
-                    correct: 2,
-                    explanation: "Tor uses onion routing to anonymize internet traffic through multiple relays."
-                },
-                {
-                    question: "What is a privacy-focused Linux distribution?",
-                    options: ["Ubuntu", "Tails", "Mint", "Fedora"],
-                    correct: 1,
-                    explanation: "Tails (The Amnesic Incognito Live System) is designed for privacy and anonymity."
-                },
-                {
-                    question: "What does 2FA stand for?",
-                    options: ["Two-Factor Authentication", "Two-Firewall Access", "Two-File Archive", "Trusted File Access"],
-                    correct: 0,
-                    explanation: "2FA adds a second layer of security beyond just a password."
-                },
-                {
-                    question: "What is the dark web?",
-                    options: ["Illegal websites only", "Encrypted networks not indexed by search engines", "A separate internet", "Hacker websites"],
-                    correct: 1,
-                    explanation: "The dark web uses special software (like Tor) and isn't indexed by regular search engines."
-                },
-                {
-                    question: "What is metadata?",
-                    options: ["Encrypted data", "Data about data", "Hidden files", "Compressed files"],
-                    correct: 1,
-                    explanation: "Metadata describes other data - like who, when, where of a file or communication."
-                },
-                {
-                    question: "Which is a secure messaging app with E2EE?",
-                    options: ["Telegram (default)", "WhatsApp (default)", "SMS", "Facebook Messenger"],
-                    correct: 1,
-                    explanation: "WhatsApp uses Signal Protocol for E2EE by default. Signal also has it."
-                },
-                {
-                    question: "What is the purpose of a firewall?",
-                    options: ["Speed up internet", "Block/allow network traffic", "Encrypt files", "Store passwords"],
-                    correct: 1,
-                    explanation: "Firewalls monitor and control incoming/outgoing network traffic based on security rules."
-                }
-            ]
+    const questions = [
+        // EASY (Level 1) - Linux Basics - 10 questions
+        {
+            level: 1,
+            question: "What does 'ls' stand for in Linux?",
+            options: ["List", "Load", "Log", "Link"],
+            explanation: "ls is short for 'list' - it lists directory contents."
+        },
+        {
+            level: 1,
+            question: "What does 'sudo' stand for?",
+            options: ["Super User Do", "Switch User Do", "Standard User Do", "Single User Do"],
+            explanation: "sudo stands for 'superuser do' - it runs commands with elevated privileges."
+        },
+        {
+            level: 1,
+            question: "Which file contains the list of users on a Linux system?",
+            options: ["/etc/passwd", "/etc/users", "/etc/shadow", "/etc/group"],
+            explanation: "/etc/passwd contains user account information (not passwords)."
+        },
+        {
+            level: 1,
+            question: "What is the default root directory on Linux?",
+            options: ["/root", "/home", "/", "/var"],
+            explanation: "/" (forward slash) is the root directory - the top of the filesystem hierarchy."
+        },
+        {
+            level: 1,
+            question: "Which command creates a new directory?",
+            options: ["mkdir", "cd", "touch", "pwd"],
+            explanation: "mkdir (make directory) creates a new directory/folder."
+        },
+        {
+            level: 1,
+            question: "What does 'cd' stand for?",
+            options: ["Change Directory", "Create Directory", "Copy Directory", "Check Directory"],
+            explanation: "cd stands for 'change directory' - it navigates to a different folder."
+        },
+        {
+            level: 1,
+            question: "Which command displays the current working directory?",
+            options: ["pwd", "whoami", "ls", "cat"],
+            explanation: "pwd (print working directory) shows where you are in the filesystem."
+        },
+        {
+            level: 1,
+            question: "What does the 'rm' command do?",
+            options: ["Removes files", "Renames files", "Copies files", "Moves files"],
+            explanation: "rm (remove) deletes files. Use rm -r to remove directories."
+        },
+        {
+            level: 1,
+            question: "Which command is used to read the first lines of a file?",
+            options: ["head", "tail", "cat", "grep"],
+            explanation: "head displays the first lines of a file. tail shows the last lines."
+        },
+        {
+            level: 1,
+            question: "What does 'cp' command do?",
+            options: ["Copies files", "Moves files", "Deletes files", "Compares files"],
+            explanation: "cp (copy) duplicates files or directories to a new location."
+        },
+
+        // MEDIUM (Level 2) - FOSS, Privacy & Security - 10 questions
+        {
+            level: 2,
+            question: "What does FOSS stand for?",
+            options: ["Free and Open Source Software", "Fast Operating System Software", "File Open Source System", "Free Online Software Service"],
+            explanation: "FOSS means Free and Open Source Software - both free as in freedom and openly developed."
+        },
+        {
+            level: 2,
+            question: "Who founded the Free Software Foundation?",
+            options: ["Richard Stallman", "Linus Torvalds", "Steve Jobs", "Bill Gates"],
+            explanation: "Richard Stallman founded the FSF in 1985 to promote free software."
+        },
+        {
+            level: 2,
+            question: "What is the main purpose of a VPN?",
+            options: ["Encrypt internet traffic and hide IP address", "Speed up internet connection", "Block all advertisements", "Store passwords securely"],
+            explanation: "A VPN encrypts your traffic and masks your IP address for privacy."
+        },
+        {
+            level: 2,
+            question: "What is end-to-end encryption?",
+            options: ["Only sender and recipient can read messages", "Data is encrypted at each hop", "All servers must be encrypted", "Only the server can read messages"],
+            explanation: "End-to-end encryption means only the communicating users can decrypt messages."
+        },
+        {
+            level: 2,
+            question: "What is the purpose of a firewall?",
+            options: ["Monitor and control network traffic", "Speed up internet connection", "Store encrypted passwords", "Generate encryption keys"],
+            explanation: "A firewall filters incoming and outgoing network traffic based on security rules."
+        },
+        {
+            level: 2,
+            question: "What does '2FA' stand for?",
+            options: ["Two-Factor Authentication", "Two-File Authentication", "Two-Function Access", "Two-Format Authorization"],
+            explanation: "2FA requires two different types of verification to log in."
+        },
+        {
+            level: 2,
+            question: "What is the purpose of the /etc/shadow file?",
+            options: ["Stores encrypted passwords", "Lists system services", "Contains network config", "Tracks login history"],
+            explanation: "/etc/shadow stores actual password hashes (not plaintext) for added security."
+        },
+        {
+            level: 2,
+            question: "What is metadata privacy risk?",
+            options: ["Data about who you communicate with", "The content of messages", "Your encryption keys", "Server locations"],
+            explanation: "Metadata (who, when, where) can reveal much about you even if content is encrypted."
+        },
+        {
+            level: 2,
+            question: "What is the purpose of a password manager?",
+            options: ["Store unique encrypted passwords", "Generate random passwords only", "Hack into accounts", "Share passwords securely"],
+            explanation: "Password managers securely store and autofill unique passwords for each account."
+        },
+        {
+            level: 2,
+            question: "What does 'Tor' stand for?",
+            options: ["The Onion Router", "Total Online Protection", "Technical Operation Route", "Trusted Onion Registry"],
+            explanation: "Tor is 'The Onion Router' - it routes traffic through multiple encrypted layers."
+        },
+
+        // HARD (Level 3) - Advanced Linux, Networking & DevOps - 10 questions
+        {
+            level: 3,
+            question: "What is the difference between TCP and UDP?",
+            options: ["TCP is connection-oriented, UDP is connectionless", "TCP is faster than UDP", "UDP is more reliable", "There is no difference"],
+            explanation: "TCP establishes connections and guarantees delivery. UDP sends packets without confirming receipt."
+        },
+        {
+            level: 3,
+            question: "What does 'CI/CD' stand for?",
+            options: ["Continuous Integration/Continuous Deployment", "Code Integration/Code Deployment", "Centralized Integration/Centralized Delivery", "Continuous Internet/Continuous Download"],
+            explanation: "CI/CD automates building, testing, and deploying code changes."
+        },
+        {
+            level: 3,
+            question: "What is Docker used for?",
+            options: ["Containerize applications", "Manage databases", "Host websites", "Send emails"],
+            explanation: "Docker containers package applications with their dependencies for consistent deployment."
+        },
+        {
+            level: 3,
+            question: "What is Kubernetes?",
+            options: ["Container orchestration platform", "Programming language", "Text editor", "Version control system"],
+            explanation: "Kubernetes automates deployment, scaling, and management of containerized applications."
+        },
+        {
+            level: 3,
+            question: "What is the purpose of 'chmod +x' command?",
+            options: ["Make a file executable", "Delete executable permissions", "Change file owner", "Copy execute permissions"],
+            explanation: "chmod +x adds execute permission, allowing a file to be run as a program."
+        },
+        {
+            level: 3,
+            question: "What is an inode in Linux?",
+            options: ["A data structure that stores file metadata", "A type of hard link", "The file content itself", "A directory entry"],
+            explanation: "An inode stores metadata about a file (permissions, size, timestamps) but not the name or content."
+        },
+        {
+            level: 3,
+            question: "What is the difference between a process and a daemon?",
+            options: ["Daemon runs in background, process is a running program", "They are the same thing", "Process runs in background", "Daemon is a user program"],
+            explanation: "A daemon is a process that runs in the background without user interaction."
+        },
+        {
+            level: 3,
+            question: "What is 'load average' in Linux?",
+            options: ["Average number of processes waiting to run", "CPU temperature", "Memory usage percentage", "Network traffic speed"],
+            explanation: "Load average shows how many processes are typically waiting for CPU time."
+        },
+        {
+            level: 3,
+            question: "What does DNS stand for?",
+            options: ["Domain Name System", "Digital Network Service", "Dynamic Name Server", "Direct Network Solution"],
+            explanation: "DNS translates domain names (like google.com) into IP addresses."
+        },
+        {
+            level: 3,
+            question: "What is a systemd service?",
+            options: ["A background process managed by systemd", "A user application", "A hardware driver", "A network protocol"],
+            explanation: "systemd services are daemons controlled by systemd, Linux's init system."
+        }
+    ];
+
+    let currentQuestion = null;
+    let selectedAnswer = null;
+    let score = 0;
+    let streak = 0;
+    let currentLevel = 1;
+    let gameStarted = false;
+    let completedQuestions = { 1: [], 2: [], 3: [] };
+
+    function shuffle(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function shuffleOptions(options, correctIndex) {
+        const items = options.map((text, i) => ({ text, isCorrect: i === correctIndex }));
+        const shuffled = shuffle(items);
+        return {
+            options: shuffled.map(item => item.text),
+            newCorrectIndex: shuffled.findIndex(item => item.isCorrect)
         };
+    }
+
+    function updateLevelPips() {
+        document.getElementById('pip1').className = 'level-pip' + (currentLevel >= 1 ? ' active' : '');
+        document.getElementById('pip2').className = 'level-pip' + (currentLevel >= 2 ? ' active' : '');
+        document.getElementById('pip3').className = 'level-pip' + (currentLevel >= 3 ? ' active' : '');
+        document.getElementById('level').textContent = currentLevel;
+    }
+
+    function updateProgressInfo() {
+        const total3 = questions.filter(q => q.level === 3).length;
+        const done3 = completedQuestions[3].length;
+        document.getElementById('progressInfo').textContent = 
+            `Level 3 Progress: ${done3}/${total3} | Win by getting streak of 7 or completing all Level 3 questions`;
+    }
+
+    function startGame(level) {
+        currentLevel = level;
+        gameStarted = true;
+        streak = 0;
+        score = 0;
+        completedQuestions = { 1: [], 2: [], 3: [] };
         
-        let questions = [];
-        let currentIndex = 0;
-        let score = 0;
-        let correctCount = 0;
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+        document.getElementById('startScreen').style.display = 'none';
+        document.getElementById('gameContent').style.display = 'block';
+        document.getElementById('winScreen').classList.remove('active');
         
-        function startGame() {
-            const category = document.getElementById('category').value;
+        updateLevelPips();
+        initGame();
+    }
+
+    function getQuestionForLevel(level) {
+        const levelQuestions = questions.filter(q => q.level === level);
+        const available = levelQuestions.filter(q => !completedQuestions[level].includes(q.question));
+        
+        if (available.length === 0) {
+            return null;
+        }
+        
+        return available[Math.floor(Math.random() * available.length)];
+    }
+
+    function initGame() {
+        if (currentLevel === 3 && completedQuestions[3].length >= questions.filter(q => q.level === 3).length) {
+            showWin("Level 3 Mastered!", "You've completed all Level 3 questions!");
+            return;
+        }
+
+        currentQuestion = getQuestionForLevel(currentLevel);
+        
+        if (!currentQuestion) {
+            showWin("Level Complete!", `You've mastered Level ${currentLevel}!`);
+            return;
+        }
+
+        selectedAnswer = null;
+        const shuffled = shuffleOptions(currentQuestion.options, 0);
+        currentQuestion.shuffledOptions = shuffled.options;
+        currentQuestion.shuffledCorrectIndex = shuffled.newCorrectIndex;
+
+        document.getElementById('questionNumber').textContent = `Level ${currentLevel} Question`;
+        document.getElementById('questionText').textContent = currentQuestion.question;
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('explanation').style.display = 'none';
+        document.getElementById('submitBtn').disabled = true;
+
+        const optionsList = document.getElementById('optionsList');
+        optionsList.innerHTML = '';
+
+        currentQuestion.shuffledOptions.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => selectAnswer(i, btn);
+            optionsList.appendChild(btn);
+        });
+    }
+
+    function selectAnswer(index, btn) {
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => b.style.borderColor = 'var(--charcoal)');
+        btn.style.borderColor = '#00ff00';
+        selectedAnswer = index;
+        document.getElementById('submitBtn').disabled = false;
+    }
+
+    function showWin(title, subtitle) {
+        document.getElementById('gameContent').style.display = 'none';
+        document.getElementById('winScreen').classList.add('active');
+        document.getElementById('winTitle').textContent = title;
+        document.getElementById('winSubtitle').textContent = subtitle;
+    }
+
+    function checkAnswer() {
+        const isCorrect = selectedAnswer === currentQuestion.shuffledCorrectIndex;
+        const buttons = document.querySelectorAll('.option-btn');
+
+        buttons.forEach((btn, i) => {
+            btn.disabled = true;
+            if (i === currentQuestion.shuffledCorrectIndex) {
+                btn.classList.add('correct');
+            } else if (i === selectedAnswer && !isCorrect) {
+                btn.classList.add('wrong');
+            }
+        });
+
+        const feedback = document.getElementById('feedback');
+
+        if (isCorrect) {
+            streak++;
+            const points = currentLevel * 10 + (streak > 3 ? 5 : 0);
+            score += points;
             
-            if (category === 'mixed') {
-                questions = [];
-                ['linux', 'foss', 'privacy'].forEach(cat => {
-                    const catQuestions = shuffle([...allQuestions[cat]]);
-                    questions.push(...catQuestions.slice(0, 4));
-                });
-                questions = shuffle(questions).slice(0, 10);
+            completedQuestions[currentLevel].push(currentQuestion.question);
+            
+            feedback.className = 'feedback correct';
+            feedback.innerHTML = `✓ Correct! +${points} points | Streak: ${streak}/7`;
+            document.getElementById('explanation').innerHTML = `<strong>Explanation:</strong> ${currentQuestion.explanation}`;
+            document.getElementById('explanation').style.display = 'block';
+
+            if (streak >= 7) {
+                if (currentLevel < 3) {
+                    currentLevel++;
+                    streak = 0;
+                    updateLevelPips();
+                    feedback.innerHTML += `<br><br>🎉 Level Up! Now on Level ${currentLevel}`;
+                    setTimeout(() => initGame(), 2500);
+                } else {
+                    showWin("🏆 QUIZ MASTER!", `Final Score: ${score} | You've mastered all levels!`);
+                }
             } else {
-                questions = shuffle([...allQuestions[category]]).slice(0, 10);
+                setTimeout(() => initGame(), 2000);
             }
-            
-            currentIndex = 0;
-            score = 0;
-            correctCount = 0;
-            
-            document.getElementById('startScreen').style.display = 'none';
-            document.getElementById('endScreen').style.display = 'none';
-            document.getElementById('gameScreen').classList.add('active');
-            
-            showQuestion();
-            updateStats();
+        } else {
+            streak = 0;
+            feedback.className = 'feedback wrong';
+            feedback.innerHTML = `✗ The correct answer was highlighted above`;
+            document.getElementById('explanation').innerHTML = `<strong>Explanation:</strong> ${currentQuestion.explanation}`;
+            document.getElementById('explanation').style.display = 'block';
+            setTimeout(() => initGame(), 4200);
         }
-        
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-        
-        function showQuestion() {
-            const q = questions[currentIndex];
-            
-            document.getElementById('questionNumber').textContent = `Question ${currentIndex + 1} of ${questions.length}`;
-            document.getElementById('questionText').textContent = q.question;
-            
-            const optionsList = document.getElementById('optionsList');
-            optionsList.innerHTML = '';
-            
-            q.options.forEach((opt, i) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = opt;
-                btn.onclick = () => checkAnswer(i);
-                optionsList.appendChild(btn);
-            });
-            
-            document.getElementById('feedback').className = 'feedback';
-            document.getElementById('explanation').className = 'explanation';
-            document.getElementById('nextBtn').className = 'next-btn';
-        }
-        
-        function checkAnswer(selected) {
-            const q = questions[currentIndex];
-            const buttons = document.querySelectorAll('.option-btn');
-            
-            buttons.forEach((btn, i) => {
-                btn.classList.add('disabled');
-                if (i === q.correct) btn.classList.add('correct');
-                if (i === selected && i !== q.correct) btn.classList.add('wrong');
-            });
-            
-            const feedback = document.getElementById('feedback');
-            if (selected === q.correct) {
-                score += 10;
-                correctCount++;
-                feedback.textContent = '✓ CORRECT!';
-                feedback.className = 'feedback show correct';
-            } else {
-                feedback.textContent = '✗ WRONG!';
-                feedback.className = 'feedback show wrong';
-            }
-            
-            document.getElementById('explanation').innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
-            document.getElementById('explanation').className = 'explanation show';
-            document.getElementById('nextBtn').className = 'next-btn show';
-            
-            updateStats();
-        }
-        
-        function nextQuestion() {
-            currentIndex++;
-            
-            if (currentIndex >= questions.length) {
-                endGame();
-                return;
-            }
-            
-            showQuestion();
-            updateStats();
-        }
-        
-        function endGame() {
-            document.getElementById('gameScreen').classList.remove('active');
-            document.getElementById('endScreen').style.display = 'block';
-            
-            document.getElementById('finalScore').textContent = score;
-            document.getElementById('finalCorrect').textContent = `${correctCount}/${questions.length}`;
-            
-            let message = '';
-            if (correctCount === 10) message = '🏆 PERFECT SCORE!';
-            else if (correctCount >= 8) message = '🌟 Excellent!';
-            else if (correctCount >= 6) message = '👍 Good job!';
-            else if (correctCount >= 4) message = '📚 Keep learning!';
-            else message = '💪 Try again!';
-            
-            document.getElementById('finalMessage').textContent = message;
-        }
-        
-        function updateStats() {
-            document.getElementById('score').textContent = score;
-            document.getElementById('correct').textContent = correctCount;
-            document.getElementById('questionNum').textContent = `${currentIndex + 1}/${questions.length}`;
-        }
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+        feedback.style.display = 'block';
+        document.getElementById('submitBtn').disabled = true;
+    }
+
+    document.getElementById('submitBtn').addEventListener('click', checkAnswer);
+
+    updateLevelPips();
+    updateProgressInfo();
     </script>
 </body>
 </html>

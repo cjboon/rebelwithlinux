@@ -17,7 +17,7 @@
     <script src="../theme.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
+        html, body { height: 100%; overflow-x: hidden; }
         body {
             background: var(--white);
             color: var(--black);
@@ -29,8 +29,8 @@
             padding: 20px;
         }
         h1 { margin-bottom: 10px; font-size: 1.8rem; color: #00ff00; }
-        .subtitle { margin-bottom: 20px; color: var(--charcoal); }
-        
+        .subtitle { margin-bottom: 20px; color: var(--charcoal); text-align: center; }
+
         .stats-bar {
             display: flex;
             gap: 30px;
@@ -38,20 +38,63 @@
             background: var(--charcoal);
             padding: 12px 24px;
             border-radius: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .stat { text-align: center; }
         .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; }
         .stat-value { font-size: 24px; font-weight: bold; color: #00ff00; }
-        
+
+        .level-indicator {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .level-pip {
+            width: 40px;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--charcoal);
+        }
+        .level-pip.active { background: #00ff00; }
+
         .game-container {
             background: var(--charcoal);
             border-radius: 12px;
             padding: 30px;
-            max-width: 800px;
+            max-width: 700px;
             width: 100%;
             border: 2px solid var(--charcoal);
         }
-        
+
+        .start-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .start-screen h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--black);
+        }
+        .difficulty-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .diff-btn {
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            background: #e0e0e0;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1a1a1a;
+        }
+        .diff-btn:hover { background: #1a1a1a; color: #e0e0e0; }
+
         .code-box {
             background: var(--black);
             border: 1px solid var(--charcoal);
@@ -63,143 +106,133 @@
             line-height: 1.6;
             overflow-x: auto;
         }
-        
-        .code-line { color: #ff79c6; }
-        .code-comment { color: #6272a4; }
-        .code-string { color: #f1fa8c; }
-        
+
+        .code-line { color: #00ff00; }
+
         .options-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: 1fr;
+            gap: 12px;
         }
-        
+
         .option-btn {
             background: var(--charcoal);
             border: 2px solid var(--charcoal);
             border-radius: 8px;
             padding: 15px;
-            color: var(--black);
+            color: #1a1a1a;
             font-family: 'Courier New', monospace;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.2s;
             text-align: left;
         }
-        
+
         .option-btn:hover {
             background: var(--charcoal);
             border-color: #00ff00;
         }
-        
+
         .option-btn.correct {
             background: #1a4d1a;
             border-color: #00ff00;
             color: #00ff00;
         }
-        
+
         .option-btn.wrong {
             background: #4d1a1a;
             border-color: #ff4444;
             color: #ff4444;
         }
-        
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .action-btn {
+            padding: 12px 24px;
+            background: #00ff00;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
         .feedback {
             text-align: center;
             padding: 15px;
             margin-top: 15px;
             border-radius: 8px;
             font-weight: bold;
-            display: none;
         }
-        
-        .feedback.show { display: block; }
         .feedback.correct { background: #1a4d1a; color: #00ff00; }
         .feedback.wrong { background: #4d1a1a; color: #ff4444; }
-        
+
         .explanation {
-            background: var(--charcoal);
+            background: var(--black);
             border-radius: 8px;
             padding: 15px;
             margin-top: 15px;
-            display: none;
-        }
-        
-        .explanation.show { display: block; }
-        
-        .next-btn {
-            background: #00ff00;
-            color: var(--black);
-            border: none;
-            padding: 12px 30px;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 15px;
-            display: none;
-        }
-        
-        .next-btn.show { display: inline-block; }
-        
-        .difficulty-select {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .difficulty-select select {
-            background: var(--charcoal);
-            color: var(--black);
-            border: 2px solid var(--charcoal);
-            padding: 10px 20px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        
-        .start-screen, .game-screen { width: 100%; }
-        .game-screen { display: none; }
-        .game-screen.active { display: block; }
-        
-        .back-link {
-            position: fixed;
-            top: 20px;
-            left: 20px;
             color: var(--charcoal);
-            text-decoration: none;
-            font-size: 14px;
         }
-        .back-link:hover { color: #00ff00; }
-        
-        /* Mobile optimizations */
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            h1 { font-size: 1.4rem; }
-            .stats-bar {
-                gap: 15px;
-                padding: 8px 12px;
-            }
-            .stat-value { font-size: 18px; }
-            .game-container { padding: 15px; }
-            .options-grid {
-                grid-template-columns: 1fr;
-            }
-            .code-box {
-                padding: 12px;
-                font-size: 12px;
-            }
-            .current-word { font-size: 14px; }
+
+        .win-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .win-screen.active { display: block; }
+        .win-icon { font-size: 5rem; margin-bottom: 20px; }
+        .win-title { font-size: 2rem; margin-bottom: 10px; color: #00ff00; }
+        .win-subtitle { color: var(--charcoal); margin-bottom: 20px; }
+
+        .progress-info {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--charcoal);
+        }
+
+        .help-section {
+            margin-top: 30px;
+            text-align: left;
+            background: var(--black);
+            border: 2px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .help-section h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--white);
+        }
+        .help-section p, .help-section li {
+            font-size: 0.85rem;
+            color: var(--white);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        .help-section ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .stats-bar { gap: 15px; }
+            .code-box { padding: 12px; font-size: 12px; }
         }
     </style>
 </head>
 <body>
-    <a href="../index.html#games" class="back-link">← Back to Games</a>
-    
     <h1>🤖 TURING GAME</h1>
     <p class="subtitle">Guess what the code does!</p>
-    
+
     <div class="stats-bar">
         <div class="stat">
             <div class="stat-label">Score</div>
@@ -210,473 +243,606 @@
             <div class="stat-value" id="streak">0</div>
         </div>
         <div class="stat">
-            <div class="stat-label">Round</div>
-            <div class="stat-value" id="round">1</div>
+            <div class="stat-label">Level</div>
+            <div class="stat-value" id="level">1</div>
         </div>
     </div>
-    
+
+    <div class="level-indicator" id="levelIndicator">
+        <div class="level-pip active" id="pip1"></div>
+        <div class="level-pip" id="pip2"></div>
+        <div class="level-pip" id="pip3"></div>
+    </div>
+
     <div class="game-container">
         <div class="start-screen" id="startScreen">
-            <div class="difficulty-select">
-                <select id="difficulty">
-                    <option value="easy">Easy - Bash Basics</option>
-                    <option value="medium" selected>Medium - Scripting</option>
-                    <option value="hard">Hard - Advanced</option>
-                </select>
+            <h2>Select Difficulty</h2>
+            <div class="difficulty-btns">
+                <button class="diff-btn" onclick="startGame(1)">Easy</button>
+                <button class="diff-btn" onclick="startGame(2)">Medium</button>
+                <button class="diff-btn" onclick="startGame(3)">Hard</button>
             </div>
-            <p style="text-align: center; margin-bottom: 20px; color: #888;">
-                You'll see a piece of code. Can you predict what it does?<br>
-                Test your understanding of bash, Linux commands, and scripting!
-            </p>
-            <div style="text-align: center;">
-                <button class="next-btn show" onclick="startGame()">START GAME</button>
+            <p class="progress-info" id="progressInfo"></p>
+
+            <div class="help-section">
+                <h3>How It Works</h3>
+                <p>You'll see a piece of code. Choose the correct description of what it does.</p>
+                <ul>
+                    <li>Get 10 questions correct to master a level</li>
+                    <li>Build a streak of 7 to advance to the next level</li>
+                    <li>The correct answer changes position each time</li>
+                </ul>
+
+                <h3 style="margin-top: 15px;">Common Commands Reference</h3>
+                <ul>
+                    <li><code>ls</code> - List directory contents</li>
+                    <li><code>pwd</code> - Print working directory</li>
+                    <li><code>cat</code> - Display file contents</li>
+                    <li><code>mkdir</code> - Create directory</li>
+                    <li><code>rm</code> - Remove files</li>
+                    <li><code>cp</code> - Copy files</li>
+                    <li><code>head</code> - Show first lines of file</li>
+                    <li><code>wc</code> - Word count (lines, words, bytes)</li>
+                    <li><code>whoami</code> - Show current user</li>
+                    <li><code>cd</code> - Change directory</li>
+                    <li><code>grep</code> - Search for patterns in text</li>
+                    <li><code>chmod</code> - Change file permissions</li>
+                    <li><code>export</code> - Set environment variables</li>
+                    <li><code>tar</code> - Archive utility (create/extract tar files)</li>
+                    <li><code>ps</code> - List running processes</li>
+                    <li><code>df</code> - Show disk space usage</li>
+                    <li><code>sort</code> - Sort lines of text</li>
+                    <li><code>crontab</code> - Schedule recurring tasks</li>
+                    <li><code>awk</code> - Pattern scanning and processing language</li>
+                    <li><code>find</code> - Search for files in directory tree</li>
+                    <li><code>netstat</code> - Show network connections and ports</li>
+                    <li><code>dd</code> - Convert and copy files (raw data)</li>
+                    <li><code>iptables</code> - Configure Linux firewall rules</li>
+                    <li><code>lsof</code> - List open files (including network ports)</li>
+                    <li><code>ssh</code> - Secure shell remote login</li>
+                </ul>
             </div>
         </div>
-        
-        <div class="game-screen" id="gameScreen">
-            <div class="code-box" id="codeBox"></div>
-            <div class="options-grid" id="optionsGrid"></div>
-            <div class="feedback" id="feedback"></div>
-            <div class="explanation" id="explanation"></div>
-            <div style="text-align: center;">
-                <button class="next-btn" id="nextBtn" onclick="nextQuestion()">NEXT QUESTION →</button>
+
+        <div id="gameContent" style="display:none;">
+            <div class="code-box">
+                <span class="code-line" id="codeDisplay">$ code here</span>
             </div>
+
+            <div class="options-grid" id="optionsGrid"></div>
+
+            <div class="btn-row">
+                <button class="action-btn" id="submitBtn" disabled>Submit</button>
+            </div>
+
+            <div class="feedback" id="feedback" style="display:none;"></div>
+            <div class="explanation" id="explanation" style="display:none;"></div>
         </div>
     </div>
-    
+
+    <div class="win-screen" id="winScreen">
+        <div class="win-icon">🏆</div>
+        <div class="win-title" id="winTitle">Victory!</div>
+        <div class="win-subtitle" id="winSubtitle">You've mastered the Turing Game!</div>
+        <button class="action-btn" onclick="location.reload()">Play Again</button>
+    </div>
+
     <script>
-        const questions = {
-            easy: [
-                {
-                    code: 'ls -la',
-                    options: [
-                        'List all files including hidden ones',
-                        'Delete all files in current directory',
-                        'Create a new directory',
-                        'Show system information'
-                    ],
-                    correct: 0,
-                    explanation: 'ls lists directory contents. The -a flag shows hidden files (starting with .) and -l uses long format.'
-                },
-                {
-                    code: 'pwd',
-                    options: [
-                        'Print working directory',
-                        'Delete current folder',
-                        'Power down the system',
-                        'Print with decoration'
-                    ],
-                    correct: 0,
-                    explanation: 'pwd prints the current working directory path.'
-                },
-                {
-                    code: 'cat file.txt',
-                    options: [
-                        'Display file contents',
-                        'Concatenate files together',
-                        'Create a new file',
-                        'Change file permissions'
-                    ],
-                    correct: 0,
-                    explanation: 'cat displays the contents of a file to the terminal. It can also concatenate files when given multiple arguments.'
-                },
-                {
-                    code: 'mkdir newfolder',
-                    options: [
-                        'Make a new directory',
-                        'Remove an empty directory',
-                        'Move to a directory',
-                        'List directory contents'
-                    ],
-                    correct: 0,
-                    explanation: 'mkdir creates a new directory (make directory).'
-                },
-                {
-                    code: 'rm file.txt',
-                    options: [
-                        'Remove/delete a file',
-                        'Read a file',
-                        'Rename a file',
-                        'Copy a file'
-                    ],
-                    correct: 0,
-                    explanation: 'rm removes (deletes) files. Use rm -r for directories.'
-                },
-                {
-                    code: 'cp old.txt new.txt',
-                    options: [
-                        'Copy a file',
-                        'Delete a file',
-                        'Compare two files',
-                        'Create a file'
-                    ],
-                    correct: 0,
-                    explanation: 'cp copies a file from source to destination.'
-                },
-                {
-                    code: 'mv old.txt new.txt',
-                    options: [
-                        'Rename or move a file',
-                        'View differences between files',
-                        'Copy a file',
-                        'Delete a file'
-                    ],
-                    correct: 0,
-                    explanation: 'mv moves or renames a file.'
-                },
-                {
-                    code: 'head -n 10 file.txt',
-                    options: [
-                        'Show first 10 lines',
-                        'Show last 10 lines',
-                        'Count lines in file',
-                        'Hide file contents'
-                    ],
-                    correct: 0,
-                    explanation: 'head shows the first lines of a file. -n specifies the number of lines.'
-                },
-                {
-                    code: 'chmod +x script.sh',
-                    options: [
-                        'Make file executable',
-                        'Change file owner',
-                        'Copy with execute permission',
-                        'Check file permissions'
-                    ],
-                    correct: 0,
-                    explanation: 'chmod +x adds execute permission to a file.'
-                },
-                {
-                    code: 'whoami',
-                    options: [
-                        'Show current username',
-                        'Show who is logged in',
-                        'Send message to all users',
-                        'List all users'
-                    ],
-                    correct: 0,
-                    explanation: 'whoami displays the current username.'
-                }
+    const questions = [
+        // EASY (Level 1) - 10 questions
+        {
+            level: 1,
+            code: 'ls -la',
+            options: [
+                'List all files including hidden ones',
+                'Delete all files in current directory',
+                'Create a new directory',
+                'Show system information'
             ],
-            medium: [
-                {
-                    code: 'for i in *.txt; do echo "$i"; done',
-                    options: [
-                        'Loop through all .txt files and print each',
-                        'Delete all .txt files',
-                        'Count all .txt files',
-                        'Search for text in files'
-                    ],
-                    correct: 0,
-                    explanation: 'This for loop iterates over all .txt files and echoes (prints) each filename.'
-                },
-                {
-                    code: 'grep -r "error" /var/log/',
-                    options: [
-                        'Search recursively for "error" in /var/log/',
-                        'Replace "error" in all log files',
-                        'Delete error logs',
-                        'Count error occurrences'
-                    ],
-                    correct: 0,
-                    explanation: 'grep searches for patterns. -r searches recursively through directories.'
-                },
-                {
-                    code: 'find . -type f -mtime -7',
-                    options: [
-                        'Find files modified in last 7 days',
-                        'Find files created in last 7 days',
-                        'Find files older than 7 days',
-                        'Find files modified at midnight'
-                    ],
-                    correct: 0,
-                    explanation: 'find locates files. -mtime -7 finds files modified within the last 7 days.'
-                },
-                {
-                    code: 'tar -czf archive.tar.gz folder/',
-                    options: [
-                        'Compress folder into tar.gz archive',
-                        'Extract tar.gz archive',
-                        'List archive contents',
-                        'Test archive integrity'
-                    ],
-                    correct: 0,
-                    explanation: 'tar -czf creates a compressed archive (c=create, z=gzip, f=file).'
-                },
-                {
-                    code: 'ps aux | grep python',
-                    options: [
-                        'List all python processes',
-                        'Kill all python processes',
-                        'Start python process',
-                        'Install python'
-                    ],
-                    correct: 0,
-                    explanation: 'ps aux lists processes, grep filters for "python" - showing running Python processes.'
-                },
-                {
-                    code: 'df -h',
-                    options: [
-                        'Show disk usage in human-readable format',
-                        'List files in detail',
-                        'Display file differences',
-                        'Find duplicate files'
-                    ],
-                    correct: 0,
-                    explanation: 'df shows disk filesystem usage. -h makes it human-readable (KB/MB/GB).'
-                },
-                {
-                    code: 'curl -s https://api.example.com | jq',
-                    options: [
-                        'Fetch JSON and format it',
-                        'Download a file',
-                        'Upload data to server',
-                        'Compare two APIs'
-                    ],
-                    correct: 0,
-                    explanation: 'curl fetches URLs, jq formats JSON output beautifully in the terminal.'
-                },
-                {
-                    code: 'chown user:group file.txt',
-                    options: [
-                        'Change file owner and group',
-                        'Change file permissions',
-                        'Copy with ownership',
-                        'Check file ownership'
-                    ],
-                    correct: 0,
-                    explanation: 'chown changes the owner and group of a file.'
-                },
-                {
-                    code: 'ln -s target link',
-                    options: [
-                        'Create symbolic link',
-                        'Create hard link',
-                        'List all links',
-                        'Remove link'
-                    ],
-                    correct: 0,
-                    explanation: 'ln -s creates a symbolic (soft) link to a target.'
-                },
-                {
-                    code: 'sort file.txt | uniq',
-                    options: [
-                        'Sort and remove duplicates',
-                        'Find unique lines only',
-                        'Compare sorted files',
-                        'Count unique lines'
-                    ],
-                    correct: 0,
-                    explanation: 'sort orders lines, uniq removes adjacent duplicates - together they get unique sorted lines.'
-                }
+            explanation: 'ls lists directory contents. The -a flag shows hidden files (starting with .) and -l uses long format.'
+        },
+        {
+            level: 1,
+            code: 'pwd',
+            options: [
+                'Print working directory',
+                'Delete current folder',
+                'Power down the system',
+                'Print with decoration'
             ],
-            hard: [
-                {
-                    code: 'awk -F: \'{print $1}\' /etc/passwd',
-                    options: [
-                        'Print first field (username) from passwd',
-                        'Print all fields from passwd',
-                        'Delete first field',
-                        'Count total fields'
-                    ],
-                    correct: 0,
-                    explanation: 'awk with -F: sets field separator to colon, prints $1 (first field - usernames).'
-                },
-                {
-                    code: 'sed -i \'s/foo/bar/g\' file.txt',
-                    options: [
-                        'Replace all "foo" with "bar" in file.txt',
-                        'Delete all "foo" lines',
-                        'Find "foo" in file.txt',
-                        'Save original to file.txt'
-                    ],
-                    correct: 0,
-                    explanation: 'sed -i does in-place editing, s/old/new/g replaces all occurrences globally.'
-                },
-                {
-                    code: 'netstat -tulpn | grep :80',
-                    options: [
-                        'Show processes listening on port 80',
-                        'Connect to port 80',
-                        'Block port 80',
-                        'List all network ports'
-                    ],
-                    correct: 0,
-                    explanation: 'netstat shows network statistics, -tulpn shows listening sockets with process info.'
-                },
-                {
-                    code: 'xargs -I {} cp {} /backup/',
-                    options: [
-                        'Copy each input item to /backup/',
-                        'Delete items from backup',
-                        'List backup contents',
-                        'Create backup archive'
-                    ],
-                    correct: 0,
-                    explanation: 'xargs -I {} replaces {} with each input item, running cp for each.'
-                },
-                {
-                    code: 'tar -tzf archive.tar.gz | head -5',
-                    options: [
-                        'List first 5 files in archive',
-                        'Extract 5 files from archive',
-                        'Compress 5 files',
-                        'Test archive'
-                    ],
-                    correct: 0,
-                    explanation: 'tar -t lists archive contents, head -5 shows first 5 entries.'
-                },
-                {
-                    code: 'cut -d: -f1,3 /etc/passwd | sort -t: -k2 -n',
-                    options: [
-                        'Sort users by UID',
-                        'List users and groups',
-                        'Find user by ID',
-                        'Count total users'
-                    ],
-                    correct: 0,
-                    explanation: 'cut extracts fields, sort -n sorts numerically by the second field (UID).'
-                },
-                {
-                    code: 'while read line; do echo "$line" | wc -c; done < file.txt',
-                    options: [
-                        'Print character count for each line',
-                        'Count total lines in file',
-                        'Read and delete lines',
-                        'Echo file contents'
-                    ],
-                    correct: 0,
-                    explanation: 'This reads file line by line, printing character count for each line including newline.'
-                },
-                {
-                    code: 'iptables -A INPUT -p tcp --dport 22 -j DROP',
-                    options: [
-                        'Block incoming SSH connections',
-                        'Allow SSH connections',
-                        'Redirect SSH to port 22',
-                        'Log SSH attempts'
-                    ],
-                    correct: 0,
-                    explanation: 'iptables adds (-A) a rule to INPUT chain to DROP TCP connections on port 22.'
-                },
-                {
-                    code: 'dd if=/dev/zero of=/dev/sdb bs=1M count=1',
-                    options: [
-                        'Write 1MB of zeros to beginning of disk',
-                        'Read 1MB from disk',
-                        'Copy disk to file',
-                        'Check disk speed'
-                    ],
-                    correct: 0,
-                    explanation: 'dd writes zeros to the first 1MB of sdb - often used to wipe disk headers.'
-                },
-                {
-                    code: 'exec 2>&1; set -x; commands',
-                    options: [
-                        'Redirect stderr to stdout and enable debug mode',
-                        'Execute commands in background',
-                        'Set executable flag',
-                        'Exit on error'
-                    ],
-                    correct: 0,
-                    explanation: 'exec 2>&1 redirects stderr to stdout, set -x enables command tracing/debugging.'
-                }
-            ]
+            explanation: 'pwd prints the current working directory path.'
+        },
+        {
+            level: 1,
+            code: 'cat file.txt',
+            options: [
+                'Display file contents',
+                'Change file permissions',
+                'Copy file to another location',
+                'Compare two files'
+            ],
+            explanation: 'cat displays the entire contents of a file to stdout.'
+        },
+        {
+            level: 1,
+            code: 'mkdir myproject',
+            options: [
+                'Create a new directory',
+                'Remove an empty directory',
+                'Move a file or directory',
+                'List directory contents'
+            ],
+            explanation: 'mkdir creates a new directory (folder) with the specified name.'
+        },
+        {
+            level: 1,
+            code: 'rm oldfile.txt',
+            options: [
+                'Delete a file permanently',
+                'Rename a file',
+                'Copy a file',
+                'Edit a file'
+            ],
+            explanation: 'rm removes/deletes the specified file. Use with caution - it does not go to trash.'
+        },
+        {
+            level: 1,
+            code: 'cp backup.txt /tmp/',
+            options: [
+                'Copy file to /tmp directory',
+                'Move file to /tmp',
+                'Delete file from /tmp',
+                'Compare files in /tmp'
+            ],
+            explanation: 'cp copies a file to the specified destination directory.'
+        },
+        {
+            level: 1,
+            code: 'head -n 10 file.txt',
+            options: [
+                'Show first 10 lines of file',
+                'Show last 10 lines of file',
+                'Count lines in file',
+                'Search for 10 in file'
+            ],
+            explanation: 'head displays the first lines of a file. -n specifies how many lines.'
+        },
+        {
+            level: 1,
+            code: 'wc file.txt',
+            options: [
+                'Count lines, words, and characters',
+                'Copy file to working directory',
+                'Delete file contents',
+                'Find word in file'
+            ],
+            explanation: 'wc (word count) outputs the number of lines, words, and bytes in a file.'
+        },
+        {
+            level: 1,
+            code: 'whoami',
+            options: [
+                'Display current username',
+                'Show who is logged in',
+                'List all users on system',
+                'Create a new user'
+            ],
+            explanation: 'whoami prints the username of the current user.'
+        },
+        {
+            level: 1,
+            code: 'cd ..',
+            options: [
+                'Go to parent directory',
+                'Go to home directory',
+                'Create a directory',
+                'Delete current directory'
+            ],
+            explanation: 'cd .. changes the current directory to the parent (one level up).'
+        },
+
+        // MEDIUM (Level 2) - 10 questions
+        {
+            level: 2,
+            code: 'grep -r "error" /var/log',
+            options: [
+                'Search recursively for "error" in logs',
+                'Delete all error logs',
+                'Create error log file',
+                'Count errors in logs'
+            ],
+            explanation: 'grep -r searches recursively through directories. Here it looks for "error" in all log files.'
+        },
+        {
+            level: 2,
+            code: 'chmod 755 script.sh',
+            options: [
+                'Make script executable',
+                'Delete the script',
+                'Copy script to home',
+                'Edit script permissions'
+            ],
+            explanation: 'chmod 755 sets rwxr-xr-x permissions (owner full, others read/execute).'
+        },
+        {
+            level: 2,
+            code: './script.sh',
+            options: [
+                'Execute the script',
+                'Create a new script',
+                'Edit the script',
+                'Copy the script'
+            ],
+            explanation: './ runs the script in the current directory. The ./ means "current directory".'
+        },
+        {
+            level: 2,
+            code: 'export PATH=$PATH:/new/bin',
+            options: [
+                'Add /new/bin to command search path',
+                'Remove /new/bin from path',
+                'Show current PATH variable',
+                'Delete PATH variable'
+            ],
+            explanation: 'export adds directories to PATH, making their commands available system-wide.'
+        },
+        {
+            level: 2,
+            code: 'if [ -f "$file" ]; then',
+            options: [
+                'Check if file exists and is regular',
+                'Delete the file',
+                'Create a new file',
+                'Copy file to backup'
+            ],
+            explanation: '-f checks if a file exists and is a regular file (not a directory).'
+        },
+        {
+            level: 2,
+            code: 'tar -czf backup.tar.gz /home',
+            options: [
+                'Compress /home into tar.gz archive',
+                'Extract tar archive',
+                'List tar contents',
+                'Delete /home directory'
+            ],
+            explanation: 'tar -czf creates (c) a gzip (z) compressed (f) archive of /home.'
+        },
+        {
+            level: 2,
+            code: 'ps aux | grep nginx',
+            options: [
+                'Find nginx processes',
+                'Stop all nginx processes',
+                'Start nginx server',
+                'Restart nginx service'
+            ],
+            explanation: 'ps aux lists all processes, grep filters to show only nginx.'
+        },
+        {
+            level: 2,
+            code: 'df -h',
+            options: [
+                'Show disk space usage',
+                'Delete hidden files',
+                'Find largest files',
+                'Format hard drive'
+            ],
+            explanation: 'df -h shows disk free space in human-readable format (KB, MB, GB).'
+        },
+        {
+            level: 2,
+            code: 'sort -u list.txt',
+            options: [
+                'Sort and remove duplicates',
+                'Count unique lines',
+                'Delete sorted lines',
+                'Search for duplicates'
+            ],
+            explanation: 'sort -u sorts lines alphabetically and removes duplicates (-u means unique).'
+        },
+        {
+            level: 2,
+            code: 'crontab -e',
+            options: [
+                'Edit scheduled tasks',
+                'Delete all cron jobs',
+                'List all cron jobs',
+                'Stop cron service'
+            ],
+            explanation: 'crontab -e opens the editor to configure scheduled (cron) jobs.'
+        },
+
+        // HARD (Level 3) - 10 questions
+        {
+            level: 3,
+            code: 'awk -F: \'{print $1}\' /etc/passwd',
+            options: [
+                'Extract all usernames from passwd',
+                'Delete user accounts',
+                'Create new users',
+                'Change user passwords'
+            ],
+            explanation: 'awk with -F: splits on colons and prints the first field ($1), giving all usernames.'
+        },
+        {
+            level: 3,
+            code: 'find / -perm -4000 2>/dev/null',
+            options: [
+                'Find all setuid files on system',
+                'Delete setuid files',
+                'Count setuid files',
+                'Create setuid files'
+            ],
+            explanation: 'find -perm -4000 searches for files with setuid bit set. 2>/dev/null hides error messages.'
+        },
+        {
+            level: 3,
+            code: 'netstat -tulpn | grep LISTEN',
+            options: [
+                'Show listening network ports',
+                'Block all network ports',
+                'Test network speed',
+                'Reset network connections'
+            ],
+            explanation: 'netstat -tulpn shows TCP/UDP ports with program names, grep LISTEN filters to active listeners.'
+        },
+        {
+            level: 3,
+            code: 'dd if=/dev/zero of=test.img bs=1M count=100',
+            options: [
+                'Create 100MB file of zeros',
+                'Delete 100MB file',
+                'Copy 100MB to memory',
+                'Compress 100MB file'
+            ],
+            explanation: 'dd creates a file (of) from /dev/zero with 1M blocks, 100 blocks = 100MB file.'
+        },
+        {
+            level: 3,
+            code: 'iptables -A INPUT -p tcp --dport 22 -j ACCEPT',
+            options: [
+                'Allow SSH connections',
+                'Block SSH connections',
+                'Restart SSH service',
+                'Check SSH status'
+            ],
+            explanation: 'iptables -A INPUT appends a rule allowing TCP port 22 (SSH) traffic.'
+        },
+        {
+            level: 3,
+            code: 'lsof -i :80',
+            options: [
+                'Show processes using port 80',
+                'Free up port 80',
+                'Block port 80',
+                'Close port 80'
+            ],
+            explanation: 'lsof lists open files, -i :80 shows processes listening on or connected to port 80.'
+        },
+        {
+            level: 3,
+            code: 'tar -tzf backup.tar.gz | wc -l',
+            options: [
+                'Count files in archive',
+                'Extract and count',
+                'Compress and count',
+                'List and delete files'
+            ],
+            explanation: 'tar -tzf lists contents without extracting, pipe to wc -l counts the lines.'
+        },
+        {
+            level: 3,
+            code: 'exec 2>&1',
+            options: [
+                'Redirect stderr to stdout',
+                'Close error output',
+                'Enable error logging',
+                'Disable all errors'
+            ],
+            explanation: 'exec 2>&1 redirects stderr (2) to stdout (1), combining all output streams.'
+        },
+        {
+            level: 3,
+            code: ':(){ :|:& };:',
+            options: [
+                'Fork bomb - crash the system',
+                'Create a function',
+                'Define a loop',
+                'Empty function definition'
+            ],
+            explanation: 'This is a fork bomb! It recursively calls itself until the system crashes. : is a function that pipes to itself twice and runs in background.'
+        },
+        {
+            level: 3,
+            code: 'ssh -L 8080:localhost:80 user@host',
+            options: [
+                'Tunnel local port 8080 to remote port 80',
+                'Copy files to remote host',
+                'Execute command on remote host',
+                'Mount remote filesystem'
+            ],
+            explanation: 'ssh -L creates a local port forward: connections to localhost:8080 are tunneled to the remote server\'s localhost:80.'
+        }
+    ];
+
+    let currentQuestion = null;
+    let selectedAnswer = null;
+    let score = 0;
+    let streak = 0;
+    let currentLevel = 1;
+    let gameStarted = false;
+    let completedQuestions = { 1: [], 2: [], 3: [] };
+
+    function shuffle(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function shuffleOptions(options, correctIndex) {
+        const items = options.map((text, i) => ({ text, isCorrect: i === correctIndex }));
+        const shuffled = shuffle(items);
+        return {
+            options: shuffled.map(item => item.text),
+            newCorrectIndex: shuffled.findIndex(item => item.isCorrect)
         };
+    }
+
+    function updateLevelPips() {
+        document.getElementById('pip1').className = 'level-pip' + (currentLevel >= 1 ? ' active' : '');
+        document.getElementById('pip2').className = 'level-pip' + (currentLevel >= 2 ? ' active' : '');
+        document.getElementById('pip3').className = 'level-pip' + (currentLevel >= 3 ? ' active' : '');
+        document.getElementById('level').textContent = currentLevel;
+    }
+
+    function updateProgressInfo() {
+        const total3 = questions.filter(q => q.level === 3).length;
+        const done3 = completedQuestions[3].length;
+        document.getElementById('progressInfo').textContent = 
+            `Level 3 Progress: ${done3}/${total3} | Win by getting streak of 7 or completing all Level 3 questions`;
+    }
+
+    function startGame(level) {
+        currentLevel = level;
+        gameStarted = true;
+        streak = 0;
+        score = 0;
+        completedQuestions = { 1: [], 2: [], 3: [] };
         
-        let currentDifficulty = 'medium';
-        let currentQuestions = [];
-        let currentIndex = 0;
-        let score = 0;
-        let streak = 0;
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+        document.getElementById('startScreen').style.display = 'none';
+        document.getElementById('gameContent').style.display = 'block';
+        document.getElementById('winScreen').classList.remove('active');
         
-        function startGame() {
-            currentDifficulty = document.getElementById('difficulty').value;
-            currentQuestions = shuffle([...questions[currentDifficulty]]);
-            currentIndex = 0;
-            score = 0;
-            streak = 0;
-            
-            document.getElementById('startScreen').style.display = 'none';
-            document.getElementById('gameScreen').classList.add('active');
-            
-            updateStats();
-            showQuestion();
+        updateLevelPips();
+        initGame();
+    }
+
+    function getQuestionForLevel(level) {
+        const levelQuestions = questions.filter(q => q.level === level);
+        const available = levelQuestions.filter(q => !completedQuestions[level].includes(q.code));
+        
+        if (available.length === 0) {
+            return null;
         }
         
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+        return available[Math.floor(Math.random() * available.length)];
+    }
+
+    function initGame() {
+        if (currentLevel === 3 && completedQuestions[3].length >= questions.filter(q => q.level === 3).length) {
+            showWin("Level 3 Mastered!", "You've completed all Level 3 questions!");
+            return;
+        }
+
+        currentQuestion = getQuestionForLevel(currentLevel);
+        
+        if (!currentQuestion) {
+            showWin("Level Complete!", `You've mastered Level ${currentLevel}!`);
+            return;
+        }
+
+        selectedAnswer = null;
+        const shuffled = shuffleOptions(currentQuestion.options, currentQuestion.options.indexOf(currentQuestion.options[0]));
+        currentQuestion.shuffledOptions = shuffled.options;
+        currentQuestion.shuffledCorrectIndex = shuffled.newCorrectIndex;
+
+        document.getElementById('codeDisplay').textContent = '$ ' + currentQuestion.code;
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('explanation').style.display = 'none';
+        document.getElementById('submitBtn').disabled = true;
+
+        const optionsGrid = document.getElementById('optionsGrid');
+        optionsGrid.innerHTML = '';
+
+        currentQuestion.shuffledOptions.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => selectAnswer(i, btn);
+            optionsGrid.appendChild(btn);
+        });
+    }
+
+    function selectAnswer(index, btn) {
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => b.style.borderColor = 'var(--charcoal)');
+        btn.style.borderColor = '#00ff00';
+        selectedAnswer = index;
+        document.getElementById('submitBtn').disabled = false;
+    }
+
+    function showWin(title, subtitle) {
+        document.getElementById('gameContent').style.display = 'none';
+        document.getElementById('winScreen').classList.add('active');
+        document.getElementById('winTitle').textContent = title;
+        document.getElementById('winSubtitle').textContent = subtitle;
+    }
+
+    function checkAnswer() {
+        const isCorrect = selectedAnswer === currentQuestion.shuffledCorrectIndex;
+        const buttons = document.querySelectorAll('.option-btn');
+
+        buttons.forEach((btn, i) => {
+            btn.disabled = true;
+            if (i === currentQuestion.shuffledCorrectIndex) {
+                btn.classList.add('correct');
+            } else if (i === selectedAnswer && !isCorrect) {
+                btn.classList.add('wrong');
             }
-            return array;
-        }
-        
-        function showQuestion() {
-            const q = currentQuestions[currentIndex];
+        });
+
+        const feedback = document.getElementById('feedback');
+
+        if (isCorrect) {
+            streak++;
+            const points = currentLevel * 10 + (streak > 3 ? 5 : 0);
+            score += points;
             
-            document.getElementById('codeBox').innerHTML = `<span class="code-line">$ ${q.code}</span>`;
+            completedQuestions[currentLevel].push(currentQuestion.code);
             
-            const optionsGrid = document.getElementById('optionsGrid');
-            optionsGrid.innerHTML = '';
-            
-            q.options.forEach((opt, i) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = opt;
-                btn.onclick = () => checkAnswer(i);
-                optionsGrid.appendChild(btn);
-            });
-            
-            document.getElementById('feedback').className = 'feedback';
-            document.getElementById('explanation').className = 'explanation';
-            document.getElementById('nextBtn').className = 'next-btn';
-        }
-        
-        function checkAnswer(selected) {
-            const q = currentQuestions[currentIndex];
-            const buttons = document.querySelectorAll('.option-btn');
-            
-            buttons.forEach((btn, i) => {
-                btn.disabled = true;
-                if (i === q.correct) btn.classList.add('correct');
-                if (i === selected && i !== q.correct) btn.classList.add('wrong');
-            });
-            
-            const feedback = document.getElementById('feedback');
-            if (selected === q.correct) {
-                score += 10 + (streak * 2);
-                streak++;
-                feedback.textContent = '✓ CORRECT!';
-                feedback.className = 'feedback show correct';
+            feedback.className = 'feedback correct';
+            feedback.innerHTML = `✓ Correct! +${points} points | Streak: ${streak}/7`;
+            document.getElementById('explanation').innerHTML = `<strong>Explanation:</strong> ${currentQuestion.explanation}`;
+            document.getElementById('explanation').style.display = 'block';
+
+            if (streak >= 7) {
+                if (currentLevel < 3) {
+                    currentLevel++;
+                    streak = 0;
+                    updateLevelPips();
+                    feedback.innerHTML += `<br><br>🎉 Level Up! Now on Level ${currentLevel}`;
+                    setTimeout(() => initGame(), 2500);
+                } else {
+                    showWin("🏆 TURING MASTER!", `Final Score: ${score} | You've mastered all levels!`);
+                }
             } else {
-                streak = 0;
-                feedback.textContent = '✗ WRONG!';
-                feedback.className = 'feedback show wrong';
+                setTimeout(() => initGame(), 2000);
             }
-            
-            document.getElementById('explanation').innerHTML = `<strong>Explanation:</strong> ${q.explanation}`;
-            document.getElementById('explanation').className = 'explanation show';
-            document.getElementById('nextBtn').className = 'next-btn show';
-            
-            updateStats();
+        } else {
+            streak = 0;
+            feedback.className = 'feedback wrong';
+            feedback.innerHTML = `✗ The correct answer was highlighted above`;
+            document.getElementById('explanation').innerHTML = `<strong>Explanation:</strong> ${currentQuestion.explanation}`;
+            document.getElementById('explanation').style.display = 'block';
+            setTimeout(() => initGame(), 4200);
         }
-        
-        function nextQuestion() {
-            currentIndex++;
-            if (currentIndex >= currentQuestions.length) {
-                currentQuestions = shuffle([...questions[currentDifficulty]]);
-                currentIndex = 0;
-            }
-            document.getElementById('round').textContent = currentIndex + 1;
-            showQuestion();
-        }
-        
-        function updateStats() {
-            document.getElementById('score').textContent = score;
-            document.getElementById('streak').textContent = streak;
-            document.getElementById('round').textContent = currentIndex + 1;
-        }
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+        feedback.style.display = 'block';
+        document.getElementById('submitBtn').disabled = true;
+    }
+
+    document.getElementById('submitBtn').addEventListener('click', checkAnswer);
+
+    updateLevelPips();
+    updateProgressInfo();
     </script>
 </body>
 </html>

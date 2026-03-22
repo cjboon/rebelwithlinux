@@ -51,27 +51,39 @@ setup_systemd_timer
 NOW=$(date +%s)
 START_TIME=$((NOW - 86400))
 
-START_DATE=$(date -d "@$START_TIME" "+%d/%b/%Y")
-END_DATE=$(date -d "@$NOW" "+%d/%b/%Y")
-
 TMPDIR=$(mktemp -d)
 trap "rm -rf $TMPDIR" EXIT
 
-while IFS= read -r line; do
-  if [[ "$line" =~ \[([0-9]+)/([A-Za-z]+)/([0-9]+):([0-9]+):([0-9]+):([0-9]+) ]]; then
-    day="${BASH_REMATCH[1]}"
-    mon="${BASH_REMATCH[2]}"
-    year="${BASH_REMATCH[3]}"
-    h="${BASH_REMATCH[4]}"
-    min="${BASH_REMATCH[5]}"
-    s="${BASH_REMATCH[6]}"
-    ts=$(date -d "$mon $day $year $h:$min:$s" +%s 2>/dev/null)
-    if [ -n "$ts" ] && [ "$ts" -ge "$START_TIME" ]; then
-      echo "$line"
-    fi
-  fi
-done < "$LOG_FILE" > "$TMPDIR/filtered.log"
+# Process log and keep only last 24 hours in one gawk command
+gawk -v start_time="$START_TIME" '
+BEGIN {
+    # Month name to number mapping (with leading zeros for sprintf)
+    months["Jan"]="01"; months["Feb"]="02"; months["Mar"]="03"; months["Apr"]="04"
+    months["May"]="05"; months["Jun"]="06"; months["Jul"]="07"; months["Aug"]="08"
+    months["Sep"]="09"; months["Oct"]="10"; months["Nov"]="11"; months["Dec"]="12"
+}
+{
+    # Parse Apache combined log format
+    if (match($0, /\[([0-9]+)\/([A-Za-z]+)\/([0-9]+):([0-9]+):([0-9]+):([0-9]+)/, arr)) {
+        ts = mktime(sprintf("%04d %02d %02d %02d %02d %02d", arr[3], months[arr[2]], arr[1], arr[4], arr[5], arr[6]))
+        
+        if (ts >= start_time) {
+            print
+        }
+    }
+}
+' "$LOG_FILE" > "$TMPDIR/filtered.log"
 
+# Replace log file with filtered data (keeps only last 24 hours)
+if [ -s "$TMPDIR/filtered.log" ]; then
+    cat "$TMPDIR/filtered.log" > "$LOG_FILE"
+    echo "$(date): Retained $(wc -l < "$TMPDIR/filtered.log") log entries from last 24 hours"
+else
+    : > "$LOG_FILE"
+    echo "$(date): No log entries in last 24 hours, log cleared"
+fi
+
+# Process OS stats
 TOTAL=$(gawk -F'"' '{print $1, $6}' "$TMPDIR/filtered.log" | sort -u -k1,1 | gawk '{
   ua = $0
   if (ua ~ /[Ww]indows/) print "Windows", $1
@@ -131,16 +143,69 @@ END {
 }
 ')
 
+# Process top pages
+TOP_PAGES=$(gawk -F'"' '
+{
+    # Extract the request path from field 2 (split by ")
+    if (match($2, /^(GET|POST|PUT|DELETE)\s+(\S+)/, arr)) {
+        path = arr[2]
+        # Skip common non-page requests
+        if (path ~ /\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)(\?|$)/) next
+        if (path ~ /(phpmyadmin|server-status|\.env)/) next
+        # Skip empty or root
+        if (path == "" || path == "/") next
+        pages[path]++
+    }
+}
+END {
+    # Sort by count descending
+    n = 0
+    for (p in pages) {
+        counts[++n] = pages[p]
+        paths[n] = p
+    }
+    # Bubble sort
+    for (i = 1; i <= n; i++) {
+        for (j = i + 1; j <= n; j++) {
+            if (counts[j] > counts[i]) {
+                tmp = counts[i]; counts[i] = counts[j]; counts[j] = tmp
+                tmp = paths[i]; paths[i] = paths[j]; paths[j] = tmp
+            }
+        }
+    }
+    # Output top 5
+    if (n > 5) n = 5
+    for (i = 1; i <= n; i++) {
+        # Strip directory prefix - keep only filename
+        n_parts = split(paths[i], parts, "/")
+        display_path = parts[n_parts]
+        # Truncate long filenames
+        if (length(display_path) > 50) {
+            display_path = substr(display_path, 1, 47) "..."
+        }
+        # Format number with commas
+        fmt_count = counts[i]
+        printf "                <div style=\"margin-bottom: 8px;\">%s - <strong>%d</strong> views</div>\n", display_path, fmt_count
+    }
+}
+' "$TMPDIR/filtered.log")
+
+# If no pages found, show placeholder
+if [ -z "$TOP_PAGES" ]; then
+    TOP_PAGES="                <div style=\"margin-bottom: 8px;\">No data available</div>"
+fi
+
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
 
-python3 - "$INDEX_FILE" "$TOTAL" "$REPORT_HTML" "$TIMESTAMP" << 'PYEOF'
+python3 - "$INDEX_FILE" "$TOTAL" "$REPORT_HTML" "$TOP_PAGES" "$TIMESTAMP" << 'PYEOF'
 import re
 import sys
 
 index_file = sys.argv[1]
 total = sys.argv[2]
 report_html = sys.argv[3]
-timestamp = sys.argv[4]
+top_pages = sys.argv[4]
+timestamp = sys.argv[5]
 
 with open(index_file, 'r') as f:
     content = f.read()
@@ -166,6 +231,23 @@ replacement2 = r'\1' + f'''
 {report_html}'''
 content = re.sub(pattern2, replacement2, content, flags=re.DOTALL)
 
+# Replace top pages section - use tmpl markers around just the content
+inner_start = '<!-- tp_content_start -->'
+inner_end = '<!-- tp_content_end -->'
+if inner_start in content and inner_end in content:
+    s = content.find(inner_start)
+    e = content.find(inner_end) + len(inner_end)
+    content = content[:s] + top_pages + content[e:]
+else:
+    # Fallback: replace entire top-pages-list div content
+    start_marker = '<!-- Top Pages --><!-- tmpl_start -->'
+    end_marker = '<!-- tmpl_end -->'
+    s = content.find(start_marker)
+    e = content.find(end_marker) + len(end_marker)
+    if s != -1 and e != -1:
+        new_section = f'{top_pages}\n            '
+        content = content[:s] + start_marker + '\n        <div style="margin-top: 32px; padding-top: 24px;">\n            <h3 style="font-family: \'IBM Plex Mono\', monospace; font-size: 1.25rem; margin-bottom: 16px;">// PAGE VIEWS</h3>\n            <div id="top-pages-list" style="font-family: \'IBM Plex Mono\', monospace; font-size: 0.9rem; max-width: 400px; margin: 0 auto;">\n                ' + new_section + '</div>\n        </div>' + end_marker + content[e:]
+
 # Re-insert Live Server Stats if it existed
 if live_server_stats:
     content = content.replace('</ul>\n    </section>', f'</ul>\n    {live_server_stats}\n    </section>')
@@ -173,4 +255,3 @@ if live_server_stats:
 with open(index_file, 'w') as f:
     f.write(content)
 PYEOF
-

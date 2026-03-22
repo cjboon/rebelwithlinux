@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var theme = saved || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/games/game-chain.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Chain - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../theme.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow-x: hidden; }
+        body {
+            background: var(--white);
+            color: var(--black);
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 { margin-bottom: 10px; font-size: 1.8rem; color: var(--black); }
+        .subtitle { margin-bottom: 20px; color: var(--charcoal); text-align: center; }
+
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+            background: var(--charcoal);
+            padding: 12px 24px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .stat { text-align: center; }
+        .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; }
+        .stat-value { font-size: 24px; font-weight: bold; color: var(--black); }
+
+        .level-indicator {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .level-pip {
+            width: 40px;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--charcoal);
+        }
+        .level-pip.active { background: #22c55e; }
+
+        .game-container {
+            background: var(--charcoal);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 700px;
+            width: 100%;
+            border: 2px solid var(--charcoal);
+        }
+
+        .start-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .start-screen h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--black);
+        }
+        .difficulty-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .diff-btn {
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            background: #e0e0e0;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1a1a1a;
+        }
+        .diff-btn:hover { background: #1a1a1a; color: #e0e0e0; }
+
+        .scenario-box {
+            background: var(--black);
+            border: 2px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .scenario-label { font-size: 11px; color: var(--gray); text-transform: uppercase; margin-bottom: 8px; }
+        .scenario-text { color: var(--white); line-height: 1.5; }
+
+        .command-display {
+            background: var(--black);
+            border: 2px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .command-display .pipe { color: var(--gray); font-weight: bold; }
+
+        .chain-slot {
+            padding: 8px 16px;
+            background: var(--charcoal);
+            border: 2px dashed var(--gray);
+            border-radius: 6px;
+            color: var(--gray);
+            font-family: 'Courier New', monospace;
+        }
+        .chain-slot.filled {
+            border: 2px solid var(--black);
+            background: var(--white);
+            color: var(--black);
+        }
+        .chain-slot.correct { background: #22c55e; color: white; border-color: #16a34a; }
+        .chain-slot.wrong { background: #ef4444; color: white; border-color: #dc2626; }
+
+        .parts-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .part-btn {
+            padding: 10px 16px;
+            background: #e0e0e0;
+            border: 2px solid #1a1a1a;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1a1a1a;
+        }
+        .part-btn:hover { background: #1a1a1a; color: #e0e0e0; }
+        .part-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .part-btn.selected { background: #1a1a1a; color: #e0e0e0; }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .action-btn {
+            padding: 12px 24px;
+            background: var(--black);
+            color: var(--white);
+            border: 2px solid var(--black);
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .feedback {
+            text-align: center;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .feedback.correct { background: #22c55e; color: white; }
+        .feedback.wrong { background: #ef4444; color: white; }
+
+        .win-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .win-screen.active { display: block; }
+        .win-icon { font-size: 5rem; margin-bottom: 20px; }
+        .win-title { font-size: 2rem; margin-bottom: 10px; color: #22c55e; }
+        .win-subtitle { color: var(--charcoal); margin-bottom: 20px; }
+
+        .progress-info {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--charcoal);
+        }
+
+        .help-section {
+            margin-top: 30px;
+            text-align: left;
+            background: var(--black);
+            border: 2px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .help-section h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--white);
+        }
+        .help-section p, .help-section li {
+            font-size: 0.85rem;
+            color: var(--white);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        .help-section ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+        .help-section code {
+            background: var(--charcoal);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: var(--white);
+        }
+
+        @media (max-width: 600px) {
+            .stats-bar { flex-wrap: wrap; gap: 15px; }
+            .part-btn { padding: 8px 12px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <h1>// COMMAND CHAIN</h1>
+    <p class="subtitle">Build the command using pipes and redirects</p>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-label">Score</div>
+            <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Streak</div>
+            <div class="stat-value" id="streak">0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Level</div>
+            <div class="stat-value" id="level">1</div>
+        </div>
+    </div>
+
+    <div class="level-indicator" id="levelIndicator">
+        <div class="level-pip active" id="pip1"></div>
+        <div class="level-pip" id="pip2"></div>
+        <div class="level-pip" id="pip3"></div>
+    </div>
+
+    <div class="game-container" id="gameArea">
+        <div class="start-screen" id="startScreen">
+            <h2>Select Difficulty</h2>
+            <div class="difficulty-btns">
+                <button class="diff-btn" onclick="startGame(1)">Easy</button>
+                <button class="diff-btn" onclick="startGame(2)">Medium</button>
+                <button class="diff-btn" onclick="startGame(3)">Hard</button>
+            </div>
+            <p class="progress-info" id="progressInfo"></p>
+
+            <div class="help-section">
+                <h3>How Pipes & Redirects Work</h3>
+                <p>Chain commands together to build powerful one-liners:</p>
+                <ul>
+                    <li><code>|</code> - Pipe: sends output of left command to input of right command</li>
+                    <li><code>></code> - Redirect stdout to file (overwrites)</li>
+                    <li><code>2></code> - Redirect stderr to file</li>
+                </ul>
+                <p><strong>Example:</strong> <code>ls | grep log | wc -l</code></p>
+                <p>This lists files → filters for "log" → counts the results</p>
+                
+                <h3 style="margin-top: 15px;">Common Commands</h3>
+                <ul>
+                    <li><code>ls</code> - List directory contents</li>
+                    <li><code>cat</code> - Display file contents</li>
+                    <li><code>grep</code> - Search for patterns</li>
+                    <li><code>wc</code> - Count lines, words, characters</li>
+                    <li><code>sort</code> - Sort lines</li>
+                    <li><code>uniq</code> - Filter duplicate lines</li>
+                    <li><code>head</code>, <code>tail</code> - First/last lines of file</li>
+                    <li><code>awk</code> - Text processing</li>
+                    <li><code>xargs</code> - Build command from input</li>
+                    <li><code>find</code> - Search for files</li>
+                    <li><code>du</code> - Disk usage</li>
+                    <li><code>systemctl</code> - Control system services</li>
+                    <li><code>netstat</code> - Network statistics</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="gameContent" style="display:none;">
+            <div class="scenario-box">
+                <div class="scenario-label">Scenario</div>
+                <div class="scenario-text" id="scenario">Build a command</div>
+            </div>
+
+            <div class="command-display" id="commandDisplay">
+                <div class="chain-slot" id="slot0">?</div>
+            </div>
+
+            <div class="parts-pool" id="partsPool"></div>
+
+            <div class="btn-row">
+                <button class="action-btn" id="undoBtn" disabled>Undo</button>
+                <button class="action-btn" id="clearBtn" disabled>Clear</button>
+                <button class="action-btn" id="submitBtn" disabled>Submit</button>
+            </div>
+
+            <div class="feedback" id="feedback" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div class="win-screen" id="winScreen">
+        <div class="win-icon">🏆</div>
+        <div class="win-title" id="winTitle">Victory!</div>
+        <div class="win-subtitle" id="winSubtitle">You've mastered Command Chain!</div>
+        <button class="action-btn" onclick="location.reload()">Play Again</button>
+    </div>
+
+    <script>
+    const scenarios = [
+        {
+            level: 1,
+            scenario: "List all files in current directory",
+            answer: ["ls"],
+            parts: ["ls", "cat", "grep", "|", ">"],
+            explanation: "ls lists directory contents"
+        },
+        {
+            level: 1,
+            scenario: "List files with details including hidden files",
+            answer: ["ls", "-l", "-a"],
+            parts: ["ls", "cat", "-l", "-a", "|", ">"],
+            explanation: "ls -l -a lists with long format and shows hidden files"
+        },
+        {
+            level: 1,
+            scenario: "Show current working directory",
+            answer: ["pwd"],
+            parts: ["ls", "pwd", "cd", "|", ">"],
+            explanation: "pwd prints the current working directory path"
+        },
+        {
+            level: 1,
+            scenario: "List files in long format",
+            answer: ["ls", "-l"],
+            parts: ["ls", "cat", "-l", "-a", "|", ">"],
+            explanation: "ls -l shows detailed listing of files"
+        },
+        {
+            level: 1,
+            scenario: "Change to parent directory",
+            answer: ["cd", ".."],
+            parts: ["ls", "cd", "pwd", "..", "|", ">"],
+            explanation: "cd .. moves up one directory level"
+        },
+        {
+            level: 1,
+            scenario: "Display current user",
+            answer: ["whoami"],
+            parts: ["ls", "whoami", "cd", "pwd", "|", ">"],
+            explanation: "whoami shows the current username"
+        },
+        {
+            level: 1,
+            scenario: "List directory contents one per line",
+            answer: ["ls", "-1"],
+            parts: ["ls", "cat", "-1", "-a", "|", ">"],
+            explanation: "ls -1 lists one file per line"
+        },
+        {
+            level: 1,
+            scenario: "Show file type information",
+            answer: ["file", "readme.txt"],
+            parts: ["ls", "file", "cat", "readme.txt", "|", ">"],
+            explanation: "file command determines file type"
+        },
+        {
+            level: 1,
+            scenario: "Display last lines of a file",
+            answer: ["tail", "log.txt"],
+            parts: ["head", "tail", "cat", "log.txt", "|", ">"],
+            explanation: "tail shows the last lines of a file"
+        },
+        {
+            level: 1,
+            scenario: "Display first lines of a file",
+            answer: ["head", "config.conf"],
+            parts: ["head", "tail", "cat", "config.conf", "|", ">"],
+            explanation: "head shows the first lines of a file"
+        },
+        {
+            level: 2,
+            scenario: "List files and find those containing 'config'",
+            answer: ["ls", "|", "grep", "config"],
+            parts: ["ls", "cat", "grep", "config", "-r", "|", ">", "2>"],
+            explanation: "Pipe output of ls to grep to filter"
+        },
+        {
+            level: 2,
+            scenario: "Search for 'error' in a log file and show line numbers",
+            answer: ["grep", "-n", "error", "log.txt"],
+            parts: ["grep", "cat", "-n", "-i", "error", "log.txt", "|", ">"],
+            explanation: "grep -n shows line numbers with matches"
+        },
+        {
+            level: 2,
+            scenario: "Count lines in a file",
+            answer: ["wc", "-l", "file.txt"],
+            parts: ["wc", "cat", "-l", "-w", "file.txt", "|", ">"],
+            explanation: "wc -l counts lines in the file"
+        },
+        {
+            level: 2,
+            scenario: "Display file contents",
+            answer: ["cat", "file.txt"],
+            parts: ["ls", "cat", "grep", "file.txt", "|", ">"],
+            explanation: "cat displays the entire file contents"
+        },
+        {
+            level: 2,
+            scenario: "List files, filter for 'log', display end of file",
+            answer: ["ls", "|", "grep", "log", "|", "tail"],
+            parts: ["ls", "cat", "grep", "tail", "log", "|", ">", "|"],
+            explanation: "tail shows the last lines of filtered output"
+        },
+        {
+            level: 2,
+            scenario: "Search case-insensitively for 'port' in config",
+            answer: ["grep", "-i", "port", "config.ini"],
+            parts: ["grep", "cat", "-i", "-n", "port", "config.ini", "|", ">"],
+            explanation: "grep -i makes search case-insensitive"
+        },
+        {
+            level: 2,
+            scenario: "Count number of processes running",
+            answer: ["ps", "|", "wc", "-l"],
+            parts: ["ps", "ls", "grep", "wc", "-l", "|", ">"],
+            explanation: "ps lists processes, wc -l counts them"
+        },
+        {
+            level: 2,
+            scenario: "Find files modified in last day",
+            answer: ["find", ".", "-mtime", "-1"],
+            parts: ["find", "ls", "grep", ".", "-mtime", "-1", "|", ">"],
+            explanation: "find -mtime -1 finds files modified within 1 day"
+        },
+        {
+            level: 2,
+            scenario: "Show disk usage of current directory",
+            answer: ["du", "-sh", "."],
+            parts: ["du", "df", "-sh", "-h", ".", "|", ">"],
+            explanation: "du -sh shows disk usage in human-readable format"
+        },
+        {
+            level: 2,
+            scenario: "List all environment variables",
+            answer: ["env"],
+            parts: ["env", "cat", "grep", "export", "|", ">"],
+            explanation: "env displays all environment variables"
+        },
+        {
+            level: 3,
+            scenario: "List files, find 'log', count lines",
+            answer: ["ls", "|", "grep", "log", "|", "wc", "-l"],
+            parts: ["ls", "cat", "grep", "-r", "log", "|", "wc", "-l"],
+            explanation: "Chain: list → filter for 'log' → count lines"
+        },
+        {
+            level: 3,
+            scenario: "Find lines with 'warning' in syslog, sort them",
+            answer: ["grep", "warning", "/var/log/syslog", "|", "sort"],
+            parts: ["grep", "cat", "sort", "-r", "warning", "/var/log/syslog", "|", ">"],
+            explanation: "grep filters, sort orders the results"
+        },
+        {
+            level: 3,
+            scenario: "Find processes named 'nginx', show full command",
+            answer: ["pgrep", "nginx", "|", "xargs", "ps"],
+            parts: ["pgrep", "ps", "xargs", "pstree", "nginx", "|", ">"],
+            explanation: "pgrep finds PIDs, xargs passes to ps for details"
+        },
+        {
+            level: 3,
+            scenario: "Save list of running services to a file",
+            answer: ["systemctl", "list-units", "|", "grep", "running", ">", "services.txt"],
+            parts: ["systemctl", "list-units", "ps", "grep", "running", "|", ">", "services.txt"],
+            explanation: "Redirect output to a file with >"
+        },
+        {
+            level: 3,
+            scenario: "Find the 5 largest files in /tmp",
+            answer: ["find", "/tmp", "-type", "f", "|", "xargs", "du", "|", "sort", "-nr", "|", "head", "-5"],
+            parts: ["find", "/tmp", "-type", "f", "|", "xargs", "du", "|", "sort", "-nr", "|", "head", "-5"],
+            explanation: "find → measure → sort reverse → take top 5"
+        },
+        {
+            level: 3,
+            scenario: "Count unique users currently logged in",
+            answer: ["who", "|", "awk", "{print $1}", "|", "sort", "|", "uniq", "|", "wc", "-l"],
+            parts: ["who", "|", "awk", "{print $1}", "|", "sort", "|", "uniq", "|", "wc", "-l"],
+            explanation: "who → extract users → sort → unique → count"
+        },
+        {
+            level: 3,
+            scenario: "Find top 3 largest directories",
+            answer: ["du", "-h", ".", "|", "sort", "-hr", "|", "head", "-3"],
+            parts: ["du", "-h", ".", "|", "sort", "-hr", "|", "head", "-3"],
+            explanation: "disk usage → human readable → sort reverse → top 3"
+        },
+        {
+            level: 3,
+            scenario: "Search for 'Failed' in auth.log, show last 10",
+            answer: ["grep", "Failed", "/var/log/auth.log", "|", "tail", "-10"],
+            parts: ["grep", "Failed", "/var/log/auth.log", "|", "tail", "-10"],
+            explanation: "grep filters failed logins, tail shows recent 10"
+        },
+        {
+            level: 3,
+            scenario: "Show all listening ports and their processes",
+            answer: ["netstat", "-tulpn", "|", "grep", "LISTEN"],
+            parts: ["netstat", "-tulpn", "|", "grep", "LISTEN", "|"],
+            explanation: "netstat -tulpn shows listening ports with PID"
+        },
+        {
+            level: 3,
+            scenario: "Extract IPs from access log and count occurrences",
+            answer: ["cat", "access.log", "|", "awk", "{print $1}", "|", "sort", "|", "uniq", "-c", "|", "sort", "-nr"],
+            parts: ["cat", "access.log", "|", "awk", "{print $1}", "|", "sort", "|", "uniq", "-c", "|", "sort", "-nr"],
+            explanation: "cat → extract IPs → sort → count unique → sort by count"
+        },
+        {
+            level: 3,
+            scenario: "Find files changed in last 7 days, exclude logs",
+            answer: ["find", ".", "-mtime", "-7", "|", "grep", "-v", ".log"],
+            parts: ["find", ".", "-mtime", "-7", "|", "grep", "-v", ".log"],
+            explanation: "find recent files but exclude log files"
+        }
+    ];
+
+    let currentScenario = null;
+    let selectedParts = [];
+    let score = 0;
+    let streak = 0;
+    let currentLevel = 1;
+    let gameStarted = false;
+    let completedQuestions = { 1: [], 2: [], 3: [] };
+
+    function shuffle(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function updateLevelPips() {
+        document.getElementById('pip1').className = 'level-pip' + (currentLevel >= 1 ? ' active' : '');
+        document.getElementById('pip2').className = 'level-pip' + (currentLevel >= 2 ? ' active' : '');
+        document.getElementById('pip3').className = 'level-pip' + (currentLevel >= 3 ? ' active' : '');
+        document.getElementById('level').textContent = currentLevel;
+    }
+
+    function updateProgressInfo() {
+        const total3 = scenarios.filter(s => s.level === 3).length;
+        const done3 = completedQuestions[3].length;
+        document.getElementById('progressInfo').textContent = 
+            `Level 3 Progress: ${done3}/${total3} completed | Win by getting streak of 7 or completing all Level 3 questions`;
+    }
+
+    function startGame(level) {
+        currentLevel = level;
+        gameStarted = true;
+        streak = 0;
+        score = 0;
+        completedQuestions = { 1: [], 2: [], 3: [] };
+        
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+        document.getElementById('startScreen').style.display = 'none';
+        document.getElementById('gameContent').style.display = 'block';
+        document.getElementById('winScreen').classList.remove('active');
+        
+        updateLevelPips();
+        initGame();
+    }
+
+    function getQuestionForLevel(level) {
+        const levelQuestions = scenarios.filter(s => s.level === level);
+        const available = levelQuestions.filter(q => !completedQuestions[level].includes(q.scenario));
+        
+        if (available.length === 0) {
+            return null;
+        }
+        
+        return available[Math.floor(Math.random() * available.length)];
+    }
+
+    function initGame() {
+        if (currentLevel === 3 && completedQuestions[3].length >= scenarios.filter(s => s.level === 3).length) {
+            showWin("Level 3 Mastered!", "You've completed all Level 3 questions!");
+            return;
+        }
+
+        currentScenario = getQuestionForLevel(currentLevel);
+        
+        if (!currentScenario) {
+            showWin("Level Complete!", `You've mastered Level ${currentLevel}!`);
+            return;
+        }
+
+        selectedParts = [];
+
+        document.getElementById('scenario').textContent = currentScenario.scenario;
+        document.getElementById('feedback').style.display = 'none';
+
+        renderCommandDisplay();
+        renderPartsPool();
+        updateButtons();
+    }
+
+    function renderCommandDisplay() {
+        const display = document.getElementById('commandDisplay');
+        const slots = [];
+
+        selectedParts.forEach((part, i) => {
+            if (part === '|' || part === '>' || part === '2>') {
+                if (i > 0) {
+                    slots.push(`<span class="pipe">${part}</span>`);
+                } else {
+                    slots.push(`<div class="chain-slot wrong">${part}</div>`);
+                }
+            } else {
+                slots.push(`<div class="chain-slot filled">${part}</div>`);
+            }
+        });
+
+        const emptySlots = Math.max(3, currentScenario.answer.length) - selectedParts.length;
+        for (let i = 0; i < emptySlots; i++) {
+            slots.push(`<div class="chain-slot">?</div>`);
+        }
+
+        display.innerHTML = slots.join(' ');
+    }
+
+    function renderPartsPool() {
+        const pool = document.getElementById('partsPool');
+        const shuffledParts = shuffle(currentScenario.parts);
+
+        pool.innerHTML = shuffledParts.map(part => {
+            const usedCount = selectedParts.filter(p => p === part).length;
+            const availableCount = currentScenario.parts.filter(p => p === part).length;
+            const disabled = usedCount >= availableCount;
+            return `<button class="part-btn" data-part="${part}" ${disabled ? 'disabled' : ''}>${part}</button>`;
+        }).join('');
+
+        pool.querySelectorAll('.part-btn').forEach(btn => {
+            btn.addEventListener('click', () => selectPart(btn.dataset.part));
+        });
+    }
+
+    function selectPart(part) {
+        selectedParts.push(part);
+        renderCommandDisplay();
+        renderPartsPool();
+        updateButtons();
+    }
+
+    function undoPart() {
+        if (selectedParts.length > 0) {
+            selectedParts.pop();
+            renderCommandDisplay();
+            renderPartsPool();
+            updateButtons();
+        }
+    }
+
+    function clearParts() {
+        selectedParts = [];
+        renderCommandDisplay();
+        renderPartsPool();
+        updateButtons();
+    }
+
+    function updateButtons() {
+        document.getElementById('undoBtn').disabled = selectedParts.length === 0;
+        document.getElementById('clearBtn').disabled = selectedParts.length === 0;
+        document.getElementById('submitBtn').disabled = selectedParts.length === 0;
+    }
+
+    function showWin(title, subtitle) {
+        document.getElementById('gameContent').style.display = 'none';
+        document.getElementById('winScreen').classList.add('active');
+        document.getElementById('winTitle').textContent = title;
+        document.getElementById('winSubtitle').textContent = subtitle;
+    }
+
+    function checkAnswer() {
+        const answer = currentScenario.answer;
+        let isCorrect = true;
+
+        if (selectedParts.length !== answer.length) {
+            isCorrect = false;
+        } else {
+            for (let i = 0; i < answer.length; i++) {
+                if (selectedParts[i] !== answer[i]) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+        }
+
+        const feedback = document.getElementById('feedback');
+        feedback.style.display = 'block';
+
+        if (isCorrect) {
+            streak++;
+            const points = currentLevel * 10 + (streak > 3 ? 5 : 0);
+            score += points;
+            
+            completedQuestions[currentLevel].push(currentScenario.scenario);
+            
+            feedback.className = 'feedback correct';
+            feedback.innerHTML = `✓ Correct! ${currentScenario.explanation}<br>+${points} points | Streak: ${streak}/7`;
+
+            if (streak >= 7) {
+                if (currentLevel < 3) {
+                    currentLevel++;
+                    streak = 0;
+                    updateLevelPips();
+                    feedback.innerHTML += `<br><br>🎉 Level Up! Now on Level ${currentLevel}`;
+                    setTimeout(() => initGame(), 2500);
+                } else {
+                    showWin("🏆 COMMAND CHAIN MASTER!", `Final Score: ${score} | You've mastered all levels!`);
+                }
+            } else {
+                setTimeout(() => initGame(), 2000);
+            }
+        } else {
+            streak = 0;
+            feedback.className = 'feedback wrong';
+            feedback.innerHTML = `✗ The correct command was: ${answer.join(' ')}<br>${currentScenario.explanation}`;
+            setTimeout(() => initGame(), 4200);
+        }
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+    }
+
+    document.getElementById('undoBtn').addEventListener('click', undoPart);
+    document.getElementById('clearBtn').addEventListener('click', clearParts);
+    document.getElementById('submitBtn').addEventListener('click', checkAnswer);
+
+    updateLevelPips();
+    updateProgressInfo();
+    </script>
+</body>
+</html>

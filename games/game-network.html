@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var theme = saved || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/games/game-network.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Nerd - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../theme.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow-x: hidden; }
+        body {
+            background: var(--white);
+            color: var(--black);
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 { margin-bottom: 10px; font-size: 1.8rem; color: var(--black); }
+        .subtitle { margin-bottom: 20px; color: var(--charcoal); text-align: center; }
+
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+            background: var(--charcoal);
+            padding: 12px 24px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .stat { text-align: center; }
+        .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; }
+        .stat-value { font-size: 24px; font-weight: bold; color: var(--black); }
+
+        .level-indicator {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .level-pip {
+            width: 40px;
+            height: 6px;
+            background: var(--charcoal);
+            border-radius: 3px;
+        }
+        .level-pip.active { background: #22c55e; }
+
+        .game-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--black);
+            border: 2px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 30px;
+        }
+        .start-screen { text-align: center; }
+        .start-screen h2 { color: var(--white); margin-bottom: 20px; }
+        .difficulty-btns {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .diff-btn {
+            padding: 12px 24px;
+            background: #e0e0e0;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1a1a1a;
+        }
+        .diff-btn:hover { background: #1a1a1a; color: #e0e0e0; }
+        .diff-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .progress-info {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--white);
+        }
+
+        .question-box {
+            background: var(--charcoal);
+            border: 2px solid var(--gray);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .question-label { font-size: 11px; color: var(--gray); text-transform: uppercase; margin-bottom: 8px; }
+        .question-text { color: var(--white); line-height: 1.5; font-size: 1rem; }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .option-btn {
+            padding: 12px 16px;
+            background: #e0e0e0;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1a1a1a;
+            text-align: left;
+        }
+        .option-btn:hover:not(:disabled) { background: #1a1a1a; color: #e0e0e0; }
+        .option-btn.selected { background: #1a1a1a; color: #e0e0e0; border-color: #22c55e; }
+        .option-btn.correct { background: #22c55e; color: white; border-color: #16a34a; }
+        .option-btn.wrong { background: #ef4444; color: white; border-color: #dc2626; }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .action-btn {
+            padding: 12px 24px;
+            background: var(--black);
+            color: var(--white);
+            border: 2px solid var(--black);
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .feedback {
+            text-align: center;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .feedback.correct { background: #22c55e; color: white; }
+        .feedback.wrong { background: #ef4444; color: white; }
+
+        .explanation {
+            background: var(--charcoal);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--white);
+            text-align: center;
+        }
+
+        .win-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .win-screen.active { display: block; }
+        .win-icon { font-size: 5rem; margin-bottom: 20px; }
+        .win-title { font-size: 2rem; margin-bottom: 10px; color: #22c55e; }
+        .win-subtitle { color: var(--charcoal); margin-bottom: 20px; }
+
+        .help-section {
+            margin-top: 30px;
+            text-align: left;
+            background: var(--black);
+            border: 2px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .help-section h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--white);
+        }
+        .help-section p, .help-section li {
+            font-size: 0.85rem;
+            color: var(--white);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        .help-section ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+        .help-section code {
+            background: var(--charcoal);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: var(--white);
+        }
+
+        @media (max-width: 600px) {
+            .stats-bar { flex-wrap: wrap; gap: 15px; }
+            .option-btn { padding: 10px 12px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <h1>// NETWORK NERD</h1>
+    <p class="subtitle">Master Linux networking commands</p>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-label">Score</div>
+            <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Streak</div>
+            <div class="stat-value" id="streak">0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Level</div>
+            <div class="stat-value" id="level">1</div>
+        </div>
+    </div>
+
+    <div class="level-indicator" id="levelIndicator">
+        <div class="level-pip active" id="pip1"></div>
+        <div class="level-pip" id="pip2"></div>
+        <div class="level-pip" id="pip3"></div>
+    </div>
+
+    <div class="game-container" id="gameArea">
+        <div class="start-screen" id="startScreen">
+            <h2>Select Difficulty</h2>
+            <div class="difficulty-btns">
+                <button class="diff-btn" onclick="startGame(1)">Easy</button>
+                <button class="diff-btn" onclick="startGame(2)">Medium</button>
+                <button class="diff-btn" onclick="startGame(3)">Hard</button>
+            </div>
+            <p class="progress-info" id="progressInfo"></p>
+
+            <div class="help-section">
+                <h3>Essential Networking Commands</h3>
+                <ul>
+                    <li><code>ip</code> - Show/manipulate network interfaces and routing</li>
+                    <li><code>ping</code> - Test connectivity to a host</li>
+                    <li><code>curl</code> - Transfer data from/to a server</li>
+                    <li><code>ss</code> - Investigate sockets (modern replacement for netstat)</li>
+                    <li><code>netstat</code> - Network statistics (deprecated, use ss)</li>
+                    <li><code>traceroute</code> - Trace the path packets take to a host</li>
+                    <li><code>dig</code> - DNS lookup utility</li>
+                    <li><code>nslookup</code> - Query DNS servers</li>
+                    <li><code>host</code> - DNS lookup tool</li>
+                    <li><code>arp</code> - Show/manipulate ARP cache</li>
+                    <li><code>route</code> - Show/manipulate IP routing table</li>
+                    <li><code>iptables</code> - Firewall rule management</li>
+                    <li><code>firewalld</code> - Dynamic firewall manager</li>
+                    <li><code>nmap</code> - Network discovery and security auditing</li>
+                    <li><code>tcpdump</code> - Packet capture and analysis</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="gameContent" style="display:none;">
+            <div class="question-box">
+                <div class="question-label">Question</div>
+                <div class="question-text" id="questionText">Loading...</div>
+            </div>
+
+            <div class="options-list" id="optionsList"></div>
+
+            <div class="btn-row">
+                <button class="action-btn" id="submitBtn" disabled>Submit</button>
+            </div>
+
+            <div class="feedback" id="feedback" style="display:none;"></div>
+            <div class="explanation" id="explanation" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div class="win-screen" id="winScreen">
+        <div class="win-icon">🏆</div>
+        <div class="win-title" id="winTitle">Victory!</div>
+        <div class="win-subtitle" id="winSubtitle">You've mastered Network Nerd!</div>
+        <button class="action-btn" onclick="location.reload()">Play Again</button>
+    </div>
+
+    <script>
+    const questions = [
+        // EASY (Level 1) - Basic Networking - 10 questions
+        {
+            level: 1,
+            question: "Which command tests connectivity to a host using ICMP?",
+            options: ["ping", "curl", "ssh", "netstat"],
+            explanation: "ping sends ICMP echo requests to test connectivity with a host."
+        },
+        {
+            level: 1,
+            question: "What does the 'ip addr show' command display?",
+            options: ["Network interfaces and their IP addresses", "Routing table", "DNS servers", "Active connections"],
+            explanation: "ip addr show lists all network interfaces and their assigned IP addresses."
+        },
+        {
+            level: 1,
+            question: "Which command would you use to see your default gateway?",
+            options: ["ip route", "ping localhost", "ifconfig", "nslookup"],
+            explanation: "ip route shows the routing table including the default gateway."
+        },
+        {
+            level: 1,
+            question: "What does 'curl' do by default when given a URL?",
+            options: ["Fetches the content of a URL", "Shows DNS records", "Opens an SSH connection", "Scans open ports"],
+            explanation: "curl transfers data from/to a server, defaulting to GET request."
+        },
+        {
+            level: 1,
+            question: "Which command displays all active network connections?",
+            options: ["ss -tuna", "ping -c 1", "ip link", "route -n"],
+            explanation: "ss -tuna shows all TCP, UDP, and listening sockets with addresses."
+        },
+        {
+            level: 1,
+            question: "What does the command 'host google.com' do?",
+            options: ["Performs DNS lookup for the domain", "Connects to Google's server", "Shows Google IP", "Tests Google connectivity"],
+            explanation: "host performs DNS lookups to find IP addresses associated with a domain."
+        },
+        {
+            level: 1,
+            question: "Which file contains the system's hostname?",
+            options: ["/etc/hostname", "/etc/hosts", "/etc/networks", "/etc/resolv.conf"],
+            explanation: "/etc/hostname stores the system's static hostname."
+        },
+        {
+            level: 1,
+            question: "What does 'ping -c 4' do differently from 'ping'?",
+            options: ["Sends exactly 4 packets then stops", "Uses 4 byte packets", "Connects to 4 hosts", "Sends at 4ms interval"],
+            explanation: "ping -c 4 sends exactly 4 packets and then stops, instead of running forever."
+        },
+        {
+            level: 1,
+            question: "Which command shows the DNS servers being used?",
+            options: ["cat /etc/resolv.conf", "ip route", "ss -t", "arp -a"],
+            explanation: "/etc/resolv.conf contains the DNS nameservers configured for the system."
+        },
+        {
+            level: 1,
+            question: "What does 'traceroute google.com' show?",
+            options: ["The path packets take to reach Google", "Google's web server", "Your public IP", "DNS records for Google"],
+            explanation: "traceroute shows each hop (router) packets pass through to reach the destination."
+        },
+
+        // MEDIUM (Level 2) - Intermediate Networking - 10 questions
+        {
+            level: 2,
+            question: "What does 'ss -tlnp' show?",
+            options: ["Listening TCP ports with process names", "All established connections", "UDP sockets only", "Network interface statistics"],
+            explanation: "ss -tlnp shows TCP (-t), listening (-l), with numeric ports (-n) and process (-p)."
+        },
+        {
+            level: 2,
+            question: "Which command performs a DNS TXT record lookup?",
+            options: ["dig txt example.com", "host -t txt example.com", "nslookup txt example.com", "All of the above"],
+            explanation: "dig, host, and nslookup can all query TXT records (dig is most common)."
+        },
+        {
+            level: 2,
+            question: "What does 'curl -I' do?",
+            options: ["Fetches only HTTP headers", "Posts form data", "Follows redirects", "Sends a DELETE request"],
+            explanation: "curl -I fetches only the HTTP headers without the response body."
+        },
+        {
+            level: 2,
+            question: "Which command adds a static route?",
+            options: ["ip route add", "route add", "Both ip route add and route add", "netstat -r"],
+            explanation: "Both 'ip route add' (modern) and 'route add' (legacy) can add static routes."
+        },
+        {
+            level: 2,
+            question: "What does 'netstat -r' display?",
+            options: ["Kernel routing table", "Network statistics", "Active sockets", "Interface configurations"],
+            explanation: "netstat -r shows the kernel routing table (same as 'route -n' or 'ip route')."
+        },
+        {
+            level: 2,
+            question: "Which command would check if port 443 is open on a remote host?",
+            options: ["nc -zv host 443", "ping host", "route add", "arp -a"],
+            explanation: "nc -zv tests if a port is open (-z) and shows verbose output (-v)."
+        },
+        {
+            level: 2,
+            question: "What does 'curl -X POST -d \"data\" URL' do?",
+            options: ["Sends POST request with data", "Downloads file quietly", "Uploads file to server", "Shows HTTP headers"],
+            explanation: "-X POST specifies the method and -d sends data in the request body."
+        },
+        {
+            level: 2,
+            question: "Which command shows the ARP cache?",
+            options: ["ip neigh show", "ss", "dig", "traceroute"],
+            explanation: "ip neigh show (or 'arp -a') displays the ARP cache mapping IP to MAC addresses."
+        },
+        {
+            level: 2,
+            question: "What does 'dig +short example.com' return?",
+            options: ["Just the IP addresses", "Full DNS details", "Only MX records", "Only TXT records"],
+            explanation: "+short outputs only the IP addresses without the extra DNS query metadata."
+        },
+        {
+            level: 2,
+            question: "Which command brings interface eth0 down?",
+            options: ["ip link set eth0 down", "ifconfig eth0 down", "Both are valid", "netstat eth0 down"],
+            explanation: "Both 'ip link set eth0 down' and 'ifconfig eth0 down' can disable an interface."
+        },
+
+        // HARD (Level 3) - Advanced Networking - 10 questions
+        {
+            level: 3,
+            question: "What does 'iptables -L -v -n' show?",
+            options: ["All rules with packet counts", "Only INPUT chain", "Only ACCEPT rules", "Firewall disabled status"],
+            explanation: "-L lists rules, -v shows verbose (packet counts), -n shows numeric addresses."
+        },
+        {
+            level: 3,
+            question: "Which command captures packets on interface eth0?",
+            options: ["tcpdump -i eth0", "ping -i eth0", "ss -i eth0", "route -i eth0"],
+            explanation: "tcpdump -i specifies the interface to capture packets from."
+        },
+        {
+            level: 3,
+            question: "What does 'nmap -sS -p 1-1000 host' do?",
+            options: ["SYN scan ports 1-1000", "UDP scan all ports", "ICMP ping sweep", "OS detection scan"],
+            explanation: "-sS is SYN scan (stealth), -p specifies port range to scan."
+        },
+        {
+            level: 3,
+            question: "What is the difference between TCP and UDP?",
+            options: ["TCP is connection-oriented, UDP is connectionless", "TCP is faster", "UDP is more reliable", "They are identical"],
+            explanation: "TCP establishes connections and guarantees delivery. UDP sends without confirmation."
+        },
+        {
+            level: 3,
+            question: "Which command shows routing table with numeric addresses?",
+            options: ["ip route show", "netstat -r -n", "Both are valid", "ping -n"],
+            explanation: "Both 'ip route show' and 'netstat -r -n' show routes with numeric addresses."
+        },
+        {
+            level: 3,
+            question: "What does 'sysctl net.ipv4.ip_forward' check?",
+            options: ["Whether IP forwarding is enabled", "The default gateway", "DNS settings", "Firewall status"],
+            explanation: "This sysctl variable controls whether the system can forward packets between interfaces."
+        },
+        {
+            level: 3,
+            question: "Which port does SSH typically use?",
+            options: ["22", "80", "443", "21"],
+            explanation: "SSH (Secure Shell) uses port 22 by default for encrypted remote access."
+        },
+        {
+            level: 3,
+            question: "What does 'curl -H \"Authorization: Token xxx\" URL' do?",
+            options: ["Sends request with auth header", "Downloads hidden file", "Follows HTTP redirect", "Uses HTTP instead of HTTPS"],
+            explanation: "-H adds a custom header to the request, commonly used for authentication."
+        },
+        {
+            level: 3,
+            question: "Which command lists all network interfaces with statistics?",
+            options: ["ip -s link", "netstat -i", "Both are valid", "ifconfig -s"],
+            explanation: "Both 'ip -s link' and 'netstat -i' show interface statistics."
+        },
+        {
+            level: 3,
+            question: "What does 'ip neigh flush all' do?",
+            options: ["Clears the entire ARP cache", "Deletes all routes", "Restarts networking", "Flushes DNS cache"],
+            explanation: "ip neigh flush all removes all entries from the ARP/neighbor cache."
+        }
+    ];
+
+    let currentQuestion = null;
+    let selectedAnswer = null;
+    let correctAnswer = null;
+    let score = 0;
+    let streak = 0;
+    let currentLevel = 1;
+    let gameStarted = false;
+    let completedQuestions = { 1: [], 2: [], 3: [] };
+
+    function shuffle(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function shuffleOptions(options, correctIndex) {
+        const items = options.map((text, i) => ({ text, isCorrect: i === correctIndex }));
+        const shuffled = shuffle(items);
+        return {
+            options: shuffled.map(item => item.text),
+            newCorrectIndex: shuffled.findIndex(item => item.isCorrect)
+        };
+    }
+
+    function updateLevelPips() {
+        document.getElementById('pip1').className = 'level-pip' + (currentLevel >= 1 ? ' active' : '');
+        document.getElementById('pip2').className = 'level-pip' + (currentLevel >= 2 ? ' active' : '');
+        document.getElementById('pip3').className = 'level-pip' + (currentLevel >= 3 ? ' active' : '');
+        document.getElementById('level').textContent = currentLevel;
+    }
+
+    function updateProgressInfo() {
+        const total3 = questions.filter(q => q.level === 3).length;
+        const done3 = completedQuestions[3].length;
+        document.getElementById('progressInfo').textContent = 
+            `Level 3 Progress: ${done3}/${total3} | Win by getting streak of 7 or completing all Level 3 questions`;
+    }
+
+    function startGame(level) {
+        currentLevel = level;
+        gameStarted = true;
+        document.getElementById('startScreen').style.display = 'none';
+        document.getElementById('gameContent').style.display = 'block';
+        updateLevelPips();
+        updateProgressInfo();
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const levelQuestions = questions.filter(q => q.level === currentLevel);
+        const available = levelQuestions.filter((q, i) => !completedQuestions[currentLevel].includes(i));
+        
+        if (available.length === 0) {
+            if (currentLevel < 3) {
+                currentLevel++;
+                updateLevelPips();
+                updateProgressInfo();
+                loadQuestion();
+            } else {
+                showWinScreen();
+            }
+            return;
+        }
+
+        const q = available[Math.floor(Math.random() * available.length)];
+        const originalIndex = questions.indexOf(q);
+        currentQuestion = { ...q, originalIndex };
+        selectedAnswer = null;
+        correctAnswer = q.options[0];
+
+        const correctIndex = q.options.indexOf(q.options.find(o => 
+            q.explanation.toLowerCase().includes(o.toLowerCase()) || 
+            q.question.toLowerCase().includes(o.toLowerCase())
+        ));
+        
+        const shuffled = shuffleOptions(q.options, correctIndex >= 0 ? correctIndex : 0);
+        currentQuestion.shuffledOptions = shuffled.options;
+        correctAnswer = shuffled.options[shuffled.newCorrectIndex];
+
+        document.getElementById('questionText').textContent = q.question;
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('explanation').style.display = 'none';
+        document.getElementById('submitBtn').disabled = true;
+
+        const optionsList = document.getElementById('optionsList');
+        optionsList.innerHTML = '';
+        currentQuestion.shuffledOptions.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => selectOption(btn, opt);
+            optionsList.appendChild(btn);
+        });
+    }
+
+    function selectOption(btn, opt) {
+        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedAnswer = opt;
+        document.getElementById('submitBtn').disabled = false;
+    }
+
+    function submitAnswer() {
+        if (!selectedAnswer) return;
+
+        const isCorrect = selectedAnswer === correctAnswer;
+        const buttons = document.querySelectorAll('.option-btn');
+        
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            if (btn.textContent === correctAnswer) {
+                btn.classList.add('correct');
+            } else if (btn.textContent === selectedAnswer && !isCorrect) {
+                btn.classList.add('wrong');
+            }
+        });
+
+        if (isCorrect) {
+            score += 10 * currentLevel;
+            streak++;
+            document.getElementById('feedback').textContent = `Correct! +${10 * currentLevel} points`;
+            document.getElementById('feedback').className = 'feedback correct';
+            document.getElementById('explanation').textContent = currentQuestion.explanation;
+            document.getElementById('explanation').style.display = 'block';
+            completedQuestions[currentLevel].push(currentQuestion.originalIndex);
+        } else {
+            streak = 0;
+            document.getElementById('feedback').textContent = `Wrong! The answer was: ${correctAnswer}`;
+            document.getElementById('feedback').className = 'feedback wrong';
+        }
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+        document.getElementById('feedback').style.display = 'block';
+        document.getElementById('submitBtn').disabled = true;
+
+        if (streak >= 7 && currentLevel < 3) {
+            currentLevel++;
+            streak = 0;
+            updateLevelPips();
+            updateProgressInfo();
+            setTimeout(loadQuestion, 1500);
+        } else if (streak >= 7 && currentLevel === 3) {
+            setTimeout(showWinScreen, 1500);
+        } else {
+            setTimeout(loadQuestion, 2000);
+        }
+    }
+
+    function showWinScreen() {
+        document.getElementById('gameContent').style.display = 'none';
+        document.getElementById('winScreen').classList.add('active');
+        document.getElementById('winTitle').textContent = 'You\'re a Network Nerd!';
+        document.getElementById('winSubtitle').textContent = `Final Score: ${score} | Max Streak: ${streak}`;
+    }
+
+    document.getElementById('submitBtn').addEventListener('click', submitAnswer);
+    </script>
+</body>
+</html>
