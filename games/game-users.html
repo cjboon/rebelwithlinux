@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var theme = saved || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/games/game-users.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Manager - REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="../theme.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow-x: hidden; }
+        body {
+            background: var(--white);
+            color: var(--black);
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 { margin-bottom: 10px; font-size: 1.8rem; color: var(--black); }
+        .subtitle { margin-bottom: 20px; color: var(--charcoal); text-align: center; }
+
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+            background: var(--charcoal);
+            padding: 12px 24px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .stat { text-align: center; }
+        .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; }
+        .stat-value { font-size: 24px; font-weight: bold; color: var(--black); }
+
+        .level-indicator {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .level-pip {
+            width: 40px;
+            height: 6px;
+            background: var(--charcoal);
+            border-radius: 3px;
+        }
+        .level-pip.active { background: #22c55e; }
+
+        .game-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--black);
+            border: 2px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 30px;
+        }
+        .start-screen { text-align: center; }
+        .start-screen h2 { color: var(--white); margin-bottom: 20px; }
+        .difficulty-btns {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .diff-btn {
+            padding: 12px 24px;
+            background: #e0e0e0;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1a1a1a;
+        }
+        .diff-btn:hover { background: #1a1a1a; color: #e0e0e0; }
+        .diff-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .progress-info {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--white);
+        }
+
+        .question-box {
+            background: var(--charcoal);
+            border: 2px solid var(--gray);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .question-label { font-size: 11px; color: var(--gray); text-transform: uppercase; margin-bottom: 8px; }
+        .question-text { color: var(--white); line-height: 1.5; font-size: 1rem; }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .option-btn {
+            padding: 12px 16px;
+            background: #e0e0e0;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1a1a1a;
+            text-align: left;
+        }
+        .option-btn:hover:not(:disabled) { background: #1a1a1a; color: #e0e0e0; }
+        .option-btn.selected { background: #1a1a1a; color: #e0e0e0; border-color: #22c55e; }
+        .option-btn.correct { background: #22c55e; color: white; border-color: #16a34a; }
+        .option-btn.wrong { background: #ef4444; color: white; border-color: #dc2626; }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .action-btn {
+            padding: 12px 24px;
+            background: var(--black);
+            color: var(--white);
+            border: 2px solid var(--black);
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .feedback {
+            text-align: center;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .feedback.correct { background: #22c55e; color: white; }
+        .feedback.wrong { background: #ef4444; color: white; }
+
+        .explanation {
+            background: var(--charcoal);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--white);
+            text-align: center;
+        }
+
+        .win-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .win-screen.active { display: block; }
+        .win-icon { font-size: 5rem; margin-bottom: 20px; }
+        .win-title { font-size: 2rem; margin-bottom: 10px; color: #22c55e; }
+        .win-subtitle { color: var(--charcoal); margin-bottom: 20px; }
+
+        .help-section {
+            margin-top: 30px;
+            text-align: left;
+            background: var(--black);
+            border: 2px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .help-section h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--white);
+        }
+        .help-section p, .help-section li {
+            font-size: 0.85rem;
+            color: var(--white);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        .help-section ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+        .help-section code {
+            background: var(--charcoal);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: var(--white);
+        }
+
+        @media (max-width: 600px) {
+            .stats-bar { flex-wrap: wrap; gap: 15px; }
+            .option-btn { padding: 10px 12px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <h1>// USER MANAGER</h1>
+    <p class="subtitle">Master Linux user and group management</p>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-label">Score</div>
+            <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Streak</div>
+            <div class="stat-value" id="streak">0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-label">Level</div>
+            <div class="stat-value" id="level">1</div>
+        </div>
+    </div>
+
+    <div class="level-indicator" id="levelIndicator">
+        <div class="level-pip active" id="pip1"></div>
+        <div class="level-pip" id="pip2"></div>
+        <div class="level-pip" id="pip3"></div>
+    </div>
+
+    <div class="game-container" id="gameArea">
+        <div class="start-screen" id="startScreen">
+            <h2>Select Difficulty</h2>
+            <div class="difficulty-btns">
+                <button class="diff-btn" onclick="startGame(1)">Easy</button>
+                <button class="diff-btn" onclick="startGame(2)">Medium</button>
+                <button class="diff-btn" onclick="startGame(3)">Hard</button>
+            </div>
+            <p class="progress-info" id="progressInfo"></p>
+
+            <div class="help-section">
+                <h3>User Management Commands</h3>
+                <ul>
+                    <li><code>useradd</code> - Create a new user account</li>
+                    <li><code>usermod</code> - Modify an existing user</li>
+                    <li><code>userdel</code> - Delete a user account</li>
+                    <li><code>passwd</code> - Change user password</li>
+                    <li><code>groupadd</code> - Create a new group</li>
+                    <li><code>groupdel</code> - Delete a group</li>
+                    <li><code>groups</code> - Show user's groups</li>
+                    <li><code>id</code> - Display user and group IDs</li>
+                    <li><code>who</code> - Show who's logged in</li>
+                    <li><code>su</code> - Switch user</li>
+                    <li><code>sudo</code> - Execute as superuser</li>
+                    <li><code>/etc/passwd</code> - User account info</li>
+                    <li><code>/etc/shadow</code> - Encrypted passwords</li>
+                    <li><code>/etc/group</code> - Group definitions</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="gameContent" style="display:none;">
+            <div class="question-box">
+                <div class="question-label">Question</div>
+                <div class="question-text" id="questionText">Loading...</div>
+            </div>
+
+            <div class="options-list" id="optionsList"></div>
+
+            <div class="btn-row">
+                <button class="action-btn" id="submitBtn" disabled>Submit</button>
+            </div>
+
+            <div class="feedback" id="feedback" style="display:none;"></div>
+            <div class="explanation" id="explanation" style="display:none;"></div>
+        </div>
+    </div>
+
+    <div class="win-screen" id="winScreen">
+        <div class="win-icon">🏆</div>
+        <div class="win-title" id="winTitle">Victory!</div>
+        <div class="win-subtitle" id="winSubtitle">You've mastered User Manager!</div>
+        <button class="action-btn" onclick="location.reload()">Play Again</button>
+    </div>
+
+    <script>
+    const questions = [
+        // EASY (Level 1) - Basic User Commands - 10 questions
+        {
+            level: 1,
+            question: "Which command creates a new user account?",
+            options: ["useradd", "adduser", "Both useradd and adduser", "newuser"],
+            explanation: "useradd is the low-level command, adduser is a friendlier wrapper on Debian-based systems. Both work."
+        },
+        {
+            level: 1,
+            question: "Which file stores user account information (excluding passwords)?",
+            options: ["/etc/passwd", "/etc/shadow", "/etc/group", "/etc/gshadow"],
+            explanation: "/etc/passwd contains username, UID, GID, home dir, shell. Passwords are in /etc/shadow."
+        },
+        {
+            level: 1,
+            question: "What does the 'id' command display?",
+            options: ["User and group IDs", "User's password status", "User's login history", "User's home directory size"],
+            explanation: "id shows UID, primary GID, and all supplementary groups a user belongs to."
+        },
+        {
+            level: 1,
+            question: "Which command shows all currently logged-in users?",
+            options: ["who", "w", "users", "Both who and w"],
+            explanation: "who and w both show logged-in users. w also shows what they're doing."
+        },
+        {
+            level: 1,
+            question: "What is a user's default login shell usually on Linux?",
+            options: ["/bin/bash", "/bin/sh", "/usr/bin/zsh", "/bin/fish"],
+            explanation: "/bin/bash (Bourne Again Shell) is the most common default shell on Linux."
+        },
+        {
+            level: 1,
+            question: "Which command changes a user's password?",
+            options: ["passwd", "chpasswd", "password", "changepw"],
+            explanation: "passwd is the standard command to change your own or another user's password."
+        },
+        {
+            level: 1,
+            question: "What does 'whoami' command do?",
+            options: ["Shows current username", "Shows all users", "Shows user ID", "Shows user groups"],
+            explanation: "whoami simply displays the effective username of the current user."
+        },
+        {
+            level: 1,
+            question: "Which directory contains user home directories by default?",
+            options: ["/home", "/root", "/users", "/var/home"],
+            explanation: "/home is the conventional location for regular user home directories. /root is root's home."
+        },
+        {
+            level: 1,
+            question: "What is the UID for the root user?",
+            options: ["0", "1", "1000", "65534"],
+            explanation: "UID 0 is reserved for root. UID 0 has full system privileges."
+        },
+        {
+            level: 1,
+            question: "Which command displays the groups a user belongs to?",
+            options: ["groups", "id -Gn", "Both groups and id -Gn", "grouplist"],
+            explanation: "groups shows your groups. id -Gn shows groups for any user. Both are valid."
+        },
+
+        // MEDIUM (Level 2) - User Modification & Groups - 10 questions
+        {
+            level: 2,
+            question: "Which command adds user 'john' to the 'sudo' group?",
+            options: ["usermod -aG sudo john", "useradd -g sudo john", "usermod -G sudo john", "groupadd sudo john"],
+            explanation: "usermod -aG appends (-a) the user to additional groups (-G) without removing them from existing groups."
+        },
+        {
+            level: 2,
+            question: "What does 'userdel -r john' do?",
+            options: ["Deletes user and home directory", "Only deletes the user", "Locks the user account", "Changes user's shell"],
+            explanation: "The -r flag removes the user's home directory and mail spool along with the account."
+        },
+        {
+            level: 2,
+            question: "Which file contains encrypted user passwords?",
+            options: ["/etc/shadow", "/etc/passwd", "/etc/shadow.old", "/etc/master.passwd"],
+            explanation: "/etc/shadow stores encrypted password hashes and password aging information."
+        },
+        {
+            level: 2,
+            question: "What does 'usermod -L john' do?",
+            options: ["Locks the user account", "Lists user info", "Changes login shell", "Sets user as admin"],
+            explanation: "usermod -L locks the account by prefixing the password with ! in /etc/shadow."
+        },
+        {
+            level: 2,
+            question: "Which command creates a new group?",
+            options: ["groupadd", "addgroup", "Both groupadd and addgroup", "newgroup"],
+            explanation: "groupadd is the low-level command, addgroup is a friendlier wrapper on Debian."
+        },
+        {
+            level: 2,
+            question: "What is the purpose of the 'sudo' command?",
+            options: ["Execute as superuser", "Switch default user", "Delete user", "Show user info"],
+            explanation: "sudo (superuser do) allows regular users to execute commands with elevated privileges."
+        },
+        {
+            level: 2,
+            question: "Which file defines which groups can use sudo?",
+            options: ["/etc/sudoers", "/etc/sudo.conf", "/etc/sudoers.d", "All of the above"],
+            explanation: "/etc/sudoers is the main config. /etc/sudoers.d/ contains additional config files."
+        },
+        {
+            level: 2,
+            question: "What does 'su - john' do?",
+            options: ["Switch to john with login shell", "Switch to john briefly", "Show john's info", "Delete john user"],
+            explanation: "su - john simulates a full login as john, loading their environment."
+        },
+        {
+            level: 2,
+            question: "Which command changes a user's default shell?",
+            options: ["usermod -s /bin/zsh john", "chsh -s /bin/zsh", "Both are valid", "shellmod -s /bin/zsh john"],
+            explanation: "usermod -s and chsh both change the login shell. chsh is user-friendly, usermod is more versatile."
+        },
+        {
+            level: 2,
+            question: "What does the 'chage' command do?",
+            options: ["Change user password aging", "Change user group", "Change user home", "Change user ID"],
+            explanation: "chage manages password expiration policies: minimum/maximum age, warning days, etc."
+        },
+
+        // HARD (Level 3) - Advanced User Management - 10 questions
+        {
+            level: 3,
+            question: "What does 'useradd -D' display?",
+            options: ["Default settings for new users", "All users list", "Deleted users", "User directories"],
+            explanation: "useradd -D shows the default values used when creating users (shell, home, etc.)"
+        },
+        {
+            level: 3,
+            question: "Which special file has the 'nobody' user权限?",
+            options: ["/dev/null", "/etc/passwd", "/var/log", "All of the above"],
+            explanation: "nobody is an unprivileged user. /dev/null accepts and discards all data."
+        },
+        {
+            level: 3,
+            question: "What is the range for normal user UIDs typically?",
+            options: ["1000-65534", "0-999", "65535 and above", "1-100"],
+            explanation: "UIDs 1000+ are typically for regular users. 0-999 are reserved for system accounts."
+        },
+        {
+            level: 3,
+            question: "Which command shows last logged-in users?",
+            options: ["last", "lastlog", "Both last and lastlog", "who.last"],
+            explanation: "last shows recent logins with terminal, IP. lastlog shows each user's last login time."
+        },
+        {
+            level: 3,
+            question: "What does 'usermod -u 1500 john' do?",
+            options: ["Changes john's UID to 1500", "Sets 1500 login attempts", "Adds 1500 to group", "Changes password expiry"],
+            explanation: "usermod -u changes the user's UID. All files in their home need owner updating."
+        },
+        {
+            level: 3,
+            question: "Which command forces password expiration?",
+            options: ["passwd -e john", "chage -d 0 john", "Both force expiration", "usermod -E john"],
+            explanation: "Both passwd -e and chage -d 0 force the user to change password on next login."
+        },
+        {
+            level: 3,
+            question: "What is PAM in Linux user management?",
+            options: ["Pluggable Authentication Modules", "Password Access Method", "Primary Account Manager", "Privileged Access Mode"],
+            explanation: "PAM provides flexible authentication mechanisms used by login, su, sudo, and many services."
+        },
+        {
+            level: 3,
+            question: "Which file limits per-user process count?",
+            options: ["/etc/security/limits.conf", "/etc/ulimit.conf", "/etc/limits.conf", "/etc/user.conf"],
+            explanation: "/etc/security/limits.conf sets resource limits like max processes, file size, etc."
+        },
+        {
+            level: 3,
+            question: "What does 'newgrp developers' do?",
+            options: ["Changes primary group to developers", "Adds to developers group", "Creates developers group", "Shows developers group"],
+            explanation: "newgrp changes the user's primary group for the current shell session."
+        },
+        {
+            level: 3,
+            question: "Which command lists all users including system accounts?",
+            options: ["getent passwd", "cat /etc/passwd", "Both list all users", "ls /home"],
+            explanation: "getent passwd queries the NSS database. /etc/passwd is the local file. Both work."
+        }
+    ];
+
+    let currentQuestion = null;
+    let selectedAnswer = null;
+    let correctAnswer = null;
+    let score = 0;
+    let streak = 0;
+    let currentLevel = 1;
+    let gameStarted = false;
+    let completedQuestions = { 1: [], 2: [], 3: [] };
+
+    function shuffle(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function shuffleOptions(options) {
+        const items = options.map((text, i) => ({ text, isCorrect: false }));
+        const correctText = options[0];
+        const shuffled = shuffle(items);
+        const correctIdx = Math.floor(Math.random() * shuffled.length);
+        shuffled[correctIdx].text = correctText;
+        return shuffled.map(item => item.text);
+    }
+
+    function updateLevelPips() {
+        document.getElementById('pip1').className = 'level-pip' + (currentLevel >= 1 ? ' active' : '');
+        document.getElementById('pip2').className = 'level-pip' + (currentLevel >= 2 ? ' active' : '');
+        document.getElementById('pip3').className = 'level-pip' + (currentLevel >= 3 ? ' active' : '');
+        document.getElementById('level').textContent = currentLevel;
+    }
+
+    function updateProgressInfo() {
+        const total3 = questions.filter(q => q.level === 3).length;
+        const done3 = completedQuestions[3].length;
+        document.getElementById('progressInfo').textContent = 
+            `Level 3 Progress: ${done3}/${total3} | Win by getting streak of 7 or completing all Level 3 questions`;
+    }
+
+    function startGame(level) {
+        currentLevel = level;
+        gameStarted = true;
+        document.getElementById('startScreen').style.display = 'none';
+        document.getElementById('gameContent').style.display = 'block';
+        updateLevelPips();
+        updateProgressInfo();
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const levelQuestions = questions.filter(q => q.level === currentLevel);
+        const available = levelQuestions.filter((q, i) => !completedQuestions[currentLevel].includes(i));
+        
+        if (available.length === 0) {
+            if (currentLevel < 3) {
+                currentLevel++;
+                updateLevelPips();
+                updateProgressInfo();
+                loadQuestion();
+            } else {
+                showWinScreen();
+            }
+            return;
+        }
+
+        const q = available[Math.floor(Math.random() * available.length)];
+        const originalIndex = questions.indexOf(q);
+        currentQuestion = { ...q, originalIndex };
+        selectedAnswer = null;
+        correctAnswer = q.options[0];
+
+        const shuffledOptions = shuffleOptions(q.options);
+        currentQuestion.shuffledOptions = shuffledOptions;
+        correctAnswer = shuffledOptions[0];
+
+        document.getElementById('questionText').textContent = q.question;
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('explanation').style.display = 'none';
+        document.getElementById('submitBtn').disabled = true;
+
+        const optionsList = document.getElementById('optionsList');
+        optionsList.innerHTML = '';
+        currentQuestion.shuffledOptions.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => selectOption(btn, opt);
+            optionsList.appendChild(btn);
+        });
+    }
+
+    function selectOption(btn, opt) {
+        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedAnswer = opt;
+        document.getElementById('submitBtn').disabled = false;
+    }
+
+    function submitAnswer() {
+        if (!selectedAnswer) return;
+
+        const isCorrect = selectedAnswer === correctAnswer;
+        const buttons = document.querySelectorAll('.option-btn');
+        
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            if (btn.textContent === correctAnswer) {
+                btn.classList.add('correct');
+            } else if (btn.textContent === selectedAnswer && !isCorrect) {
+                btn.classList.add('wrong');
+            }
+        });
+
+        if (isCorrect) {
+            score += 10 * currentLevel;
+            streak++;
+            document.getElementById('feedback').textContent = `Correct! +${10 * currentLevel} points`;
+            document.getElementById('feedback').className = 'feedback correct';
+            document.getElementById('explanation').textContent = currentQuestion.explanation;
+            document.getElementById('explanation').style.display = 'block';
+            completedQuestions[currentLevel].push(currentQuestion.originalIndex);
+        } else {
+            streak = 0;
+            document.getElementById('feedback').textContent = `Wrong! The answer was: ${correctAnswer}`;
+            document.getElementById('feedback').className = 'feedback wrong';
+        }
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('streak').textContent = streak;
+        document.getElementById('feedback').style.display = 'block';
+        document.getElementById('submitBtn').disabled = true;
+
+        if (streak >= 7 && currentLevel < 3) {
+            currentLevel++;
+            streak = 0;
+            updateLevelPips();
+            updateProgressInfo();
+            setTimeout(loadQuestion, 1500);
+        } else if (streak >= 7 && currentLevel === 3) {
+            setTimeout(showWinScreen, 1500);
+        } else {
+            setTimeout(loadQuestion, 2000);
+        }
+    }
+
+    function showWinScreen() {
+        document.getElementById('gameContent').style.display = 'none';
+        document.getElementById('winScreen').classList.add('active');
+        document.getElementById('winTitle').textContent = 'You\'re a User Manager!';
+        document.getElementById('winSubtitle').textContent = `Final Score: ${score} | Max Streak: ${streak}`;
+    }
+
+    document.getElementById('submitBtn').addEventListener('click', submitAnswer);
+    </script>
+</body>
+</html>
