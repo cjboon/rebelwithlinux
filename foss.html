@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var theme = saved || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FOSS - Free Open Source Software | REBEL WITH LINUX</title>
+    <meta name="description" content="Free and Open Source Software for privacy, security, and freedom. Tails, Whonix, Kicksecure, Parrot OS, Kali Linux, and more for the security-conscious rebel.">
+    <meta name="author" content="cjboon">
+    <meta name="robots" content="index, follow">
+
+    <link rel="canonical" href="https://rebelwithlinux.com/foss.html">
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+</head>
+
+<body id="top">
+    <div class="section-links" style="background: var(--ivory); padding: 16px; text-align: center;">
+        <a href="index.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Home</a>
+        <a href="guides.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Guides</a>
+        <a href="foss.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Foss</a>
+        <a href="tests.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Tests</a>
+        <a href="games.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Games</a>
+        <a href="blog.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Blog</a>
+        <a href="about.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">About</a>
+        <a href="contact.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Contact</a>
+        <a href="search.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Search</a>
+        <a href="stats.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Stats</a>
+        <button id="themeBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Light</button>
+        <button id="loginBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Login</button>
+        <a href="account.html" id="accountBtn" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: none;">Account</a>
+    </div>
+    <script>
+        (function() {
+            var theme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            document.getElementById('themeBtn').style.display = 'inline-block';
+            document.getElementById('themeBtn').textContent = theme === 'dark' ? 'Light' : 'Dark';
+            if (theme === 'dark') {
+                document.getElementById('themeBtn').style.color = '#e0e0e0';
+            }
+            
+            document.getElementById('themeBtn').addEventListener('click', function() {
+                var current = document.documentElement.getAttribute('data-theme');
+                var next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                this.textContent = next === 'dark' ? 'Light' : 'Dark';
+                this.style.color = next === 'dark' ? '#e0e0e0' : '#000000';
+            });
+
+            var isLoggedIn = localStorage.getItem('auth') === 'true';
+            if (isLoggedIn) {
+                document.getElementById('accountBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('loginBtn').style.display = 'inline-block';
+            }
+        })();
+    </script>
+
+    <main style="padding-top: 20px;">
+        <section class="lessons-section" id="distros">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <h2>// Privacy-First Linux</h2>
+                    <p>Distros that put your freedom first</p>
+                </div>
+            </div>
+
+            <div class="lessons-grid">
+                <!-- TAILS -->
+                <a href="https://tails.net" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Tails</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">The Amnesic Incognito Live System. Boot from USB, leave no trace. Tor browser pre-installed.</p>
+                    </article>
+                </a>
+
+                <!-- PARROT OS -->
+                <a href="https://www.parrotsec.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SECURITY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Parrot OS</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Security, forensics, and development. Lightweight alternative to Kali with a full desktop.</p>
+                    </article>
+                </a>
+
+                <!-- KALI LINUX -->
+                <a href="https://www.kali.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">SECURITY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Kali Linux</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Penetration testing and security auditing. Know your enemy by becoming your enemy.</p>
+                    </article>
+                </a>
+
+                <!-- WHONIX -->
+                <a href="https://www.whonix.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Whonix</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Runs inside a VM with a Tor gateway. Isolation that even the NSA can't easily break.</p>
+                    </article>
+                </a>
+
+                <!-- ARCH LINUX -->
+                <a href="https://www.archlinux.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">BUILD</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Arch Linux</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Build it yourself from scratch. No bloat, full control. You decide what runs on your machine.</p>
+                    </article>
+                </a>
+
+                <!-- KICKSECURE -->
+                <a href="https://kicksecure.com" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Kicksecure</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Whonix-based hardened Linux. Everyday privacy for regular users.</p>
+                    </article>
+                </a>
+            </div>
+        </section>
+
+        <section class="lessons-section" id="privacy-tools">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <h2>// Privacy Tools</h2>
+                    <p>Take back your digital identity</p>
+                </div>
+            </div>
+
+            <div class="lessons-grid">
+                <!-- TOR BROWSER -->
+                <a href="https://www.torproject.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Tor Browser</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Anonymous browsing through the Tor network. Escape surveillance and censorship.</p>
+                    </article>
+                </a>
+
+                <!-- SIMPLEX -->
+                <a href="https://simplex.chat" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Simplex</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Private messaging with no phone number required. End-to-end encrypted by default.</p>
+                    </article>
+                </a>
+
+                <!-- ONIONSHARE -->
+                <a href="https://onionshare.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">OnionShare</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Send and receive files anonymously. Creates an onion service for secure transfer.</p>
+                    </article>
+                </a>
+
+                <!-- GRAPHENEOS -->
+                <a href="https://grapheneos.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">GrapheneOS</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Hardened Android alternative. No Google services, maximum security and privacy.</p>
+                    </article>
+                </a>
+
+                <!-- MONERO -->
+                <a href="https://www.getmonero.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Monero</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Private, untraceable cryptocurrency. Ring signatures hide your transactions.</p>
+                    </article>
+                </a>
+
+                <!-- ELECTRUM -->
+                <a href="https://electrum.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Electrum</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Lightweight Bitcoin wallet. Take control of your finances without intermediaries.</p>
+                    </article>
+                </a>
+
+                <!-- FEATHER WALLET -->
+                <a href="https://featherwallet.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Feather Wallet</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Desktop Monero wallet. Built for privacy, runs on Windows, Mac, and Linux.</p>
+                    </article>
+                </a>
+
+                <!-- SIGNAL -->
+                <a href="https://signal.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Signal</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">End-to-end encrypted messaging and calls. Even the metadata is private.</p>
+                    </article>
+                </a>
+
+                <!-- CWTCH -->
+                <a href="https://cwtch.im" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Cwtch</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Decentralized, metadata-free messaging. Privacy even the server can't see.</p>
+                    </article>
+                </a>
+            </div>
+        </section>
+
+        <section class="lessons-section" id="security-tools">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <h2>// Security</h2>
+                    <p>Protect your systems and data</p>
+                </div>
+            </div>
+
+            <div class="lessons-grid">
+                <!-- KLEOPATRA -->
+                <a href="https://apps.kde.org/kleopatra" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">ENCRYPTION</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Kleopatra</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">GPG key manager for KDE. Sign, verify, and encrypt with ease.</p>
+                    </article>
+                </a>
+
+                <!-- GPG -->
+                <a href="https://gnupg.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">ENCRYPTION</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">GPG</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">GNU Privacy Guard. Encrypt emails, files, and messages. No backdoors.</p>
+                    </article>
+                </a>
+
+                <!-- KEEPASSXC -->
+                <a href="https://keepassxc.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PASSWORDS</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">KeePassXC</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Offline password manager. Your vault never leaves your machine.</p>
+                    </article>
+                </a>
+
+                <!-- VERACRYPT -->
+                <a href="https://www.veracrypt.fr" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">ENCRYPTION</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">VeraCrypt</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Disk encryption you can trust. Create encrypted containers and hidden volumes.</p>
+                    </article>
+                </a>
+
+                <!-- NMAP -->
+                <a href="https://nmap.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">NETWORK</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Nmap</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Network discovery and security auditing. Know your own infrastructure.</p>
+                    </article>
+                </a>
+
+                <!-- WIRESHARK -->
+                <a href="https://wireshark.org" target="_blank" rel="noopener noreferrer" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">NETWORK</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Wireshark</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Packet analyzer. Deep dive into network traffic and troubleshoot issues.</p>
+                    </article>
+                </a>
+            </div>
+        </section>
+
+        <section class="lessons-section" id="projects">
+            <div class="section-header">
+                <div class="section-title-wrap">
+                    <h2>// Projects</h2>
+                    <p>Build your own privacy-first infrastructure</p>
+                </div>
+            </div>
+
+            <div class="lessons-grid">
+                <!-- WIREGUARD VPN -->
+                <a href="projects/project-wireguard.html" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">NETWORKING</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">WireGuard VPN</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Set up your own VPN server. Take back control of your network traffic.</p>
+                    </article>
+                </a>
+
+                <!-- MATRIX CHAT -->
+                <a href="projects/project-matrix.html" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">COMMUNICATION</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Matrix Chat Server</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Self-host your own encrypted chat. No Big Tech watching your conversations.</p>
+                    </article>
+                </a>
+
+                <!-- ONION SITE -->
+                <a href="projects/project-onion.html" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Onion Site</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Host your site on Tor. Complete anonymity for visitors and servers alike.</p>
+                    </article>
+                </a>
+
+                <!-- SELF-HOSTED MAIL -->
+                <a href="projects/project-mail.html" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">COMMUNICATION</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Self-Hosted Mail</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Run your own mail server. Your emails stay yours, forever.</p>
+                    </article>
+                </a>
+
+                <!-- HOMELAB -->
+                <a href="projects/project-homelab.html" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">INFRASTRUCTURE</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Homelab Dashboard</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Build your own local server infrastructure. Monitor everything you own.</p>
+                    </article>
+                </a>
+
+                <!-- I3 WM -->
+                <a href="projects/project-i3.html" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">DESKTOP</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">i3 Window Manager</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Minimal, keyboard-driven desktop. Maximize productivity, minimize distraction.</p>
+                    </article>
+                </a>
+
+                <!-- ENCRYPTED PASTEBIN -->
+                <a href="projects/project-paste.html" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Encrypted Pastebin</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Share code securely. End-to-end encrypted pastes that expire.</p>
+                    </article>
+                </a>
+
+                <!-- PRIVATE FILE SHARE -->
+                <a href="projects/project-fileshare.html" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PRIVACY</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Private File Share</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Transfer files peer-to-peer. No cloud, no tracking, no logs.</p>
+                    </article>
+                </a>
+
+                <!-- PERSONAL BLOG -->
+                <a href="projects/project-blog.html" class="lesson-card" style="text-decoration: none; color: inherit;">
+                    <article style="padding: 24px; background: var(--white); height: 100%;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">PUBLISHING</div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Personal Blog</h3>
+                        <p style="font-size: 0.875rem; color: var(--charcoal);">Static site generator. Write in Markdown, publish anywhere.</p>
+                    </article>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer style="text-align: center; padding: 0 24px 24px;">
+        <a href="site-map.html" style="color: var(--black);">Site Map</a>
+        <span style="color: var(--charcoal);"> | </span>
+        <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" style="color: var(--black);">Onion Site</a>
+        <span style="color: var(--charcoal);"> | </span>
+        <a href="https://github.com/cjboon/rebelwithlinux" style="color: var(--black);">GitHub</a>
+    </footer>
+
+    <div id="loginModal" class="auth-modal">
+        <div class="auth-box">
+            <button class="close-auth" onclick="closeLoginModal()">×</button>
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="showAuthTab('login')">Login</button>
+                <button class="auth-tab" onclick="showAuthTab('register')">Register</button>
+            </div>
+            <div id="loginError" class="auth-error"></div>
+            <div id="loginSuccess" class="auth-success"></div>
+            <form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)">
+                <input type="email" id="loginEmail" placeholder="Email" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <input type="password" id="loginPassword" placeholder="Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <button type="submit" style="width:100%;padding:12px;background:var(--black);color:var(--white);border:none;font-family:'IBM Plex Mono',monospace;cursor:pointer;">Login</button>
+            </form>
+            <form id="registerForm" class="auth-form" onsubmit="handleRegister(event)">
+                <input type="email" id="registerEmail" placeholder="Email" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <input type="password" id="registerPassword" placeholder="Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <input type="password" id="registerConfirm" placeholder="Confirm Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <button type="submit" style="width:100%;padding:12px;background:var(--black);color:var(--white);border:none;font-family:'IBM Plex Mono',monospace;cursor:pointer;">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('loginSuccess').classList.remove('show');
+            if (tab === 'login') {
+                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+        function openLoginModal() { document.getElementById('loginModal').classList.add('active'); showAuthTab('login'); }
+        function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); document.getElementById('loginError').classList.remove('show'); document.getElementById('loginSuccess').classList.remove('show'); }
+        document.getElementById('loginBtn').addEventListener('click', openLoginModal);
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            const successDiv = document.getElementById('loginSuccess');
+            try {
+                const formData = new FormData();
+                formData.append('action', 'login');
+                formData.append('email', email);
+                formData.append('password', password);
+                const response = await fetch('api/auth.php', { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.success) {
+                    localStorage.setItem('auth', 'true');
+                    successDiv.textContent = 'Login successful!';
+                    successDiv.classList.add('show');
+                    setTimeout(() => { window.location.href = 'account.html'; }, 500);
+                } else {
+                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.classList.add('show');
+                }
+            } catch (err) { errorDiv.textContent = 'Connection error'; errorDiv.classList.add('show'); }
+        }
+        async function handleRegister(e) {
+            e.preventDefault();
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirm').value;
+            const errorDiv = document.getElementById('loginError');
+            if (password !== confirm) { errorDiv.textContent = 'Passwords do not match'; errorDiv.classList.add('show'); return; }
+            try {
+                const formData = new FormData();
+                formData.append('action', 'register');
+                formData.append('email', email);
+                formData.append('password', password);
+                const response = await fetch('api/auth.php', { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.success) {
+                    localStorage.setItem('auth', 'true');
+                    document.getElementById('loginSuccess').textContent = 'Registration successful! Logging in...';
+                    document.getElementById('loginSuccess').classList.add('show');
+                    setTimeout(() => { window.location.href = 'account.html'; }, 500);
+                } else {
+                    errorDiv.textContent = data.error || 'Registration failed';
+                    errorDiv.classList.add('show');
+                }
+            } catch (err) { errorDiv.textContent = 'Connection error'; errorDiv.classList.add('show'); }
+        }
+    </script>
+
+</body>
+</html>
