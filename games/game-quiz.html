@@ -13,6 +13,7 @@
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Trivia - Linux & FOSS | REBEL WITH LINUX</title>
+    <link rel="stylesheet" href="../fonts.css">
     <link rel="stylesheet" href="../style.css">
     <script src="../theme.js"></script>
     <style>
@@ -26,7 +27,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 0;
+            position: relative;
         }
         h1 { margin-bottom: 10px; font-size: 1.8rem; color: #1a1a1a; }
         .subtitle { margin-bottom: 20px; color: #1a1a1a; text-align: center; }
@@ -237,9 +239,147 @@
             .stats-bar { gap: 15px; }
             .question-box { padding: 15px; }
         }
+        
+        [data-theme="dark"] body { background: var(--white) !important; color: var(--black) !important; }
+        [data-theme="dark"] h1, [data-theme="dark"] .subtitle, [data-theme="dark"] .stat-label, [data-theme="dark"] .stat-value, [data-theme="dark"] .win-subtitle { color: var(--black) !important; }
+        [data-theme="dark"] .diff-btn, [data-theme="dark"] .diff-btn:hover, [data-theme="dark"] .next-btn, [data-theme="dark"] .restart-btn, [data-theme="dark"] .option-btn { background: var(--white) !important; color: var(--black) !important; border-color: var(--black) !important; }
+        [data-theme="dark"] .question-box { background: var(--white) !important; color: var(--black) !important; border-color: var(--black) !important; }
     </style>
 </head>
 <body>
+    <div class="section-links" style="background: var(--ivory); padding: 16px; text-align: center; position: sticky; top: 0; z-index: 100;">
+        <a href="../index.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Home</a>
+        <a href="../guides.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Guides</a>
+        <a href="../foss.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Foss</a>
+        <a href="../tests.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Tests</a>
+        <a href="../games.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Games</a>
+        <a href="../blog.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Blog</a>
+        <a href="../search.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Search</a>
+        <button id="themeBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Light</button>
+        <button id="loginBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Login</button>
+        <a href="../account.html" id="accountBtn" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: none;">Account</a>
+    </div>
+
+    <script>
+        (function() {
+            var theme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            document.getElementById('themeBtn').style.display = 'inline-block';
+            document.getElementById('themeBtn').textContent = theme === 'dark' ? 'Light' : 'Dark';
+            if (theme === 'dark') {
+                document.getElementById('themeBtn').style.color = '#e0e0e0';
+            }
+            document.getElementById('themeBtn').addEventListener('click', function() {
+                var current = document.documentElement.getAttribute('data-theme');
+                var next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                this.textContent = next === 'dark' ? 'Light' : 'Dark';
+                this.style.color = next === 'dark' ? '#e0e0e0' : '#000000';
+            });
+            var isLoggedIn = localStorage.getItem('auth') === 'true';
+            if (isLoggedIn) {
+                document.getElementById('accountBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('loginBtn').style.display = 'inline-block';
+            }
+        })();
+    </script>
+
+    <div id="loginModal" class="auth-modal">
+        <div class="auth-box">
+            <button class="close-auth" onclick="closeLoginModal()">×</button>
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="showAuthTab('login')">Login</button>
+                <button class="auth-tab" onclick="showAuthTab('register')">Register</button>
+            </div>
+            <div id="loginError" class="auth-error"></div>
+            <div id="loginSuccess" class="auth-success"></div>
+            <form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)">
+                <input type="email" id="loginEmail" placeholder="Email" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <input type="password" id="loginPassword" placeholder="Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <button type="submit" style="width:100%;padding:12px;background:var(--black);color:var(--white);border:none;font-family:'IBM Plex Mono',monospace;cursor:pointer;">Login</button>
+            </form>
+            <form id="registerForm" class="auth-form" onsubmit="handleRegister(event)">
+                <input type="email" id="registerEmail" placeholder="Email" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <input type="password" id="registerPassword" placeholder="Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <input type="password" id="registerConfirm" placeholder="Confirm Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <button type="submit" style="width:100%;padding:12px;background:var(--black);color:var(--white);border:none;font-family:'IBM Plex Mono',monospace;cursor:pointer;">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('loginSuccess').classList.remove('show');
+            if (tab === 'login') {
+                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+            showAuthTab('login');
+        }
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('active');
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('loginSuccess').classList.remove('show');
+        }
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('password', password);
+            const response = await fetch('../api/auth.php', { method: 'POST', body: formData, credentials: 'include' });
+            const data = await response.json();
+            if (data.success) {
+                localStorage.setItem('auth', 'true');
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('accountBtn').style.display = 'inline-block';
+                closeLoginModal();
+            } else {
+                document.getElementById('loginError').textContent = data.error || 'Login failed';
+                document.getElementById('loginError').classList.add('show');
+            }
+        }
+        async function handleRegister(e) {
+            e.preventDefault();
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirm').value;
+            if (password !== confirm) {
+                document.getElementById('loginError').textContent = 'Passwords do not match';
+                document.getElementById('loginError').classList.add('show');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('password', password);
+            formData.append('action', 'register');
+            const response = await fetch('../api/auth.php', { method: 'POST', body: formData, credentials: 'include' });
+            const data = await response.json();
+            if (data.success) {
+                localStorage.setItem('auth', 'true');
+                document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('accountBtn').style.display = 'inline-block';
+                closeLoginModal();
+            } else {
+                document.getElementById('loginError').textContent = data.error || 'Registration failed';
+                document.getElementById('loginError').classList.add('show');
+            }
+        }
+        document.getElementById('loginBtn').addEventListener('click', openLoginModal);
+    </script>
+
     <h1>❓ QUIZ TRIVIA</h1>
     <p class="subtitle">Test your Linux & FOSS knowledge!</p>
 
@@ -341,7 +481,7 @@
             level: 1,
             question: "What is the default root directory on Linux?",
             options: ["/root", "/home", "/", "/var"],
-            explanation: "/" (forward slash) is the root directory - the top of the filesystem hierarchy."
+            explanation: "\"/\" (forward slash) is the root directory - the top of the filesystem hierarchy."
         },
         {
             level: 1,
@@ -684,5 +824,24 @@
     updateLevelPips();
     updateProgressInfo();
     </script>
+    <footer id="site-footer" style="text-align: center; padding: 0 24px 12px;">
+        <div style="font-size: 1.2rem; margin-bottom: 20px;">www.rebelwithlinux.com</div>
+        <div style="margin-bottom: 8px;">
+            <a href="../site-map.html" style="color: var(--black);">Site Map</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" style="color: var(--black);">Onion Site</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="https://github.com/cjboon/rebelwithlinux" style="color: var(--black);">GitHub</a>
+        </div>
+    </footer>
+
+    <div id="footer-links" style="text-align: center; padding: 0 24px 12px;">
+        <a href="../about.html" style="color: var(--black);">About</a>
+        <span style="color: var(--charcoal);"> | </span>
+        <a href="../contact.html" style="color: var(--black);">Contact</a>
+        <span style="color: var(--charcoal);"> | </span>
+        <a href="../stats.html" style="color: var(--black);">Stats</a>
+    </div>
+
 </body>
 </html>
