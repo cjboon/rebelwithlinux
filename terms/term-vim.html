@@ -14,8 +14,7 @@
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vim Tutor - Rebel with Linux</title>
-    <link rel="stylesheet" href="../style.css">
-    <style>
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -28,8 +27,8 @@
         }
         
         body {
-            background: #1a1a1a;
-            color: #cccccc;
+            background: var(--term-bg);
+            color: var(--term-text);
             font-family: 'Courier New', monospace;
             font-size: 15px;
         }
@@ -48,11 +47,11 @@
         }
         
         .left-pane {
-            border-right: 2px solid #444444;
+            border-right: 2px solid var(--term-border);
         }
         
         .terminal-header {
-            background: #333333;
+            background: var(--term-header-bg);
             padding: 0.5rem 1rem;
             display: flex;
             align-items: center;
@@ -65,20 +64,20 @@
             border-radius: 50%;
         }
         
-        .dot-red { background: #666666; }
-        .dot-yellow { background: #888888; }
-        .dot-green { background: #aaaaaa; }
+        .dot-red { background: var(--term-dot-red); }
+        .dot-yellow { background: var(--term-dot-yellow); }
+        .dot-green { background: var(--term-dot-green); }
         
         .terminal-title {
             margin-left: 1rem;
-            color: #cccccc;
+            color: var(--term-text);
             font-size: 0.85rem;
         }
         
         .pane-label {
-            background: #333333;
+            background: var(--term-header-bg);
             padding: 0.5rem 1rem;
-            color: #cccccc;
+            color: var(--term-text);
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -89,11 +88,11 @@
             display: flex;
             flex-direction: column;
             padding: 1rem;
-            background: #1a1a1a;
+            background: var(--term-bg);
         }
         
         .input-label {
-            color: #aaaaaa;
+            color: var(--term-text-muted);
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
         }
@@ -103,7 +102,7 @@
             width: 100%;
             background: transparent;
             border: none;
-            color: #cccccc;
+            color: var(--term-text);
             font-family: 'Courier New', monospace;
             font-size: 15px;
             resize: none;
@@ -111,16 +110,16 @@
         }
         
         .hint {
-            color: #666666;
+            color: var(--term-text-muted);
             font-size: 0.75rem;
             margin-top: 0.5rem;
         }
         
         .vim-output-area {
             flex: 1;
-            border-top: 2px solid #444444;
+            border-top: 2px solid var(--term-border);
             padding: 0.5rem;
-            background: #222222;
+            background: var(--term-input-bg);
             overflow-y: auto;
             font-family: 'Courier New', monospace;
             font-size: 14px;
@@ -128,7 +127,7 @@
         }
         
         .vim-output-line {
-            color: #aaaaaa;
+            color: var(--term-text-muted);
             font-size: 0.85rem;
             margin-bottom: 0.25rem;
         }
@@ -147,7 +146,7 @@
             flex: 1;
             padding: 1rem;
             overflow-y: auto;
-            background: #1e1e1e;
+            background: var(--term-bg);
         }
         
         .message {
@@ -156,13 +155,13 @@
         }
         
         .message .speaker {
-            color: #ffffff;
+            color: var(--term-text-light);
             font-weight: bold;
             margin-bottom: 0.25rem;
         }
         
         .message .text {
-            color: #cccccc;
+            color: var(--term-text);
         }
         
         .message .text.fail {
@@ -175,37 +174,37 @@
         }
         
         .message .text.success {
-            color: #cccccc;
+            color: var(--term-text);
         }
         
         .level-title {
-            color: #ffffff;
+            color: var(--term-text-light);
             font-size: 1.1rem;
             font-weight: bold;
             margin-bottom: 0.5rem;
             padding: 0.5rem;
-            background: #2d2d2d;
-            border-left: 3px solid #f0c674;
+            background: var(--term-bg);
+            border-left: 3px solid var(--term-accent, #f0c674);
         }
         
         /* Light mode overrides */
-        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
-        [data-theme="light"] .terminal-header { background: #e0e0e0; }
-        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
-        [data-theme="light"] .pane-label { background: #e0e0e0; }
-        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .vim-output-area { background: #ffffff; color: #1a1a1a; }
-        [data-theme="light"] .vim-output-area { background: #f5f5f5; border-top-color: #cccccc; }
-        [data-theme="light"] #command-input { color: #1a1a1a; }
-        [data-theme="light"] .input-label { color: #444444; }
-        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
-        [data-theme="light"] .hint { color: #666666; }
-        [data-theme="light"] .vim-output-line { color: #333333; }
-        [data-theme="light"] .message .speaker { color: #1a1a1a; }
-        [data-theme="light"] .message .text { color: #333333; }
+        [data-theme="light"] body { background: var(--term-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .terminal-header { background: var(--term-header-bg-light); }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: var(--term-text-dark); }
+        [data-theme="light"] .pane-label { background: var(--term-header-bg-light); }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .vim-output-area { background: var(--term-input-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .vim-output-area { background: var(--term-bg-light); border-top-color: var(--term-text); }
+        [data-theme="light"] #command-input { color: var(--term-text-dark); }
+        [data-theme="light"] .input-label { color: var(--term-text-muted); }
+        [data-theme="light"] .left-pane { border-right: 2px solid var(--term-border-light); }
+        [data-theme="light"] .hint { color: var(--term-text-muted); }
+        [data-theme="light"] .vim-output-line { color: var(--term-text-dark); }
+        [data-theme="light"] .message .speaker { color: var(--term-text-dark); }
+        [data-theme="light"] .message .text { color: var(--term-text-dark); }
         [data-theme="light"] .message .text.fail { color: #dc322f; }
         [data-theme="light"] .message .text.hint { color: #268bd2; }
-        [data-theme="light"] .message .text.success { color: #333333; }
-        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        [data-theme="light"] .message .text.success { color: var(--term-text-dark); }
+        [data-theme="light"] .level-title { background: var(--term-bg-light); color: #b58900; border-left-color: #b58900; }
         
         /* Mobile optimizations */
         @media (max-width: 768px) {
@@ -217,11 +216,11 @@
                 height: 50vh;
             }
             .right-pane {
-                border-bottom: 2px solid #444444;
+                border-bottom: 2px solid var(--term-border);
             }
             .left-pane {
                 border-right: none;
-                border-top: 2px solid #444444;
+                border-top: 2px solid var(--term-border);
             }
             body { font-size: 14px; }
             .terminal-header { padding: 8px; }
@@ -247,6 +246,24 @@
             border-radius: 4px;
         }
     </style>
+
+    <link rel="stylesheet" href="../css/00-fonts.css">
+    <link rel="stylesheet" href="../css/01-variables.css">
+    <link rel="stylesheet" href="../css/02-reset.css">
+    <link rel="stylesheet" href="../css/03-typography.css">
+    <link rel="stylesheet" href="../css/04-navigation.css">
+    <link rel="stylesheet" href="../css/05-layout.css">
+    <link rel="stylesheet" href="../css/06-buttons.css">
+    <link rel="stylesheet" href="../css/07-cards.css">
+    <link rel="stylesheet" href="../css/08-terminal.css">
+    <link rel="stylesheet" href="../css/09-quiz.css">
+    <link rel="stylesheet" href="../css/10-sections.css">
+    <link rel="stylesheet" href="../css/11-modals.css">
+    <link rel="stylesheet" href="../css/12-forms.css">
+    <link rel="stylesheet" href="../css/13-account.css">
+    <link rel="stylesheet" href="../css/14-animations.css">
+    <link rel="stylesheet" href="../css/15-responsive.css">
+    <link rel="stylesheet" href="../css/16-nojs.css">
 </head>
 <body>
     <div class="container">

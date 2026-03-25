@@ -14,52 +14,51 @@
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sed Tutor - Rebel with Linux</title>
-    <link rel="stylesheet" href="../style.css">
-    <style>
+<style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
-        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        body { background: var(--term-bg); color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; }
         .container { display: flex; height: 100vh; width: 100vw; }
         .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .left-pane { border-right: #444444; 2px solid }
-        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-header { background: var(--term-header-bg); padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
         .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
-        .dot-red { background: #666666; }
-        .dot-yellow { background: #888888; }
-        .dot-green { background: #aaaaaa; }
-        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
-        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
-        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
-        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
-        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
-        .sed-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
-        .sed-output-line { color: #aaaaaa; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .dot-red { background: var(--term-dot-red); }
+        .dot-yellow { background: var(--term-dot-yellow); }
+        .dot-green { background: var(--term-dot-green); }
+        .terminal-title { margin-left: 1rem; color: var(--term-text); font-size: 0.85rem; }
+        .pane-label { background: var(--term-header-bg); padding: 0.5rem 1rem; color: var(--term-text); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: var(--term-bg); }
+        .input-label { color: var(--term-text-muted); margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: var(--term-text-muted); font-size: 0.75rem; margin-top: 0.5rem; }
+        .sed-output-area { flex: 1; border-top: 2px solid var(--term-border); padding: 0.5rem; background: var(--term-input-bg); overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .sed-output-line { color: var(--term-text-muted); margin-bottom: 0.25rem; white-space: pre-wrap; }
         .sed-error-line { color: #cc6666; margin-bottom: 0.25rem; }
         .terminal-pane.right-pane { flex: 1; }
-        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1e; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: var(--term-bg); }
         .message { margin-bottom: 1rem; line-height: 1.5; }
         .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
         .message .text { color: #b5bd68; }
         .message .text.fail { color: #cc6666; }
         .message .text.hint { color: #81a2be; font-style: italic; }
-        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
-        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
-        [data-theme="light"] .terminal-header { background: #e0e0e0; }
-        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
-        [data-theme="light"] .pane-label { background: #e0e0e0; }
-        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .sed-output-area { background: #ffffff; color: #1a1a1a; }
-        [data-theme="light"] .sed-output-area { background: #f5f5f5; border-top-color: #cccccc; }
-        [data-theme="light"] #command-input { color: #1a1a1a; }
-        [data-theme="light"] .input-label { color: #444444; }
-        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
-        [data-theme="light"] .hint { color: #666666; }
-        [data-theme="light"] .sed-output-line { color: #333333; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: var(--term-bg); border-left: 3px solid var(--term-accent, #f0c674); }
+        [data-theme="light"] body { background: var(--term-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .terminal-header { background: var(--term-header-bg-light); }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: var(--term-text-dark); }
+        [data-theme="light"] .pane-label { background: var(--term-header-bg-light); }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .sed-output-area { background: var(--term-input-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .sed-output-area { background: var(--term-bg-light); border-top-color: var(--term-text); }
+        [data-theme="light"] #command-input { color: var(--term-text-dark); }
+        [data-theme="light"] .input-label { color: var(--term-text-muted); }
+        [data-theme="light"] .left-pane { border-right: 2px solid var(--term-border-light); }
+        [data-theme="light"] .hint { color: var(--term-text-muted); }
+        [data-theme="light"] .sed-output-line { color: var(--term-text-dark); }
         [data-theme="light"] .message .speaker { color: #b58900; }
         [data-theme="light"] .message .text { color: #859900; }
         [data-theme="light"] .message .text.fail { color: #dc322f; }
         [data-theme="light"] .message .text.hint { color: #268bd2; }
-        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        [data-theme="light"] .level-title { background: var(--term-bg-light); color: #b58900; border-left-color: #b58900; }
         
         /* Mobile optimizations */
         @media (max-width: 768px) {
@@ -71,11 +70,11 @@
                 height: 50vh;
             }
             .right-pane {
-                border-bottom: 2px solid #444444;
+                border-bottom: 2px solid var(--term-border);
             }
             .left-pane {
                 border-right: none;
-                border-top: 2px solid #444444;
+                border-top: 2px solid var(--term-border);
             }
             body { font-size: 14px; }
             .terminal-header { padding: 8px; }
@@ -101,6 +100,24 @@
             border-radius: 4px;
         }
     </style>
+
+    <link rel="stylesheet" href="../css/00-fonts.css">
+    <link rel="stylesheet" href="../css/01-variables.css">
+    <link rel="stylesheet" href="../css/02-reset.css">
+    <link rel="stylesheet" href="../css/03-typography.css">
+    <link rel="stylesheet" href="../css/04-navigation.css">
+    <link rel="stylesheet" href="../css/05-layout.css">
+    <link rel="stylesheet" href="../css/06-buttons.css">
+    <link rel="stylesheet" href="../css/07-cards.css">
+    <link rel="stylesheet" href="../css/08-terminal.css">
+    <link rel="stylesheet" href="../css/09-quiz.css">
+    <link rel="stylesheet" href="../css/10-sections.css">
+    <link rel="stylesheet" href="../css/11-modals.css">
+    <link rel="stylesheet" href="../css/12-forms.css">
+    <link rel="stylesheet" href="../css/13-account.css">
+    <link rel="stylesheet" href="../css/14-animations.css">
+    <link rel="stylesheet" href="../css/15-responsive.css">
+    <link rel="stylesheet" href="../css/16-nojs.css">
 </head>
 <body>
     <div class="container">
@@ -494,7 +511,130 @@
                 content: "On lines with 'TODO', replace 'fix' with 'DONE':\nsed '/TODO/s/fix/DONE/'",
                 hint: "Type: sed '/TODO/s/fix/DONE/'",
                 answer: "sed '/TODO/s/",
-                success: "INTERMEDIATE COMPLETE! You now command addresses, patterns, groups, hold space, and more! You're a sed wizard!",
+                success: "INTERMEDIATE COMPLETE! You now command addresses, patterns, groups, hold space, and more! You're a sed wizard! Type --expert to become a master!",
+                type: "starts"
+            }
+        ];
+        
+        const expertLevels = [
+            {
+                id: 1,
+                title: "The Branching Spell",
+                intro: "Welcome to EXPERT mode, apprentice! Let's master the advanced arts of sed!",
+                content: "Execute from file:\nsed -f commands.sed input.txt",
+                hint: "Type: sed -f",
+                answer: "sed -f",
+                success: "Loading from file! -f reads commands from a file. This is how you save and reuse complex spells!",
+                type: "starts"
+            },
+            {
+                id: 2,
+                title: "In-Place Editing",
+                intro: "The -i flag edits files IN PLACE! No output to stdout - transforms the file itself!",
+                content: "Edit in place:\nsed -i 's/old/new/g' file.txt",
+                hint: "Type: sed -i",
+                answer: "sed -i",
+                success: "In-place transformation! -i edits the file directly. Use -i.bak for backup: sed -i.bak 's/old/new/' file.txt!",
+                type: "starts"
+            },
+            {
+                id: 3,
+                title: "Regex Character Classes",
+                intro: "Advanced regex in sed! Match specific types of characters precisely.",
+                content: "Match word characters:\nsed 's/\\w/X/g'",
+                hint: "Type: sed 's/\\\\w/X/g'",
+                answer: "sed 's/\\\\w",
+                success: "Word characters matched! \\\\w matches [a-zA-Z0-9_]. \\\\W matches non-word characters. Precision at your fingertips!",
+                type: "starts"
+            },
+            {
+                id: 4,
+                title: "Digit Matching",
+                intro: "Match digits and non-digits with \\\\d and \\\\D!",
+                content: "Replace digits with #:\nsed 's/\\d/#/g'",
+                hint: "Type: sed 's/\\\\d/#/g'",
+                answer: "sed 's/\\\\d",
+                success: "Digits replaced! \\\\d matches [0-9], \\\\D matches non-digits. Perfect for anonymizing numbers!",
+                type: "starts"
+            },
+            {
+                id: 5,
+                title: "Whitespace Magic",
+                intro: "Match whitespace and non-whitespace with \\\\s and \\\\S!",
+                content: "Replace spaces with underscores:\nsed 's/ /_/g' file.txt",
+                hint: "Type: sed 's/ /_/g'",
+                answer: "sed 's/ /",
+                success: "Spaces transformed! \\\\s matches [ \\\\t\\\\n\\\\r\\\\f], \\\\S matches non-whitespace. Clean up your text!",
+                type: "starts"
+            },
+            {
+                id: 6,
+                title: "Word Boundaries",
+                intro: "Use \\\\b for word boundaries - match whole words only!",
+                content: "Replace whole 'cat':\nsed 's/\\\\bcat\\\\b/dog/g'",
+                hint: "Type: sed 's/\\\\bcat\\\\b/dog/g'",
+                answer: "sed 's/\\\\bcat",
+                success: "Whole words only! \\\\b matches word boundaries. 'cat' in 'category' stays, standalone 'cat' becomes 'dog'!",
+                type: "starts"
+            },
+            {
+                id: 7,
+                title: "Quoting Special Characters",
+                intro: "Escape special characters with \\\\char! When you need to match literally.",
+                content: "Match literal dot:\nsed 's/\\\\./\\./g'",
+                hint: "Type: sed 's/\\\\./\\\\./g'",
+                answer: "sed 's/\\\\./",
+                success: "Literal dot matched! \\\\. matches only '.', not 'any character'. Essential for matching actual punctuation!",
+                type: "starts"
+            },
+            {
+                id: 8,
+                title: "Next Line Command",
+                intro: "The 'n' command prints pattern space then reads next line!",
+                content: "Print then next:\nsed 'n;d'",
+                hint: "Type: sed 'n;d'",
+                answer: "sed 'n",
+                success: "Next line handling! 'n' prints then replaces with next line, 'd' deletes. Control flow in sed!",
+                type: "starts"
+            },
+            {
+                id: 9,
+                title: "Branch and Test",
+                intro: "The 'b' branches to label, 't' tests if substitution succeeded!",
+                content: "Branch on substitution:\nsed '1,5{b s/a/A/;p};q'",
+                hint: "Type: sed '1,5{b",
+                answer: "sed '1,5{b",
+                success: "Conditional branching! 'b' jumps, 't' tests success. This is programming in sed!",
+                type: "starts"
+            },
+            {
+                id: 10,
+                title: "Multi-Line Processing",
+                intro: "Sed processes line by line, but we can use N to append next line to pattern space!",
+                content: "Two-line pattern:\nsed 'N;s/\\n/ /'",
+                hint: "Type: sed 'N",
+                answer: "sed 'N",
+                success: "Multi-line magic! 'N' appends next line. Now you can match across line boundaries!",
+                type: "starts"
+            },
+            {
+                id: 11,
+                title: "The Mystery of Hold Space",
+                intro: "Let's combine hold space commands for ultimate transformation!",
+                content: "Swap first and last:\nsed '1h;$!d;x'",
+                hint: "Type: sed '1h;$!d;x'",
+                answer: "sed '1h",
+                success: "First-last swap! '1h' copies line 1 to hold, '$!d' deletes non-last, 'x' exchanges. Hold space mastery!",
+                type: "starts"
+            },
+            {
+                id: 12,
+                title: "Expert Finale - Master Wizard",
+                intro: "Final challenge! Combine addresses, regex, hold space, and multi-line for ultimate transformation!",
+                content: "Reverse lines 1-10:\nsed '1h;1!H;${g;s/\\n/ /g}'",
+                hint: "Type: sed '1h;1!H",
+                answer: "sed '1h;1!H",
+                success: "EXPERT COMPLETE! You've mastered sed - addresses, regex, hold space, multi-line! You're a TRUE sed wizard! The text obeys your will completely! PROUD!",
                 type: "starts"
             }
         ];
@@ -625,21 +765,26 @@
             
             const menu3 = document.createElement('div');
             menu3.className = 'output-line choice';
-            menu3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            menu3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'expert\')">--expert</span> - Master sed (lessons 25-36)';
             history.appendChild(menu3);
             
             const menu4 = document.createElement('div');
             menu4.className = 'output-line choice';
-            menu4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            menu4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
             history.appendChild(menu4);
             
             const menu5 = document.createElement('div');
             menu5.className = 'output-line choice';
-            menu5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            menu5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
             history.appendChild(menu5);
             
+            const menu6 = document.createElement('div');
+            menu6.className = 'output-line choice';
+            menu6.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menu6);
+            
             addLine('');
-            addCharacterMessage("Click on a choice or type --beginner, --intermediate, --fullscreen, --darkmode, or --exit!");
+            await showCharacterMessage("Click on a choice or type --beginner, --intermediate, --expert, --fullscreen, --darkmode, or --exit!");
             addLine('');
         }
         
@@ -650,6 +795,9 @@
             } else if (trackName === 'intermediate') {
                 levels = intermediateLevels;
                 addCharacterMessage("Welcome back! You've mastered the basics - now let's dive into addresses, patterns, capture groups, and the hold space!");
+            } else if (trackName === 'expert') {
+                levels = expertLevels;
+                addCharacterMessage("Welcome to EXPERT mode! We'll tackle file operations, advanced regex, multi-line processing, and the hold space magic!");
             }
             
             currentLevel = 0;
@@ -685,6 +833,11 @@
             
             if (cmd === '--intermediate') {
                 await startTrack('intermediate');
+                return;
+            }
+            
+            if (cmd === '--expert') {
+                await startTrack('expert');
                 return;
             }
             
@@ -727,6 +880,7 @@
                 addCharacterMessage("Type --start to return to the main menu!");
                 addCharacterMessage("Type --beginner for beginner lessons (1-12)");
                 addCharacterMessage("Type --intermediate for intermediate lessons (13-24)");
+                addCharacterMessage("Type --expert for expert lessons (25-36)");
                 addCharacterMessage("Type --fullscreen to toggle fullscreen mode");
                 addCharacterMessage("Type --darkmode to toggle dark/light mode");
                 addCharacterMessage("Type --exit to go back to homepage");
@@ -743,7 +897,13 @@
             if (cmd === '--skip') {
                 currentLevel++;
                 if (currentLevel >= levels.length) {
-                    addCharacterMessage("You finished all the levels! You're a sed wizard now! Type --start to practice again!");
+                    if (levels === beginnerLevels) {
+                        addCharacterMessage("You finished all the beginner levels! Type --intermediate to continue your journey!");
+                    } else if (levels === intermediateLevels) {
+                        addCharacterMessage("You finished all the intermediate levels! Type --expert to become a master!");
+                    } else {
+                        addCharacterMessage("You finished all the expert levels! You're a sed master now! Type --beginner to start over!");
+                    }
                     return;
                 }
                 showLevel();
@@ -766,7 +926,9 @@
                     if (levels === beginnerLevels) {
                         addCharacterMessage("CONGRATULATIONS! You completed all 12 beginner sed lessons! You're a true text transformation wizard! Type --intermediate to continue your journey!");
                     } else if (levels === intermediateLevels) {
-                        addCharacterMessage("CONGRATULATIONS! You completed all 12 intermediate sed lessons! You've mastered addresses, patterns, capture groups, and the hold space! The power of sed is yours! Type --beginner to start over!");
+                        addCharacterMessage("CONGRATULATIONS! You completed all 12 intermediate sed lessons! You've mastered addresses, patterns, capture groups, and the hold space! The power of sed is yours! Type --expert to become a master wizard!");
+                    } else {
+                        addCharacterMessage("CONGRATULATIONS! You completed all 12 expert sed lessons! You're a TRUE sed wizard! The text bends to your will! Type --beginner to start over!");
                     }
                     addLine('═══════════════════════════════════════', 'lesson-number');
                     addLine('');

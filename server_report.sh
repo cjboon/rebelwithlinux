@@ -81,8 +81,9 @@ uptime = os.popen('uptime -p 2>/dev/null || echo "uptime unavailable"').read().s
 loadavg = os.popen("cat /proc/loadavg | awk '{print $1}'").read().strip()
 memory = os.popen("free -h | awk '/^Mem:/ {print $3\"/\"$2}'").read().strip()
 disk = os.popen("df -h / | awk 'NR==2 {print $3\"/\"$2}'").read().strip()
-proc = os.popen("ps aux --sort=-%cpu | head -2 | tail -1 | awk '{print $11}'").read().strip()
-cpu = os.popen("ps aux --sort=-%cpu | head -2 | tail -1 | awk '{print $3}'").read().strip()
+top_proc_line = os.popen("ps aux --sort=-%cpu | head -2 | tail -1").read().strip()
+proc = top_proc_line.split()[10]
+cpu = top_proc_line.split()[2]
 
 print(f"Stats: {uptime} | {loadavg} | {memory}")
 
@@ -103,7 +104,7 @@ content = re.sub(r'<span class="stat-uptime"[^>]*>[^<]*</span>', f'<span class="
 content = re.sub(r'<span class="stat-load"[^>]*>[^<]*</span>', f'<span class="stat-load">{loadavg}</span>', content)
 content = re.sub(r'<span class="stat-memory"[^>]*>[^<]*</span>', f'<span class="stat-memory">{memory}</span>', content)
 content = re.sub(r'<span class="stat-disk"[^>]*>[^<]*</span>', f'<span class="stat-disk">{disk}</span>', content)
-content = re.sub(r'<span class="stat-proc"[^>]*>[^<]*</span>', f'<span class="stat-proc">{proc}<br>{cpu}% CPU</span>', content)
+content = re.sub(r'<span class="stat-proc"[^>]*>.*?</span>', f'<span class="stat-proc">{proc}<br>{cpu}% CPU</span>', content, flags=re.DOTALL)
 
 with open(html_file, 'w') as f:
     f.write(content)

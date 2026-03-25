@@ -14,8 +14,7 @@
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bash Tutor - Rebel with Linux</title>
-    <link rel="stylesheet" href="../style.css">
-    <style>
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -28,8 +27,8 @@
         }
         
         body {
-            background: #1a1a1a;
-            color: #cccccc;
+            background: var(--term-bg);
+            color: var(--term-text);
             font-family: 'Courier New', monospace;
             font-size: 15px;
         }
@@ -48,11 +47,11 @@
         }
         
         .left-pane {
-            border-right: 2px solid #444444;
+            border-right: 2px solid var(--term-border);
         }
         
         .terminal-header {
-            background: #333333;
+            background: var(--term-header-bg);
             padding: 0.5rem 1rem;
             display: flex;
             align-items: center;
@@ -65,20 +64,20 @@
             border-radius: 50%;
         }
         
-        .dot-red { background: #666666; }
-        .dot-yellow { background: #888888; }
-        .dot-green { background: #aaaaaa; }
+        .dot-red { background: var(--term-dot-red); }
+        .dot-yellow { background: var(--term-dot-yellow); }
+        .dot-green { background: var(--term-dot-green); }
         
         .terminal-title {
             margin-left: 1rem;
-            color: #cccccc;
+            color: var(--term-text);
             font-size: 0.85rem;
         }
         
         .pane-label {
-            background: #333333;
+            background: var(--term-header-bg);
             padding: 0.5rem 1rem;
-            color: #cccccc;
+            color: var(--term-text);
             font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -89,11 +88,11 @@
             display: flex;
             flex-direction: column;
             padding: 1rem;
-            background: #1a1a1a;
+            background: var(--term-bg);
         }
         
         .input-label {
-            color: #aaaaaa;
+            color: var(--term-text-muted);
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
         }
@@ -103,7 +102,7 @@
             width: 100%;
             background: transparent;
             border: none;
-            color: #cccccc;
+            color: var(--term-text);
             font-family: 'Courier New', monospace;
             font-size: 15px;
             resize: none;
@@ -112,11 +111,11 @@
         }
         
         #command-input::placeholder {
-            color: #666666;
+            color: var(--term-text-muted);
         }
         
         .hint {
-            color: #666666;
+            color: var(--term-text-muted);
             font-size: 0.75rem;
             margin-top: 0.5rem;
         }
@@ -125,7 +124,7 @@
             flex: 1;
             padding: 1rem;
             overflow-y: auto;
-            background: #1a1a1a;
+            background: var(--term-bg);
             font-family: 'Courier New', monospace;
             font-size: 15px;
         }
@@ -135,30 +134,30 @@
             white-space: pre-wrap;
             word-break: break-all;
             line-height: 1.4;
-            color: #cccccc;
+            color: var(--term-text);
         }
         
         .character-name {
-            color: #ffffff;
+            color: var(--term-text-light);
             font-weight: bold;
         }
         
         .user-input {
-            color: #888888;
+            color: var(--term-text-muted);
         }
         
         .lesson-number {
-            color: #aaaaaa;
+            color: var(--term-text-muted);
             font-weight: bold;
         }
         
         .command-output {
-            color: #dddddd;
+            color: var(--term-text);
             margin-left: 1rem;
         }
         
         .encouragement {
-            color: #999999;
+            color: var(--term-text-muted);
             font-style: italic;
         }
         
@@ -168,7 +167,7 @@
         }
         
         .choice {
-            color: #888888;
+            color: var(--term-text-muted);
             cursor: pointer;
             margin-bottom: 0.25rem;
         }
@@ -179,9 +178,9 @@
         
         .bash-output-area {
             flex: 1;
-            border-top: 2px solid #444444;
+            border-top: 2px solid var(--term-border);
             padding: 0.5rem;
-            background: #222222;
+            background: var(--term-input-bg);
             overflow-y: auto;
             font-family: 'Courier New', monospace;
             font-size: 14px;
@@ -189,67 +188,67 @@
         }
         
         .bash-output-line {
-            color: #ffffff;
+            color: var(--term-text-light);
             margin-bottom: 2px;
         }
         
         .bash-error-line {
-            color: #999999;
+            color: var(--term-text-muted);
             margin-bottom: 2px;
         }
         
         .bash-prompt {
-            color: #aaaaaa;
+            color: var(--term-text-muted);
         }
         
         /* Light mode overrides */
         [data-theme="light"] body {
-            background: #f5f5f5;
-            color: #1a1a1a;
+            background: var(--term-bg-light);
+            color: var(--term-text-dark);
         }
         [data-theme="light"] .terminal-header {
-            background: #e0e0e0;
+            background: var(--term-header-bg-light);
         }
         [data-theme="light"] .terminal-title,
         [data-theme="light"] .pane-label {
-            color: #1a1a1a;
+            color: var(--term-text-dark);
         }
         [data-theme="light"] .pane-label {
-            background: #e0e0e0;
+            background: var(--term-header-bg-light);
         }
         [data-theme="light"] .input-area,
         [data-theme="light"] .output-area,
         [data-theme="light"] .bash-output-area {
-            background: #ffffff;
-            color: #1a1a1a;
+            background: var(--term-input-bg-light);
+            color: var(--term-text-dark);
         }
         [data-theme="light"] .bash-output-area {
-            background: #f5f5f5;
-            border-top-color: #cccccc;
+            background: var(--term-bg-light);
+            border-top-color: var(--term-text);
         }
         [data-theme="light"] #command-input {
-            color: #1a1a1a;
+            color: var(--term-text-dark);
         }
         [data-theme="light"] .input-label {
-            color: #444444;
+            color: var(--term-text-muted);
         }
         [data-theme="light"] .left-pane {
-            border-right: 2px solid #cccccc;
+            border-right: 2px solid var(--term-border-light);
         }
         [data-theme="light"] .hint,
         [data-theme="light"] .bash-output-line {
-            color: #666666;
+            color: var(--term-text-muted);
         }
         [data-theme="light"] .bash-prompt {
-            color: #333333;
+            color: var(--term-text-dark);
         }
-        [data-theme="light"] .character-name { color: #1a1a1a; }
-        [data-theme="light"] .user-input { color: #444444; }
-        [data-theme="light"] .lesson-number { color: #333333; }
-        [data-theme="light"] .command-output { color: #555555; }
-        [data-theme="light"] .encouragement { color: #666666; }
-        [data-theme="light"] .choice { color: #444444; }
-        [data-theme="light"] .output-line { color: #333333; }
+        [data-theme="light"] .character-name { color: var(--term-text-dark); }
+        [data-theme="light"] .user-input { color: var(--term-text-muted); }
+        [data-theme="light"] .lesson-number { color: var(--term-text-dark); }
+        [data-theme="light"] .command-output { color: var(--term-text-muted); }
+        [data-theme="light"] .encouragement { color: var(--term-text-muted); }
+        [data-theme="light"] .choice { color: var(--term-text-muted); }
+        [data-theme="light"] .output-line { color: var(--term-text-dark); }
         
         /* Mobile optimizations */
         @media (max-width: 768px) {
@@ -261,11 +260,11 @@
                 height: 50vh;
             }
             .right-pane {
-                border-bottom: 2px solid #444444;
+                border-bottom: 2px solid var(--term-border);
             }
             .left-pane {
                 border-right: none;
-                border-top: 2px solid #444444;
+                border-top: 2px solid var(--term-border);
             }
             body { font-size: 14px; }
             .terminal-header { padding: 8px; }
@@ -303,6 +302,24 @@
             background: #3d6d1e;
         }
     </style>
+
+    <link rel="stylesheet" href="../css/00-fonts.css">
+    <link rel="stylesheet" href="../css/01-variables.css">
+    <link rel="stylesheet" href="../css/02-reset.css">
+    <link rel="stylesheet" href="../css/03-typography.css">
+    <link rel="stylesheet" href="../css/04-navigation.css">
+    <link rel="stylesheet" href="../css/05-layout.css">
+    <link rel="stylesheet" href="../css/06-buttons.css">
+    <link rel="stylesheet" href="../css/07-cards.css">
+    <link rel="stylesheet" href="../css/08-terminal.css">
+    <link rel="stylesheet" href="../css/09-quiz.css">
+    <link rel="stylesheet" href="../css/10-sections.css">
+    <link rel="stylesheet" href="../css/11-modals.css">
+    <link rel="stylesheet" href="../css/12-forms.css">
+    <link rel="stylesheet" href="../css/13-account.css">
+    <link rel="stylesheet" href="../css/14-animations.css">
+    <link rel="stylesheet" href="../css/15-responsive.css">
+    <link rel="stylesheet" href="../css/16-nojs.css">
 </head>
 <body>
     <div class="container">
@@ -989,7 +1006,7 @@
             
             output.scrollTop = output.scrollHeight;
             addLine('');
-            addCharacterMessage("Click on a choice or type --beginner, --intermediate, --expert, --fullscreen, --darkmode, or --exit!");
+            await showCharacterMessage("Click on a choice or type --beginner, --intermediate, --expert, --fullscreen, --darkmode, or --exit!");
         }
         
         async function startTrack(trackName) {

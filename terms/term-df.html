@@ -14,59 +14,58 @@
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>df/du Tutor - Rebel with Linux</title>
-    <link rel="stylesheet" href="../style.css">
-    <style>
+<style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; }
-        body { background: #1a1a1a; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; }
+        body { background: var(--term-bg); color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; }
         .container { display: flex; height: 100vh; width: 100vw; }
         .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .left-pane { border-right: 2px solid #444444; }
-        .terminal-header { background: #333333; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .left-pane { border-right: 2px solid var(--term-border); }
+        .terminal-header { background: var(--term-header-bg); padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
         .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
-        .dot-red { background: #666666; }
-        .dot-yellow { background: #888888; }
-        .dot-green { background: #aaaaaa; }
-        .terminal-title { margin-left: 1rem; color: #cccccc; font-size: 0.85rem; }
-        .pane-label { background: #333333; padding: 0.5rem 1rem; color: #cccccc; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: #1a1a1a; }
-        .input-label { color: #aaaaaa; margin-bottom: 0.5rem; font-size: 0.9rem; }
-        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: #cccccc; font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
-        .hint { color: #666666; font-size: 0.75rem; margin-top: 0.5rem; }
-        .df-output-area { flex: 1; border-top: 2px solid #444444; padding: 0.5rem; background: #222222; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
-        .df-output-line { color: #aaaaaa; margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .dot-red { background: var(--term-dot-red); }
+        .dot-yellow { background: var(--term-dot-yellow); }
+        .dot-green { background: var(--term-dot-green); }
+        .terminal-title { margin-left: 1rem; color: var(--term-text); font-size: 0.85rem; }
+        .pane-label { background: var(--term-header-bg); padding: 0.5rem 1rem; color: var(--term-text); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: var(--term-bg); }
+        .input-label { color: var(--term-text-muted); margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: var(--term-text-muted); font-size: 0.75rem; margin-top: 0.5rem; }
+        .df-output-area { flex: 1; border-top: 2px solid var(--term-border); padding: 0.5rem; background: var(--term-input-bg); overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .df-output-line { color: var(--term-text-muted); margin-bottom: 0.25rem; white-space: pre-wrap; }
         .df-error-line { color: #cc6666; margin-bottom: 0.25rem; }
         .df-success-line { color: #b5bd68; margin-bottom: 0.25rem; }
         .terminal-pane.right-pane { flex: 1; }
-        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: #1e1e1e; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: var(--term-bg); }
         .message { margin-bottom: 1rem; line-height: 1.5; }
         .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
         .message .text { color: #b5bd68; }
         .message .text.fail { color: #cc6666; }
         .message .text.hint { color: #81a2be; font-style: italic; }
         .message .text.success { color: #b5bd68; }
-        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: #2d2d2d; border-left: 3px solid #f0c674; }
-        [data-theme="light"] body { background: #f5f5f5; color: #1a1a1a; }
-        [data-theme="light"] .terminal-header { background: #e0e0e0; }
-        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: #1a1a1a; }
-        [data-theme="light"] .pane-label { background: #e0e0e0; }
-        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .df-output-area { background: #ffffff; color: #1a1a1a; }
-        [data-theme="light"] .df-output-area { background: #f5f5f5; border-top-color: #cccccc; }
-        [data-theme="light"] #command-input { color: #1a1a1a; }
-        [data-theme="light"] .input-label { color: #444444; }
-        [data-theme="light"] .left-pane { border-right: 2px solid #cccccc; }
-        [data-theme="light"] .hint { color: #666666; }
-        [data-theme="light"] .df-output-line { color: #333333; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: var(--term-bg); border-left: 3px solid var(--term-accent, #f0c674); }
+        [data-theme="light"] body { background: var(--term-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .terminal-header { background: var(--term-header-bg-light); }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: var(--term-text-dark); }
+        [data-theme="light"] .pane-label { background: var(--term-header-bg-light); }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .df-output-area { background: var(--term-input-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .df-output-area { background: var(--term-bg-light); border-top-color: var(--term-text); }
+        [data-theme="light"] #command-input { color: var(--term-text-dark); }
+        [data-theme="light"] .input-label { color: var(--term-text-muted); }
+        [data-theme="light"] .left-pane { border-right: 2px solid var(--term-border-light); }
+        [data-theme="light"] .hint { color: var(--term-text-muted); }
+        [data-theme="light"] .df-output-line { color: var(--term-text-dark); }
         [data-theme="light"] .message .speaker { color: #b58900; }
         [data-theme="light"] .message .text { color: #859900; }
         [data-theme="light"] .message .text.fail { color: #dc322f; }
         [data-theme="light"] .message .text.hint { color: #268bd2; }
-        [data-theme="light"] .level-title { background: #eee8d5; color: #b58900; border-left-color: #b58900; }
+        [data-theme="light"] .level-title { background: var(--term-bg-light); color: #b58900; border-left-color: #b58900; }
         @media (max-width: 768px) {
             .container { flex-direction: column-reverse; }
             .terminal-pane { flex: none; height: 50vh; }
-            .right-pane { border-bottom: 2px solid #444444; }
-            .left-pane { border-right: none; border-top: 2px solid #444444; }
+            .right-pane { border-bottom: 2px solid var(--term-border); }
+            .left-pane { border-right: none; border-top: 2px solid var(--term-border); }
             body { font-size: 14px; }
             .terminal-header { padding: 8px; }
             .terminal-title { font-size: 12px; }
@@ -75,6 +74,24 @@
         }
         .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
     </style>
+
+    <link rel="stylesheet" href="../css/00-fonts.css">
+    <link rel="stylesheet" href="../css/01-variables.css">
+    <link rel="stylesheet" href="../css/02-reset.css">
+    <link rel="stylesheet" href="../css/03-typography.css">
+    <link rel="stylesheet" href="../css/04-navigation.css">
+    <link rel="stylesheet" href="../css/05-layout.css">
+    <link rel="stylesheet" href="../css/06-buttons.css">
+    <link rel="stylesheet" href="../css/07-cards.css">
+    <link rel="stylesheet" href="../css/08-terminal.css">
+    <link rel="stylesheet" href="../css/09-quiz.css">
+    <link rel="stylesheet" href="../css/10-sections.css">
+    <link rel="stylesheet" href="../css/11-modals.css">
+    <link rel="stylesheet" href="../css/12-forms.css">
+    <link rel="stylesheet" href="../css/13-account.css">
+    <link rel="stylesheet" href="../css/14-animations.css">
+    <link rel="stylesheet" href="../css/15-responsive.css">
+    <link rel="stylesheet" href="../css/16-nojs.css">
 </head>
 <body>
     <div class="container">
