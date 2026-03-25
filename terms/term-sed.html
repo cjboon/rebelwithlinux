@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-sed.html" />
+    <link rel="icon" href="/img/favicon.ico">
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-nix.html" />
     <script>
         (function() {
             var saved = localStorage.getItem('theme');
@@ -9,56 +10,217 @@
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>
-    <script src="../theme.js"></script>
+    <script src="../js/theme.js"></script>
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sed Tutor - Rebel with Linux</title>
+    <title>Linux Tutor - Rebel with Linux</title>
 <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
-        body { background: var(--term-bg); color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; }
-        .container { display: flex; height: 100vh; width: 100vw; }
-        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .left-pane { border-right: #444444; 2px solid }
-        .terminal-header { background: var(--term-header-bg); padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        body {
+            background: var(--term-bg);
+            color: var(--term-text);
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        .terminal-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .left-pane {
+            border-right: 2px solid var(--term-border);
+        }
+        
+        .terminal-header {
+            background: var(--term-header-bg);
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
         .dot-red { background: var(--term-dot-red); }
         .dot-yellow { background: var(--term-dot-yellow); }
         .dot-green { background: var(--term-dot-green); }
-        .terminal-title { margin-left: 1rem; color: var(--term-text); font-size: 0.85rem; }
-        .pane-label { background: var(--term-header-bg); padding: 0.5rem 1rem; color: var(--term-text); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: var(--term-bg); }
-        .input-label { color: var(--term-text-muted); margin-bottom: 0.5rem; font-size: 0.9rem; }
-        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
-        .hint { color: var(--term-text-muted); font-size: 0.75rem; margin-top: 0.5rem; }
-        .sed-output-area { flex: 1; border-top: 2px solid var(--term-border); padding: 0.5rem; background: var(--term-input-bg); overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
-        .sed-output-line { color: var(--term-text-muted); margin-bottom: 0.25rem; white-space: pre-wrap; }
-        .sed-error-line { color: #cc6666; margin-bottom: 0.25rem; }
-        .terminal-pane.right-pane { flex: 1; }
-        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: var(--term-bg); }
-        .message { margin-bottom: 1rem; line-height: 1.5; }
-        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
-        .message .text { color: #b5bd68; }
-        .message .text.fail { color: #cc6666; }
-        .message .text.hint { color: #81a2be; font-style: italic; }
-        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: var(--term-bg); border-left: 3px solid var(--term-accent, #f0c674); }
+        
+        .terminal-title {
+            margin-left: 1rem;
+            color: var(--term-text);
+            font-size: 0.85rem;
+        }
+        
+        .pane-label {
+            background: var(--term-header-bg);
+            padding: 0.5rem 1rem;
+            color: var(--term-text);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .input-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            background: var(--term-bg);
+        }
+        
+        .input-label {
+            color: var(--term-text-muted);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        #command-input {
+            flex: 1;
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--term-text);
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+        }
+        
+        #command-input::placeholder {
+            color: var(--term-text-muted);
+        }
+        
+        .hint {
+            color: var(--term-text-muted);
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        .output-area {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: var(--term-bg);
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+        }
+        
+        .output-line {
+            margin-bottom: 0.3rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.4;
+            color: var(--term-text);
+        }
+        
+        .character-name {
+            color: var(--term-text-light);
+            font-weight: bold;
+        }
+        
+        .user-input {
+            color: var(--term-text-muted);
+        }
+        
+        .lesson-number {
+            color: var(--term-text-muted);
+            font-weight: bold;
+        }
+        
+        .command-output {
+            color: var(--term-text);
+            margin-left: 1rem;
+        }
+        
+        .encouragement {
+            color: var(--term-text-muted);
+            font-style: italic;
+        }
+        
+        .choices {
+            margin-top: 0.5rem;
+            margin-left: 1rem;
+        }
+        
+        .choice {
+            color: var(--term-text-muted);
+            cursor: pointer;
+            margin-bottom: 0.25rem;
+        }
+        
+        .choice:hover {
+            text-decoration: underline;
+        }
+        
+        .bash-output-area {
+            flex: 1;
+            border-top: 2px solid var(--term-border);
+            padding: 0.5rem;
+            background: var(--term-input-bg);
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            min-height: 100px;
+        }
+        
+        .bash-output-line {
+            color: var(--term-text-light);
+            margin-bottom: 2px;
+        }
+        
+        .bash-error-line {
+            color: var(--term-text-muted);
+            margin-bottom: 2px;
+        }
+        
+        .bash-prompt {
+            color: var(--term-text-muted);
+        }
+        
+        /* Light mode overrides */
         [data-theme="light"] body { background: var(--term-bg-light); color: var(--term-text-dark); }
         [data-theme="light"] .terminal-header { background: var(--term-header-bg-light); }
         [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: var(--term-text-dark); }
         [data-theme="light"] .pane-label { background: var(--term-header-bg-light); }
-        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .sed-output-area { background: var(--term-input-bg-light); color: var(--term-text-dark); }
-        [data-theme="light"] .sed-output-area { background: var(--term-bg-light); border-top-color: var(--term-text); }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .bash-output-area { background: var(--term-input-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .bash-output-area { background: var(--term-bg-light); border-top-color: var(--term-text); }
         [data-theme="light"] #command-input { color: var(--term-text-dark); }
         [data-theme="light"] .input-label { color: var(--term-text-muted); }
         [data-theme="light"] .left-pane { border-right: 2px solid var(--term-border-light); }
-        [data-theme="light"] .hint { color: var(--term-text-muted); }
-        [data-theme="light"] .sed-output-line { color: var(--term-text-dark); }
-        [data-theme="light"] .message .speaker { color: #b58900; }
-        [data-theme="light"] .message .text { color: #859900; }
-        [data-theme="light"] .message .text.fail { color: #dc322f; }
-        [data-theme="light"] .message .text.hint { color: #268bd2; }
-        [data-theme="light"] .level-title { background: var(--term-bg-light); color: #b58900; border-left-color: #b58900; }
+        [data-theme="light"] .hint, [data-theme="light"] .bash-output-line { color: var(--term-text-muted); }
+        [data-theme="light"] .bash-prompt { color: var(--term-text-dark); }
+        [data-theme="light"] .character-name { color: var(--term-text-dark); }
+        [data-theme="light"] .user-input { color: var(--term-text-muted); }
+        [data-theme="light"] .lesson-number { color: var(--term-text-dark); }
+        [data-theme="light"] .command-output { color: var(--term-text-muted); }
+        [data-theme="light"] .encouragement { color: var(--term-text-muted); }
+        [data-theme="light"] .choice { color: var(--term-text-muted); }
+        [data-theme="light"] .output-line { color: var(--term-text-dark); }
         
         /* Mobile optimizations */
         @media (max-width: 768px) {
@@ -126,16 +288,16 @@
                 <span class="terminal-dot dot-red"></span>
                 <span class="terminal-dot dot-yellow"></span>
                 <span class="terminal-dot dot-green"></span>
-                <span class="terminal-title">Sed Tutor</span>
+                <span class="terminal-title">Linux Tutor</span>
             </div>
             <div class="input-area" style="flex: 1;">
-                <div class="input-label">&gt;&gt; Type sed command:</div>
-                <textarea id="command-input" placeholder="sed 's/old/new/' file.txt" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <div class="input-label">&gt;&gt; Type your answer (Linux command):</div>
+                <textarea id="command-input" placeholder="Type your answer here..." autofocus spellcheck="false" style="flex: 1;"></textarea>
                 <button class="mobile-run-btn" id="runBtn">Run Command</button>
                 <div class="hint">Enter for new line, Ctrl+Enter to run</div>
             </div>
-            <div class="sed-output-area" id="sed-output">
-                <div class="sed-output-line" style="color: #586e75;">Sed output will appear here...</div>
+            <div class="bash-output-area" id="bash-output">
+                <div class="bash-output-line" style="color: #586e75;">Linux command output will appear here...</div>
             </div>
         </div>
         <div class="terminal-pane right-pane">
@@ -152,7 +314,7 @@
         const input = document.getElementById('command-input');
         const history = document.getElementById('history');
         const output = document.getElementById('output');
-        const sedOutput = document.getElementById('sed-output');
+        const bashOutput = document.getElementById('bash-output');
         
         let currentLevel = 0;
         let userId = null;
@@ -180,7 +342,11 @@
             try {
                 const response = await fetch('/api/auth.php?action=check');
                 const data = await response.json();
-                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+                if (data.authenticated) { 
+                    userId = data.email;
+                    userTheme = data.theme || 'dark';
+                    return true; 
+                }
             } catch (e) {}
             return false;
         }
@@ -188,7 +354,7 @@
         async function loadProgress() {
             if (!userId) return null;
             try {
-                const response = await fetch('/api/progress.php?course=sed');
+                const response = await fetch('/api/progress.php?course=linux');
                 if (response.ok) {
                     const data = await response.json();
                     if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
@@ -203,68 +369,62 @@
                 await fetch('/api/progress.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ course: 'sed', lesson_id: level, completed: true, quiz_score: 0 })
+                    body: JSON.stringify({ course: 'linux', lesson_id: level, completed: true, quiz_score: 0 })
                 });
             } catch (e) {}
         }
         
-        function addSedLine(text, type = 'output') {
+        function addBashLine(text, type = 'output') {
             const line = document.createElement('div');
-            line.className = type === 'error' ? 'sed-error-line' : 'sed-output-line';
+            line.className = type === 'error' ? 'bash-error-line' : 'bash-output-line';
             line.textContent = text;
-            sedOutput.appendChild(line);
-            sedOutput.scrollTop = sedOutput.scrollHeight;
+            bashOutput.appendChild(line);
+            bashOutput.scrollTop = bashOutput.scrollHeight;
         }
         
-        function clearSedOutput() {
-            sedOutput.innerHTML = '';
+        function clearBashOutput() {
+            bashOutput.innerHTML = '';
         }
         
-        function runSedCode(cmd) {
-            addSedLine('$ echo "' + testData.line1 + '" | ' + cmd);
-            
-            const inputText = testData.line1;
-            let result = inputText;
-            let error = null;
+        // Session management
+        let sessionId = localStorage.getItem('linuxSessionId');
+        if (!sessionId) {
+            sessionId = 'session_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('linuxSessionId', sessionId);
+        }
+        
+        async function runBashCode(cmd) {
+            addBashLine('$ ' + cmd);
             
             try {
-                const match = cmd.match(/sed\s+['"]s\/([^\/]*)\/([^\/]*)\/(['"]?)(g?)(I?)/);
-                if (match) {
-                    const pattern = match[1];
-                    const replacement = match[2];
-                    const hasG = match[4] === 'g';
-                    const hasI = match[5] === 'I';
-                    
-                    let flags = '';
-                    if (hasI) flags += 'i';
-                    if (hasG) flags += 'g';
-                    
-                    const regex = new RegExp(pattern, flags);
-                    if (hasG) {
-                        result = inputText.replace(regex, replacement);
-                    } else {
-                        result = inputText.replace(regex, replacement);
-                    }
-                } else if (cmd.includes("'d'") || cmd.includes('/d')) {
-                    const delMatch = cmd.match(/sed\s+['"]\/([^\/]+)\/d['"]/);
-                    if (delMatch) {
-                        const pattern = new RegExp(delMatch[1], 'g');
-                        result = inputText.replace(pattern, '');
-                    }
-                } else {
-                    result = "(Sed commands supported: s/pattern/replacement/, /pattern/d)";
-                }
+                const response = await fetch('/cgi-bin/bash_exec.py', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'code=' + encodeURIComponent(cmd) + '&session=' + sessionId
+                });
                 
-                result.split('\n').forEach(line => addSedLine(line));
+                const data = await response.json();
+                
+                if (data.error) {
+                    addBashLine(data.output, 'error');
+                } else {
+                    if (data.output) {
+                        data.output.split('\n').forEach(line => addBashLine(line));
+                    } else {
+                        addBashLine('(no output)', 'output');
+                    }
+                }
             } catch (e) {
-                addSedLine('Error: ' + e.message, 'error');
+                addBashLine('Error: ' + e.message, 'error');
             }
         }
         
         const character = {
-            name: "Sed the Wizard",
-            greeting: "Greetings, apprentice! I am Sed the Wizard - master of text transformation! Sed (Stream Editor) is the most powerful spell in your command-line arsenal. With sed, you can transform any text instantly - find, replace, delete, insert - with magical precision! Let's begin your journey into the dark arts of text manipulation! Type --beginner or --intermediate to choose your path.",
-            encourage: ["Magical work!", "Enchanting transformation!", "You're a natural wizard!", "The text obeys your will!", "Perfect casting!", "Most excellent!"],
+            name: "Linux Larry",
+            greeting: "Hey honey! I'm Linux Larry - a fabulous terminal enthusiast who believes everyone deserves to shine! ✨ I'll teach you the Linux command line - it's like learning a fabulous new dance! One by one, you'll master these gorgeous commands and dance your way through the terminal! Let's make some magic happen, darling! 💅",
+            encourage: ["You're serving looks AND commands!", "Keep going, you gorgeous thing!", "Every command you learn is another accessory for your outfit!", "I'm absolutely gagging over here!", "You're slaying that terminal!", "The terminal is your runway, honey!"],
             getEncouragement: function() {
                 return this.encourage[Math.floor(Math.random() * this.encourage.length)];
             }
@@ -273,368 +433,368 @@
         const beginnerLevels = [
             {
                 id: 1,
-                title: "The Substitution Spell",
-                intro: "Welcome, apprentice! Let's start with sed's most powerful spell: substitution! The 's' command replaces text. It's like magic - watch!",
-                content: "Replace 'hello' with 'hi':\nsed 's/hello/hi/'",
-                hint: "Type: sed 's/hello/hi/'",
-                answer: "sed 's/hello/hi/'",
-                success: "Magnificent! The 's' command substitutes! Format: s/pattern/replacement/. See how 'hello' became 'hi'? The spell is cast!",
+                title: "Echo - Your First Command",
+                intro: "Welcome! Let's start with echo - it's how you make the terminal speak. Think of it as shouting your message to the digital void.",
+                content: "Let's try it - type this and press Ctrl+Enter:\necho \"Hello, free world!\"",
+                hint: "Type: echo \"Hello, free world!\"",
+                answer: "echo \"Hello, free world!\"",
+                success: "Beautiful! echo is your voice in the terminal. Those quotes tell the shell it's text. You're taking your first steps toward command line mastery!",
                 type: "exact"
             },
             {
                 id: 2,
-                title: "Global Replacement",
-                intro: "By default, sed only replaces the FIRST match. But what if we want to replace ALL? That's where the 'g' flag comes in!",
-                content: "Replace ALL occurrences:\nsed 's/hello/hi/g'",
-                hint: "Type: sed 's/hello/hi/g'",
-                answer: "sed 's/hello/hi/g'",
-                success: "Behold! The 'g' means GLOBAL - every 'hello' becomes 'hi'! Without 'g', only the first would change. Master the g, and transformation is yours!",
+                title: "Who Are You?",
+                intro: "Time to introduce yourself to the system. The whoami command tells you exactly that - who you're logged in as. Important in a world where identity matters.",
+                content: "Find out who you are:\nwhoami",
+                hint: "Type: whoami",
+                answer: "whoami",
+                success: "That's you! Knowing your identity in Linux is fundamental. Are you root? A regular user? This determines what you can and cannot do. Permissions matter!",
                 type: "exact"
             },
             {
                 id: 3,
-                title: "Case Sensitivity",
-                intro: "Sed is case-sensitive by default. But we can use the 'I' flag to ignore case!",
-                content: "Replace ignoring case:\nsed 's/apple/grape/Ig'",
-                hint: "Type: sed 's/apple/grape/Ig'",
-                answer: "sed 's/apple/grape/Ig'",
-                success: "Case ignored! The 'I' flag makes it case-insensitive. Combined with 'g', it replaces ALL case variations! True wizardry!",
+                title: "Where Are You?",
+                intro: "Just like in life, knowing where you are matters. pwd prints your current working directory - your digital coordinates.",
+                content: "Find your location:\npwd",
+                hint: "Type: pwd",
+                answer: "pwd",
+                success: "That's your current path! /home/yourname is typical for regular users, /root for the superuser. Navigate wisely, freedom fighter!",
                 type: "exact"
             },
             {
                 id: 4,
-                title: "The Delete Spell",
-                intro: "Sometimes you don't want to replace - you want to DESTROY! The 'd' command deletes lines that match.",
-                content: "Delete lines with 'hello':\nsed '/hello/d'",
-                hint: "Type: sed '/hello/d'",
-                answer: "sed '/hello/d'",
-                success: "Gone! The 'd' command deletes matching lines entirely. Use with caution - once deleted, text is lost to the void!",
+                title: "List Files",
+                intro: "Time to see what's around you. ls lists the contents of your current directory. Knowledge is power - seeing what's available is step one.",
+                content: "See what's in your directory:\nls",
+                hint: "Type: ls",
+                answer: "ls",
+                success: "Look at all those files! ls -la shows hidden files too (they start with a dot). In Linux, everything is a file - including your hardware!",
                 type: "exact"
             },
             {
                 id: 5,
-                title: "Addressed Magic",
-                intro: "Sed can target SPECIFIC lines! Use line numbers to apply magic only where needed.",
-                content: "Change only line 1:\nsed '1s/world/there/'",
-                hint: "Type: sed '1s/world/there/'",
-                answer: "sed '1s/world/there/'",
-                success: "Only line 1 changed! The '1' before the command is the address. Use any line number - precision is the wizard's ally!",
+                title: "Make a Directory",
+                intro: "Let's create something! mkdir makes new directories (folders). Every revolution needs a headquarters - let's build yours.",
+                content: "Create a directory:\nmkdir my_rebel_base",
+                hint: "Type: mkdir my_rebel_base",
+                answer: "mkdir my_rebel_base",
+                success: "You made a directory! Now use 'cd my_rebel_base' to enter it. Building your digital infrastructure, one command at a time!",
                 type: "exact"
             },
             {
                 id: 6,
-                title: "Range of Power",
-                intro: "You can address a RANGE of lines! From one line to another.",
-                content: "Change lines 1 to 3:\nsed '1,3s/line/note/'",
-                hint: "Type: sed '1,3s/line/note/'",
-                answer: "sed '1,3s/line/note/'",
-                success: "Only lines 1 through 3 transformed! The comma creates a range. From line X to line Y - master this range and power is yours!",
+                title: "Change Directory",
+                intro: "Navigation is freedom. cd lets you change your current directory. A free mind goes wherever it wants.",
+                content: "Navigate into your new directory:\ncd my_rebel_base",
+                hint: "Type: cd my_rebel_base",
+                answer: "cd my_rebel_base",
+                success: "You're inside! Use 'cd ..' to go back. Use 'cd ~' or just 'cd' to go home. The terminal is your oyster, freedom fighter!",
                 type: "exact"
             },
             {
                 id: 7,
-                title: "Print Command",
-                intro: "The 'p' command prints lines. Combined with -n, it shows only what you want.",
-                content: "Print specific line:\nsed -n '2p'",
-                hint: "Type: sed -n '2p'",
-                answer: "sed -n '2p'",
-                success: "Only line 2 appears! The -n suppresses auto-print, 'p' prints the addressed line. Filtering has never been so elegant!",
+                title: "Create a File",
+                intro: "Let's make something useful. touch creates empty files. Every big project starts small.",
+                content: "Create a text file:\ntouch manifest.txt",
+                hint: "Type: touch manifest.txt",
+                answer: "touch manifest.txt",
+                success: "You made a file! Now it's yours. Use 'ls' to confirm it's there. You can write to it later with echo or a text editor like nano or vim!",
                 type: "exact"
             },
             {
                 id: 8,
-                title: "Pattern as Address",
-                intro: "Addresses can be PATTERNS too! Apply magic only to lines matching a regex.",
-                content: "Change lines with 'two':\nsed '/two/s/three/THREE/'",
-                hint: "Type: sed '/two/s/three/THREE/'",
-                answer: "sed '/two/s/three/THREE/'",
-                success: "Only the line containing 'two' was modified! The address /pattern/ targets matching lines. Selective magic!",
-                type: "exact"
+                title: "Write to a File",
+                intro: "Now let's put some thoughts down. We can use echo with redirection (>) to write to a file.",
+                content: "Write a message to your file:\necho \"Free software is human rights\" > manifest.txt",
+                hint: "Type: echo \"Free software is human rights\" > manifest.txt",
+                answer: "echo \"Free software",
+                success: "Beautiful words! The > redirects output into the file instead of the screen. Use >> to append. You're writing your own story now!",
+                type: "starts"
             },
             {
                 id: 9,
-                title: "Character Classes",
-                intro: "Use brackets [] to match CHARACTER CLASSES - any single character in the set.",
-                content: "Replace any digit:\nsed 's/[0-9]/X/g'",
-                hint: "Type: sed 's/[0-9]/X/g'",
-                answer: "sed 's/[0-9]/X/g'",
-                success: "All digits become X! [0-9] matches any digit. [a-z] for lowercase, [A-Z] for uppercase, [aeiou] for vowels. Classes are powerful!",
+                title: "Read a File",
+                intro: "Now let's read what we wrote. cat displays the entire contents of a file.",
+                content: "Read your manifest:\ncat manifest.txt",
+                hint: "Type: cat manifest.txt",
+                answer: "cat manifest.txt",
+                success: "Your words, displayed! cat is short for concatenate - it can join files together too. Reading is fundamental in the free world!",
                 type: "exact"
             },
             {
                 id: 10,
-                title: "Wildcard Magic",
-                intro: "The dot (.) matches ANY character. Combine with * for 'any number of any character'.",
-                content: "Match any 3 chars:\nsed 's/.../XXX/g'",
-                hint: "Type: sed 's/.../XXX/g'",
-                answer: "sed 's/.../XXX/g'",
-                success: "Every group of 3 characters became XXX! The dot is a wildcard, matching anything. This is the basis of pattern matching!",
+                title: "Remove a File",
+                intro: "Sometimes we need to let go. rm removes files. But be careful - in Linux, there's no trash bin recovery!",
+                content: "Remove your file:\nrm manifest.txt",
+                hint: "Type: rm manifest.txt",
+                answer: "rm manifest.txt",
+                success: "Gone! Use rm -r to remove directories. Remember: with great power comes great responsibility. The terminal doesn't forgive mistakes easily!",
                 type: "exact"
             },
             {
                 id: 11,
-                title: "Ampersand Magic",
-                intro: "The & represents what was MATCHED! Insert around what you find.",
-                content: "Wrap match in tags:\nsed 's/fox/<&>/g'",
-                hint: "Type: sed 's/fox/<&>/g'",
-                answer: "sed 's/fox/<&>/g'",
-                success: "The matched text (&) got wrapped in tags! & is your wildcard capture. Insert BEFORE, AFTER, or AROUND your match!",
+                title: "Check System Info",
+                intro: "Let's learn about your system. uname gives you system information - know your weapon!",
+                content: "Get system information:\nuname -a",
+                hint: "Type: uname -a",
+                answer: "uname -a",
+                success: "There's your system info! Kernel version, hostname, all that good stuff. The -a flag means 'all'. Flags modify how commands work - read those man pages!",
                 type: "exact"
             },
             {
                 id: 12,
                 title: "Beginner Finale",
-                intro: "Incredible! You've mastered the fundamentals of sed! Let's combine everything!",
-                content: "The ultimate spell:\nsed '1,2s/[a-z]/U&/g'",
-                hint: "Type: sed '1,2s/[a-z]/U&/g'",
-                answer: "sed '1,2s/[a-z]/U&/g'",
-                success: "YOU DID IT! First 2 lines, lowercase letters all became UPPERCASE! Range, class, global, AND ampersand - you've mastered the basics! Sed apprentice - COMPLETE! The text transformation arts are yours! PROUD!",
+                intro: "You've come so far, freedom fighter! Let's put it all together with a quick tour.",
+                content: "Check home directory with details:\nls -la ~",
+                hint: "Type: ls -la ~",
+                answer: "ls -la ~",
+                success: "LOOK AT YOU! You can navigate, create, read, and destroy files. You know your system. You're a real Linux user now! Keep learning, keep fighting for digital freedom! The terminal is your weapon, and you're wielding it well! PROUD OF YOU!",
                 type: "starts"
             }
         ];
         
         const intermediateLevels = [
             {
-                id: 1,
-                title: "Line Addresses",
-                intro: "Welcome to INTERMEDIATE level! Let's learn about addresses - we can target specific lines!",
-                content: "Replace only on line 2:\nsed '2s/hello/hi/'",
-                hint: "Type: sed '2s/hello/hi/'",
-                answer: "sed '2s/",
-                success: "Line addresses are powerful! '2s' means only on line 2. You can use any line number - sed obeys your spatial commands!",
+                id: 13,
+                title: "Find Files",
+                intro: "Welcome back! Let's learn find - one of the most powerful commands. It searches for files anywhere in your system.",
+                content: "Find all .txt files:\nfind ~ -name \"*.txt\"",
+                hint: "Type: find ~ -name \"*.txt\"",
+                answer: "find ~ -name",
+                success: "Incredible! find searches recursively from your home directory. The * is a wildcard matching anything. This is essential for organizing your digital life!",
                 type: "starts"
             },
             {
-                id: 2,
-                title: "Range of Lines",
-                intro: "We can target a RANGE of lines! This is very useful for processing specific sections.",
-                content: "Replace on lines 1-3:\nsed '1,3s/hello/hi/'",
-                hint: "Type: sed '1,3s/hello/hi/'",
-                answer: "sed '1,3s/",
-                success: "The range 1,3 means lines 1 through 3! You can transform entire sections of files with this spell!",
+                id: 14,
+                title: "Search Inside Files",
+                intro: "grep is your search engine within files. Find that one line in thousands of log files. Massive time saver.",
+                content: "Search for a word:\ngrep -r \"error\" /var/log",
+                hint: "Type: grep -r \"error\" /var/log",
+                answer: "grep",
+                success: "grep searches through file contents! -r means recursive. This is how you debug, investigate, and find needles in haystacks. Power users live in grep!",
                 type: "starts"
             },
             {
-                id: 3,
-                title: "Pattern Addresses",
-                intro: "Instead of line numbers, we can use PATTERNS to find lines!",
-                content: "Replace only in lines containing 'error':\nsed '/error/s/warn/critical/'",
-                hint: "Type: sed '/error/s/warn/critical/'",
-                answer: "sed '/error/s/",
-                success: "Pattern matching! '/error/' selects lines with 'error', then s/// works on those lines only. Precise targeting!",
-                type: "starts"
-            },
-            {
-                id: 4,
-                title: "Delete by Range",
-                intro: "We can delete ranges of lines too! Very useful for removing headers or footers.",
-                content: "Delete lines 1-5:\nsed '1,5d'",
-                hint: "Type: sed '1,5d'",
-                answer: "sed '1,5d'",
-                success: "Lines 1 through 5 are gone! This is how you strip headers from files instantly. The void claims them!",
+                id: 15,
+                title: "Process Management",
+                intro: "ps shows running processes. In a world of surveillance, knowing what's running on your machine is critical.",
+                content: "See all your processes:\nps aux",
+                hint: "Type: ps aux",
+                answer: "ps aux",
+                success: "There's everything running on your system! Use 'kill [PID]' to stop something. Use 'top' or 'htop' for a live view. Know thy processes!",
                 type: "exact"
             },
             {
-                id: 5,
-                title: "Print Only Matched",
-                intro: "The 'p' command prints lines. Combined with -n, it shows ONLY matching lines!",
-                content: "Print lines with 'hello':\nsed -n '/hello/p'",
-                hint: "Type: sed -n '/hello/p'",
-                answer: "sed -n '/hello/p'",
-                success: "The -n suppresses auto-print, 'p' prints matches. This is like grep with sed power! Selective display!",
+                id: 16,
+                title: "Kill Processes",
+                intro: "Sometimes things go wrong. kill terminates processes by their ID. Use responsibly - you have the power to end things.",
+                content: "Find a process ID:\npidof bash",
+                hint: "Type: pidof bash",
+                answer: "pidof bash",
+                success: "That's a process ID! Use 'kill [PID]' to stop it. For stubborn processes, use 'kill -9 [PID]'. Use with caution - you can crash your own programs!",
                 type: "starts"
             },
             {
-                id: 6,
-                title: "Multiple Commands",
-                intro: "We can chain multiple sed commands with -e! Like casting multiple spells at once!",
-                content: "Two replacements:\nsed -e 's/foo/bar/' -e 's/baz/qux/'",
-                hint: "Type: sed -e 's/foo/bar/' -e 's/baz/qux/'",
-                answer: "sed -e 's/foo/bar/' -e",
-                success: "Multiple commands! Each -e adds a command. You can chain as many as you need for complex transformations!",
-                type: "starts"
-            },
-            {
-                id: 7,
-                title: "Using & as Match",
-                intro: "The & represents what you matched! Very useful for wrapping text.",
-                content: "Wrap matches in brackets:\nsed 's/word/[&]/'",
-                hint: "Type: sed 's/word/[&]/'",
-                answer: "s/word/[&]/",
-                success: "The & inserts the matched text! [word] - you can wrap, add prefixes, suffixes - & is your placeholder!",
-                type: "starts"
-            },
-            {
-                id: 8,
-                title: "Capture Groups",
-                intro: "Parentheses () create capture groups, \\1 \\2 reference them! This is advanced magic.",
-                content: "Swap words:\nsed 's/\\(word1\\) \\(word2\\)/\\2 \\1/'",
-                hint: "Type: sed 's/\\\\(word1\\\\) \\\\(word2\\\\)/\\\\2 \\\\1/'",
-                answer: "sed 's/\\\\(word1\\\\) \\\\2 \\1/'",
-                success: "Capture groups! \\1 and \\2 hold matched parts. This swaps word1 and word2 - regex sorcery!",
-                type: "starts"
-            },
-            {
-                id: 9,
-                title: "The Hold Space",
-                intro: "Sed has a 'hold' space - like a clipboard! The 'h' command copies pattern to hold, 'x' exchanges them.",
-                content: "Copy line to hold:\nsed 'h'",
-                hint: "Type: sed 'h'",
-                answer: "sed 'h'",
-                success: "The hold space stores lines! 'h' copies, 'H' appends, 'g' gets from hold. This is sed's memory!",
+                id: 17,
+                title: "Check Disk Space",
+                intro: "df shows disk space usage. Keep an eye on your storage - full disks cause problems.",
+                content: "Check disk usage:\ndf -h",
+                hint: "Type: df -h",
+                answer: "df -h",
+                success: "-h means human-readable (KB/MB/GB). / is your root, /home is where your files live. Keep /tmp clean - it's for temporary files!",
                 type: "exact"
             },
             {
-                id: 10,
-                title: "Insert and Append",
-                intro: "The 'i' inserts BEFORE a line, 'a' appends AFTER. These need addresses!",
-                content: "Insert before line 1:\nsed '1i\\New line'",
-                hint: "Type: sed '1i\\\\New line'",
-                answer: "sed '1i\\\\",
-                success: "Line insertion! 'i' inserts before, 'a' appends after. Perfect for adding headers to files!",
+                id: 18,
+                title: "Check Memory",
+                intro: "free shows RAM usage. In resource-constrained environments, knowing your memory is vital.",
+                content: "Check memory:\nfree -h",
+                hint: "Type: free -h",
+                answer: "free -h",
+                success: "There's your memory info! used, free, available. Linux is efficient - it uses unused memory for disk caching. That's the free software difference!",
+                type: "exact"
+            },
+            {
+                id: 19,
+                title: "View Running Tasks",
+                intro: "top gives you a live view of system resources. Like Task Manager, but actually useful.",
+                content: "See live processes:\ntop",
+                hint: "Type: top",
+                answer: "top",
+                success: "That's top in action! q to quit. It shows CPU, memory, running processes. For fancier views, try 'htop' if installed. Stay informed, freedom fighter!",
+                type: "exact"
+            },
+            {
+                id: 20,
+                title: "Network Connections",
+                intro: "netstat shows network connections. In a world of surveillance, knowing who's connecting to your machine is essential.",
+                content: "Check network connections:\nnetstat -tuln",
+                hint: "Type: netstat -tuln",
+                answer: "netstat -tuln",
+                success: "That's your listening ports! -t TCP, -u UDP, -l listening, -n numeric. See something suspicious? You might have a breach!",
+                type: "exact"
+            },
+            {
+                id: 21,
+                title: "Check Open Files",
+                intro: "lsof lists open files. In Linux, everything is a file - so this shows what's using what.",
+                content: "See open files:\nlsof",
+                hint: "Type: lsof",
+                answer: "lsof",
+                success: "Every open file! Useful for finding what process is using a file, or detecting unauthorized access. This is pro-level monitoring!",
+                type: "exact"
+            },
+            {
+                id: 22,
+                title: "File Permissions",
+                intro: "chmod changes file permissions. In the free world, control who can read, write, or execute your files.",
+                content: "Make a script executable:\nchmod +x script.sh",
+                hint: "Type: chmod +x script.sh",
+                answer: "chmod +x",
+                success: "That file can now run! r=read, w=write, x=execute. 755 is common for scripts (you + everyone can execute). Permissions are your digital locks!",
                 type: "starts"
             },
             {
-                id: 11,
-                title: "Change Entire Line",
-                intro: "The 'c' command replaces an ENTIRE line with new text!",
-                content: "Replace line 1:\nsed '1c\\Replaced!'",
-                hint: "Type: sed '1c\\\\Replaced!'",
-                answer: "sed '1c\\\\",
-                success: "Complete replacement! 'c' swaps the whole line. This is how you do wholesale line transformations!",
+                id: 23,
+                title: "Change Ownership",
+                intro: "chown changes file ownership. Only the file owner or root can do this.",
+                content: "Change ownership:\nchown user:group file",
+                hint: "Type: chown user:group file",
+                answer: "chown",
+                success: "Ownership transferred! user:group format. Remember: root can change anything, regular users are limited. The root user is the ultimate key!",
                 type: "starts"
             },
             {
-                id: 12,
+                id: 24,
                 title: "Intermediate Finale",
-                intro: "Final challenge! Use sed to transform text in a way that combines multiple techniques!",
-                content: "On lines with 'TODO', replace 'fix' with 'DONE':\nsed '/TODO/s/fix/DONE/'",
-                hint: "Type: sed '/TODO/s/fix/DONE/'",
-                answer: "sed '/TODO/s/",
-                success: "INTERMEDIATE COMPLETE! You now command addresses, patterns, groups, hold space, and more! You're a sed wizard! Type --expert to become a master!",
+                intro: "You've advanced so much! Let's combine file searching with permissions.",
+                content: "Find and check permissions:\nfind ~ -type f -perm -4000",
+                hint: "Type: find ~ -type f -perm",
+                answer: "find ~ -type f",
+                success: "Those are SUID files - they run with owner privileges. Dangerous if misused! You're now a SYSTEM ADMINISTRATOR level user! The machine bends to your will! PROUD!",
                 type: "starts"
             }
         ];
         
         const expertLevels = [
             {
-                id: 1,
-                title: "The Branching Spell",
-                intro: "Welcome to EXPERT mode, apprentice! Let's master the advanced arts of sed!",
-                content: "Execute from file:\nsed -f commands.sed input.txt",
-                hint: "Type: sed -f",
-                answer: "sed -f",
-                success: "Loading from file! -f reads commands from a file. This is how you save and reuse complex spells!",
+                id: 25,
+                title: "SSH Keys",
+                intro: "Welcome to expert level! SSH keys are the gold standard for secure access. Passwords are so last century - keys are more secure.",
+                content: "Generate an SSH key:\nssh-keygen -t ed25519",
+                hint: "Type: ssh-keygen -t ed25519",
+                answer: "ssh-keygen -t ed25519",
+                success: "You made a keypair! ed25519 is modern and secure. The public key goes on servers, private key stays with you. NO PASSWORDS = NO HACKS. This is how professionals operate!",
                 type: "starts"
             },
             {
-                id: 2,
-                title: "In-Place Editing",
-                intro: "The -i flag edits files IN PLACE! No output to stdout - transforms the file itself!",
-                content: "Edit in place:\nsed -i 's/old/new/g' file.txt",
-                hint: "Type: sed -i",
-                answer: "sed -i",
-                success: "In-place transformation! -i edits the file directly. Use -i.bak for backup: sed -i.bak 's/old/new/' file.txt!",
+                id: 26,
+                title: "SSH Copy",
+                intro: "Now let's get that key onto a server. ssh-copy-id automates the process.",
+                content: "Copy key to server:\nssh-copy-id user@server",
+                hint: "Type: ssh-copy-id user@server",
+                answer: "ssh-copy-id",
+                success: "Key installed! Now you can ssh in without a password. Or use ssh -i to specify a key. This is secure, key-based authentication - the way it should be!",
                 type: "starts"
             },
             {
-                id: 3,
-                title: "Regex Character Classes",
-                intro: "Advanced regex in sed! Match specific types of characters precisely.",
-                content: "Match word characters:\nsed 's/\\w/X/g'",
-                hint: "Type: sed 's/\\\\w/X/g'",
-                answer: "sed 's/\\\\w",
-                success: "Word characters matched! \\\\w matches [a-zA-Z0-9_]. \\\\W matches non-word characters. Precision at your fingertips!",
+                id: 27,
+                title: "Package Management - APT",
+                intro: "apt is Debian's package manager. Installing software from official repos is safe and easy.",
+                content: "Update package lists:\nsudo apt update",
+                hint: "Type: sudo apt update",
+                answer: "sudo apt update",
+                success: "You refreshed the package lists! sudo = superuser do. apt update fetches latest versions. Then 'sudo apt upgrade' to install them. Always update before installing!",
                 type: "starts"
             },
             {
-                id: 4,
-                title: "Digit Matching",
-                intro: "Match digits and non-digits with \\\\d and \\\\D!",
-                content: "Replace digits with #:\nsed 's/\\d/#/g'",
-                hint: "Type: sed 's/\\\\d/#/g'",
-                answer: "sed 's/\\\\d",
-                success: "Digits replaced! \\\\d matches [0-9], \\\\D matches non-digits. Perfect for anonymizing numbers!",
+                id: 28,
+                title: "Install Software",
+                intro: "Now install something useful. The FOSS way - from official repositories.",
+                content: "Install a package:\nsudo apt install neovim",
+                hint: "Type: sudo apt install neovim",
+                answer: "sudo apt install",
+                success: "Installing from repos is safe! It handles dependencies automatically. You've got neovim - a free software editor! Say no to VSCode surveillance!",
                 type: "starts"
             },
             {
-                id: 5,
-                title: "Whitespace Magic",
-                intro: "Match whitespace and non-whitespace with \\\\s and \\\\S!",
-                content: "Replace spaces with underscores:\nsed 's/ /_/g' file.txt",
-                hint: "Type: sed 's/ /_/g'",
-                answer: "sed 's/ /",
-                success: "Spaces transformed! \\\\s matches [ \\\\t\\\\n\\\\r\\\\f], \\\\S matches non-whitespace. Clean up your text!",
+                id: 29,
+                title: "Systemd Services",
+                intro: "systemd manages services. Start, stop, enable services to run at boot. This is server administration!",
+                content: "Check service status:\nsystemctl status nginx",
+                hint: "Type: systemctl status nginx",
+                answer: "systemctl status",
+                success: "There's the service status! Use 'start', 'stop', 'restart', 'enable', 'disable'. Enable = start at boot. This is how you run servers!",
                 type: "starts"
             },
             {
-                id: 6,
-                title: "Word Boundaries",
-                intro: "Use \\\\b for word boundaries - match whole words only!",
-                content: "Replace whole 'cat':\nsed 's/\\\\bcat\\\\b/dog/g'",
-                hint: "Type: sed 's/\\\\bcat\\\\b/dog/g'",
-                answer: "sed 's/\\\\bcat",
-                success: "Whole words only! \\\\b matches word boundaries. 'cat' in 'category' stays, standalone 'cat' becomes 'dog'!",
+                id: 30,
+                title: "Firewall Basics",
+                intro: "ufw is a simple firewall. In a hostile internet, you need walls.",
+                content: "Enable the firewall:\nsudo ufw enable",
+                hint: "Type: sudo ufw enable",
+                answer: "sudo ufw enable",
+                success: "Firewall active! Use 'ufw allow [port]' to open ports, 'ufw deny [port]' to block. Default deny incoming = security mindset!",
                 type: "starts"
             },
             {
-                id: 7,
-                title: "Quoting Special Characters",
-                intro: "Escape special characters with \\\\char! When you need to match literally.",
-                content: "Match literal dot:\nsed 's/\\\\./\\./g'",
-                hint: "Type: sed 's/\\\\./\\\\./g'",
-                answer: "sed 's/\\\\./",
-                success: "Literal dot matched! \\\\. matches only '.', not 'any character'. Essential for matching actual punctuation!",
+                id: 31,
+                title: "Logs",
+                intro: "Logs tell the truth. /var/log is where the system speaks. Learn to read them.",
+                content: "View system logs:\ntail -f /var/log/syslog",
+                hint: "Type: tail -f /var/log/syslog",
+                answer: "tail -f /var/log/syslog",
+                success: "Live logs! tail shows end of file, -f follows new entries. This is how you debug, investigate, find intruders. The truth is in the logs!",
                 type: "starts"
             },
             {
-                id: 8,
-                title: "Next Line Command",
-                intro: "The 'n' command prints pattern space then reads next line!",
-                content: "Print then next:\nsed 'n;d'",
-                hint: "Type: sed 'n;d'",
-                answer: "sed 'n",
-                success: "Next line handling! 'n' prints then replaces with next line, 'd' deletes. Control flow in sed!",
+                id: 32,
+                title: "Cron Jobs",
+                intro: "Cron schedules tasks. Automation is freedom - do things once, let the machine repeat.",
+                content: "List cron jobs:\ncrontab -l",
+                hint: "Type: crontab -l",
+                answer: "crontab -l",
+                success: "That's your scheduled tasks! Use 'crontab -e' to edit. Format: minute hour day month weekday command. Automate your backups!",
+                type: "exact"
+            },
+            {
+                id: 33,
+                title: "Tar Archives",
+                intro: "tar bundles files. Essential for backups and distribution.",
+                content: "Create an archive:\ntar -cvf backup.tar my_rebel_base/",
+                hint: "Type: tar -cvf backup.tar my_rebel_base/",
+                answer: "tar -cvf backup.tar",
+                success: "Archive created! -c create, -v verbose, -f file. Use -xvf to extract. For compression, add -z (gzip) or -j (bzip2). Backup like a pro!",
                 type: "starts"
             },
             {
-                id: 9,
-                title: "Branch and Test",
-                intro: "The 'b' branches to label, 't' tests if substitution succeeded!",
-                content: "Branch on substitution:\nsed '1,5{b s/a/A/;p};q'",
-                hint: "Type: sed '1,5{b",
-                answer: "sed '1,5{b",
-                success: "Conditional branching! 'b' jumps, 't' tests success. This is programming in sed!",
+                id: 34,
+                title: "rsync",
+                intro: "rsync syncs files efficiently. Only copies changes - perfect for backups.",
+                content: "Sync a directory:\nrsync -av src/ dest/",
+                hint: "Type: rsync -av src/ dest/",
+                answer: "rsync -av",
+                success: "Directory synced! -a archive mode (preserves permissions), -v verbose. This is how pros do backups - fast and efficient!",
                 type: "starts"
             },
             {
-                id: 10,
-                title: "Multi-Line Processing",
-                intro: "Sed processes line by line, but we can use N to append next line to pattern space!",
-                content: "Two-line pattern:\nsed 'N;s/\\n/ /'",
-                hint: "Type: sed 'N",
-                answer: "sed 'N",
-                success: "Multi-line magic! 'N' appends next line. Now you can match across line boundaries!",
+                id: 35,
+                title: "Curl",
+                intro: "curl is your HTTP client. Fetch web pages, test APIs, download files - all from terminal.",
+                content: "Download a file:\ncurl -O https://example.com/file",
+                hint: "Type: curl -O https://example.com/file",
+                answer: "curl -O",
+                success: "File downloaded! -O saves with original name, -o saves as custom name. Use -I to just fetch headers. curl is incredibly versatile!",
                 type: "starts"
             },
             {
-                id: 11,
-                title: "The Mystery of Hold Space",
-                intro: "Let's combine hold space commands for ultimate transformation!",
-                content: "Swap first and last:\nsed '1h;$!d;x'",
-                hint: "Type: sed '1h;$!d;x'",
-                answer: "sed '1h",
-                success: "First-last swap! '1h' copies line 1 to hold, '$!d' deletes non-last, 'x' exchanges. Hold space mastery!",
-                type: "starts"
-            },
-            {
-                id: 12,
-                title: "Expert Finale - Master Wizard",
-                intro: "Final challenge! Combine addresses, regex, hold space, and multi-line for ultimate transformation!",
-                content: "Reverse lines 1-10:\nsed '1h;1!H;${g;s/\\n/ /g}'",
-                hint: "Type: sed '1h;1!H",
-                answer: "sed '1h;1!H",
-                success: "EXPERT COMPLETE! You've mastered sed - addresses, regex, hold space, multi-line! You're a TRUE sed wizard! The text obeys your will completely! PROUD!",
+                id: 36,
+                title: "Expert Finale",
+                intro: "You. Are. INCREDIBLE. Let's do one final challenge - a real system administration task!",
+                content: "Update, upgrade, and clean:\nsudo apt update && sudo apt upgrade -y && sudo apt autoremove -y",
+                hint: "Type: sudo apt update &&",
+                answer: "sudo apt update &&",
+                success: "YOU DID IT! System updated, packages upgraded, cruft removed! You are now a LINUX EXPERT! You can admin systems, secure them, automate them. The free world needs people like you! I'm SO incredibly proud! You fought hard and earned your freedom! STAY FREE, STAY LINUX!",
                 type: "starts"
             }
         ];
@@ -717,7 +877,7 @@
             output.scrollTop = output.scrollHeight;
             
             addLine('');
-            await showCharacterMessage("Cast your spell! " + level.hint, false);
+            await showCharacterMessage("Go ahead, try it! " + level.hint, false);
             addLine('');
         }
         
@@ -730,7 +890,7 @@
             addLine('');
             const encour = document.createElement('div');
             encour.className = 'output-line encouragement';
-            encour.textContent = '✨ ' + character.getEncouragement() + ' ✨';
+            encour.textContent = '⚓ ' + character.getEncouragement() + ' ⚓';
             history.appendChild(encour);
             
             addLine('');
@@ -738,19 +898,19 @@
         
         async function startGame() {
             history.innerHTML = '';
-            clearSedOutput();
+            clearBashOutput();
             currentLevel = 0;
             
             addLine('');
             addLine('╔═══════════════════════════════════════╗', 'lesson-number');
-            addLine('║    SED TUTOR with Sed the Wizard     ║', 'lesson-number');
+            addLine('║   LINUX TUTOR with Linux Larry        ║', 'lesson-number');
             addLine('╚═══════════════════════════════════════╝', 'lesson-number');
             addLine('');
             
             await showCharacterMessage(character.greeting);
             
             addLine('');
-            addLine('Choose your path, apprentice:', 'lesson-number');
+            addLine('Choose your path, freedom fighter:', 'lesson-number');
             addLine('');
             
             const menu1 = document.createElement('div');
@@ -760,12 +920,12 @@
             
             const menu2 = document.createElement('div');
             menu2.className = 'output-line choice';
-            menu2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Advanced sed (lessons 13-24)';
+            menu2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - For those who know the basics (lessons 13-24)';
             history.appendChild(menu2);
             
             const menu3 = document.createElement('div');
             menu3.className = 'output-line choice';
-            menu3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'expert\')">--expert</span> - Master sed (lessons 25-36)';
+            menu3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'expert\')">--expert</span> - Master Linux administration (lessons 25-36)';
             history.appendChild(menu3);
             
             const menu4 = document.createElement('div');
@@ -791,13 +951,13 @@
         async function startTrack(trackName) {
             if (trackName === 'beginner') {
                 levels = beginnerLevels;
-                addCharacterMessage("Excellent! We'll start from the very beginning. I'll teach you the fundamental spells of text transformation!");
+                addCharacterMessage("Excellent choice! We'll start from scratch - perfect for beginners! I'll be here the whole way. Let's begin your Linux journey!");
             } else if (trackName === 'intermediate') {
                 levels = intermediateLevels;
-                addCharacterMessage("Welcome back! You've mastered the basics - now let's dive into addresses, patterns, capture groups, and the hold space!");
+                addCharacterMessage("Welcome back! You've got the basics - now let's dive into system administration, networking, and process management!");
             } else if (trackName === 'expert') {
                 levels = expertLevels;
-                addCharacterMessage("Welcome to EXPERT mode! We'll tackle file operations, advanced regex, multi-line processing, and the hold space magic!");
+                addCharacterMessage("Welcome to EXPERT level! We're going pro - SSH, systemd, firewalls, automation - everything you need toadminister systems like a boss!");
             }
             
             currentLevel = 0;
@@ -818,8 +978,6 @@
             if (!cmd) return;
             
             addUserInput(cmd);
-            
-            runSedCode(cmd);
             
             if (cmd === '--start' || cmd === '--restart') {
                 startGame();
@@ -855,6 +1013,8 @@
                 const newTheme = current === 'dark' ? 'light' : 'dark';
                 document.documentElement.setAttribute('data-theme', newTheme);
                 localStorage.setItem('theme', newTheme);
+                const toggle = document.getElementById('themeToggle');
+                if (toggle) toggle.checked = newTheme === 'dark';
                 if (userId) {
                     try {
                         await fetch('/api/auth.php', {
@@ -865,8 +1025,82 @@
                         });
                     } catch (e) {}
                 }
+                addCharacterMessage("Theme switched to " + newTheme + " mode!");
+                return;
+            }
+            
+            if (cmd === '--exit') {
+                window.location.href = '../index.html';
+                return;
+            }
+            
+            if (cmd === '--help') {
+                addCharacterMessage("Type --start to return to the main menu!");
+                addCharacterMessage("Type --beginner for beginner lessons (1-12)");
+                addCharacterMessage("Type --intermediate for intermediate lessons (13-24)");
+                addCharacterMessage("Type --expert for expert lessons (25-36)");
+                addCharacterMessage("Type --fullscreen to toggle fullscreen mode");
+                addCharacterMessage("Type --darkmode to toggle dark/light mode");
+                addCharacterMessage("Type --exit to go back to homepage");
+                addCharacterMessage("Type --level to see your current level");
+                addCharacterMessage("Type --hint if you're stuck");
+                return;
+            }
+            
+            if (cmd === '--level') {
+                addCharacterMessage("You are at level " + (currentLevel + 1) + " of " + levels.length + ".");
+                return;
+            }
+            
+            if (cmd === '--hint') {
+                const level = levels[currentLevel];
+                addCharacterMessage("Hint: " + level.hint);
+                return;
+            }
+            
+            await runSedCode(cmd);
+            
+            if (cmd === '--beginner') {
+                await startTrack('beginner');
+                return;
+            }
+            
+            if (cmd === '--intermediate') {
+                await startTrack('intermediate');
+                return;
+            }
+            
+            if (cmd === '--expert') {
+                await startTrack('expert');
+                return;
+            }
+            
+            if (cmd === '--fullscreen') {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    document.documentElement.requestFullscreen();
+                }
+                return;
+            }
+            
+            if (cmd === '--darkmode') {
+                const current = document.documentElement.getAttribute('data-theme');
+                const newTheme = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
                 const toggle = document.getElementById('themeToggle');
                 if (toggle) toggle.checked = newTheme === 'dark';
+                if (userId) {
+                    try {
+                        await fetch('/api/auth.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: 'action=updateTheme&theme=' + newTheme,
+                            credentials: 'include'
+                        });
+                    } catch (e) {}
+                }
                 addCharacterMessage("Theme switched to " + newTheme + " mode!");
                 return;
             }
@@ -900,9 +1134,9 @@
                     if (levels === beginnerLevels) {
                         addCharacterMessage("You finished all the beginner levels! Type --intermediate to continue your journey!");
                     } else if (levels === intermediateLevels) {
-                        addCharacterMessage("You finished all the intermediate levels! Type --expert to become a master!");
+                        addCharacterMessage("You finished all the intermediate levels! Type --expert to continue to master level!");
                     } else {
-                        addCharacterMessage("You finished all the expert levels! You're a sed master now! Type --beginner to start over!");
+                        addCharacterMessage("You finished all the expert levels! You're a Linux legend now! Type --beginner to start over!");
                     }
                     return;
                 }
@@ -924,11 +1158,11 @@
                     addLine('');
                     addLine('═══════════════════════════════════════', 'lesson-number');
                     if (levels === beginnerLevels) {
-                        addCharacterMessage("CONGRATULATIONS! You completed all 12 beginner sed lessons! You're a true text transformation wizard! Type --intermediate to continue your journey!");
+                        addCharacterMessage("CONGRATULATIONS! You completed all 12 beginner Linux lessons! I'm so incredibly proud of you! Type --intermediate to continue your journey!");
                     } else if (levels === intermediateLevels) {
-                        addCharacterMessage("CONGRATULATIONS! You completed all 12 intermediate sed lessons! You've mastered addresses, patterns, capture groups, and the hold space! The power of sed is yours! Type --expert to become a master wizard!");
+                        addCharacterMessage("CONGRATULATIONS! You completed all 12 intermediate Linux lessons! You're amazing! Type --expert for the ultimate challenge!");
                     } else {
-                        addCharacterMessage("CONGRATULATIONS! You completed all 12 expert sed lessons! You're a TRUE sed wizard! The text bends to your will! Type --beginner to start over!");
+                        addCharacterMessage("CONGRATULATIONS! You are a TRUE LINUX MASTER! Expert level complete! You can now admin systems, secure them, automate them! The free world needs you! I'm SO incredibly proud! STAY FREE!");
                     }
                     addLine('═══════════════════════════════════════', 'lesson-number');
                     addLine('');
@@ -936,7 +1170,7 @@
                     setTimeout(() => showLevel(), 1500);
                 }
             } else {
-                addCharacterMessage("Hmm, that's not quite right. Try again! Remember the format: sed 's/pattern/replacement/' - you've got this!");
+                addCharacterMessage("Hmm, that's not quite right. Try again! Remember - just type what I showed you. You've got this!");
             }
         }
         
@@ -967,6 +1201,7 @@
             if (savedLevel > 0) {
                 currentLevel = savedLevel - 1;
             }
+            // Apply server theme if logged in
             if (userId) {
                 document.documentElement.setAttribute('data-theme', userTheme);
                 localStorage.setItem('theme', userTheme);
@@ -987,11 +1222,11 @@
             <a href="https://github.com/cjboon/rebelwithlinux" style="color: var(--black);">GitHub</a>
         </div>
         <div>
-            <a href="about.html" style="color: var(--black);">About</a>
+            <a href="../html/about.html" style="color: var(--black);">About</a>
             <span style="color: var(--charcoal);"> | </span>
-            <a href="contact.html" style="color: var(--black);">Contact</a>
+            <a href="../html/contact.html" style="color: var(--black);">Contact</a>
             <span style="color: var(--charcoal);"> | </span>
-            <a href="stats.html" style="color: var(--black);">Stats</a>
+            <a href="../html/stats.html" style="color: var(--black);">Stats</a>
         </div>
     </footer>
 

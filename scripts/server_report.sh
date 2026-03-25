@@ -7,7 +7,7 @@ DEFAULT_LOCATION="Unknown"
 # === END CONFIG ===
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HTML_FILE="${WEB_ROOT}/stats.html"
+HTML_FILE="${WEB_ROOT}/html/stats.html"
 
 setup_systemd_timer() {
     local timer_name="server-report.timer"
@@ -17,13 +17,16 @@ setup_systemd_timer() {
         echo "Setting up systemd timer..."
         
         # Create service file
-        cat > "/etc/systemd/system/$service_name" << 'EOF'
+        cat > "/etc/systemd/system/$service_name" << EOF
 [Unit]
 Description=Hourly Server Report Script
 
 [Service]
 Type=oneshot
 ExecStart=${SCRIPT_DIR}/server_report.sh
+
+[Install]
+WantedBy=multi-user.target
 EOF
         
         # Create timer file
@@ -64,7 +67,7 @@ import sys
 import json
 import re
 
-html_file = os.environ.get('HTML_FILE', '/var/www/rebelwithlinux.com/stats.html')
+html_file = os.environ.get('HTML_FILE', '/var/www/rebelwithlinux.com/html/stats.html')
 default_location = os.environ.get('DEFAULT_LOCATION', 'Ogden, Utah')
 
 print(f"Checking file: {html_file}")
