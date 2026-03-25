@@ -161,6 +161,7 @@
                     }
 
                     function showPenguin() {
+                        localStorage.setItem('penguinLoaded', 'true');
                         var introContainer = document.getElementById('intro-container');
                         var penguinContainer = document.getElementById('penguin-container');
                         var homeContent = document.getElementById('home-content');
@@ -192,10 +193,22 @@
                         }, fadeTime);
                     }
 
-                    setTimeout(function() {
-                        typeLine();
-                        setTimeout(fadeLines, texts.length * lineDelay + texts[texts.length-1].length * charDelay + holdTime);
-                    }, 500);
+                    var penguinLoaded = localStorage.getItem('penguinLoaded') === 'true';
+
+                    function skipToPenguin() {
+                        var introContainer = document.getElementById('intro-container');
+                        introContainer.style.display = 'none';
+                        showPenguin();
+                    }
+
+                    if (penguinLoaded) {
+                        setTimeout(skipToPenguin, 500);
+                    } else {
+                        setTimeout(function() {
+                            typeLine();
+                            setTimeout(fadeLines, texts.length * lineDelay + texts[texts.length-1].length * charDelay + holdTime);
+                        }, 500);
+                    }
                 });
             </script>
         </section>
