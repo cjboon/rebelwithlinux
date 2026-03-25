@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <link rel="icon" href="/img/favicon.ico">
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-kubectl.html" />
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var theme = saved || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <script src="../js/theme.js"></script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kubectl Tutor - Rebel with Linux</title>
+<style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: var(--term-bg); color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid var(--term-border); }
+        .terminal-header { background: var(--term-header-bg); padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: var(--term-dot-red); }
+        .dot-yellow { background: var(--term-dot-yellow); }
+        .dot-green { background: var(--term-dot-green); }
+        .terminal-title { margin-left: 1rem; color: var(--term-text); font-size: 0.85rem; }
+        .pane-label { background: var(--term-header-bg); padding: 0.5rem 1rem; color: var(--term-text); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: var(--term-bg); }
+        .input-label { color: var(--term-text-muted); margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: var(--term-text-muted); font-size: 0.75rem; margin-top: 0.5rem; }
+        .kubectl-output-area { flex: 1; border-top: 2px solid var(--term-border); padding: 0.5rem; background: var(--term-input-bg); overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .kubectl-output-line { color: var(--term-text-muted); margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .kubectl-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .kubectl-success-line { color: #b5bd68; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: var(--term-bg); }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: var(--term-bg); border-left: 3px solid var(--term-accent, #f0c674); }
+        [data-theme="light"] body { background: var(--term-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .terminal-header { background: var(--term-header-bg-light); }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: var(--term-text-dark); }
+        [data-theme="light"] .pane-label { background: var(--term-header-bg-light); }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .kubectl-output-area { background: var(--term-input-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .kubectl-output-area { background: var(--term-bg-light); border-top-color: var(--term-text); }
+        [data-theme="light"] #command-input { color: var(--term-text-dark); }
+        [data-theme="light"] .input-label { color: var(--term-text-muted); }
+        [data-theme="light"] .left-pane { border-right: 2px solid var(--term-border-light); }
+        [data-theme="light"] .hint { color: var(--term-text-muted); }
+        [data-theme="light"] .kubectl-output-line { color: var(--term-text-dark); }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: var(--term-bg-light); color: #b58900; border-left-color: #b58900; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid var(--term-border); }
+            .left-pane { border-right: none; border-top: 2px solid var(--term-border); }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+
+    <link rel="stylesheet" href="../css/00-fonts.css">
+    <link rel="stylesheet" href="../css/01-variables.css">
+    <link rel="stylesheet" href="../css/02-reset.css">
+    <link rel="stylesheet" href="../css/03-typography.css">
+    <link rel="stylesheet" href="../css/04-navigation.css">
+    <link rel="stylesheet" href="../css/05-layout.css">
+    <link rel="stylesheet" href="../css/06-buttons.css">
+    <link rel="stylesheet" href="../css/07-cards.css">
+    <link rel="stylesheet" href="../css/08-terminal.css">
+    <link rel="stylesheet" href="../css/09-quiz.css">
+    <link rel="stylesheet" href="../css/10-sections.css">
+    <link rel="stylesheet" href="../css/11-modals.css">
+    <link rel="stylesheet" href="../css/12-forms.css">
+    <link rel="stylesheet" href="../css/13-account.css">
+    <link rel="stylesheet" href="../css/14-animations.css">
+    <link rel="stylesheet" href="../css/15-responsive.css">
+    <link rel="stylesheet" href="../css/16-nojs.css">
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">kubectl Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type kubectl command:</div>
+                <textarea id="command-input" placeholder="kubectl get pods" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="kubectl-output-area" id="kubectl-output">
+                <div class="kubectl-output-line" style="color: #586e75;">kubectl output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const kubectlOutput = document.getElementById('kubectl-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=kubectl');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'kubectl', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addKubectlLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'kubectl-error-line' : type === 'success' ? 'kubectl-success-line' : 'kubectl-output-line';
+            line.textContent = text;
+            kubectlOutput.appendChild(line);
+            kubectlOutput.scrollTop = kubectlOutput.scrollHeight;
+        }
+        
+        function clearKubectlOutput() { kubectlOutput.innerHTML = ''; }
+        
+        function runKubectl(cmd) {
+            addKubectlLine('$ ' + cmd);
+            
+            const responses = {
+                "kubectl get pods": "NAME                        READY   STATUS    RESTARTS   AGE\nnginx-7bb7cc8fb7-abc12    1/1     Running   0          5d\nredis-5c9b8d6f4-def34      1/1     Running   0          10d",
+                "kubectl get nodes": "NAME           STATUS   ROLES           AGE   VERSION\nk8s-master    Ready    control-plane   30d   v1.28.0\nk8s-worker1   Ready    worker          25d   v1.28.0",
+                "kubectl get services": "NAME         TYPE           CLUSTER-IP      PORT(S)        AGE\nkubernetes    ClusterIP      10.96.0.1       443/TCP        30d\nnginx         LoadBalancer   10.96.45.123    80:32000/TCP   5d",
+                "kubectl get deployments": "NAME   READY   UP-TO-DATE   AVAILABLE   AGE\nnginx   1/1    1            1           5d",
+                "kubectl get all": "NAME                        READY   STATUS    RESTARTS   AGE\npod/nginx-7bb7cc8fb7-abc12   1/1     Running   0          5d\nNAME                 TYPE           CLUSTER-IP      PORT(S)        AGE\nservice/nginx        LoadBalancer   10.96.45.123    80:32000/TCP   5d",
+                "kubectl describe": "Name:         nginx-7bb7cc8fb7-abc12\nNamespace:    default\nNode:         k8s-worker1/192.168.1.10\nStatus:       Running\nIP:           10.244.1.5",
+                "kubectl apply -f": "deployment.apps/nginx created\nservice/nginx created",
+                "kubectl create deployment": "deployment.apps/nginx created",
+                "kubectl delete": "deployment.apps \"nginx\" deleted",
+                "kubectl logs": "2024/01/15 10:30:45 [notice] nginx started\n2024/01/15 10:30:46 [notice] Connection accepted",
+                "kubectl exec": "root@nginx-7bb7cc8fb7-abc12:/# ls\nbin  boot  dev  etc  home  lib  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var",
+                "-n": "default\nkube-system\nmonitoring",
+                "--all-namespaces": "NAMESPACE     NAME                        READY   STATUS\nkube-system   coredns-7bd4f88fc-s4xyz       1/1     Running\ndefault       nginx-7bb7cc8fb7-abc12        1/1     Running",
+                "kubectl scale": "deployment.apps/nginx scaled",
+                "kubectl port-forward": "Forwarding from 127.0.0.1:8080 -> 80",
+                "kubectl top": "NAME                   CPU(cores)   MEMORY(bytes)\nnginx-7bb7cc8fb7-abc12   5m           42Mi",
+                "kubectl rollout": "deployment.apps/nginx rolled back",
+                "kubectl cordon": "node/k8s-worker2 cordoned",
+                "kubectl drain": "node/k8s-worker2 drained"
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addKubectlLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.toLowerCase().includes('kubectl')) {
+                    addKubectlLine('Command executed');
+                    matched = true;
+                } else {
+                    addKubectlLine('Try: kubectl get pods', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "K8s Katie",
+            greeting: "Hey! I'm K8s Katie - your Kubernetes guide! kubectl is how you talk to your Kubernetes cluster. Deploy, scale, debug - kubectl does it all! Ready to become a cloud-native commander?",
+            encourage: ["Excellent!", "Pod created!", "You're a K8s hero!", "Keep orchestrating!", "Cluster managed!", "Brilliant!"],
+            getEncouragement: function() { return this.encourage[Math.floor(Math.random() * this.encourage.length)]; }
+        };
+        
+        const beginnerLevels = [
+            { id: 1, title: "Check Cluster Status", intro: "Welcome! Let's start by checking your cluster. kubectl cluster-info shows cluster status.", content: "Check cluster:\nkubectl cluster-info", hint: "Type: kubectl cluster-info", answer: "kubectl cluster-info", success: "Cluster info shown! Your master and etcd are running. kubectl talks to the API server!", type: "contains" },
+            { id: 2, title: "List Nodes", intro: "kubectl get nodes shows all nodes in your cluster and their status.", content: "Get all nodes:\nkubectl get nodes", hint: "Type: kubectl get nodes", answer: "kubectl get nodes", success: "Nodes listed! See who's Ready, their roles, and versions. Healthy cluster = all nodes Ready!", type: "contains" },
+            { id: 3, title: "List Pods", intro: "Pods are the smallest deployable units. kubectl get pods shows running pods.", content: "Get pods in default namespace:\nkubectl get pods", hint: "Type: kubectl get pods", answer: "kubectl get pods", success: "Pods displayed! See NAME, READY, STATUS, RESTARTS, AGE. READY shows containers running!", type: "contains" },
+            { id: 4, title: "Wide Output", intro: "Use -o wide for more details including node and IP info.", content: "Wide output:\nkubectl get pods -o wide", hint: "Type: -o wide", answer: "-o wide", success: "More details! Now you see NODE and IP addresses. Essential for debugging!", type: "contains" },
+            { id: 5, title: "Specific Namespace", intro: "Namespaces isolate resources. Use -n to query specific namespaces.", content: "Get pods in kube-system:\nkubectl get pods -n kube-system", hint: "Type: -n kube-system", answer: "-n kube-system", success: "System pods shown! Core Kubernetes components run in kube-system namespace!", type: "contains" },
+            { id: 6, title: "All Namespaces", intro: "Use --all-namespaces or -A to see pods across all namespaces.", content: "Get pods all namespaces:\nkubectl get pods -A", hint: "Type: -A", answer: "-A", success: "All namespaces! Useful for seeing the whole cluster state at once!", type: "contains" },
+            { id: 7, title: "List Services", intro: "Services expose pods to the network. kubectl get svc lists them.", content: "Get services:\nkubectl get svc", hint: "Type: kubectl get svc", answer: "kubectl get svc", success: "Services listed! See TYPE (ClusterIP, LoadBalancer, NodePort) and PORT(S)!", type: "contains" },
+            { id: 8, title: "List Deployments", intro: "Deployments manage pod replicas. kubectl get deployments shows them.", content: "Get deployments:\nkubectl get deployments", hint: "Type: kubectl get deployments", answer: "kubectl get deployments", success: "Deployments shown! See READY (desired/current), UP-TO-DATE, AVAILABLE. That's replica management!", type: "contains" },
+            { id: 9, title: "Describe Resource", intro: "kubectl describe shows detailed info about a resource - events, conditions, more!", content: "Describe a pod:\nkubectl describe pod nginx-7bb7cc8fb7-abc12", hint: "Type: kubectl describe pod", answer: "kubectl describe pod", success: "Detailed info! Shows Events, Conditions, volumes - everything about the pod. Debugging essential!", type: "contains" },
+            { id: 10, title: "View Logs", intro: "kubectl logs shows container output from a pod.", content: "Get pod logs:\nkubectl logs nginx-7bb7cc8fb7-abc12", hint: "Type: kubectl logs", answer: "kubectl logs", success: "Logs displayed! Application output, errors, warnings - essential for debugging!", type: "contains" },
+            { id: 11, title: "Follow Logs", intro: "Use -f to follow logs in real-time as new entries appear.", content: "Follow logs:\nkubectl logs -f nginx-7bb7cc8fb7-abc12", hint: "Type: kubectl logs -f", answer: "kubectl logs -f", success: "Live logs! -f follows in real-time. Like tail -f for containers!", type: "contains" },
+            { id: 12, title: "Beginner Finale", intro: "Final challenge! Check cluster status and list all pods in kube-system!", content: "Challenge:\nkubectl cluster-info && kubectl get pods -n kube-system", hint: "Type: kubectl cluster-info", answer: "kubectl cluster-info", success: "BEGINNER COMPLETE! You can: get nodes, pods, svc, deployments, describe, logs! K8s operator!", type: "starts" }
+        ];
+        
+        const intermediateLevels = [
+            { id: 1, title: "Apply Manifest", intro: "INTERMEDIATE! kubectl apply applies configuration from a YAML file.", content: "Apply a manifest:\nkubectl apply -f deployment.yaml", hint: "Type: kubectl apply -f", answer: "kubectl apply -f", success: "Manifest applied! Kubernetes creates or updates resources. Infrastructure as Code!", type: "contains" },
+            { id: 2, title: "Create Deployment", intro: "kubectl create deployment creates a deployment from image directly.", content: "Create nginx deployment:\nkubectl create deployment nginx --image=nginx", hint: "Type: kubectl create deployment", answer: "kubectl create deployment", success: "Deployment created! Quick way to deploy from image without YAML!", type: "contains" },
+            { id: 3, title: "Scale Replicas", intro: "kubectl scale changes the number of replicas in a deployment.", content: "Scale to 3 replicas:\nkubectl scale deployment nginx --replicas=3", hint: "Type: kubectl scale", answer: "kubectl scale", success: "Scaled! Now 3 nginx pods run. kubectl autoscale for automatic scaling based on load!", type: "contains" },
+            { id: 4, title: "Execute in Pod", intro: "kubectl exec runs commands inside a running container.", content: "Shell into pod:\nkubectl exec -it nginx-7bb7cc8fb7-abc12 -- sh", hint: "Type: kubectl exec -it", answer: "kubectl exec -it", success: "Interactive shell! -it for interactive terminal. Debug inside containers!", type: "contains" },
+            { id: 5, title: "Port Forward", intro: "kubectl port-forward forwards local port to pod port for local debugging.", content: "Forward local 8080 to pod 80:\nkubectl port-forward pod/nginx-7bb7cc8fb7-abc12 8080:80", hint: "Type: kubectl port-forward", answer: "kubectl port-forward", success: "Port forwarded! Now localhost:8080 goes to your pod. Local debugging!", type: "contains" },
+            { id: 6, title: "Delete Resources", intro: "kubectl delete removes resources from the cluster.", content: "Delete deployment:\nkubectl delete deployment nginx", hint: "Type: kubectl delete", answer: "kubectl delete", success: "Deleted! Resources removed from cluster. Use -f with manifest to delete created resources!", type: "contains" },
+            { id: 7, title: "Resource Usage", intro: "kubectl top shows CPU/memory usage for pods and nodes.", content: "Show pod metrics:\nkubectl top pod", hint: "Type: kubectl top pod", answer: "kubectl top", success: "Metrics shown! CPU in millicores, memory in mebibytes. Know your resource consumption!", type: "contains" },
+            { id: 8, title: "Cordon Node", intro: "kubectl cordon marks a node as unschedulable - no new pods placed there.", content: "Cordon a node:\nkubectl cordon k8s-worker2", hint: "Type: kubectl cordon", answer: "kubectl cordon", success: "Node cordoned! Useful for maintenance - prepare node before upgrading!", type: "contains" },
+            { id: 9, title: "Drain Node", intro: "kubectl drain evicts all pods from a node safely.", content: "Drain a node:\nkubectl drain k8s-worker2 --ignore-daemonsets", hint: "Type: kubectl drain", answer: "kubectl drain", success: "Node drained! Pods evicted, replicas moved elsewhere. Prepare for maintenance!", type: "contains" },
+            { id: 10, title: "Rollout Status", intro: "kubectl rollout status shows deployment progress.", content: "Check rollout:\nkubectl rollout status deployment nginx", hint: "Type: kubectl rollout status", answer: "kubectl rollout status", success: "Rollout status! Watch your deployment progress. - undo to rollback!", type: "contains" },
+            { id: 11, title: "Get Events", intro: "kubectl get events shows cluster events - errors, scheduling, warnings.", content: "Get recent events:\nkubectl get events --sort-by='.lastTimestamp'", hint: "Type: kubectl get events", answer: "kubectl get events", success: "Events shown! Sort by time to see latest. Essential for debugging cluster issues!", type: "contains" },
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Scale nginx to 5, verify pods, then scale back to 1!", content: "Challenge:\nkubectl scale deployment nginx --replicas=5 && kubectl get pods -l app=nginx", hint: "Type: kubectl scale", answer: "kubectl scale", success: "INTERMEDIATE COMPLETE! You master: apply, scale, exec, port-forward, drain, events, rollout! K8s MASTER! Type --expert for advanced cluster management!", type: "starts" }
+        ];
+        
+        const expertLevels = [
+            { id: 25, title: "YAML Manifests", intro: "EXPERT MODE! Write Kubernetes manifests - the foundation of GitOps!", content: "Create from manifest:\nkubectl apply -f deployment.yaml", hint: "Type: kubectl apply -f", answer: "kubectl apply -f", success: "Manifest applied! YAML is how you define desired state in K8s. Infrastructure as Code!", type: "contains" },
+            { id: 26, title: "ConfigMaps", intro: "ConfigMaps store configuration data separate from containers!", content: "Create ConfigMap:\nkubectl create configmap app-config --from-literal=DB_HOST=localhost", hint: "Type: kubectl create configmap", answer: "kubectl create configmap", success: "ConfigMap created! Separate config from container images. Much cleaner!", type: "contains" },
+            { id: 27, title: "Secrets", intro: "Secrets store sensitive data - base64 encoded but should be protected!", content: "Create secret:\nkubectl create secret generic db-creds --from-literal=password=supersecret", hint: "Type: kubectl create secret", answer: "kubectl create secret", success: "Secret created! Base64 encoded but should use TLS/encryption at rest in production!", type: "contains" },
+            { id: 28, title: "Resource Quotas", intro: "ResourceQuotas limit resource usage per namespace!", content: "Apply quota:\nkubectl apply -f quota.yaml", hint: "Type: ResourceQuota", answer: "ResourceQuota", success: "Quota applied! Limit CPU, memory, or object counts per namespace. Prevent resource exhaustion!", type: "contains" },
+            { id: 29, title: "Pod Disruption Budget", intro: "PDBs ensure minimum availability during disruptions!", content: "Create PDB:\nkubectl create poddisruptionbudget web-pdb --selector=app=web --min-available=1", hint: "Type: --min-available", answer: "--min-available", success: "PDB created! Ensures at least 1 pod always available during evictions/upgrades!", type: "contains" },
+            { id: 30, title: "Network Policies", intro: "Network Policies control traffic flow between pods!", content: "Apply network policy:\nkubectl apply -f network-policy.yaml", hint: "Type: NetworkPolicy", answer: "NetworkPolicy", success: "Policy applied! Restrict pod-to-pod traffic. Essential for zero-trust networking!", type: "contains" },
+            { id: 31, title: "RBAC Basics", intro: "RBAC controls who can do what in the cluster!", content: "Create Role:\nkubectl create role pod-reader --verb=get,list --resource=pods", hint: "Type: kubectl create role", answer: "kubectl create role", success: "Role created! Define permissions. Bind to users with RoleBinding!", type: "contains" },
+            { id: 32, title: "kubectl Cheat Sheet", intro: "Create a quick reference alias for common commands!", content: "Quick alias:\nalias k='kubectl'\nalias kgp='kubectl get pods'\nalias kdp='kubectl describe pod'", hint: "Type: alias k='kubectl'", answer: "alias k='kubectl'", success: "Aliases set! k=kubectl, kgp=get pods, kdp=describe pod. Faster commands!", type: "contains" },
+            { id: 33, title: "kubectl Dry Run", intro: "Use --dry-run=client to validate without applying!", content: "Dry run validation:\nkubectl create deployment nginx --image=nginx --dry-run=client -o yaml", hint: "Type: --dry-run=client", answer: "--dry-run=client", success: "Validated! Shows YAML without creating. Perfect for generating manifests!", type: "contains" },
+            { id: 34, title: "kubectl Logs Tricks", intro: "Use -f for tail, --previous for crashed containers!", content: "Previous container logs:\nkubectl logs nginx-abc123 --previous", hint: "Type: --previous", answer: "--previous", success: "Previous logs! Crashed container logs before restart. Debugging essential!", type: "contains" },
+            { id: 35, title: "kubectl Top", intro: "Check actual resource usage vs requests/limits!", content: "Node resource usage:\nkubectl top node", hint: "Type: kubectl top node", answer: "kubectl top node", success: "Node metrics! See CPU/memory pressure. Compare to requests/limits to optimize!", type: "contains" },
+            { id: 36, title: "Expert Finale - K8s Master", intro: "You've mastered kubectl! Let's combine manifests, RBAC, policies!", content: "Ultimate challenge:\nkubectl apply -f deployment.yaml && kubectl set image deployment/nginx nginx=nginx:1.21 && kubectl rollout status deployment/nginx", hint: "Type: kubectl apply -f", answer: "kubectl apply -f", success: "EXPERT COMPLETE! Manifests, rolling updates, RBAC, NetworkPolicies! You're a TRUE K8s master! K8s Katie is thrilled - go forth and orchestrate the cloud!", type: "starts" }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') return user === answer;
+            else if (level.type === 'contains') return user.includes(answer);
+            else if (level.type === 'starts') return user.startsWith(answer);
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! kubectl levels complete! You're a Kubernetes master!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: get, describe, logs, cluster-info. I'll make you a K8s commander!"); }
+            else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Advanced: apply, scale, exec, drain, rollout, events!"); }
+            else if (trackName === 'expert') { levels = expertLevels; await showMessage(character.name, "Welcome to EXPERT mode! Manifests, RBAC, NetworkPolicies, quotas! Time to become a true K8s master!"); }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) { document.exitFullscreen(); }
+            else { document.documentElement.requestFullscreen(); }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=updateTheme&theme=' + newTheme, credentials: 'include' });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--expert') { startTrack('expert'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels[currentLevel];
+                clearKubectlOutput();
+                runKubectl(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--expert') { startTrack('expert'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels[currentLevel];
+                clearKubectlOutput();
+                runKubectl(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) { currentLevel = savedLevel - 1; }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basics: get, describe, logs, cluster-info (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Advanced: apply, scale, exec, drain (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'expert\')">--expert</span> - Master: manifests, RBAC, policies (lessons 25-36)';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv5);
+            
+            const menuDiv6 = document.createElement('div');
+            menuDiv6.className = 'output-line choice';
+            menuDiv6.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv6);
+            
+            await showMessage(character.name, "Type --beginner, --intermediate, or --expert to start! Or click the options above. Use --fullscreen, --darkmode, or --exit anytime!", '', true);
+        }
+        init();
+    </script>
+    <footer id="site-footer" style="text-align: center; padding: 0 24px 24px;">
+        <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>
+        <div style="margin-bottom: 23px;">
+            <a href="site-map.html" style="color: var(--black);">Site Map</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" style="color: var(--black);">Onion Site</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="https://github.com/cjboon/rebelwithlinux" style="color: var(--black);">GitHub</a>
+        </div>
+        <div>
+            <a href="../sections/about.html" style="color: var(--black);">About</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/contact.html" style="color: var(--black);">Contact</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/stats.html" style="color: var(--black);">Stats</a>
+        </div>
+    </footer>
+
+</body>
+</html>

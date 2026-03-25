@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <link rel="icon" href="/img/favicon.ico">
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-nginx.html" />
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var theme = saved || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <script src="../js/theme.js"></script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nginx Tutor - Rebel with Linux</title>
+<style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: var(--term-bg); color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid var(--term-border); }
+        .terminal-header { background: var(--term-header-bg); padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: var(--term-dot-red); }
+        .dot-yellow { background: var(--term-dot-yellow); }
+        .dot-green { background: var(--term-dot-green); }
+        .terminal-title { margin-left: 1rem; color: var(--term-text); font-size: 0.85rem; }
+        .pane-label { background: var(--term-header-bg); padding: 0.5rem 1rem; color: var(--term-text); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: var(--term-bg); }
+        .input-label { color: var(--term-text-muted); margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: var(--term-text-muted); font-size: 0.75rem; margin-top: 0.5rem; }
+        .nginx-output-area { flex: 1; border-top: 2px solid var(--term-border); padding: 0.5rem; background: var(--term-input-bg); overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .nginx-output-line { color: var(--term-text-muted); margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .nginx-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .nginx-success-line { color: #b5bd68; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: var(--term-bg); }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: var(--term-text-light); font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: var(--term-text); }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: var(--term-bg); border-left: 3px solid var(--term-accent, #f0c674); }
+        .progress-bar { background: var(--term-header-bg); height: 20px; border-radius: 3px; margin: 1rem; overflow: hidden; }
+        .progress-fill { background: #b5bd68; height: 100%; transition: width 0.3s ease; }
+        [data-theme="light"] body { background: var(--term-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .terminal-header { background: var(--term-header-bg-light); }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: var(--term-text-dark); }
+        [data-theme="light"] .pane-label { background: var(--term-header-bg-light); }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .nginx-output-area { background: var(--term-input-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .nginx-output-area { background: var(--term-bg-light); border-top-color: var(--term-text); }
+        [data-theme="light"] #command-input { color: var(--term-text-dark); }
+        [data-theme="light"] .input-label { color: var(--term-text-muted); }
+        [data-theme="light"] .left-pane { border-right: 2px solid var(--term-border-light); }
+        [data-theme="light"] .hint { color: var(--term-text-muted); }
+        [data-theme="light"] .nginx-output-line { color: var(--term-text-dark); }
+        [data-theme="light"] .message .speaker { color: var(--term-text-dark); }
+        [data-theme="light"] .message .text { color: var(--term-text-dark); }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: var(--term-bg-light); color: #b58900; border-left-color: #b58900; }
+        [data-theme="light"] .progress-bar { background: #cccccc; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid var(--term-border); }
+            .left-pane { border-right: none; border-top: 2px solid var(--term-border); }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+
+    <link rel="stylesheet" href="../css/00-fonts.css">
+    <link rel="stylesheet" href="../css/01-variables.css">
+    <link rel="stylesheet" href="../css/02-reset.css">
+    <link rel="stylesheet" href="../css/03-typography.css">
+    <link rel="stylesheet" href="../css/04-navigation.css">
+    <link rel="stylesheet" href="../css/05-layout.css">
+    <link rel="stylesheet" href="../css/06-buttons.css">
+    <link rel="stylesheet" href="../css/07-cards.css">
+    <link rel="stylesheet" href="../css/08-terminal.css">
+    <link rel="stylesheet" href="../css/09-quiz.css">
+    <link rel="stylesheet" href="../css/10-sections.css">
+    <link rel="stylesheet" href="../css/11-modals.css">
+    <link rel="stylesheet" href="../css/12-forms.css">
+    <link rel="stylesheet" href="../css/13-account.css">
+    <link rel="stylesheet" href="../css/14-animations.css">
+    <link rel="stylesheet" href="../css/15-responsive.css">
+    <link rel="stylesheet" href="../css/16-nojs.css">
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">nginx Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type nginx command:</div>
+                <textarea id="command-input" placeholder="Type your answer here..." autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="nginx-output-area" id="nginx-output">
+                <div class="nginx-output-line" style="color: #586e75;">nginx output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const nginxOutput = document.getElementById('nginx-output');
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=nginx');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'nginx', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+
+        function addNginxLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'nginx-error-line' : 'nginx-output-line';
+            line.textContent = text;
+            nginxOutput.appendChild(line);
+            nginxOutput.scrollTop = nginxOutput.scrollHeight;
+        }
+
+        function clearNginxOutput() {
+            nginxOutput.innerHTML = '';
+        }
+
+        async function runNginx(cmd) {
+            addNginxLine('$ ' + cmd);
+            const responses = {
+                'nginx -t': 'nginx: the configuration file /etc/nginx/nginx.conf syntax is ok\nnginx: configuration file /etc/nginx/nginx.conf test is successful',
+                'nginx -t -c /etc/nginx/nginx.conf': 'nginx: the configuration file /etc/nginx/nginx.conf syntax is ok\nnginx: configuration file /etc/nginx/nginx.conf test is successful',
+                'nginx -s reload': '',
+                'nginx -s stop': '',
+                'nginx -s quit': '',
+                'nginx -s reopen': '',
+                'nginx': '',
+                'nginx -v': 'nginx version: nginx/1.24.0',
+                'nginx -V': 'nginx version: nginx/1.24.0\nbuilt by gcc 12.2.1\nconfigure arguments: --prefix=/etc/nginx',
+                'systemctl start nginx': '',
+                'systemctl stop nginx': '',
+                'systemctl restart nginx': '',
+                'systemctl reload nginx': '',
+                'systemctl status nginx': '● nginx.service - A high performance web server\n   Loaded: loaded (/lib/systemd/system/nginx.service; enabled)\n   Active: active (running)',
+                'nginx -c /etc/nginx/nginx.conf': ''
+            };
+
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    if (value) addNginxLine(value);
+                    else addNginxLine('Command executed successfully');
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched) {
+                if (cmd.toLowerCase().includes('nginx')) {
+                    addNginxLine('Command executed (simulated)');
+                } else {
+                    addNginxLine('Not an nginx command. Start with: nginx', 'error');
+                }
+            }
+        }
+
+        const character = {
+            name: "nginx Nick",
+            greeting: "Hey! I'm nginx Nick - your guide to the world's most popular web server! nginx handles millions of requests per day. It's fast, lightweight, and powers everything from tiny blogs to massive Netflix. Let's master it together!",
+            encourage: ["Perfect config!", "Server virtuoso!", "Load balancer legend!", "Reverse proxy royal!", "High performance!", "Zero downtime!"],
+            getEncouragement: function() { return this.encouragement[Math.floor(Math.random() * this.encouragement.length)]; }
+        };
+
+        const beginnerLevels = [
+            {
+                id: 1,
+                title: "Test Your Config",
+                intro: "Welcome! Let's start with the most important nginx command: testing your configuration! Always run this before reloading.",
+                content: "Test nginx config:\nnginx -t",
+                hint: "Type: nginx -t",
+                answer: "nginx -t",
+                success: "Config tested! -t checks your config for syntax errors without actually reloading. ALWAYS do this before reloading!",
+                type: "contains"
+            },
+            {
+                id: 2,
+                title: "Check nginx Version",
+                intro: "Need to know which nginx version is installed? Use -v for short, -V for verbose with compile flags!",
+                content: "Show nginx version:\nnginx -v",
+                hint: "Type: nginx -v",
+                answer: "nginx -v",
+                success: "Version shown! -v gives you the version. -V also shows configure arguments - super useful for checking installed modules!",
+                type: "contains"
+            },
+            {
+                id: 3,
+                title: "Verbose Version Info",
+                intro: "The -V flag shows VERSION and all the compile flags - essential for knowing what modules are available!",
+                content: "Show version with details:\nnginx -V",
+                hint: "Type: nginx -V",
+                answer: "nginx -V",
+                success: "Verbose! Now you see --prefix, --with-modules, etc. This tells you what nginx can do!",
+                type: "contains"
+            },
+            {
+                id: 4,
+                title: "Start nginx",
+                intro: "Simply running 'nginx' starts the server! It reads the default config at /etc/nginx/nginx.conf",
+                content: "Start nginx:\nnginx",
+                hint: "Type: nginx",
+                answer: "nginx",
+                success: "nginx started! It forks into the background and starts accepting connections on port 80!",
+                type: "contains"
+            },
+            {
+                id: 5,
+                title: "Specify Custom Config",
+                intro: "Use -c to specify a different config file instead of the default!",
+                content: "Start with custom config:\nnginx -c /etc/nginx/myapp.conf",
+                hint: "Type: nginx -c /etc/nginx/myapp.conf",
+                answer: "nginx -c",
+                success: "Custom config! -c lets you use different configs for different projects or testing!",
+                type: "contains"
+            },
+            {
+                id: 6,
+                title: "Graceful Reload",
+                intro: "After editing config, use -s reload to reload without dropping connections!",
+                content: "Reload nginx config:\nnginx -s reload",
+                hint: "Type: nginx -s reload",
+                answer: "nginx -s reload",
+                success: "Reloaded! nginx gracefully swaps to the new config, keeping existing connections alive!",
+                type: "contains"
+            },
+            {
+                id: 7,
+                title: "Stop nginx",
+                intro: "Use 'nginx -s stop' for a quick shutdown - it aborts current connections!",
+                content: "Stop nginx immediately:\nnginx -s stop",
+                hint: "Type: nginx -s stop",
+                answer: "nginx -s stop",
+                success: "Stopped! -s stop is fast but may drop connections. For graceful, use quit!",
+                type: "contains"
+            },
+            {
+                id: 8,
+                title: "Graceful Quit",
+                intro: "'nginx -s quit' gracefully shuts down after finishing current requests!",
+                content: "Quit gracefully:\nnginx -s quit",
+                hint: "Type: nginx -s quit",
+                answer: "nginx -s quit",
+                success: "Quit gracefully! This waits for active requests to finish - no dropped connections!",
+                type: "contains"
+            },
+            {
+                id: 9,
+                title: "Reopen Log Files",
+                intro: "Use -s reopen to reopen log files after rotating them with logrotate!",
+                content: "Reopen log files:\nnginx -s reopen",
+                hint: "Type: nginx -s reopen",
+                answer: "nginx -s reopen",
+                success: "Logs reopened! Perfect after log rotation - nginx starts writing to new files!",
+                type: "contains"
+            },
+            {
+                id: 10,
+                title: "Using systemctl",
+                intro: "On systemd systems, use systemctl to manage nginx as a service!",
+                content: "Start nginx via systemd:\nsystemctl start nginx",
+                hint: "Type: systemctl start nginx",
+                answer: "systemctl start nginx",
+                success: "systemctl works! This is how you manage nginx on most modern Linux systems!",
+                type: "contains"
+            },
+            {
+                id: 11,
+                title: "Check Status",
+                intro: "Use systemctl status to see if nginx is running and check for errors!",
+                content: "Check nginx status:\nsystemctl status nginx",
+                hint: "Type: systemctl status nginx",
+                answer: "systemctl status nginx",
+                success: "Status shown! Look for 'active (running)' - this means nginx is healthy and serving!",
+                type: "contains"
+            },
+            {
+                id: 12,
+                title: "Restart nginx",
+                intro: "Use systemctl restart when start/stop won't cut it - it does both!",
+                content: "Restart nginx via systemd:\nsystemctl restart nginx",
+                hint: "Type: systemctl restart nginx",
+                answer: "systemctl restart nginx",
+                success: "BEGINNER COMPLETE! You now know: -t testing, -v version, -c config, -s signals, systemctl commands! nginx is YOURS!",
+                type: "contains"
+            }
+        ];
+
+        const intermediateLevels = [
+            {
+                id: 1,
+                title: "Global Directives",
+                intro: "Welcome to INTERMEDIATE! Let's explore global config with -g flag - set directives without editing files!",
+                content: "Set worker processes:\nnginx -g 'worker_processes 4;'",
+                hint: "Type: nginx -g 'worker_processes 4;'",
+                answer: "nginx -g",
+                success: "Global directives! -g sets directives at runtime - perfect for temporary changes or testing!",
+                type: "contains"
+            },
+            {
+                id: 2,
+                title: "PID File Location",
+                intro: "The master process PID is stored in /run/nginx.pid by default - useful for scripting!",
+                content: "Check nginx PID file:\ncat /run/nginx.pid",
+                hint: "Type: cat /run/nginx.pid",
+                answer: "cat /run/nginx.pid",
+                success: "PID shown! Kill this PID to stop nginx, or use it with other process management tools!",
+                type: "contains"
+            },
+            {
+                id: 3,
+                title: "Kill by PID",
+                intro: "You can kill nginx directly using its PID file - alternative to -s signals!",
+                content: "Graceful kill nginx:\nkill -QUIT $(cat /run/nginx.pid)",
+                hint: "Type: kill -QUIT $(cat /run/nginx.pid)",
+                answer: "kill -QUIT",
+                success: "Direct kill! -QUIT is graceful, -TERM is fast. Only for when -s signals don't work!",
+                type: "contains"
+            },
+            {
+                id: 4,
+                title: "Test Specific Config",
+                intro: "Combine -t with -c to test a specific config file!",
+                content: "Test custom config:\nnginx -t -c /etc/nginx/sites-available/myapp",
+                hint: "Type: nginx -t -c /etc/nginx/sites-available/myapp",
+                answer: "nginx -t -c",
+                success: "Custom config tested! Always test before switching configs - never reload blindly!",
+                type: "contains"
+            },
+            {
+                id: 5,
+                title: "Reload via systemctl",
+                intro: "systemctl reload nginx is the systemd way to reload config gracefully!",
+                content: "Reload via systemd:\nsystemctl reload nginx",
+                hint: "Type: systemctl reload nginx",
+                answer: "systemctl reload nginx",
+                success: "systemctl reload! Same as 'nginx -s reload' but via the service manager!",
+                type: "contains"
+            },
+            {
+                id: 6,
+                title: "Enable on Boot",
+                intro: "Want nginx to start automatically? Use systemctl enable!",
+                content: "Enable nginx on boot:\nsystemctl enable nginx",
+                hint: "Type: systemctl enable nginx",
+                answer: "systemctl enable nginx",
+                success: "Enabled! nginx will now start automatically on system boot. Essential for production!",
+                type: "contains"
+            },
+            {
+                id: 7,
+                title: "Disable on Boot",
+                intro: "Use disable to prevent nginx from starting automatically!",
+                content: "Disable nginx on boot:\nsystemctl disable nginx",
+                hint: "Type: systemctl disable nginx",
+                answer: "systemctl disable nginx",
+                success: "Disabled! Sometimes you need this for maintenance or alternative web servers!",
+                type: "contains"
+            },
+            {
+                id: 8,
+                title: "Multiple Worker Processes",
+                intro: "The worker_processes directive controls how many workers run - auto is usually best!",
+                content: "Set workers to auto:\nnginx -g 'worker_processes auto;'",
+                hint: "Type: nginx -g 'worker_processes auto;'",
+                answer: "worker_processes auto",
+                success: "Auto workers! nginx will use all available CPU cores - best for most servers!",
+                type: "contains"
+            },
+            {
+                id: 9,
+                title: "Worker Connections",
+                intro: "worker_connections sets max clients per worker - client body buffers too!",
+                content: "Show default connections:\nnginx -V 2>&1 | grep CONFIGURE",
+                hint: "Type: nginx -V 2>&1 | grep CONFIGURE",
+                answer: "nginx -V",
+                success: "Compile options shown! Check the CONFIGURE_ARGs for built-in settings like worker_connections!",
+                type: "contains"
+            },
+            {
+                id: 10,
+                title: "Config Test with Error Details",
+                intro: "When config test fails, nginx shows the exact line and error - learn to read it!",
+                content: "Look for config errors:\nnginx -t 2>&1",
+                hint: "Type: nginx -t 2>&1",
+                answer: "nginx -t",
+                success: "Error details! nginx tells you exactly which line failed - read carefully!",
+                type: "contains"
+            },
+            {
+                id: 11,
+                title: "Reload with Config Path",
+                intro: "Combine signals with config path for full control over reloading!",
+                content: "Test then reload custom config:\nnginx -t -c /etc/nginx/nginx.conf && nginx -s reload -c /etc/nginx/nginx.conf",
+                hint: "Type: nginx -t -c /etc/nginx/nginx.conf",
+                answer: "nginx -t -c",
+                success: "Test and reload! Always test first, then reload - never reload a broken config!",
+                type: "contains"
+            },
+            {
+                id: 12,
+                title: "Intermediate Finale",
+                intro: "Final challenge! Show version, test config, and reload - all in one session!",
+                content: "Version, test, reload:\nnginx -v && nginx -t && nginx -s reload",
+                hint: "Type: nginx -v && nginx -t && nginx -s reload",
+                answer: "nginx -v && nginx -t",
+                success: "INTERMEDIATE COMPLETE! You now know: global directives, PID management, systemctl control, boot management, error debugging! nginx ADMIN is YOUR title!",
+                type: "starts"
+            }
+        ];
+
+        const levels = [...beginnerLevels, ...intermediateLevels];
+
+        async function showMessage(speaker, text, type = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text';
+            if (type) textDiv.classList.add(type);
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+
+        function showLevel(level) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${level.id}: ${level.title}`;
+            output.appendChild(div);
+            showMessage(character.name, level.intro);
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message';
+            const contentText = document.createElement('div');
+            contentText.style.whiteSpace = 'pre-wrap';
+            contentText.style.marginTop = '0.5rem';
+            contentText.style.color = '#f0c674';
+            contentText.textContent = level.content;
+            contentDiv.appendChild(contentText);
+            output.appendChild(contentDiv);
+            showMessage('Hint', level.hint, 'hint');
+            currentLevel = level.id;
+            clearNginxOutput();
+            input.focus();
+        }
+
+        function checkAnswer(level, userAnswer) {
+            const trimmedAnswer = userAnswer.trim();
+            if (level.type === 'contains') {
+                return trimmedAnswer.toLowerCase().includes(level.answer.toLowerCase());
+            } else if (level.type === 'starts') {
+                return trimmedAnswer.toLowerCase().startsWith(level.answer.toLowerCase());
+            }
+            return trimmedAnswer === level.answer;
+        }
+
+        function showSuccess(level) {
+            showMessage(character.name, level.success, 'success');
+            showMessage(character.name, character.getEncouragement(), 'success');
+            saveProgress(level.id);
+            const nextLevel = levels.find(l => l.id === level.id + 1 && levels.indexOf(l) < (level.id <= 12 ? 12 : 24));
+            if (nextLevel) {
+                setTimeout(() => showLevel(nextLevel), 1500);
+            } else {
+                const completeMsg = level.id <= 12 ? 'BEGINNER TRACK COMPLETE!' : 'INTERMEDIATE TRACK COMPLETE!';
+                showMessage(character.name, `🎉 ${completeMsg} You are a true nginx master!`);
+            }
+        }
+
+        function showFail(level) {
+            showMessage(character.name, 'Not quite right. Check the hint and try again!', 'fail');
+            showMessage('Hint', level.hint, 'hint');
+        }
+
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { showMessage(character.name, 'Starting BEGINNER track! 12 levels of nginx basics!'); showLevel(beginnerLevels[0]); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { showMessage(character.name, 'Starting INTERMEDIATE track! 12 levels of nginx mastery!'); showLevel(intermediateLevels[0]); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels.find(l => l.id === currentLevel) || levels[0];
+                if (checkAnswer(level, userAnswer)) {
+                    await runNginx(userAnswer);
+                    showSuccess(level);
+                } else {
+                    await runNginx(userAnswer);
+                    showFail(level);
+                }
+                input.value = '';
+            }
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { showMessage(character.name, 'Starting BEGINNER track! 12 levels of nginx basics!'); showLevel(beginnerLevels[0]); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { showMessage(character.name, 'Starting INTERMEDIATE track! 12 levels of nginx mastery!'); showLevel(intermediateLevels[0]); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                showMessage(character.name, 'Press Ctrl+Enter to run nginx commands. Use --beginner, --intermediate, --fullscreen, --darkmode, or --exit');
+                input.value = '';
+            }
+        });
+
+        document.getElementById('runBtn').addEventListener('click', async function() {
+            const userAnswer = input.value.trim();
+            if (!userAnswer) return;
+            
+            if (userAnswer === '--beginner') { showMessage(character.name, 'Starting BEGINNER track! 12 levels of nginx basics!'); showLevel(beginnerLevels[0]); input.value = ''; return; }
+            if (userAnswer === '--intermediate') { showMessage(character.name, 'Starting INTERMEDIATE track! 12 levels of nginx mastery!'); showLevel(intermediateLevels[0]); input.value = ''; return; }
+            if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+            if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+            if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+            
+            const level = levels.find(l => l.id === currentLevel) || levels[0];
+            if (checkAnswer(level, userAnswer)) {
+                await runNginx(userAnswer);
+                showSuccess(level);
+            } else {
+                await runNginx(userAnswer);
+                showFail(level);
+            }
+            input.value = '';
+        });
+
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            const startLevel = savedLevel ? levels.find(l => l.id === savedLevel) : levels[0];
+            await showMessage(character.name, character.greeting);
+            await showMessage(character.name, 'Type --beginner for BEGINNER track, --intermediate for INTERMEDIATE track');
+            if (savedLevel && savedLevel > 12) {
+                await showMessage(character.name, `Resuming INTERMEDIATE at level ${savedLevel}`);
+                showLevel(levels.find(l => l.id === savedLevel));
+            } else if (savedLevel) {
+                await showMessage(character.name, `Resuming BEGINNER at level ${savedLevel}`);
+                showLevel(levels.find(l => l.id === savedLevel));
+            }
+        }
+
+        init();
+    </script>
+    <footer id="site-footer" style="text-align: center; padding: 0 24px 24px;">
+        <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>
+        <div style="margin-bottom: 23px;">
+            <a href="site-map.html" style="color: var(--black);">Site Map</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" style="color: var(--black);">Onion Site</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="https://github.com/cjboon/rebelwithlinux" style="color: var(--black);">GitHub</a>
+        </div>
+        <div>
+            <a href="../sections/about.html" style="color: var(--black);">About</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/contact.html" style="color: var(--black);">Contact</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/stats.html" style="color: var(--black);">Stats</a>
+        </div>
+    </footer>
+
+</body>
+</html>

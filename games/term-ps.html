@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <link rel="icon" href="/img/favicon.ico">
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-ps.html" />
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var theme = saved || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <script src="../js/theme.js"></script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ps/pkill Tutor - Rebel with Linux</title>
+<style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: var(--term-bg); color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid var(--term-border); }
+        .terminal-header { background: var(--term-header-bg); padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: var(--term-dot-red); }
+        .dot-yellow { background: var(--term-dot-yellow); }
+        .dot-green { background: var(--term-dot-green); }
+        .terminal-title { margin-left: 1rem; color: var(--term-text); font-size: 0.85rem; }
+        .pane-label { background: var(--term-header-bg); padding: 0.5rem 1rem; color: var(--term-text); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: var(--term-bg); }
+        .input-label { color: var(--term-text-muted); margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: var(--term-text-muted); font-size: 0.75rem; margin-top: 0.5rem; }
+        .ps-output-area { flex: 1; border-top: 2px solid var(--term-border); padding: 0.5rem; background: var(--term-input-bg); overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .ps-output-line { color: var(--term-text-muted); margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .ps-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .ps-success-line { color: #b5bd68; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: var(--term-bg); }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: var(--term-bg); border-left: 3px solid var(--term-accent, #f0c674); }
+        [data-theme="light"] body { background: var(--term-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .terminal-header { background: var(--term-header-bg-light); }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: var(--term-text-dark); }
+        [data-theme="light"] .pane-label { background: var(--term-header-bg-light); }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .ps-output-area { background: var(--term-input-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .ps-output-area { background: var(--term-bg-light); border-top-color: var(--term-text); }
+        [data-theme="light"] #command-input { color: var(--term-text-dark); }
+        [data-theme="light"] .input-label { color: var(--term-text-muted); }
+        [data-theme="light"] .left-pane { border-right: 2px solid var(--term-border-light); }
+        [data-theme="light"] .hint { color: var(--term-text-muted); }
+        [data-theme="light"] .ps-output-line { color: var(--term-text-dark); }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: var(--term-bg-light); color: #b58900; border-left-color: #b58900; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid var(--term-border); }
+            .left-pane { border-right: none; border-top: 2px solid var(--term-border); }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+
+    <link rel="stylesheet" href="../css/00-fonts.css">
+    <link rel="stylesheet" href="../css/01-variables.css">
+    <link rel="stylesheet" href="../css/02-reset.css">
+    <link rel="stylesheet" href="../css/03-typography.css">
+    <link rel="stylesheet" href="../css/04-navigation.css">
+    <link rel="stylesheet" href="../css/05-layout.css">
+    <link rel="stylesheet" href="../css/06-buttons.css">
+    <link rel="stylesheet" href="../css/07-cards.css">
+    <link rel="stylesheet" href="../css/08-terminal.css">
+    <link rel="stylesheet" href="../css/09-quiz.css">
+    <link rel="stylesheet" href="../css/10-sections.css">
+    <link rel="stylesheet" href="../css/11-modals.css">
+    <link rel="stylesheet" href="../css/12-forms.css">
+    <link rel="stylesheet" href="../css/13-account.css">
+    <link rel="stylesheet" href="../css/14-animations.css">
+    <link rel="stylesheet" href="../css/15-responsive.css">
+    <link rel="stylesheet" href="../css/16-nojs.css">
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">ps/pkill Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type ps/kill/top command:</div>
+                <textarea id="command-input" placeholder="ps aux" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="ps-output-area" id="ps-output">
+                <div class="ps-output-line" style="color: #586e75;">ps output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const psOutput = document.getElementById('ps-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=ps');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'ps', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addPsLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'ps-error-line' : type === 'success' ? 'ps-success-line' : 'ps-output-line';
+            line.textContent = text;
+            psOutput.appendChild(line);
+            psOutput.scrollTop = psOutput.scrollHeight;
+        }
+        
+        function clearPsOutput() { psOutput.innerHTML = ''; }
+        
+        function runPs(cmd) {
+            addPsLine('$ ' + cmd);
+            
+            const responses = {
+                "ps aux": "USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND\nroot     1  0.0  0.2  12345  6789 ?        Ss   Jan15   0:05 /sbin/init\nbob      1234  0.5  1.2  98765  4567 pts/0    Ss   10:00   0:01 bash\nbob      5678  0.1  0.5  54321  2345 pts/0    R+   10:01   0:00 ps aux",
+                "ps -ef": "UID        PID  PPID  C STIME TTY          TIME CMD\nroot         1     0  0 Jan15 ?        00:00:05 /sbin/init\nbob       1234  1233  0 10:00 pts/0    00:00:01 bash\nbob       5678  1234  0 10:01 pts/0    00:00:00 ps -ef",
+                "ps aux | grep": "bob      5678  0.1  0.5  54321  2345 pts/0    R+   10:01   0:00 grep nginx",
+                "ps": "  PID TTY          TIME CMD\n 1234 pts/0    00:00:01 bash\n 5678 pts/0    00:00:00 ps",
+                "ps -e": "  PID TTY          TIME CMD\n    1 ?        00:00:05 init\n 1234 ?        00:00:00 sshd",
+                "ps -f": "UID        PID  PPID  C STIME TTY          TIME CMD\nbob       1234  1233  0 10:00 pts/0    00:00:01 -bash",
+                "ps -o": "PID COMMAND\n1234 bash\n5678 ps",
+                "ps -o pid,ppid,cmd": "PID  PPID  CMD\n1234 1233  bash\n5678 1234  ps -o pid,ppid,cmd",
+                "ps --sort": "USER       PID %CPU %MEM    VSZ   RSS TTY\nbob      5678  1.2  0.5  54321  2345 pts/0\nbob      1234  0.1  0.2  98765  4567 pts/0",
+                "ps aux --sort=-%cpu": "USER       PID %CPU %MEM    VSZ   RSS TTY",
+                "top": "top - 10:30:00 up 5 days,  1:23,  2 users,  load average: 0.52, 0.48, 0.51\nTasks: 145 total,   3 running, 142 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 10.5 us,  2.1 sy,  0.0 ni, 85.2 id,  2.2 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem :  15883.9 total,   5432.1 free,   7891.2 used,   2560.6 buff/cache\nMiB Swap:   2048.0 total,   2048.0 free,      0.0 used.   7234.5 avail Mem\n\n  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND\n1234 bob       20   0  98765   4567   3210 R  10.5  0.5   0:23.45 firefox",
+                "top -u": "Show processes for current user only",
+                "kill": "Process killed",
+                "kill -9": "Process killed with SIGKILL",
+                "kill -15": "Process terminated gracefully",
+                "kill -l": " 1) SIGHUP   2) SIGINT   3) SIGQUIT   4) SIGILL\n 5) SIGTRAP   6) SIGABRT   7) SIGBUS   8) SIGFPE\n 9) SIGKILL  10) SIGUSR1",
+                "pkill": "Process(es) killed",
+                "pgrep": "1234\n5678",
+                "killall": "Process(es) killed",
+                "killall nginx": "nginx: no process found",
+                "pidof": "1234",
+                "pidof nginx": "1234 5678",
+                "htop": "Interactive process viewer (not available in this tutorial)",
+                "bg": "[1]+ Continued    sleep 100 &",
+                "fg": "[1]+ sleep 100",
+                "jobs": "[1]+  Running    sleep 100 &\n[2]-  Stopped    vim file.txt",
+                "nohup": "nohup: ignoring input and appending output to 'nohup.out'",
+                "nice": "Priority adjusted",
+                "renice": "Priority adjusted",
+                "ctrl+z": "[1]+ Stopped    vim file.txt"
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addPsLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.toLowerCase().includes('ps') || cmd.toLowerCase().includes('kill') || cmd.toLowerCase().includes('top') || cmd.toLowerCase().includes('pkill') || cmd.toLowerCase().includes('pgrep')) {
+                    addPsLine('Command executed');
+                    matched = true;
+                } else {
+                    addPsLine('Try: ps aux', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "Process Pete",
+            greeting: "Hey! I'm Process Pete - process management expert! Every running program is a process. ps shows them, kill ends them, top monitors them. When systems act up, processes are always the culprit. Let's debug!",
+            encourage: ["Excellent!", "Process handled!", "You're a process pro!", "Keep monitoring!", "System stable!", "Brilliant!"],
+            getEncouragement: function() { return this.encourage[Math.floor(Math.random() * this.encourage.length)]; }
+        };
+        
+        const beginnerLevels = [
+            { id: 1, title: "Basic ps Command", intro: "Welcome! ps shows running processes. No args shows your current shell.", content: "Basic ps:\nps", hint: "Type: ps", answer: "ps", success: "Processes shown! See PID (process ID), TTY (terminal), TIME (CPU time), CMD (command)!", type: "contains" },
+            { id: 2, title: "All Processes aux", intro: "ps aux shows ALL processes from ALL users - essential for system overview.", content: "All processes:\nps aux", hint: "Type: ps aux", answer: "ps aux", success: "All processes! USER, PID, %CPU, %MEM, VSZ, RSS, TTY, STAT, START, TIME, COMMAND!", type: "contains" },
+            { id: 3, title: "Full Format -ef", intro: "ps -ef shows full format with parent process ID (PPID) - great for tracing!", content: "Full format:\nps -ef", hint: "Type: ps -ef", answer: "ps -ef", success: "Full format! PPID shows parent process - trace process trees!", type: "contains" },
+            { id: 4, title: "Filter with grep", intro: "ps aux | grep filters processes by name - find specific programs!", content: "Find nginx:\nps aux | grep nginx", hint: "Type: ps aux | grep nginx", answer: "ps aux | grep", success: "nginx processes found! Combine ps with grep for targeted views!", type: "contains" },
+            { id: 5, title: "Process by User", intro: "ps -u [user] shows processes for a specific user.", content: "Your processes:\nps -u $USER", hint: "Type: ps -u $USER", answer: "ps -u", success: "Your processes! Shows only processes owned by you. $USER is your username!", type: "contains" },
+            { id: 6, title: "Kill a Process", intro: "kill [PID] sends SIGTERM (15) to gracefully stop a process.", content: "Kill process 5678:\nkill 5678", hint: "Type: kill 5678", answer: "kill", success: "SIGTERM sent! Process should terminate gracefully. If not, use kill -9!", type: "contains" },
+            { id: 7, title: "Force Kill", intro: "kill -9 [PID] sends SIGKILL - immediate, no cleanup. Last resort!", content: "Force kill:\nkill -9 5678", hint: "Type: kill -9", answer: "kill -9", success: "SIGKILL sent! Immediate termination - process can't ignore or catch this signal!", type: "contains" },
+            { id: 8, title: "pkill by Name", intro: "pkill [name] kills processes matching the name - no PID needed!", content: "Kill by name:\npkill nginx", hint: "Type: pkill nginx", answer: "pkill", success: "nginx killed! pkill is convenient but dangerous - kills ALL matching processes!", type: "contains" },
+            { id: 9, title: "pgrep Process ID", intro: "pgrep [name] finds PIDs by name - just gets IDs, doesn't kill!", content: "Find PIDs:\npgrep nginx", hint: "Type: pgrep nginx", answer: "pgrep", success: "PIDs found! pgrep is safe - just returns IDs for scripting!", type: "contains" },
+            { id: 10, title: "pidof Process", intro: "pidof [program] finds PID of a running program.", content: "Find nginx PID:\npidof nginx", hint: "Type: pidof nginx", answer: "pidof", success: "nginx PIDs shown! pidof is precise - exact program match only!", type: "contains" },
+            { id: 11, title: "Kill by Name", intro: "killall [name] kills ALL processes with that name.", content: "Kill all nginx:\nkillall nginx", hint: "Type: killall nginx", answer: "killall", success: "All nginx killed! killall is powerful - use carefully!", type: "contains" },
+            { id: 12, title: "Beginner Finale", intro: "Final challenge! Find nginx PID, then kill it gracefully!", content: "Challenge:\npidof nginx && kill [PID]", hint: "Type: pgrep nginx", answer: "pidof", success: "BEGINNER COMPLETE! You master: ps, kill, pkill, pgrep, pidof, killall! Process pro!", type: "starts" }
+        ];
+        
+        const intermediateLevels = [
+            { id: 1, title: "Signal List", intro: "INTERMEDIATE! kill -l lists all available signals.", content: "List signals:\nkill -l", hint: "Type: kill -l", answer: "kill -l", success: "Signals listed! 64 signals from SIGHUP (1) to SIGRTMAX (64). Know your options!", type: "contains" },
+            { id: 2, title: "top Basics", intro: "top is an interactive process monitor - live CPU, memory, load!", content: "Run top:\ntop", hint: "Type: top", answer: "top", success: "Interactive monitor! Press q to quit, M to sort by memory, P to sort by CPU!", type: "contains" },
+            { id: 3, title: "top User Filter", intro: "top -u [user] shows only processes for that user.", content: "Your processes in top:\ntop -u $USER", hint: "Type: top -u", answer: "top -u", success: "Your processes only! Filter out noise - see only what matters!", type: "contains" },
+            { id: 4, title: "ps Custom Output", intro: "ps -o lets you specify exact columns to display.", content: "Custom columns:\nps -o pid,ppid,%cpu,%mem,cmd", hint: "Type: ps -o", answer: "ps -o", success: "Custom output! Only the columns you want. Great for scripting!", type: "contains" },
+            { id: 5, title: "ps Sort by CPU", intro: "ps aux --sort=-%cpu sorts by CPU usage (highest first).", content: "Sort by CPU:\nps aux --sort=-%cpu | head", hint: "Type: ps aux --sort", answer: "--sort=-%cpu", success: "Top CPU consumers! Pipe to head to see just the first lines!", type: "contains" },
+            { id: 6, title: "ps Sort by Memory", intro: "ps aux --sort=-%mem sorts by memory usage.", content: "Sort by memory:\nps aux --sort=-%mem | head", hint: "Type: --sort=-%mem", answer: "--sort=-%mem", success: "Top memory users! Find what's consuming RAM!", type: "contains" },
+            { id: 7, title: "Background Jobs", intro: "Run command with & to put it in background. jobs shows them.", content: "Background job:\nsleep 100 &", hint: "Type: sleep 100 &", answer: "sleep", success: "Background job! jobs shows background processes. fg brings them back!", type: "contains" },
+            { id: 8, title: "Bring to Foreground", intro: "fg brings a background job to foreground.", content: "Bring to foreground:\nfg", hint: "Type: fg", answer: "fg", success: "Foreground! Use fg %1 where 1 is job number from jobs list!", type: "contains" },
+            { id: 9, title: "Suspend Process", intro: "Ctrl+Z suspends a running process and returns to shell.", content: "Suspend vim:\nCtrl+Z (vim file.txt then Ctrl+Z)", hint: "Press Ctrl+Z", answer: "Ctrl+Z", success: "Process suspended! Use fg to resume or kill to end it!", type: "contains" },
+            { id: 10, title: "nohup Background", intro: "nohup makes a process immune to hangups - keeps running after logout!", content: "Run immune to logout:\nnohup ./script.sh &", hint: "Type: nohup", answer: "nohup", success: "Immune to hangup! nohup ignores SIGHUP. Output goes to nohup.out!", type: "contains" },
+            { id: 11, title: "nice Priority", intro: "nice -n [level] starts process with adjusted priority (-20 to 19).", content: "Low priority:\nnice -n 10 long-task.sh", hint: "Type: nice -n", answer: "nice -n", success: "Nice level set! Lower = nicer to others (higher priority). Default is 0!", type: "contains" },
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Start a background job, check with jobs, then kill it!", content: "Challenge:\nsleep 60 &\njobs\nkill %1", hint: "Type: jobs", answer: "jobs", success: "INTERMEDIATE COMPLETE! You master: signals, top, sort, bg/fg, nohup, nice! Process MASTER!", type: "starts" }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') return user === answer;
+            else if (level.type === 'contains') return user.includes(answer);
+            else if (level.type === 'starts') return user.startsWith(answer);
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! Process management levels complete! You're a debugging master!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: ps, kill, pkill, pgrep. I'll make you a process pro!"); }
+            else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Advanced: signals, top, bg/fg, nohup, nice!"); }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) { document.exitFullscreen(); }
+            else { document.documentElement.requestFullscreen(); }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=updateTheme&theme=' + newTheme, credentials: 'include' });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                await showMessage(character.name, "Press Ctrl+Enter to run ps commands. Use --beginner, --intermediate, --fullscreen, --darkmode, or --exit", 'hint');
+                input.value = '';
+                return;
+            }
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels[currentLevel];
+                clearPsOutput();
+                runPs(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels[currentLevel];
+                clearPsOutput();
+                runPs(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) { currentLevel = savedLevel - 1; }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basics: ps, kill, pkill, pgrep (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Advanced: signals, top, bg/fg, nice (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Type --beginner or --intermediate to start! Click options or use --fullscreen, --darkmode, --exit anytime!");
+        }
+        init();
+    </script>
+    <footer id="site-footer" style="text-align: center; padding: 0 24px 24px;">
+        <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>
+        <div style="margin-bottom: 23px;">
+            <a href="site-map.html" style="color: var(--black);">Site Map</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" style="color: var(--black);">Onion Site</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="https://github.com/cjboon/rebelwithlinux" style="color: var(--black);">GitHub</a>
+        </div>
+        <div>
+            <a href="../sections/about.html" style="color: var(--black);">About</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/contact.html" style="color: var(--black);">Contact</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/stats.html" style="color: var(--black);">Stats</a>
+        </div>
+    </footer>
+
+</body>
+</html>

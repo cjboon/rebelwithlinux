@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <link rel="icon" href="/img/favicon.ico">
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-mount.html" />
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var theme = saved || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <script src="../js/theme.js"></script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mount/umount Tutor - Rebel with Linux</title>
+<style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body { background: var(--term-bg); color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid var(--term-border); }
+        .terminal-header { background: var(--term-header-bg); padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: var(--term-dot-red); }
+        .dot-yellow { background: var(--term-dot-yellow); }
+        .dot-green { background: var(--term-dot-green); }
+        .terminal-title { margin-left: 1rem; color: var(--term-text); font-size: 0.85rem; }
+        .pane-label { background: var(--term-header-bg); padding: 0.5rem 1rem; color: var(--term-text); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: var(--term-bg); }
+        .input-label { color: var(--term-text-muted); margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        .hint { color: var(--term-text-muted); font-size: 0.75rem; margin-top: 0.5rem; }
+        .mount-output-area { flex: 1; border-top: 2px solid var(--term-border); padding: 0.5rem; background: var(--term-input-bg); overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .mount-output-line { color: var(--term-text-muted); margin-bottom: 0.25rem; white-space: pre-wrap; }
+        .mount-error-line { color: #cc6666; margin-bottom: 0.25rem; }
+        .mount-success-line { color: #b5bd68; margin-bottom: 0.25rem; }
+        .terminal-pane.right-pane { flex: 1; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: var(--term-bg); }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: var(--term-bg); border-left: 3px solid var(--term-accent, #f0c674); }
+        [data-theme="light"] body { background: var(--term-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .terminal-header { background: var(--term-header-bg-light); }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: var(--term-text-dark); }
+        [data-theme="light"] .pane-label { background: var(--term-header-bg-light); }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .mount-output-area { background: var(--term-input-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .mount-output-area { background: var(--term-bg-light); border-top-color: var(--term-text); }
+        [data-theme="light"] #command-input { color: var(--term-text-dark); }
+        [data-theme="light"] .input-label { color: var(--term-text-muted); }
+        [data-theme="light"] .left-pane { border-right: 2px solid var(--term-border-light); }
+        [data-theme="light"] .hint { color: var(--term-text-muted); }
+        [data-theme="light"] .mount-output-line { color: var(--term-text-dark); }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: var(--term-bg-light); color: #b58900; border-left-color: #b58900; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid var(--term-border); }
+            .left-pane { border-right: none; border-top: 2px solid var(--term-border); }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+
+    <link rel="stylesheet" href="../css/00-fonts.css">
+    <link rel="stylesheet" href="../css/01-variables.css">
+    <link rel="stylesheet" href="../css/02-reset.css">
+    <link rel="stylesheet" href="../css/03-typography.css">
+    <link rel="stylesheet" href="../css/04-navigation.css">
+    <link rel="stylesheet" href="../css/05-layout.css">
+    <link rel="stylesheet" href="../css/06-buttons.css">
+    <link rel="stylesheet" href="../css/07-cards.css">
+    <link rel="stylesheet" href="../css/08-terminal.css">
+    <link rel="stylesheet" href="../css/09-quiz.css">
+    <link rel="stylesheet" href="../css/10-sections.css">
+    <link rel="stylesheet" href="../css/11-modals.css">
+    <link rel="stylesheet" href="../css/12-forms.css">
+    <link rel="stylesheet" href="../css/13-account.css">
+    <link rel="stylesheet" href="../css/14-animations.css">
+    <link rel="stylesheet" href="../css/15-responsive.css">
+    <link rel="stylesheet" href="../css/16-nojs.css">
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">mount Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type mount command:</div>
+                <textarea id="command-input" placeholder="mount -l" autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Press Ctrl+Enter to run</div>
+            </div>
+            <div class="mount-output-area" id="mount-output">
+                <div class="mount-output-line" style="color: #586e75;">mount output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const mountOutput = document.getElementById('mount-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) { userId = data.email; userTheme = data.theme || 'dark'; return true; }
+            } catch (e) {}
+            return false;
+        }
+
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=mount');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) return Math.max(...data.map(p => p.lesson_id));
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'mount', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addMountLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'mount-error-line' : type === 'success' ? 'mount-success-line' : 'mount-output-line';
+            line.textContent = text;
+            mountOutput.appendChild(line);
+            mountOutput.scrollTop = mountOutput.scrollHeight;
+        }
+        
+        function clearMountOutput() { mountOutput.innerHTML = ''; }
+        
+        function runMount(cmd) {
+            addMountLine('$ ' + cmd);
+            
+            const responses = {
+                "mount": "/dev/sda1 on / type ext4\n/dev/sdb1 on /data type ext4\ntmpfs on /dev/shm type tmpfs",
+                "mount -l": "/dev/sda1 on / type ext4 (rw,relatime)\n/dev/sdb1 on /data type ext4 (rw,relatime)",
+                "mount | grep": "filtered mount points",
+                "df -h": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/sda1       100G   45G   55G  45% /",
+                "lsblk": "NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT\nsda      8:0    0  100G  0 disk\nsda1     8:1    0   99G  0 part /",
+                "blkid": "/dev/sda1: UUID=\"abc123\" TYPE=\"ext4\"\n/dev/sdb1: UUID=\"def456\" TYPE=\"ext4\"",
+                "mount /dev/sdb1": "Mounted /dev/sdb1 on /mnt",
+                "mount /dev/sdb1 /data": "Mounted /dev/sdb1 on /data",
+                "mount -t ext4": "ext4 filesystem mount specified",
+                "mount -t ntfs": "NTFS filesystem mount specified",
+                "mount -t vfat": "VFAT/FAT32 filesystem mount specified",
+                "mount -t nfs": "NFS filesystem mount specified",
+                "mount -t cifs": "CIFS/SMB filesystem mount specified",
+                "-o ro": "Mounted read-only",
+                "-o rw": "Mounted read-write",
+                "-o noexec": "noexec option set",
+                "-o nosuid": "nosuid option set",
+                "-o nodev": "nodev option set",
+                "-o noatime": "noatime option set",
+                "-o remount": "Remount requested",
+                "-o loop": "Loop device mount",
+                "-o bind": "Bind mount requested",
+                "-o user": "User mount allowed",
+                "umount": "Unmount successful",
+                "umount /dev/sdb1": "Unmounted /dev/sdb1",
+                "umount /data": "Unmounted /data",
+                "umount -f": "Force unmount",
+                "umount -l": "Lazy unmount",
+                "fuser -m": "Processes using mount point",
+                "findmnt": "TARGET   SOURCE    FSTYPE OPTIONS\n/        /dev/sda1 ext4    rw,relatime\n/data     /dev/sdb1 ext4    rw,relatime",
+                "mount --bind": "Bind mount created",
+                "mount --move": "Mount point relocated",
+                "systemctl mount": "systemd mount unit started",
+                "systemctl umount": "systemd mount unit stopped",
+                "tmpfs": "tmpfs mounted",
+                "devpts": "devpts mounted",
+                "sysfs": "sysfs mounted",
+                "proc": "proc mounted",
+                "/etc/fstab": "/etc/fstab entry configured"
+            };
+            
+            let matched = false;
+            for (const [key, value] of Object.entries(responses)) {
+                if (cmd.toLowerCase().includes(key.toLowerCase())) {
+                    addMountLine(value);
+                    matched = true;
+                    break;
+                }
+            }
+            
+            if (!matched) {
+                if (cmd.toLowerCase().includes('mount') || cmd.toLowerCase().includes('umount') || cmd.toLowerCase().includes('fuser') || cmd.toLowerCase().includes('findmnt')) {
+                    addMountLine('Mount operation completed');
+                    matched = true;
+                } else {
+                    addMountLine('Try: mount -l', 'error');
+                }
+            }
+        }
+        
+        const character = {
+            name: "Mount Mary",
+            greeting: "Hey! I'm Mount Mary - filesystem mounting expert! mount connects filesystems to directories. USB drives, network shares, ISO files - I make them all accessible. Let's get things mounted!",
+            encourage: ["Excellent!", "Mounted!", "You're a mounting master!", "Keep connecting!", "Filesystems linked!", "Brilliant!"],
+            getEncouragement: function() { return this.encourage[Math.floor(Math.random() * this.encourage.length)]; }
+        };
+        
+        const beginnerLevels = [
+            { id: 1, title: "List All Mounts", intro: "Welcome! Just 'mount' shows all currently mounted filesystems.", content: "List mounts:\nmount", hint: "Type: mount", answer: "mount", success: "All mounts shown! See device -> mount_point -> filesystem type. Root (/) is always first!", type: "contains" },
+            { id: 2, title: "Mount with -l", intro: "mount -l shows mounts with labels - easier to identify!", content: "List with labels:\nmount -l", hint: "Type: mount -l", answer: "mount -l", success: "Labels shown! Easier to identify /dev/sda1 as 'backup_drive'. Labels help organize!", type: "contains" },
+            { id: 3, title: "Findmnt Command", intro: "findmnt shows mount tree - visual mount hierarchy.", content: "Tree view:\nfindmnt", hint: "Type: findmnt", answer: "findmnt", success: "Mount tree! Shows TARGET, SOURCE, FSTYPE, OPTIONS. Clean hierarchical view!", type: "contains" },
+            { id: 4, title: "List Block Devices", intro: "lsblk shows all block devices - disks and partitions.", content: "List devices:\nlsblk", hint: "Type: lsblk", answer: "lsblk", success: "Devices listed! NAME, SIZE, TYPE, MOUNTPOINT. See your disks and partitions!", type: "contains" },
+            { id: 5, title: "Basic Mount", intro: "mount device mountpoint connects device to directory.", content: "Mount USB:\nmount /dev/sdb1 /mnt/usb", hint: "Type: mount /dev/sdb1 /mnt/usb", answer: "mount /dev/sdb1", success: "Mounted! /dev/sdb1 now accessible at /mnt/usb. Device -> directory connected!", type: "contains" },
+            { id: 6, title: "Specify Filesystem -t", intro: "mount -t type specifies filesystem (ext4, ntfs, vfat).", content: "Mount ext4:\nmount -t ext4 /dev/sdb1 /data", hint: "Type: mount -t ext4", answer: "mount -t", success: "ext4 specified! mount auto-detects usually, but -t forces filesystem type!", type: "contains" },
+            { id: 7, title: "Read-Only Mount -o ro", intro: "mount -o ro makes filesystem read-only - no writes allowed!", content: "Read-only mount:\nmount -o ro /dev/sdb1 /mnt/readonly", hint: "Type: -o ro", answer: "-o ro", success: "Read-only! Data can be read but not written. Great for backups or damaged filesystems!", type: "contains" },
+            { id: 8, title: "Unmount", intro: "umount disconnects filesystem. Always unmount before unplugging!", content: "Unmount USB:\nunmount /mnt/usb", hint: "Type: unmount /mnt/usb", answer: "unmount", success: "Unmounted! Device safe to remove. Always unmount before unplugging media!", type: "contains" },
+            { id: 9, title: "Check Disk Usage df", intro: "df -h shows mounted filesystem space usage.", content: "Check space:\ndf -h", hint: "Type: df -h", answer: "df -h", success: "Space shown! See Size, Used, Avail, Use%. Mounted = accessible!", type: "contains" },
+            { id: 10, title: "UUID with blkid", intro: "blkid shows device UUIDs - better than /dev paths for fstab.", content: "Get UUID:\nblkid", hint: "Type: blkid", answer: "blkid", success: "UUIDs shown! UUID is persistent identifier. Better than /dev/sda1 which can change!", type: "contains" },
+            { id: 11, title: "Mount by UUID", intro: "mount UUID=xxx mounts using UUID instead of device path.", content: "Mount by UUID:\nmount UUID=abc123-def456 /data", hint: "Type: mount UUID=", answer: "UUID=", success: "UUID mount! More reliable than /dev path. UUIDs persist across reboots!", type: "contains" },
+            { id: 12, title: "Beginner Finale", intro: "Final challenge! List mounts, check UUID, mount a device!", content: "Challenge:\nlsblk && blkid && mount /dev/sdb1 /mnt", hint: "Type: lsblk", answer: "lsblk", success: "BEGINNER COMPLETE! You master: mount, umount, lsblk, blkid, UUID! Mount master!", type: "starts" }
+        ];
+        
+        const intermediateLevels = [
+            { id: 1, title: "Remount -o remount", intro: "INTERMEDIATE! Remount changes options on already-mounted filesystem.", content: "Remount rw:\nmount -o remount,rw /", hint: "Type: -o remount,rw", answer: "-o remount", success: "Remounted read-write! Useful for fixing mount options without unmounting!", type: "contains" },
+            { id: 2, title: "Bind Mount --bind", intro: "mount --bind attaches filesystem to new directory.", content: "Bind mount:\nmount --bind /home /mnt/home", hint: "Type: --bind", answer: "--bind", success: "Bind mounted! /mnt/home now shows /home contents. Useful for chroot and containers!", type: "contains" },
+            { id: 3, title: "Move Mount --move", intro: "mount --move moves mount to different location.", content: "Move mount:\nmount --move /old /new", hint: "Type: --move", answer: "--move", success: "Mount moved! Contents now at /new instead of /old. Relocate without unmount!", type: "contains" },
+            { id: 4, title: "Lazy Unmount -l", intro: "umount -l lazy unmounts - immediately detaches, cleanup later.", content: "Lazy unmount:\nunmount -l /mnt/busy", hint: "Type: -l", answer: "-l", success: "Lazy unmount! Detaches immediately, cleans up when not busy. For unresponsive mounts!", type: "contains" },
+            { id: 5, title: "Force Unmount -f", intro: "umount -f forces unmount even if busy. Use carefully!", content: "Force unmount:\nunmount -f /mnt/nfs", hint: "Type: -f", answer: "-f", success: "Forced! Works when normal unmount fails. Can cause data loss - last resort!", type: "contains" },
+            { id: 6, title: "fuser to Find Users", intro: "fuser -m shows processes using a mount point.", content: "Find users:\nfuser -m /data", hint: "Type: fuser -m", answer: "fuser -m", success: "Processes shown! See which processes are using /data. Kill them before unmount!", type: "contains" },
+            { id: 7, title: "tmpfs RAM Disk", intro: "tmpfs is filesystem in RAM - super fast temporary storage!", content: "RAM disk:\nmount -t tmpfs -o size=1G tmpfs /ramdisk", hint: "Type: tmpfs", answer: "tmpfs", success: "RAM disk created! tmpfs uses memory, not disk. Lightning fast, volatile storage!", type: "contains" },
+            { id: 8, title: "Mount ISO", intro: "mount -o loop mounts ISO file as filesystem.", content: "Mount ISO:\nmount -o loop image.iso /mnt/iso", hint: "Type: -o loop", answer: "-o loop", success: "ISO mounted! Contents accessible at /mnt/iso. No burning needed!", type: "contains" },
+            { id: 9, title: "vFAT USB Mount", intro: "USB drives often use vfat (FAT32). Mount with proper permissions.", content: "vFAT mount:\nmount -t vfat -o uid=1000,gid=1000 /dev/sdb1 /mnt/usb", hint: "Type: -t vfat -o uid=", answer: "-t vfat", success: "vFAT mounted! uid/gid sets ownership. Your user can now write to USB!", type: "contains" },
+            { id: 10, title: "fstab Entry", intro: "/etc/fstab auto-mounts at boot. Format: UUID=xxx / mount_point type options 0 0", content: "fstab entry:\nUUID=abc123 /data ext4 defaults 0 2", hint: "Type: /etc/fstab", answer: "/etc/fstab", success: "fstab entry! Filesystem auto-mounted at boot. UUID for reliability!", type: "contains" },
+            { id: 11, title: "noauto Option", intro: "Add 'noauto' to fstab to skip boot mount - manual mount only.", content: "Manual only:\nUUID=xxx /backup ext4 noauto 0 0", hint: "Type: noauto", answer: "noauto", success: "Noauto set! Won't mount at boot. Use 'mount /backup' when needed!", type: "contains" },
+            { id: 12, title: "Intermediate Finale", intro: "Final challenge! Create tmpfs, bind mount /home, verify with findmnt!", content: "Challenge:\nmount -t tmpfs tmpfs /ram && mount --bind /home /mnt/home && findmnt", hint: "Type: tmpfs", answer: "tmpfs", success: "INTERMEDIATE COMPLETE! You master: remount, bind, tmpfs, ISO, fstab! Mount MASTER!", type: "starts" }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') return user === answer;
+            else if (level.type === 'contains') return user.includes(answer);
+            else if (level.type === 'starts') return user.startsWith(answer);
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel + 1);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "CONGRATULATIONS! mount levels complete! You're a mounting master!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') { levels = beginnerLevels; await showMessage(character.name, "Excellent! Basics: mount, umount, lsblk, blkid, UUID. I'll make you a mounting master!"); }
+            else if (trackName === 'intermediate') { levels = intermediateLevels; await showMessage(character.name, "Welcome back! Advanced: remount, bind, tmpfs, ISO, fstab!"); }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) { document.exitFullscreen(); }
+            else { document.documentElement.requestFullscreen(); }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'action=updateTheme&theme=' + newTheme, credentials: 'include' });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                await showMessage(character.name, "Press Ctrl+Enter to run mount commands. Use --beginner, --intermediate, --fullscreen, --darkmode, or --exit", 'hint');
+                input.value = '';
+                return;
+            }
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels[currentLevel];
+                clearMountOutput();
+                runMount(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels[currentLevel];
+                clearMountOutput();
+                runMount(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite! " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        async function init() {
+            await checkLogin();
+            savedLevel = await loadProgress();
+            if (savedLevel > 0) { currentLevel = savedLevel - 1; }
+            if (userId) {
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Basics: mount, umount, lsblk (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Advanced: remount, bind, tmpfs, fstab (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv5);
+            
+            await showMessage(character.name, "Type --beginner or --intermediate to start! Click options or use --fullscreen, --darkmode, --exit anytime!");
+        }
+        init();
+    </script>
+    <footer id="site-footer" style="text-align: center; padding: 0 24px 24px;">
+        <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>
+        <div style="margin-bottom: 23px;">
+            <a href="site-map.html" style="color: var(--black);">Site Map</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" style="color: var(--black);">Onion Site</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="https://github.com/cjboon/rebelwithlinux" style="color: var(--black);">GitHub</a>
+        </div>
+        <div>
+            <a href="../sections/about.html" style="color: var(--black);">About</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/contact.html" style="color: var(--black);">Contact</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/stats.html" style="color: var(--black);">Stats</a>
+        </div>
+    </footer>
+
+</body>
+</html>

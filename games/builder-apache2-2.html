@@ -1,0 +1,701 @@
+<html lang="en" data-theme="dark">
+<head>
+    <link rel="icon" href="/img/favicon.ico">
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var theme = saved || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/builders/builder-apache2-2.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apache2 Builder Level 2 - Learn Apache Commands</title>
+<style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: var(--white);
+            color: var(--black);
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+            position: relative;
+        }
+        
+        .header { text-align: center; margin-bottom: 30px; padding: 20px; }
+        
+        .header h1 {
+            font-size: 28px;
+            color: #d22128;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+        
+        .header p { color: var(--charcoal); font-size: 14px; }
+        
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            background: var(--beige);
+            padding: 15px 30px;
+            border-radius: 8px;
+            border: 1px solid var(--charcoal);
+        }
+        
+        .stat { text-align: center; }
+        .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #58a6ff; }
+        .stat-value.score { color: #d22128; }
+        
+        .game-container {
+            background: var(--beige);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            border: 1px solid var(--charcoal);
+            display: none;
+        }
+        
+        .game-container.active { display: block; }
+        
+        .level-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+        .level-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--charcoal); }
+        .level-dot.completed { background: #d22128; }
+        .level-dot.current { background: #58a6ff; }
+        
+        .question-box {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #d22128;
+        }
+        
+        .question-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .question-text { font-size: 16px; color: var(--black); line-height: 1.6; }
+        .hint-text { margin-top: 12px; font-size: 13px; color: #d29922; font-style: italic; }
+        
+        .answer-area {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            min-height: 80px;
+            border: 2px dashed var(--charcoal);
+        }
+        
+        .answer-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+        
+        .letter-slots { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; min-height: 50px; align-items: center; }
+        
+        .letter-slot {
+            width: 46px;
+            height: 46px;
+            background: var(--white);
+            border: 2px dashed var(--charcoal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--black);
+        }
+        
+        .letter-slot.filled { border-style: solid; border-color: #d22128; }
+        .letter-slot.correct { border-color: #3fb950; background: rgba(63, 185, 80, 0.1); }
+        .letter-slot.incorrect { border-color: #f85149; background: rgba(248, 81, 73, 0.1); }
+        
+        .letter-pool { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 20px; background: var(--white); border-radius: 8px; min-height: 80px; }
+        
+        .letter-tile {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, #d22128, #b31c22);
+            background-color: #d22128;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--white);
+            cursor: grab;
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-user-drag: element;
+            box-sizing: border-box;
+        }
+        
+        .letter-tile:active { cursor: grabbing; }
+        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(210, 33, 40, 0.3); }
+        .letter-tile.dragging { opacity: 0.5; }
+        
+        .actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        
+        .btn-primary { background: #238636; color: white; }
+        .btn-primary:hover { background: #2ea043; }
+        .btn-secondary { background: var(--charcoal); color: var(--black); border: 1px solid var(--charcoal); }
+        .btn-secondary:hover { background: var(--charcoal); }
+        
+        .feedback { padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; display: none; }
+        .feedback.success { display: block; background: rgba(38, 77, 228, 0.1); border: 1px solid #264de4; color: #264de4; }
+        .feedback.error { display: block; background: rgba(248, 81, 73, 0.1); border: 1px solid #f85149; color: #f85149; }
+        
+        .completion-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .completion-modal.active { display: flex; }
+        
+        .modal-content {
+            background: var(--beige);
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--charcoal);
+            max-width: 400px;
+        }
+        
+        .modal-content h2 { color: #d22128; margin-bottom: 20px; }
+        .modal-content p { color: var(--charcoal); margin-bottom: 25px; }
+        
+        .back-link { display: inline-block; margin-top: 20px; color: #58a6ff; text-decoration: none; font-size: 14px; }
+        .back-link:hover { text-decoration: underline; }
+        
+        .progress-info { margin-top: 20px; text-align: center; color: var(--charcoal); font-size: 13px; }
+        
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .header { padding: 15px; margin-bottom: 15px; }
+            .header h1 { font-size: 20px; }
+            .header p { font-size: 12px; }
+            .stats-bar { flex-wrap: wrap; gap: 15px; padding: 10px 15px; }
+            .stat-value { font-size: 18px; }
+            .stat-label { font-size: 10px; }
+            .game-container { padding: 15px; }
+            .level-indicator { gap: 5px; }
+            .level-dot { width: 20px; height: 20px; }
+            .modal-content { padding: 20px; margin: 10px; }
+            .modal-content h2 { font-size: 18px; }
+        }
+        
+        @media (max-width: 400px) {
+            .header h1 { font-size: 16px; }
+            .stats-bar { gap: 10px; }
+            .stat-value { font-size: 16px; }
+        }
+    </style>
+
+    <link rel="stylesheet" href="../css/00-fonts.css">
+    <link rel="stylesheet" href="../css/01-variables.css">
+    <link rel="stylesheet" href="../css/02-reset.css">
+    <link rel="stylesheet" href="../css/03-typography.css">
+    <link rel="stylesheet" href="../css/04-navigation.css">
+    <link rel="stylesheet" href="../css/05-layout.css">
+    <link rel="stylesheet" href="../css/06-buttons.css">
+    <link rel="stylesheet" href="../css/07-cards.css">
+    <link rel="stylesheet" href="../css/08-terminal.css">
+    <link rel="stylesheet" href="../css/09-quiz.css">
+    <link rel="stylesheet" href="../css/10-sections.css">
+    <link rel="stylesheet" href="../css/11-modals.css">
+    <link rel="stylesheet" href="../css/12-forms.css">
+    <link rel="stylesheet" href="../css/13-account.css">
+    <link rel="stylesheet" href="../css/14-animations.css">
+    <link rel="stylesheet" href="../css/15-responsive.css">
+    <link rel="stylesheet" href="../css/16-nojs.css">
+</head>
+<body>
+<noscript>
+    <style>
+        #themeBtn, #loginBtn { display: none !important; }
+        .section-links a[href*="search.html"] { display: none !important; }
+
+    </style>
+</noscript>
+
+        <div class="section-links" style="background: var(--ivory); padding: 16px; text-align: center;">
+        <a href="../index.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Home</a>
+        <a href="../sections/guides.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Guides</a>
+        <a href="../sections/tests.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Tests</a>
+        <a href="../sections/games.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Games</a>
+        <a href="../sections/pathway.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Pathway</a>
+        <a href="../sections/foss.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Foss</a>
+        <a href="../sections/blog.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Blog</a>
+        <a href="../sections/account.html" id="accountBtn" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: none;">Account</a>
+        <button id="themeBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Light</button>
+        <button id="loginBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Login</button>
+    </div>
+
+    <script>
+        (function() {
+            var theme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            document.getElementById('themeBtn').style.display = 'inline-block';
+            document.getElementById('themeBtn').textContent = theme === 'dark' ? 'Light' : 'Dark';
+            if (theme === 'dark') {
+                document.getElementById('themeBtn').style.color = '#e0e0e0';
+            }
+            
+            document.getElementById('themeBtn').addEventListener('click', function() {
+                var current = document.documentElement.getAttribute('data-theme');
+                var next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                this.textContent = next === 'dark' ? 'Light' : 'Dark';
+                this.style.color = next === 'dark' ? '#e0e0e0' : '#000000';
+            });
+
+            var isLoggedIn = localStorage.getItem('auth') === 'true';
+            if (isLoggedIn) {
+                document.getElementById('accountBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('loginBtn').style.display = 'inline-block';
+            }
+        })();
+    </script>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="auth-modal">
+        <div class="auth-box">
+            <button class="close-auth" onclick="closeLoginModal()">×</button>
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="showAuthTab('login')">Login</button>
+                <button class="auth-tab" onclick="showAuthTab('register')">Register</button>
+            </div>
+            <div id="loginError" class="auth-error"></div>
+            <div id="loginSuccess" class="auth-success"></div>
+            <form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)">
+                <input type="email" id="loginEmail" placeholder="Email" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <input type="password" id="loginPassword" placeholder="Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <button type="submit" style="width:100%;padding:12px;background:var(--black);color:var(--white);border:none;font-family:'IBM Plex Mono',monospace;cursor:pointer;">Login</button>
+            </form>
+            <form id="registerForm" class="auth-form" onsubmit="handleRegister(event)">
+                <input type="email" id="registerEmail" placeholder="Email" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <input type="password" id="registerPassword" placeholder="Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <input type="password" id="registerConfirm" placeholder="Confirm Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <button type="submit" style="width:100%;padding:12px;background:var(--black);color:var(--white);border:none;font-family:'IBM Plex Mono',monospace;cursor:pointer;">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('loginSuccess').classList.remove('show');
+            if (tab === 'login') {
+                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+            showAuthTab('login');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('active');
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('loginSuccess').classList.remove('show');
+        }
+
+        document.getElementById('loginBtn').addEventListener('click', openLoginModal);
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            const successDiv = document.getElementById('loginSuccess');
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'login');
+                formData.append('email', email);
+                formData.append('password', password);
+                
+                const response = await fetch('../api/auth.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('auth', 'true');
+                    successDiv.textContent = 'Login successful!';
+                    successDiv.classList.add('show');
+                    setTimeout(() => {
+                        window.location.href = '../account.html';
+                    }, 500);
+                } else {
+                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.classList.add('show');
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Connection error';
+                errorDiv.classList.add('show');
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirm').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (password !== confirm) {
+                errorDiv.textContent = 'Passwords do not match';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'register');
+                formData.append('email', email);
+                formData.append('password', password);
+                
+                const response = await fetch('../api/auth.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('auth', 'true');
+                    document.getElementById('loginSuccess').textContent = 'Registration successful! Logging in...';
+                    document.getElementById('loginSuccess').classList.add('show');
+                    setTimeout(() => {
+                        window.location.href = '../account.html';
+                    }, 500);
+                } else {
+                    errorDiv.textContent = data.error || 'Registration failed';
+                    errorDiv.classList.add('show');
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Connection error';
+                errorDiv.classList.add('show');
+            }
+        }
+
+        if (window.location.hash === '#login') {
+            openLoginModal();
+        }
+    </script>
+
+    <div class="header" style="padding-top: 20px;">
+        <h1>🪶 APACHE2 BUILDER</h1>
+        <p>Drag & drop to learn Apache commands</p>
+    </div>
+    
+    <div class="stats-bar">
+        <div class="stat"><div class="stat-label">Level</div><div class="stat-value" id="levelNum">2</div></div>
+        <div class="stat"><div class="stat-label">Score</div><div class="stat-value score" id="score">0</div></div>
+        <div class="stat"><div class="stat-label">Streak</div><div class="stat-value" id="streak">0</div></div>
+    </div>
+    
+    <div class="game-container active" id="gameContainer">
+        <div class="level-indicator" id="levelIndicator"></div>
+        
+        <div class="question-box">
+            <div class="question-label">Challenge</div>
+            <div class="question-text" id="questionText"></div>
+            <div class="hint-text" id="hintText"></div>
+        </div>
+        
+        <div class="answer-area">
+            <div class="answer-label">Your Answer</div>
+            <div class="letter-slots" id="letterSlots"></div>
+        </div>
+        
+        <div class="letter-pool" id="letterPool"></div>
+        <div class="feedback" id="feedback"></div>
+        
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="clearAnswer()">Clear</button>
+            <button class="btn btn-primary" onclick="checkAnswer()">Submit</button>
+        </div>
+        
+        <div class="progress-info">Question <span id="currentQ">1</span> of <span id="totalQ">10</span></div>
+    </div>
+    
+    <div class="completion-modal" id="completionModal">
+        <div class="modal-content">
+            <h2>🎉 Level Complete!</h2>
+            <p>You scored <span id="finalScore">0</span> points!</p>
+            <button class="btn btn-primary" onclick="nextLevel()">Next Level</button>
+        </div>
+    </div>
+    
+    <a href="builder-main.html" class="back-link">&lt;&lt; back to builder games</a>
+
+    <script>
+        const levels = [{ questions: [
+            { answer: "systemctl", hint: "Service manager", code: "Control systemd service" },
+            { answer: "service", hint: "Runlevel", code: "SysV init script" },
+            { answer: "a2ensite", hint: "Enable site", code: "Enable virtual host" },
+            { answer: "a2dissite", hint: "Disable site", code: "Disable virtual host" },
+            { answer: "a2enmod", hint: "Enable module", code: "Enable Apache module" },
+            { answer: "a2dismod", hint: "Disable module", code: "Disable Apache module" },
+            { answer: "htaccess", hint: "Dir config", code: "Directory config file" },
+            { answer: "htpasswd", hint: "Password file", code: "Create password file" },
+            { answer: "rewrite", hint: "URL rewrite", code: "mod_rewrite module" },
+            { answer: "proxy", hint: "Proxy module", code: "mod_proxy module" }
+        ]}];
+        
+        let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
+        
+        function initLevel() {
+            const level = levels[currentLevel];
+            document.getElementById('levelNum').textContent = currentLevel + 1;
+            document.getElementById('totalQ').textContent = level.questions.length;
+            renderLevelIndicator();
+            loadQuestion();
+        }
+        
+        function renderLevelIndicator() {
+            const level = levels[currentLevel];
+            const indicator = document.getElementById('levelIndicator');
+            indicator.innerHTML = '';
+            for (let i = 0; i < level.questions.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'level-dot';
+                if (i < currentQuestion) dot.classList.add('completed');
+                if (i === currentQuestion) dot.classList.add('current');
+                indicator.appendChild(dot);
+            }
+        }
+        
+        function loadQuestion() {
+            const q = levels[currentLevel].questions[currentQuestion];
+            document.getElementById('currentQ').textContent = currentQuestion + 1;
+            document.getElementById('questionText').textContent = q.code;
+            document.getElementById('hintText').textContent = q.hint;
+            document.getElementById('feedback').className = 'feedback';
+            placedLetters = new Array(q.answer.length).fill(null);
+            renderLetterSlots();
+            renderLetterPool();
+            renderLevelIndicator();
+        }
+        
+        function renderLetterSlots() {
+            const slotsContainer = document.getElementById('letterSlots');
+            slotsContainer.innerHTML = '';
+            placedLetters.forEach((item, index) => {
+                const slot = document.createElement('div');
+                slot.className = 'letter-slot' + (item ? ' filled' : '');
+                slot.textContent = item ? item.letter : '';
+                slot.dataset.index = index;
+                if (item) slot.addEventListener('click', () => removeLetter(index));
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('dragleave', handleDragLeave);
+                slot.addEventListener('drop', handleDrop);
+                slotsContainer.appendChild(slot);
+            });
+        }
+        
+        function renderLetterPool() {
+            const pool = document.getElementById('letterPool');
+            pool.innerHTML = '';
+            const answer = levels[currentLevel].questions[currentQuestion].answer;
+            
+            const letters = answer.split('').map((letter, i) => ({ letter, index: i }));
+            letters.sort(() => Math.random() - 0.5);
+            
+            const placedIndices = placedLetters.map(l => l !== null ? l.index : -1).filter(i => i !== -1);
+            
+            letters.forEach((item) => {
+                if (placedIndices.includes(item.index)) {
+                    return;
+                }
+                
+                const tile = document.createElement('div');
+                tile.className = 'letter-tile';
+                tile.textContent = item.letter;
+                tile.dataset.letter = item.letter;
+                tile.dataset.originalIndex = item.index;
+                tile.draggable = true;
+                tile.addEventListener('dragstart', handleDragStart);
+                tile.addEventListener('dragend', handleDragEnd);
+                tile.addEventListener('click', () => clickToPlace(item.letter, item.index));
+                pool.appendChild(tile);
+            });
+        }
+        
+        function clickToPlace(letter, originalIndex) {
+            const emptyIndex = placedLetters.findIndex(l => l === null);
+            if (emptyIndex !== -1) {
+                placedLetters[emptyIndex] = { letter: letter, index: originalIndex };
+                renderLetterSlots();
+                renderLetterPool();
+                
+                if (!placedLetters.includes(null)) {
+                    setTimeout(checkAnswer, 300);
+                }
+            }
+        }
+        
+        function handleDragStart(e) {
+            draggedLetter = e.target.dataset.letter;
+            draggedOriginalIndex = parseInt(e.target.dataset.originalIndex);
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            const canvas = document.createElement('canvas');
+            canvas.width = 46; canvas.height = 46;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#d22128';
+            ctx.fillRect(0, 0, 46, 46);
+            ctx.fillStyle = 'var(--white)';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.target.textContent, 23, 23);
+            e.dataTransfer.setDragImage(canvas, 23, 23);
+        }
+        
+        function handleDragEnd(e) { e.target.classList.remove('dragging'); }
+        function handleDragOver(e) { e.preventDefault(); e.target.classList.add('drag-over'); }
+        function handleDragLeave(e) { e.target.classList.remove('drag-over'); }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            const slotIndex = parseInt(e.target.dataset.index);
+            if (placedLetters[slotIndex]) return;
+            placedLetters[slotIndex] = { letter: draggedLetter, index: draggedOriginalIndex };
+            renderLetterSlots();
+            renderLetterPool();
+            if (!placedLetters.includes(null)) setTimeout(checkAnswer, 300);
+        }
+        
+        function removeLetter(index) { placedLetters[index] = null; renderLetterSlots(); renderLetterPool(); }
+        function clearAnswer() { placedLetters = new Array(placedLetters.length).fill(null); renderLetterSlots(); renderLetterPool(); }
+        
+        function checkAnswer() {
+            const q = levels[currentLevel].questions[currentQuestion];
+            const userAnswer = placedLetters.map(l => l ? l.letter : '').join('');
+            const slots = document.querySelectorAll('.letter-slot');
+            
+            if (userAnswer === q.answer) {
+                score += 10 + (streak * 2);
+                streak++;
+                document.getElementById('score').textContent = score;
+                document.getElementById('streak').textContent = streak;
+                slots.forEach(slot => slot.classList.add('correct'));
+                document.getElementById('feedback').className = 'feedback success';
+                document.getElementById('feedback').textContent = '✓ Correct!';
+                setTimeout(() => {
+                    currentQuestion++;
+                    if (currentQuestion >= levels[currentLevel].questions.length) showCompletion();
+                    else loadQuestion();
+                }, 1000);
+            } else {
+                streak = 0;
+                document.getElementById('streak').textContent = streak;
+                slots.forEach(slot => slot.classList.add('incorrect'));
+                document.getElementById('feedback').className = 'feedback error';
+                document.getElementById('feedback').textContent = '✗ Try again!';
+            }
+        }
+        
+        function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
+        function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = 'builder-apache2-3.html'; }
+        
+        document.addEventListener('keydown', function(e) {
+            const key = e.key.toLowerCase();
+            if (key === 'backspace') {
+                for (let i = placedLetters.length - 1; i >= 0; i--) {
+                    if (placedLetters[i] !== null) {
+                        placedLetters[i] = null;
+                        renderLetterSlots();
+                        renderLetterPool();
+                        break;
+                    }
+                }
+            } else if (key.length === 1 && /[a-z0-9_-]/.test(key)) {
+                const emptyIndex = placedLetters.indexOf(null);
+                if (emptyIndex !== -1) {
+                    const poolItems = document.querySelectorAll('.letter-tile');
+                    for (let item of poolItems) {
+                        if (item.textContent.toLowerCase() === key) {
+                            placedLetters[emptyIndex] = { letter: item.textContent, index: parseInt(item.dataset.originalIndex) };
+                            renderLetterSlots();
+                            renderLetterPool();
+                            if (!placedLetters.includes(null)) setTimeout(checkAnswer, 300);
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
+        initLevel();
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+    <noscript>
+        <style>
+            :root { --ivory:#1a1a1a; --white:#1a1a1a; --black:#e0e0e0; --charcoal:#c0c0c0; --beige:#3a3a3a; }
+        </style>
+    </noscript>
+    <footer id="site-footer" style="text-align: center; padding: 0 24px 24px;">
+        <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>
+        <div style="margin-bottom: 23px;">
+            <a href="site-map.html" style="color: var(--black);">Site Map</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" style="color: var(--black);">Onion Site</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="https://github.com/cjboon/rebelwithlinux" style="color: var(--black);">GitHub</a>
+        </div>
+        <div>
+            <a href="../sections/about.html" style="color: var(--black);">About</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/contact.html" style="color: var(--black);">Contact</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/stats.html" style="color: var(--black);">Stats</a>
+        </div>
+    </footer>
+
+</body>
+</html>

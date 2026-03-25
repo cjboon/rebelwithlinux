@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <link rel="icon" href="/img/favicon.ico">
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-grep.html" />
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var theme = saved || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <script src="../js/theme.js"></script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grep Tutor - Rebel with Linux</title>
+<style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            background: var(--term-bg);
+            color: var(--term-text);
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+        }
+        .container { display: flex; height: 100vh; width: 100vw; }
+        .terminal-pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .left-pane { border-right: 2px solid var(--term-border); }
+        .terminal-header { background: var(--term-header-bg); padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: var(--term-dot-red); }
+        .dot-yellow { background: var(--term-dot-yellow); }
+        .dot-green { background: var(--term-dot-green); }
+        .terminal-title { margin-left: 1rem; color: var(--term-text); font-size: 0.85rem; }
+        .pane-label { background: var(--term-header-bg); padding: 0.5rem 1rem; color: var(--term-text); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .input-area { flex: 1; display: flex; flex-direction: column; padding: 1rem; background: var(--term-bg); }
+        .input-label { color: var(--term-text-muted); margin-bottom: 0.5rem; font-size: 0.9rem; }
+        #command-input { flex: 1; width: 100%; background: transparent; border: none; color: var(--term-text); font-family: 'Courier New', monospace; font-size: 15px; resize: none; outline: none; }
+        #command-input::placeholder { color: var(--term-text-muted); }
+        .hint { color: var(--term-text-muted); font-size: 0.75rem; margin-top: 0.5rem; }
+        .output-area { flex: 1; padding: 1rem; overflow-y: auto; background: var(--term-bg); }
+        .bash-output-area { flex: 1; border-top: 2px solid var(--term-border); padding: 0.5rem; background: var(--term-input-bg); overflow-y: auto; font-family: 'Courier New', monospace; font-size: 14px; min-height: 100px; }
+        .bash-output-line { color: var(--term-text-muted); font-size: 0.85rem; margin-bottom: 0.25rem; }
+        .bash-error-line { color: #ff6b6b; font-size: 0.85rem; margin-bottom: 0.25rem; }
+        .right-pane { flex: 1; }
+        .message { margin-bottom: 1rem; line-height: 1.5; }
+        .message .speaker { color: #f0c674; font-weight: bold; margin-bottom: 0.25rem; }
+        .message .text { color: #b5bd68; }
+        .message .text.fail { color: #cc6666; }
+        .message .text.hint { color: #81a2be; font-style: italic; }
+        .message .text.success { color: #b5bd68; }
+        .level-title { color: #f0c674; font-size: 1.1rem; font-weight: bold; margin-bottom: 0.5rem; padding: 0.5rem; background: var(--term-bg); border-left: 3px solid var(--term-accent, #f0c674); }
+        /* Light mode overrides */
+        [data-theme="light"] body { background: var(--term-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .terminal-header { background: var(--term-header-bg-light); }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: var(--term-text-dark); }
+        [data-theme="light"] .pane-label { background: var(--term-header-bg-light); }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .bash-output-area { background: var(--term-input-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .bash-output-area { background: var(--term-bg-light); border-top-color: var(--term-text); }
+        [data-theme="light"] #command-input { color: var(--term-text-dark); }
+        [data-theme="light"] .input-label { color: var(--term-text-muted); }
+        [data-theme="light"] .left-pane { border-right: 2px solid var(--term-border-light); }
+        [data-theme="light"] .hint { color: var(--term-text-muted); }
+        [data-theme="light"] .bash-output-line { color: var(--term-text-dark); }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: var(--term-bg-light); color: #b58900; border-left-color: #b58900; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column-reverse; }
+            .terminal-pane { flex: none; height: 50vh; }
+            .right-pane { border-bottom: 2px solid var(--term-border); }
+            .left-pane { border-right: none; border-top: 2px solid var(--term-border); }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea { min-height: 60px !important; font-size: 14px !important; }
+            .mobile-run-btn { display: block !important; }
+        }
+        .mobile-run-btn { display: none; background: #2d5016; color: #98c379; border: none; padding: 12px 24px; font-family: 'Courier New', monospace; font-size: 14px; cursor: pointer; margin-top: 10px; width: 100%; border-radius: 4px; }
+    </style>
+
+    <link rel="stylesheet" href="../css/00-fonts.css">
+    <link rel="stylesheet" href="../css/01-variables.css">
+    <link rel="stylesheet" href="../css/02-reset.css">
+    <link rel="stylesheet" href="../css/03-typography.css">
+    <link rel="stylesheet" href="../css/04-navigation.css">
+    <link rel="stylesheet" href="../css/05-layout.css">
+    <link rel="stylesheet" href="../css/06-buttons.css">
+    <link rel="stylesheet" href="../css/07-cards.css">
+    <link rel="stylesheet" href="../css/08-terminal.css">
+    <link rel="stylesheet" href="../css/09-quiz.css">
+    <link rel="stylesheet" href="../css/10-sections.css">
+    <link rel="stylesheet" href="../css/11-modals.css">
+    <link rel="stylesheet" href="../css/12-forms.css">
+    <link rel="stylesheet" href="../css/13-account.css">
+    <link rel="stylesheet" href="../css/14-animations.css">
+    <link rel="stylesheet" href="../css/15-responsive.css">
+    <link rel="stylesheet" href="../css/16-nojs.css">
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">Grep Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type your answer (grep command):</div>
+                <textarea id="command-input" placeholder="Type your answer here..." autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Enter for new line, Ctrl+Enter to run</div>
+            </div>
+            <div class="bash-output-area" id="bash-output">
+                <div class="bash-output-line" style="color: #586e75;">Grep output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const bashOutput = document.getElementById('bash-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+        
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) {
+                    userId = data.email;
+                    userTheme = data.theme || 'dark';
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+        
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=grep');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        return Math.max(...data.map(p => p.lesson_id));
+                    }
+                }
+            } catch (e) {}
+            return null;
+        }
+        
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'grep', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addBashLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'bash-error-line' : 'bash-output-line';
+            line.textContent = text;
+            bashOutput.appendChild(line);
+            bashOutput.scrollTop = bashOutput.scrollHeight;
+        }
+        
+        function clearBashOutput() {
+            bashOutput.innerHTML = '';
+        }
+        
+        async function runBashCode(cmd) {
+            addBashLine('$ ' + cmd);
+            try {
+                const response = await fetch('/cgi-bin/bash_exec.py', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'code=' + encodeURIComponent(cmd)
+                });
+                const data = await response.json();
+                if (data.error) {
+                    addBashLine(data.output, 'error');
+                } else {
+                    if (data.output) {
+                        data.output.split('\n').forEach(line => addBashLine(line));
+                    } else {
+                        addBashLine('(no output)', 'output');
+                    }
+                }
+            } catch (e) {
+                addBashLine('Error: ' + e.message, 'error');
+            }
+        }
+        
+        const character = {
+            name: "Grep Gary",
+            greeting: "Yo! I'm Grep Gary - your search power-up! grep is how you find things in files when you're adventuring through your filesystem. Forget clicking around - with grep, you find anything in seconds. It's essential for sysadmins and developers alike!",
+            encourage: ["You've got this!", "Keep searching!", "Every pattern tells a story!", "I'm proud of you!", "You're mastering the search!", "Find and conquer!"],
+            getEncouragement: function() {
+                return this.encourage[Math.floor(Math.random() * this.encourage.length)];
+            }
+        };
+        
+        const beginnerLevels = [
+            {
+                id: 1,
+                title: "Your First Search",
+                intro: "Let's start simple! grep stands for 'Global Regular Expression Print'. It searches files for patterns. Let's search for a word in a file.",
+                content: "First, create a test file:\necho -e \"apple\\nbanana\\napple pie\" > fruits.txt\nthen search for 'apple':\ngrep apple fruits.txt",
+                hint: "Type: grep apple fruits.txt",
+                answer: "grep apple",
+                success: "You found 'apple' on two lines! grep shows you every line that contains your pattern. That's the power of search - find what you need fast!",
+                type: "contains"
+            },
+            {
+                id: 2,
+                title: "Case-Insensitive Search",
+                intro: "By default, grep is case-sensitive. But sometimes you want to find things regardless of capitals!",
+                content: "Search case-insensitively:\ngrep -i Apple fruits.txt",
+                hint: "Type: grep -i Apple fruits.txt",
+                answer: "grep -i",
+                success: "With -i, it found 'apple', 'Apple', and 'apple pie'! The -i flag ignores case. Super useful when you're not sure about capitalization!",
+                type: "contains"
+            },
+            {
+                id: 3,
+                title: "Count Matches",
+                intro: "Don't want to see every match? Just want to know HOW MANY? The -c flag counts lines with matches.",
+                content: "Count the matches:\ngrep -c apple fruits.txt",
+                hint: "Type: grep -c apple fruits.txt",
+                answer: "grep -c",
+                success: "The count is 2! -c gives you just the number of matching lines. Essential for scripts and quick checks!",
+                type: "contains"
+            },
+            {
+                id: 4,
+                title: "Show Line Numbers",
+                intro: "When you find something, sometimes you need to know WHERE it is. The -n flag adds line numbers to the output.",
+                content: "Show line numbers:\ngrep -n apple fruits.txt",
+                hint: "Type: grep -n apple fruits.txt",
+                answer: "grep -n",
+                success: "Now you can see line 1 and line 3 contain 'apple'! Line numbers are crucial when editing files - now you know exactly where to go!",
+                type: "contains"
+            },
+            {
+                id: 5,
+                title: "Invert Your Search",
+                intro: "What if you want to see lines that DON'T match? The -v flag inverts the search - show non-matching lines!",
+                content: "Invert the search:\ngrep -v apple fruits.txt",
+                hint: "Type: grep -v apple fruits.txt",
+                hint: "grep -v apple",
+                answer: "grep -v apple",
+                success: "It shows 'banana' - the one line that doesn't contain 'apple'! -v is powerful for filtering out unwanted content!",
+                type: "contains"
+            },
+            {
+                id: 6,
+                title: "Search Recursively",
+                intro: "Need to search through an entire directory? The -r flag searches recursively through all files and subdirectories.",
+                content: "Search a directory:\ngrep -r password /etc/passwd 2>/dev/null | head",
+                hint: "Type: grep -r password",
+                answer: "grep -r",
+                success: "You searched through multiple files! -r is how you search entire directory trees. The 2>/dev/null hides permission errors!",
+                type: "contains"
+            },
+            {
+                id: 7,
+                title: "Match Whole Words Only",
+                intro: "grep matches substrings by default - 'cat' matches 'category' too! To match only complete words, use -w.",
+                content: "Match whole words only:\necho -e \"cat\\ncategory\\ncatalog\" | grep -w cat",
+                hint: "Type: grep -w cat",
+                answer: "grep -w",
+                success: "Only 'cat' matched! With -w, grep only matches complete words - no partial matches. Essential for precise searching!",
+                type: "contains"
+            },
+            {
+                id: 8,
+                title: "Show Context Lines",
+                intro: "Sometimes you need to see lines AROUND your match. Use -A for after, -B for before, and -C for both!",
+                content: "Show context:\ngrep -A 2 \"password\" /etc/passwd | head",
+                hint: "Type: grep -A 2",
+                answer: "grep -A",
+                success: "You see your match PLUS 2 lines after it! -A is 'after', -B is 'before', -C is 'context' (both). Super helpful for seeing surrounding code!",
+                type: "contains"
+            },
+            {
+                id: 9,
+                title: "Extended Regex - Match Patterns",
+                intro: "Time to get powerful! With -E, you can use extended regex - patterns like 'this OR that' using the | operator!",
+                content: "Match multiple patterns:\necho -e \"apple\\nbanana\\napple pie\" | grep -E \"apple|banana\"",
+                hint: "Type: grep -E \"apple|banana\"",
+                answer: "grep -E",
+                success: "You matched both 'apple' AND 'banana'! The | means OR in extended regex. This is how you build powerful search patterns!",
+                type: "contains"
+            },
+            {
+                id: 10,
+                title: "Regex - Match Start of Line",
+                intro: "Regex lets you match patterns anywhere, but ^ matches the START of a line. Perfect for finding lines starting with specific text!",
+                content: "Match start of line:\ngrep -E \"^root\" /etc/passwd",
+                hint: "Type: grep -E \"^root\" /etc/passwd",
+                answer: "grep -E \"^",
+                success: "You found the line starting with 'root'! ^ is an anchor - it means 'start of line'. Combine with $ for end of line!",
+                type: "contains"
+            },
+            {
+                id: 11,
+                title: "Regex - Match End of Line",
+                intro: "The $ anchor matches the END of a line. Want to find lines ending with a specific pattern? This is your tool!",
+                content: "Match end of line:\ngrep -E \"bash$\" /etc/passwd",
+                hint: "Type: grep -E \"bash$\" /etc/passwd",
+                answer: "grep -E \"bash$\"",
+                success: "Found all users with bash as their shell! $ means 'end of line'. Now you can find patterns at specific positions!",
+                type: "contains"
+            },
+            {
+                id: 12,
+                title: "Beginner Finale - Combined Search",
+                intro: "Let's put it together! Use -in (ignore case, show numbers, invert) for a powerful search combo!",
+                content: "Combined flags:\ngrep -in \"error\" /var/log/syslog 2>/dev/null | head",
+                hint: "Type: grep -in",
+                answer: "grep -in",
+                success: "You're now a grep beginner! You can search, ignore case, count, show numbers, invert, and use basic regex. Keep practicing, apprentice!",
+                type: "contains"
+            }
+        ];
+        
+        const intermediateLevels = [
+            {
+                id: 1,
+                title: "Extended Regex - Character Classes",
+                intro: "Welcome to intermediate grep! [] matches any single character in the brackets. Perfect for finding variations!",
+                content: "Match character classes:\necho -e \"color\\ncolour\" | grep -E \"colou?r\"",
+                hint: "Type: grep -E \"colou?r\"",
+                answer: "grep -E \"colou?r\"",
+                success: "Both 'color' and 'colour' matched! ? makes the preceding 'u' optional. Character classes and quantifiers - that's regex power!",
+                type: "contains"
+            },
+            {
+                id: 2,
+                title: "Extended Regex - Dot Wildcard",
+                intro: "The . matches ANY single character. Combine with * for 'any characters here' patterns!",
+                content: "Use dot wildcard:\necho -e \"cat\\ncut\\ncart\" | grep -E \"c.t\"",
+                hint: "Type: grep -E \"c.t\"",
+                answer: "grep -E \"c.t\"",
+                success: "Matched 'cat' and 'cut'! The dot matches any character. .* matches any number of any characters - super powerful!",
+                type: "contains"
+            },
+            {
+                id: 3,
+                title: "Extended Regex - Character Ranges",
+                intro: "Inside [], you can use ranges like a-z or 0-9 to match any character in that range!",
+                content: "Match alphanumeric:\necho -e \"abc\\n123\\na1b\" | grep -E \"[a-z][0-9]\"",
+                hint: "Type: grep -E \"[a-z][0-9]\"",
+                answer: "grep -E \"[a-z][0-9]\"",
+                success: "Matched 'a1b'! [a-z] is any lowercase letter, [0-9] is any digit. Character classes let you build precise patterns!",
+                type: "contains"
+            },
+            {
+                id: 4,
+                title: "Extended Regex - Negation",
+                intro: "Inside [], ^ at the START negates the class - match anything EXCEPT these characters!",
+                content: "Negate a character class:\necho -e \"abc\\n123\\n!@#\" | grep -E \"[^a-z]+\"",
+                hint: "Type: grep -E \"[^a-z]+\"",
+                answer: "grep -E \"[^a-z]+\"",
+                success: "Matched '123' and '!@#'! [^a-z] means 'not lowercase letter'. + means 'one or more'. Negation is super powerful!",
+                type: "contains"
+            },
+            {
+                id: 5,
+                title: "Extended Regex - Parentheses",
+                intro: "Parentheses () group patterns. They're essential for applying operators to multiple elements!",
+                content: "Group patterns:\necho -e \"abab\\ncdcd\" | grep -E \"(ab){2}\"",
+                hint: "Type: grep -E \"(ab){2}\"",
+                answer: "grep -E \"(ab){2}\"",
+                success: "Matched 'abab'! (ab){2} means 'exactly 2 times ab'. Parentheses are crucial for complex pattern matching!",
+                type: "contains"
+            },
+            {
+                id: 6,
+                title: "Only Matching Parts with -o",
+                intro: "By default, grep shows the whole line. With -o, it shows ONLY the matching part!",
+                content: "Show only matches:\necho \"My email is test@example.com here\" | grep -E \"[a-z]+@[a-z]+\\.[a-z]+\"",
+                hint: "Type: grep -o",
+                answer: "grep -o",
+                success: "With -o, you see just 'test@example.com'! Perfect for extracting specific parts from larger text!",
+                type: "contains"
+            },
+            {
+                id: 7,
+                title: "Quiet Mode with -q",
+                intro: "Sometimes you just want to know IF something matches - not WHAT matched. -q gives you a silent exit code!",
+                content: "Use quiet mode:\ngrep -q root /etc/passwd && echo \"Found!\" || echo \"Not found!\"",
+                hint: "Type: grep -q root /etc/passwd",
+                answer: "grep -q",
+                success: "Quiet mode! -q returns 0 if found, 1 if not found, but prints nothing. Perfect for if/else in scripts!",
+                type: "contains"
+            },
+            {
+                id: 8,
+                title: "Binary Files with -a",
+                intro: "grep skips binary files by default. But sometimes you need to search them anyway! -a treats files as text.",
+                content: "Search binary files:\ngrep -a \"root\" /etc/passwd",
+                hint: "Type: grep -a",
+                answer: "grep -a",
+                success: "Now you can search binary files too! -a is short for --binary-files=text. Sometimes you gotta search everywhere!",
+                type: "contains"
+            },
+            {
+                id: 9,
+                title: "Exclude Patterns with --exclude",
+                intro: "When searching directories, you might want to skip certain files. --exclude lets you ignore patterns!",
+                content: "Exclude file types:\ngrep -r \"password\" /var/log --exclude=\"*.gz\"",
+                hint: "Type: grep --exclude=\"*.gz\"",
+                answer: "grep --exclude=",
+                success: "You skipped all .gz files! --exclude and --exclude-dir are crucial for searching large codebases without noise!",
+                type: "contains"
+            },
+            {
+                id: 10,
+                title: "Multiple Patterns Combined",
+                intro: "You can use multiple -e flags to search for multiple patterns at once - OR logic made easy!",
+                content: "Multiple -e flags:\ngrep -e \"error\\|warning\\|failed\" /var/log/syslog | tail",
+                hint: "Type: grep -e",
+                answer: "grep -e",
+                success: "You matched error OR warning OR failed in one command! Multiple -e flags mean OR. Essential for log analysis!",
+                type: "contains"
+            },
+            {
+                id: 11,
+                title: "Line Before/After Match",
+                intro: "We saw -A for after, -B for before. Let's combine them for perfect context!",
+                content: "Get context both ways:\ngrep -B 2 -A 2 \"sshd\" /var/log/auth.log | head",
+                hint: "Type: grep -B 2 -A 2",
+                answer: "grep -B 2 -A 2",
+                success: "You got 2 lines before AND after each match! Perfect context for understanding what happened around an event!",
+                type: "contains"
+            },
+            {
+                id: 12,
+                title: "Intermediate Finale - Log Analysis",
+                intro: "Let's do a real-world challenge! Analyze a log file for errors and warnings with full context!",
+                content: "Analyze auth logs:\ngrep -E \"(error|failed|denied)\" /var/log/auth.log 2>/dev/null | grep -v \"sudo\" | head",
+                hint: "Type: grep -E",
+                answer: "grep -E",
+                success: "You've mastered intermediate grep! You can use extended regex, get context, exclude patterns, and chain greps. You're a search warrior now! Type --expert when ready for master-level grep!",
+                type: "contains"
+            }
+        ];
+        
+        const expertLevels = [
+            {
+                id: 25,
+                title: "Perl Regex with -P",
+                intro: "EXPERT MODE! Time to unlock the most powerful regex engine! -P enables Perl Compatible Regular Expressions (PCRE)!",
+                content: "Use Perl regex:\ngrep -P \"\\d{4}-\\d{2}-\\d{2}\" access.log",
+                hint: "Type: grep -P",
+                answer: "grep -P",
+                success: "PCRE activated! -P gives you \\d (digits), \\s (whitespace), \\w (word chars), lookaheads (?=), (?!) and more! The regex ninja's choice!",
+                type: "contains"
+            },
+            {
+                id: 26,
+                title: "Null-Delimited with -z",
+                intro: "grep -z treats input as null-delimited (\\0) instead of line-delimited. Perfect for handling weird filenames!",
+                content: "Null-delimited search:\nfind . -print0 | grep -z \".txt$\"",
+                hint: "Type: grep -z",
+                answer: "grep -z",
+                success: "Null-delimited! -z handles filenames with newlines. find -print0 + grep -z = handle any filename!",
+                type: "contains"
+            },
+            {
+                id: 27,
+                title: "Process Substitution with grep",
+                intro: "Combine grep with process substitution to search the output of commands!",
+                content: "Search command output:\ndiff file1 file2 | grep \"^<\"",
+                hint: "Type: diff file1 file2 | grep",
+                answer: "diff file1 file2 | grep",
+                success: "Process substitution! Pipe any command into grep. diff, ls, ps - search anything!",
+                type: "contains"
+            },
+            {
+                id: 28,
+                title: "grep with xargs -0",
+                intro: "Combine grep -l (files-with-matches) with xargs for powerful batch operations!",
+                content: "Batch file operations:\ngrep -rl \"TODO\" . | xargs -0 sed -i 's/TODO/FIXME/g'",
+                hint: "Type: grep -rl \"TODO\"",
+                answer: "grep -rl",
+                success: "Batch operations! grep -l lists files, xargs -0 handles spaces/newlines, sed -i edits in-place. Find and replace across your codebase!",
+                type: "contains"
+            },
+            {
+                id: 29,
+                title: "Color Output with --color",
+                intro: "Add color to your grep output for better visibility! --color=auto shows matches highlighted!",
+                content: "Colored output:\ngrep --color=auto -E \"error|warning\" syslog.log",
+                hint: "Type: grep --color",
+                answer: "grep --color",
+                success: "Color added! Matches highlighted in red, paths in other colors. Put alias grep='grep --color=auto' in your bashrc!",
+                type: "contains"
+            },
+            {
+                id: 30,
+                title: "Count Only Matches -o with wc",
+                intro: "Combine grep -o with wc -l to count EXACTLY how many matches you have!",
+                content: "Count exact matches:\ngrep -o \"error\" app.log | wc -l",
+                hint: "Type: grep -o \"error\" | wc",
+                answer: "grep -o \"error\" | wc",
+                success: "Precise counting! -o extracts each match, wc -l counts lines. More accurate than -c for multiple matches per line!",
+                type: "contains"
+            },
+            {
+                id: 31,
+                title: "Inverse with -L (files-without-match)",
+                intro: "grep -L shows files that DON'T contain the pattern - the opposite of -l!",
+                content: "Find files without pattern:\ngrep -rL \"Copyright\" src/",
+                hint: "Type: grep -rL",
+                answer: "grep -rL",
+                success: "Files without match! -L inverts -l. Great for finding files missing headers, imports, or configuration!",
+                type: "contains"
+            },
+            {
+                id: 32,
+                title: "Label with -H and -h",
+                intro: "-H always prints filename, -h never prints it. Control filename display!",
+                content: "Force filename display:\ngrep -H \"pattern\" file.txt",
+                hint: "Type: grep -H",
+                answer: "grep -H",
+                success: "Filename forced! -H is default for multiple files, -h suppresses it. Useful in scripts!",
+                type: "contains"
+            },
+            {
+                id: 33,
+                title: "Binary Files with -I",
+                intro: "-I (capital i) ignores binary files completely - don't treat them as text at all!",
+                content: "Skip binary files:\ngrep -rI \"secret\" /var/log",
+                hint: "Type: grep -rI",
+                answer: "grep -rI",
+                success: "Binary ignored! -I treats binary files as if they don't exist. -a would show them, -I ignores them. Clean searches!",
+                type: "contains"
+            },
+            {
+                id: 34,
+                title: "Line Buffering with -line-buffered",
+                intro: "Use --line-buffered for grep in pipelines to ensure immediate output!",
+                content: "Buffered grep:\nping host | grep --line-buffered \"bytes from\"",
+                hint: "Type: grep --line-buffered",
+                answer: "grep --line-buffered",
+                success: "Line buffered! Useful for monitoring commands that don't flush often. ping | grep --line-buffered shows real-time!",
+                type: "contains"
+            },
+            {
+                id: 35,
+                title: "Word Regex with -w",
+                intro: "-w matches whole words only. 'cat' won't match 'category' or 'catastrophe'!",
+                content: "Whole word match:\ngrep -rw \"for\" code.py",
+                hint: "Type: grep -rw",
+                answer: "grep -rw",
+                success: "Whole words! -w ensures complete word match. -i would add case insensitivity. Precise searching!",
+                type: "contains"
+            },
+            {
+                id: 36,
+                title: "Expert Finale - Master Search",
+                intro: "You've mastered grep! Let's combine EVERYTHING - Perl regex, null delimiters, color, and batch operations!",
+                content: "The ultimate grep command:\ngrep -rP --color=auto -l \"\\b\\w+@\\w+\\.\\w+\\b\" --include=\"*.txt\" . | xargs -0 sed -i 's/@/ [at] /g'",
+                hint: "Type: grep -rP --color",
+                answer: "grep -rP",
+                success: "EXPERT COMPLETE! You've mastered grep from basic search to Perl regex, null delimiters, xargs pipelines! You're a TRUE search master! Go forth and find what you seek, Grep Gary believes in you!",
+                type: "starts"
+            }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') {
+                levels = beginnerLevels;
+                await showMessage(character.name, "Excellent choice! We'll start from the basics - perfect for beginners! Let's begin your grep journey!");
+            } else if (trackName === 'intermediate') {
+                levels = intermediateLevels;
+                await showMessage(character.name, "Welcome back! You've got the basics - now let's dive into extended regex and advanced searching!");
+            } else if (trackName === 'expert') {
+                levels = expertLevels;
+                await showMessage(character.name, "Welcome to EXPERT mode! Perl regex, null delimiters, xargs pipelines - time to become a true search master!");
+            }
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                document.documentElement.requestFullscreen();
+            }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'action=updateTheme&theme=' + newTheme,
+                        credentials: 'include'
+                    });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        async function showMessage(speaker, text, className = '') {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            if (level.type === 'exact') {
+                return user === answer;
+            } else if (level.type === 'contains') {
+                return user.includes(answer);
+            } else if (level.type === 'starts') {
+                return user.startsWith(answer);
+            }
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel);
+            if (currentLevel >= levels.length) {
+                await showMessage(character.name, "Congratulations! You've completed all levels! You're now a grep master. Go forth and find what you seek!");
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--expert') { startTrack('expert'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                await showMessage(character.name, "Press Ctrl+Enter to run grep commands. Use --beginner, --intermediate, --expert, --fullscreen, --darkmode, or --exit", 'hint');
+                input.value = '';
+                return;
+            }
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                const level = levels[currentLevel];
+                clearBashOutput();
+                await runBashCode(userAnswer);
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite right. " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                const level = levels[currentLevel];
+                clearBashOutput();
+                await runBashCode(userAnswer);
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite right. " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        (async function init() {
+            await checkLogin();
+            if (userId) {
+                savedLevel = await loadProgress();
+                if (savedLevel > 0 && savedLevel <= levels.length) {
+                    currentLevel = savedLevel - 1;
+                }
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+            }
+            await showMessage(character.name, character.greeting);
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Learn the basics (lessons 1-12)';
+            history.appendChild(menuDiv);
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Extended regex and advanced searching (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'expert\')">--expert</span> - Perl regex and master techniques (lessons 25-36)';
+            history.appendChild(menuDiv3);
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv4);
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv5);
+            const menuDiv6 = document.createElement('div');
+            menuDiv6.className = 'output-line choice';
+            menuDiv6.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv6);
+            await showMessage(character.name, "Type --beginner, --intermediate, or --expert to start! Or click the options above. Use --fullscreen, --darkmode, or --exit anytime!");
+        })();
+    </script>
+    <footer id="site-footer" style="text-align: center; padding: 0 24px 24px;">
+        <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>
+        <div style="margin-bottom: 23px;">
+            <a href="site-map.html" style="color: var(--black);">Site Map</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" style="color: var(--black);">Onion Site</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="https://github.com/cjboon/rebelwithlinux" style="color: var(--black);">GitHub</a>
+        </div>
+        <div>
+            <a href="../sections/about.html" style="color: var(--black);">About</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/contact.html" style="color: var(--black);">Contact</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/stats.html" style="color: var(--black);">Stats</a>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <link rel="icon" href="/img/favicon.ico">
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/terms/term-git.html" />
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var theme = saved || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <script src="../js/theme.js"></script>
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Tutor - Rebel with Linux</title>
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        body {
+            background: var(--term-bg);
+            color: var(--term-text);
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        .terminal-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .left-pane {
+            border-right: 2px solid var(--term-border);
+        }
+        
+        .terminal-header {
+            background: var(--term-header-bg);
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .dot-red { background: var(--term-dot-red); }
+        .dot-yellow { background: var(--term-dot-yellow); }
+        .dot-green { background: var(--term-dot-green); }
+        
+        .terminal-title {
+            margin-left: 1rem;
+            color: var(--term-text);
+            font-size: 0.85rem;
+        }
+        
+        .pane-label {
+            background: var(--term-header-bg);
+            padding: 0.5rem 1rem;
+            color: var(--term-text);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .input-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            background: var(--term-bg);
+        }
+        
+        .input-label {
+            color: var(--term-text-muted);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        #command-input {
+            flex: 1;
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--term-text);
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            resize: none;
+            outline: none;
+        }
+        
+        .hint {
+            color: var(--term-text-muted);
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        .bash-output-area {
+            flex: 1;
+            border-top: 2px solid var(--term-border);
+            padding: 0.5rem;
+            background: var(--term-input-bg);
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            min-height: 100px;
+        }
+        
+        .bash-output-line {
+            color: var(--term-text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .bash-error-line {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .terminal-pane.right-pane {
+            flex: 1;
+        }
+        
+        .output-area {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: var(--term-bg);
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .message .speaker {
+            color: #f0c674;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        
+        .message .text {
+            color: #b5bd68;
+        }
+        
+        .message .text.fail {
+            color: #cc6666;
+        }
+        
+        .message .text.hint {
+            color: #81a2be;
+            font-style: italic;
+        }
+        
+        .message .text.success {
+            color: #b5bd68;
+        }
+        
+        .level-title {
+            color: #f0c674;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: var(--term-bg);
+            border-left: 3px solid var(--term-accent, #f0c674);
+        }
+        
+        .progress-bar {
+            background: var(--term-header-bg);
+            height: 20px;
+            border-radius: 3px;
+            margin: 1rem;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: #b5bd68;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: var(--term-text);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Light mode overrides */
+        [data-theme="light"] body { background: var(--term-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .terminal-header { background: var(--term-header-bg-light); }
+        [data-theme="light"] .terminal-title, [data-theme="light"] .pane-label { color: var(--term-text-dark); }
+        [data-theme="light"] .pane-label { background: var(--term-header-bg-light); }
+        [data-theme="light"] .input-area, [data-theme="light"] .output-area, [data-theme="light"] .bash-output-area { background: var(--term-input-bg-light); color: var(--term-text-dark); }
+        [data-theme="light"] .bash-output-area { background: var(--term-bg-light); border-top-color: var(--term-text); }
+        [data-theme="light"] #command-input { color: var(--term-text-dark); }
+        [data-theme="light"] .input-label { color: var(--term-text-muted); }
+        [data-theme="light"] .left-pane { border-right: 2px solid var(--term-border-light); }
+        [data-theme="light"] .hint { color: var(--term-text-muted); }
+        [data-theme="light"] .bash-output-line { color: var(--term-text-dark); }
+        [data-theme="light"] .message .speaker { color: #b58900; }
+        [data-theme="light"] .message .text { color: #859900; }
+        [data-theme="light"] .message .text.fail { color: #dc322f; }
+        [data-theme="light"] .message .text.hint { color: #268bd2; }
+        [data-theme="light"] .level-title { background: var(--term-bg-light); color: #b58900; border-left-color: #b58900; }
+        [data-theme="light"] .progress-bar { background: #cccccc; }
+        [data-theme="light"] .progress-text { color: var(--term-text-muted); }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column-reverse;
+            }
+            .terminal-pane {
+                flex: none;
+                height: 50vh;
+            }
+            .right-pane {
+                border-bottom: 2px solid var(--term-border);
+            }
+            .left-pane {
+                border-right: none;
+                border-top: 2px solid var(--term-border);
+            }
+            body { font-size: 14px; }
+            .terminal-header { padding: 8px; }
+            .terminal-title { font-size: 12px; }
+            textarea {
+                min-height: 60px !important;
+                font-size: 14px !important;
+            }
+            .mobile-run-btn { display: block !important; }
+        }
+        
+        .mobile-run-btn {
+            display: none;
+            background: #2d5016;
+            color: #98c379;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            border-radius: 4px;
+        }
+    </style>
+
+    <link rel="stylesheet" href="../css/00-fonts.css">
+    <link rel="stylesheet" href="../css/01-variables.css">
+    <link rel="stylesheet" href="../css/02-reset.css">
+    <link rel="stylesheet" href="../css/03-typography.css">
+    <link rel="stylesheet" href="../css/04-navigation.css">
+    <link rel="stylesheet" href="../css/05-layout.css">
+    <link rel="stylesheet" href="../css/06-buttons.css">
+    <link rel="stylesheet" href="../css/07-cards.css">
+    <link rel="stylesheet" href="../css/08-terminal.css">
+    <link rel="stylesheet" href="../css/09-quiz.css">
+    <link rel="stylesheet" href="../css/10-sections.css">
+    <link rel="stylesheet" href="../css/11-modals.css">
+    <link rel="stylesheet" href="../css/12-forms.css">
+    <link rel="stylesheet" href="../css/13-account.css">
+    <link rel="stylesheet" href="../css/14-animations.css">
+    <link rel="stylesheet" href="../css/15-responsive.css">
+    <link rel="stylesheet" href="../css/16-nojs.css">
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-pane left-pane">
+            <div class="terminal-header">
+                <span class="terminal-dot dot-red"></span>
+                <span class="terminal-dot dot-yellow"></span>
+                <span class="terminal-dot dot-green"></span>
+                <span class="terminal-title">Git Tutor</span>
+            </div>
+            <div class="input-area" style="flex: 1;">
+                <div class="input-label">&gt;&gt; Type your answer (git command):</div>
+                <textarea id="command-input" placeholder="Type your answer here..." autofocus spellcheck="false" style="flex: 1;"></textarea>
+                <button class="mobile-run-btn" id="runBtn">Run Command</button>
+                <div class="hint">Enter for new line, Ctrl+Enter to run</div>
+            </div>
+            <div class="bash-output-area" id="bash-output">
+                <div class="bash-output-line" style="color: #586e75;">Git command output will appear here...</div>
+            </div>
+        </div>
+        <div class="terminal-pane right-pane">
+            <div class="pane-label">Conversation</div>
+            <div class="output-area" id="output">
+                <div id="history"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    
+        
+        const input = document.getElementById('command-input');
+        const history = document.getElementById('history');
+        const output = document.getElementById('output');
+        const bashOutput = document.getElementById('bash-output');
+        
+        let currentLevel = 0;
+        let userId = null;
+        let savedLevel = 0;
+        let userTheme = 'dark';
+        
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) {
+                    userId = data.email;
+                    userTheme = data.theme || 'dark';
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+        
+        async function loadProgress() {
+            if (!userId) return null;
+            try {
+                const response = await fetch('/api/progress.php?course=git');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        return Math.max(...data.map(p => p.lesson_id));
+                    }
+                }
+            } catch (e) {}
+            return null;
+        }
+        
+        async function saveProgress(level) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course: 'git', lesson_id: level, completed: true, quiz_score: 0 })
+                });
+            } catch (e) {}
+        }
+        
+        function addBashLine(text, type = 'output') {
+            const line = document.createElement('div');
+            line.className = type === 'error' ? 'bash-error-line' : 'bash-output-line';
+            line.textContent = text;
+            bashOutput.appendChild(line);
+            bashOutput.scrollTop = bashOutput.scrollHeight;
+        }
+        
+        function clearBashOutput() {
+            bashOutput.innerHTML = '';
+        }
+        
+        async function runBashCode(cmd) {
+            addBashLine('$ ' + cmd);
+            
+            try {
+                const response = await fetch('/cgi-bin/bash_exec.py', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'code=' + encodeURIComponent(cmd)
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    addBashLine(data.output, 'error');
+                } else {
+                    if (data.output) {
+                        data.output.split('\n').forEach(line => addBashLine(line));
+                    } else {
+                        addBashLine('(no output)', 'output');
+                    }
+                }
+            } catch (e) {
+                addBashLine('Error: ' + e.message, 'error');
+            }
+        }
+        
+        const character = {
+            name: "Git Garry",
+            greeting: "Hey! I'm Git Gary - your version control companion. Git is like a time machine for your code. It tracks every change, lets you branch out ideas, and merge them back together. In the world of free software, collaboration is key - and Git makes it possible!",
+            encourage: ["You've got this!", "Keep pushing forward!", "Every commit tells a story!", "I'm proud of you!", "You're mastering version control!", "Collaboration is power!"],
+            getEncouragement: function() {
+                return this.encouragement[Math.floor(Math.random() * this.encouragement.length)];
+            }
+        };
+        
+        const beginnerLevels = [
+            {
+                id: 1,
+                title: "Initialize Your Repo",
+                intro: "Every journey begins with a single step. To start tracking your project with Git, you need to initialize a repository. This creates a hidden .git folder that stores all the history.",
+                content: "Let's start by creating a project folder and initializing it:\nmkdir my_project && cd my_project && git init",
+                hint: "Type: mkdir my_project && cd my_project && git init",
+                answer: "git init",
+                success: "You've initialized your first repository! The '.git' folder is now hidden in your directory. This is where Git stores all the magic - commits, branches, everything!",
+                type: "contains"
+            },
+            {
+                id: 2,
+                title: "Check the Status",
+                intro: "Now that we have a repo, let's see what's inside. git status shows you the current state of your working directory - which files are tracked, modified, or waiting to be committed.",
+                content: "Check the status of your repository:\ngit status",
+                hint: "Type: git status",
+                answer: "git status",
+                success: "You can see 'No commits yet' and 'nothing to commit' - that's because we haven't added any files yet! The status command is your window into the repository state.",
+                type: "exact"
+            },
+            {
+                id: 3,
+                title: "Create Your First File",
+                intro: "Let's create something to track. In Git, you decide what goes into your project. Let's make a simple README file.",
+                content: "Create a README file:\necho \"# My Project\" > README.md",
+                hint: "Type: echo \"# My Project\" > README.md",
+                answer: "echo",
+                success: "You've created a file! Now let's check the status again to see what Git sees.",
+                type: "contains"
+            },
+            {
+                id: 4,
+                title: "Stage Your Changes",
+                intro: "Before you can save a snapshot (commit), you need to stage your changes. Think of it as preparing files for a photo - you choose what goes in the picture.",
+                content: "Stage your README file:\ngit add README.md",
+                hint: "Type: git add README.md",
+                answer: "git add README.md",
+                success: "The file is now staged! Use 'git add .' to stage all files, or 'git add -A' for everything including deletions.",
+                type: "exact"
+            },
+            {
+                id: 5,
+                title: "Make Your First Commit",
+                intro: "Now for the magic moment - committing! A commit is like a save point in a game. It captures a snapshot of your staged changes with a message explaining what you did.",
+                content: "Commit your changes with a message:\ngit commit -m \"Initial commit - added README\"",
+                hint: "Type: git commit -m \"Initial commit - added README\"",
+                answer: "git commit",
+                success: "You've made your first commit! The repository now has a history. Every commit has a unique ID (SHA hash) that you can reference later.",
+                type: "contains"
+            },
+            {
+                id: 6,
+                title: "View Commit History",
+                intro: "Let's see what we've built! git log shows you the complete history of commits - who made them, when, and what the message was.",
+                content: "View your commit history:\ngit log",
+                hint: "Type: git log",
+                answer: "git log",
+                success: "There's your first commit! You can see the author, date, and message. Use 'git log --oneline' for a shorter view, or 'git log -n 5' for the last 5 commits.",
+                type: "exact"
+            },
+            {
+                id: 7,
+                title: "Modify a File",
+                intro: "Let's make an edit. Open the README and add more content. Then we'll see how Git tracks changes.",
+                content: "Add more content to README:\necho \"This is my awesome project!\" >> README.md",
+                hint: "Type: echo \"This is my awesome project!\" >> README.md",
+                answer: "echo",
+                success: "Now let's check the status to see how Git sees this change.",
+                type: "contains"
+            },
+            {
+                id: 8,
+                title: "Check Modified Status",
+                intro: "Now that we've modified the file, let's see what git status tells us. Git is smart - it knows exactly what's changed!",
+                content: "Check the status:\ngit status",
+                hint: "Type: git status",
+                answer: "git status",
+                success: "See how it shows 'modified: README.md'? Git tracks every change. The file was previously committed, now it's been modified but not staged yet.",
+                type: "exact"
+            },
+            {
+                id: 9,
+                title: "Stage and Commit Again",
+                intro: "Let's save this change too. Stage the modified file and commit it.",
+                content: "Stage the changes and commit:\ngit add README.md && git commit -m \"Added project description\"",
+                hint: "Type: git add README.md && git commit -m \"Added project description\"",
+                answer: "git add",
+                success: "Another commit! Now your history has two snapshots. This is version control - you can always go back to any point!",
+                type: "contains"
+            },
+            {
+                id: 10,
+                title: "Create a Branch",
+                intro: "Here's where it gets powerful - branches let you work on features without affecting the main code. It's like parallel universes!",
+                content: "Create a new branch called 'feature':\ngit branch feature",
+                hint: "Type: git branch feature",
+                answer: "git branch feature",
+                success: "You've created a new branch! Use 'git branch' to see all branches. The '*' shows which one you're on.",
+                type: "exact"
+            },
+            {
+                id: 11,
+                title: "Switch Branches",
+                intro: "Now let's jump to that branch. git checkout (or the new 'git switch') changes which branch you're working on.",
+                content: "Switch to the feature branch:\ngit checkout feature",
+                hint: "Type: git checkout feature",
+                answer: "git checkout feature",
+                success: "You're now on the feature branch! Changes here won't affect the main branch. This is how teams work on features in parallel!",
+                type: "exact"
+            },
+            {
+                id: 12,
+                title: "Intermediate Finale",
+                intro: "You've come a long way, version control warrior! Let's put it all together with one final challenge - make a change on this branch, commit it, then switch back.",
+                content: "Create a file, add it, and commit on this branch:\necho \"New feature\" > feature.txt && git add . && git commit -m \"Added feature file\"",
+                hint: "Type: echo \"New feature\" > feature.txt && git add . && git commit -m \"Added feature file\"",
+                answer: "git add",
+                success: "Amazing! You've created a branch, switched to it, added files, and committed. That's the heart of Git! Switch back with 'git checkout main' to see the difference.",
+                type: "contains"
+            }
+        ];
+        
+        const intermediateLevels = [
+            {
+                id: 1,
+                title: "Remote Repositories",
+                intro: "Welcome to intermediate Git! Remote repositories let you collaborate with others. Let's connect to a remote - typically called 'origin'.",
+                content: "Add a remote repository:\ngit remote add origin https://github.com/username/repo.git",
+                hint: "Type: git remote add origin https://github.com/username/repo.git",
+                answer: "git remote add origin",
+                success: "You've added a remote! 'origin' is just a convention name for the main remote. You can have multiple remotes with different names!",
+                type: "contains"
+            },
+            {
+                id: 2,
+                title: "List Remotes",
+                intro: "Now let's see what remotes we have. git remote -v shows you the URLs for fetching and pushing.",
+                content: "List your remotes:\ngit remote -v",
+                hint: "Type: git remote -v",
+                answer: "git remote -v",
+                success: "There are your remotes! -v means verbose so you can see the URLs. You can fetch from and push to these!",
+                type: "exact"
+            },
+            {
+                id: 3,
+                title: "Fetch Changes",
+                intro: "git fetch downloads changes from the remote but doesn't merge them. It's safe - it just brings in the data.",
+                content: "Fetch from origin:\ngit fetch origin",
+                hint: "Type: git fetch origin",
+                answer: "git fetch",
+                success: "You've fetched the remote changes! They don't affect your working directory yet. Use 'git merge' to integrate them when ready.",
+                type: "contains"
+            },
+            {
+                id: 4,
+                title: "Pull Changes",
+                intro: "git pull is like fetch + merge combined. It gets remote changes and integrates them into your current branch.",
+                content: "Pull from origin main:\ngit pull origin main",
+                hint: "Type: git pull origin main",
+                answer: "git pull",
+                success: "Pulled! Now your local branch has the latest from the remote. Be careful - pull can cause merge conflicts if you've both changed the same lines.",
+                type: "contains"
+            },
+            {
+                id: 5,
+                title: "Push Changes",
+                intro: "Time to share your work! git push sends your local commits to the remote repository.",
+                content: "Push to origin main:\ngit push origin main",
+                hint: "Type: git push origin main",
+                answer: "git push",
+                success: "Pushed! Your commits are now on the remote. You've successfully collaborated! Use -u to set upstream for future pushes.",
+                type: "contains"
+            },
+            {
+                id: 6,
+                title: "Merge Branches",
+                intro: "When you're done with a feature branch, merge it into your main branch. This combines the histories.",
+                content: "First switch to main, then merge:\ngit checkout main && git merge feature",
+                hint: "Type: git checkout main && git merge feature",
+                answer: "git merge",
+                success: "Merged! The feature branch history is now part of main. Use 'git branch -d feature' to delete the branch when done.",
+                type: "contains"
+            },
+            {
+                id: 7,
+                title: "Merge Conflicts",
+                intro: "Sometimes Git can't auto-merge. When both branches changed the same line, you get a conflict. Let's see how to resolve it.",
+                content: "Check which files have conflicts:\ngit status",
+                hint: "Type: git status",
+                answer: "git status",
+                success: "The conflicting files are marked as 'both modified'. Open them and look for <<<<<< HEAD markers to resolve!",
+                type: "exact"
+            },
+            {
+                id: 8,
+                title: "Stash Changes",
+                intro: "Need to switch branches but have uncommitted changes? git stash saves them for later without committing.",
+                content: "Stash your changes:\ngit stash",
+                hint: "Type: git stash",
+                answer: "git stash",
+                success: "Stashed! Your changes are saved. Use 'git stash pop' to get them back, or 'git stash list' to see all stashes.",
+                type: "exact"
+            },
+            {
+                id: 9,
+                title: "View Differences",
+                intro: "git diff shows you exactly what changed between commits, branches, or your working directory.",
+                content: "See unstaged changes:\ngit diff",
+                hint: "Type: git diff",
+                answer: "git diff",
+                success: "There are your changes! Green lines are additions, red are deletions. Use 'git diff --staged' for staged changes.",
+                type: "exact"
+            },
+            {
+                id: 10,
+                title: "Undo Changes",
+                intro: "Made a mistake? git checkout can discard changes in your working directory.",
+                content: "Discard changes in a file:\ngit checkout -- filename.txt",
+                hint: "Type: git checkout -- filename.txt",
+                answer: "git checkout",
+                success: "Changes discarded! The file is now back to its last committed state. Careful - this can't be undone!",
+                type: "contains"
+            },
+            {
+                id: 11,
+                title: "Reset HEAD",
+                intro: "git reset unstages files. It's like 'git add' in reverse. Use --soft to keep changes, --hard to discard.",
+                content: "Unstage a file:\ngit reset HEAD filename.txt",
+                hint: "Type: git reset HEAD filename.txt",
+                answer: "git reset",
+                success: "Unstaged! The file is still in your working directory, just not staged anymore. Use 'git reset --hard' to discard commits!",
+                type: "contains"
+            },
+            {
+                id: 12,
+                title: "Intermediate Finale",
+                intro: "You've come far! Let's do one final challenge - push your merged work to the remote!",
+                content: "Add, commit, and push your merged work:\ngit add . && git commit -m \"Merged feature\" && git push origin main",
+                hint: "Type: git add . && git commit -m \"Merged feature\" && git push origin main",
+                answer: "git push",
+                success: "Amazing! You've mastered the intermediate Git essentials! You can now collaborate, merge, and manage remote repositories like a pro!",
+                type: "contains"
+            }
+        ];
+        
+        const expertLevels = [
+            {
+                id: 1,
+                title: "Rebase Basics",
+                intro: "Welcome to EXPERT level! Time to master the most powerful Git technique - rebasing!",
+                content: "Rebase onto main:\ngit rebase main",
+                hint: "Type: git rebase main",
+                answer: "git rebase main",
+                success: "Rebase completed! Rebasing rewrites history to apply commits on top of another branch. Cleaner than merging!",
+                type: "contains"
+            },
+            {
+                id: 2,
+                title: "Interactive Rebase",
+                intro: "Interactive rebase gives you full control over commits! Squash, edit, reorder!",
+                content: "Squash last 3 commits:\ngit rebase -i HEAD~3",
+                hint: "Type: git rebase -i HEAD~3",
+                answer: "git rebase -i",
+                success: "Interactive rebase! You can squash (s), pick (p), edit (e), reorder, even split commits! Power over history!",
+                type: "contains"
+            },
+            {
+                id: 3,
+                title: "Stash Pop vs Apply",
+                intro: "git stash pop applies and removes stash, git stash apply keeps the stash for later!",
+                content: "Apply and drop stash:\ngit stash pop",
+                hint: "Type: git stash pop",
+                answer: "git stash pop",
+                success: "Stash popped! stash pop = apply + drop. stash apply keeps it around. Choose wisely!",
+                type: "contains"
+            },
+            {
+                id: 4,
+                title: "Cherry-Pick",
+                intro: "Cherry-pick applies a specific commit from any branch onto your current branch!",
+                content: "Cherry-pick a commit:\ngit cherry-pick abc123",
+                hint: "Type: git cherry-pick",
+                answer: "git cherry-pick",
+                success: "Cherry-picked! The commit is now on your branch. Great for backporting fixes!",
+                type: "contains"
+            },
+            {
+                id: 5,
+                title: "Bisect",
+                intro: "Git bisect is a binary search for bugs! It finds the exact commit that broke something!",
+                content: "Start bisect:\ngit bisect start",
+                hint: "Type: git bisect start",
+                answer: "git bisect start",
+                success: "Bisect started! Mark bad commit, find good commit, Git binary searches. Finds bugs in minutes!",
+                type: "contains"
+            },
+            {
+                id: 6,
+                title: "Reflog",
+                intro: "Reflog is Git's safety net! It records every reference update - recover anything!",
+                content: "View reflog:\ngit reflog",
+                hint: "Type: git reflog",
+                answer: "git reflog",
+                success: "Reflog shown! Every HEAD move recorded. Lost commit? Reset wrong? reflog saves you!",
+                type: "contains"
+            },
+            {
+                id: 7,
+                title: "Submodules",
+                intro: "Git submodules let you include one repository inside another - like a git dependency!",
+                content: "Add a submodule:\ngit submodule add https://github.com/user/repo",
+                hint: "Type: git submodule add",
+                answer: "git submodule add",
+                success: "Submodule added! Clone with --recursive or git submodule update --init. Manage dependencies!",
+                type: "contains"
+            },
+            {
+                id: 8,
+                title: "Worktree",
+                intro: "Git worktree lets you work on multiple branches simultaneously in different directories!",
+                content: "Create worktree:\ngit worktree add ../feature-branch feature",
+                hint: "Type: git worktree add",
+                answer: "git worktree add",
+                success: "Worktree created! Multiple branches, same repo. No more stash/unstash cycle!",
+                type: "contains"
+            },
+            {
+                id: 9,
+                title: "Blame",
+                intro: "Git blame shows who last modified each line - perfect for asking questions!",
+                content: "Blame a file:\ngit blame file.txt",
+                hint: "Type: git blame",
+                answer: "git blame",
+                success: "Blame assigned! Each line shows who and when. Great for understanding code history!",
+                type: "contains"
+            },
+            {
+                id: 10,
+                title: "LFS",
+                intro: "Git LFS handles large files efficiently - stores pointers, not contents!",
+                content: "Track large files:\ngit lfs install && git lfs track \"*.psd\"",
+                hint: "Type: git lfs track",
+                answer: "git lfs track",
+                success: "LFS enabled! Large files stored on LFS server, not in git. Efficient collaboration!",
+                type: "contains"
+            },
+            {
+                id: 11,
+                title: "Bundle",
+                intro: "Git bundle creates a single file containing a repo - perfect for offline transfer!",
+                content: "Create a bundle:\ngit bundle create repo.bundle --all",
+                hint: "Type: git bundle create",
+                answer: "git bundle create",
+                success: "Bundle created! Full repo in one file. Transfer via USB, email, carrier pigeon!",
+                type: "contains"
+            },
+            {
+                id: 12,
+                title: "Expert Finale - Git Master",
+                intro: "Final challenge! Combine everything - rebase, bisect, worktree, and submodules!",
+                content: "Create a feature workflow:\ngit checkout -b feature && git worktree add ../feature-wt feature && git add . && git commit -m \"Feature\"",
+                hint: "Type: git checkout -b feature",
+                answer: "git checkout -b feature",
+                success: "EXPERT COMPLETE! You've mastered rebasing, bisect, worktree, submodules, LFS, bundle! You're a TRUE Git master! Git Garry is incredibly proud!",
+                type: "starts"
+            }
+        ];
+        
+        let levels = beginnerLevels;
+        
+        async function startTrack(trackName) {
+            if (trackName === 'beginner') {
+                levels = beginnerLevels;
+                await showMessage(character.name, "Excellent choice! We'll start from the basics - perfect for beginners! Let's begin your Git journey!");
+            } else if (trackName === 'intermediate') {
+                levels = intermediateLevels;
+                await showMessage(character.name, "Welcome back! You've got the basics - now let's dive into remote repos, merging, and collaboration!");
+            } else if (trackName === 'expert') {
+                levels = expertLevels;
+                await showMessage(character.name, "Welcome to EXPERT mode! Rebase, bisect, worktree, submodules - time to become a true Git master!");
+            }
+            
+            currentLevel = 0;
+            showLevel();
+        }
+        
+        window.startTrack = startTrack;
+        window.toggleFullscreen = function() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                document.documentElement.requestFullscreen();
+            }
+        };
+        window.toggleDarkMode = async function() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            if (userId) {
+                try {
+                    await fetch('/api/auth.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'action=updateTheme&theme=' + newTheme,
+                        credentials: 'include'
+                    });
+                } catch (e) {}
+            }
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.checked = newTheme === 'dark';
+        };
+        
+        async function showMessage(speaker, text, className = '', allowHtml = false) {
+            const div = document.createElement('div');
+            div.className = 'message';
+            history.appendChild(div);
+            
+            const speakerDiv = document.createElement('div');
+            speakerDiv.className = 'speaker';
+            speakerDiv.textContent = speaker + ':';
+            div.appendChild(speakerDiv);
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text ' + className;
+            div.appendChild(textDiv);
+            
+            await new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        textDiv.textContent = text.substring(0, i + 1);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(type, 15);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+        
+        function showLevelTitle(title) {
+            const div = document.createElement('div');
+            div.className = 'level-title';
+            div.textContent = `Level ${currentLevel + 1}: ${title}`;
+            history.appendChild(div);
+        }
+        
+        function checkAnswer(userAnswer, level) {
+            const answer = level.answer.toLowerCase();
+            const user = userAnswer.toLowerCase().trim();
+            
+            if (level.type === 'exact') {
+                return user === answer;
+            } else if (level.type === 'contains') {
+                return user.includes(answer);
+            } else if (level.type === 'starts') {
+                return user.startsWith(answer);
+            }
+            return false;
+        }
+        
+        async function showLevel() {
+            const level = levels[currentLevel];
+            showLevelTitle(level.title);
+            await showMessage(character.name, level.intro);
+            await showMessage(character.name, level.content);
+            await showMessage(character.name, `Hint: ${level.hint}`, 'hint');
+        }
+        
+        async function advanceLevel() {
+            currentLevel++;
+            saveProgress(currentLevel);
+            if (currentLevel >= levels.length) {
+                if (levels === beginnerLevels) {
+                    await showMessage(character.name, "Congratulations! You've completed all beginner levels! You're a Git warrior! Type --intermediate to continue your journey!");
+                } else if (levels === intermediateLevels) {
+                    await showMessage(character.name, "Congratulations! You've completed all intermediate levels! Type --expert to become a true Git master!");
+                } else {
+                    await showMessage(character.name, "Congratulations! You've completed all expert levels! You're now a TRUE Git master! Go forth and collaborate!");
+                }
+                input.disabled = true;
+                return;
+            }
+            showLevel();
+        }
+        
+        input.addEventListener('keydown', async function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') {
+                    startTrack('beginner');
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--intermediate') {
+                    startTrack('intermediate');
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--expert') {
+                    startTrack('expert');
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--fullscreen') {
+                    toggleFullscreen();
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--darkmode') {
+                    toggleDarkMode();
+                    input.value = '';
+                    return;
+                }
+                if (userAnswer === '--exit') {
+                    window.location.href = '../index.html';
+                    return;
+                }
+                
+                await showMessage(character.name, "Press Ctrl+Enter to run Git commands. Use --beginner, --intermediate, --expert, --fullscreen, --darkmode, or --exit", 'hint');
+                input.value = '';
+                return;
+            }
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                const level = levels[currentLevel];
+                clearBashOutput();
+                await runBashCode(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite right. " + level.hint, 'fail');
+                }
+                input.value = '';
+            }
+        });
+        
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', async function() {
+                const userAnswer = input.value.trim();
+                if (!userAnswer) return;
+                
+                if (userAnswer === '--beginner') { startTrack('beginner'); input.value = ''; return; }
+                if (userAnswer === '--intermediate') { startTrack('intermediate'); input.value = ''; return; }
+                if (userAnswer === '--expert') { startTrack('expert'); input.value = ''; return; }
+                if (userAnswer === '--fullscreen') { toggleFullscreen(); input.value = ''; return; }
+                if (userAnswer === '--darkmode') { toggleDarkMode(); input.value = ''; return; }
+                if (userAnswer === '--exit') { window.location.href = '../index.html'; return; }
+                
+                const level = levels[currentLevel];
+                clearBashOutput();
+                await runBashCode(userAnswer);
+                
+                if (checkAnswer(userAnswer, level)) {
+                    await showMessage(character.name, level.success, 'success');
+                    await showMessage(character.name, character.getEncouragement());
+                    setTimeout(advanceLevel, 1500);
+                } else {
+                    await showMessage(character.name, "Not quite right. " + level.hint, 'fail');
+                }
+                input.value = '';
+            });
+        }
+        
+        // Initialize - check login and load progress
+        (async function init() {
+            await checkLogin();
+            if (userId) {
+                savedLevel = await loadProgress();
+                if (savedLevel > 0 && savedLevel <= levels.length) {
+                    currentLevel = savedLevel - 1;
+                }
+                document.documentElement.setAttribute('data-theme', userTheme);
+                localStorage.setItem('theme', userTheme);
+                const toggle = document.getElementById('themeToggle');
+                if (toggle) toggle.checked = userTheme === 'dark';
+            }
+            await showMessage(character.name, character.greeting, '', true);
+            
+            const menuDiv = document.createElement('div');
+            menuDiv.className = 'output-line choice';
+            menuDiv.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'beginner\')">--beginner</span> - Learn the basics (lessons 1-12)';
+            history.appendChild(menuDiv);
+            
+            const menuDiv2 = document.createElement('div');
+            menuDiv2.className = 'output-line choice';
+            menuDiv2.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'intermediate\')">--intermediate</span> - Remote repos, merging, collaboration (lessons 13-24)';
+            history.appendChild(menuDiv2);
+            
+            const menuDiv3 = document.createElement('div');
+            menuDiv3.className = 'output-line choice';
+            menuDiv3.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="startTrack(\'expert\')">--expert</span> - Rebase, bisect, submodules (lessons 25-36)';
+            history.appendChild(menuDiv3);
+            
+            const menuDiv4 = document.createElement('div');
+            menuDiv4.className = 'output-line choice';
+            menuDiv4.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleFullscreen()">--fullscreen</span> - Toggle fullscreen mode';
+            history.appendChild(menuDiv4);
+            
+            const menuDiv5 = document.createElement('div');
+            menuDiv5.className = 'output-line choice';
+            menuDiv5.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="toggleDarkMode()">--darkmode</span> - Toggle dark/light mode';
+            history.appendChild(menuDiv5);
+            
+            const menuDiv6 = document.createElement('div');
+            menuDiv6.className = 'output-line choice';
+            menuDiv6.innerHTML = '<span class="command-output" style="cursor:pointer;" onclick="window.location.href=\'../index.html\'">--exit</span> - Back to homepage';
+            history.appendChild(menuDiv6);
+            
+            await showMessage(character.name, "Choose your path - click above or type --beginner, --intermediate, --expert, --fullscreen, --darkmode, or --exit", '', true);
+        })();
+    </script>
+    <footer id="site-footer" style="text-align: center; padding: 0 24px 24px;">
+        <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>
+        <div style="margin-bottom: 23px;">
+            <a href="site-map.html" style="color: var(--black);">Site Map</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" style="color: var(--black);">Onion Site</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="https://github.com/cjboon/rebelwithlinux" style="color: var(--black);">GitHub</a>
+        </div>
+        <div>
+            <a href="../sections/about.html" style="color: var(--black);">About</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/contact.html" style="color: var(--black);">Contact</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/stats.html" style="color: var(--black);">Stats</a>
+        </div>
+    </footer>
+
+</body>
+</html>

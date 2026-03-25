@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <link rel="icon" href="/img/favicon.ico">
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            var theme = saved || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/hangman/hangman-wireguard.html" />
+    <meta charset="UTF-8">
+    <meta name="author" content="cjboon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman: WireGuard - Rebel with Linux</title>
+<style>
+        html, body { height: 100%; overflow: hidden; }
+        body { background: var(--white); color: var(--black); font-family: 'Courier New', monospace; font-size: 15px; display: flex; flex-direction: column; align-items: center; padding: 0; position: relative; }
+        h1 { margin-bottom: 10px; font-size: 1.8rem; color: var(--black); }
+        .subtitle { margin-bottom: 20px; color: var(--charcoal); }
+        .definition-label { font-weight: bold; margin-bottom: 8px; color: var(--charcoal); }
+        .definition-text { line-height: 1.5; }
+        .guesses-label { margin-bottom: 8px; color: var(--charcoal); font-size: 0.9rem; }
+        .game-container { display: flex; gap: 40px; flex-wrap: nowrap; justify-content: center; align-items: flex-start; max-width: 900px; }
+        .hangman-area { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+        .definition-area { display: flex; flex-direction: column; align-items: center; flex-grow: 1; min-width: 280px; }
+        canvas { background: var(--black); }
+        @media (prefers-color-scheme: light) { canvas { background: var(--white); } }
+        .definition-box { background: var(--white); padding: 20px; margin-bottom: 20px; }
+        .word-display { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; font-size: 1.5rem; font-family: 'Courier New', monospace; }
+        .letter-slot { width: 18px; text-align: center; }
+        .letter-slot.correct { color: #00aa00; }
+        .letter-slot.wrong { color: #cc0000; }
+        .guess-input { padding: 12px 15px; background: var(--white); border: none; border-bottom: 2px solid var(--black); color: var(--black); font-family: 'Courier New', monospace; font-size: 1rem; width: 150px; text-transform: lowercase; }
+        .guess-input:focus { outline: none; border-bottom-color: var(--charcoal); }
+        .guessed-char { padding: 5px 8px; background: var(--charcoal); font-size: 0.85rem; color: var(--white); }
+        .guessed-chars { display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 20px; overflow-x: auto; }
+        .stats { display: flex; gap: 30px; padding-top: 15px; border-top: 1px solid var(--charcoal); }
+        .stat { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: var(--black); }
+        .stat-label { font-size: 0.8rem; color: var(--charcoal); }
+        .message { margin-top: 15px; padding: 15px; text-align: center; font-weight: bold; background: var(--white); }
+        .message.win { background: var(--white); color: #00aa00; }
+        .message.lose { background: var(--white); color: #cc0000; }
+        .difficulty { color: var(--charcoal); margin-bottom: 10px; }
+        @media (max-width: 500px) { body { padding: 10px; padding-bottom: 100px; font-size: 14px; } h1 { font-size: 1.4rem; } .subtitle { font-size: 0.9rem; margin-bottom: 10px; } .game-container { flex-wrap: wrap; flex-direction: column; align-items: center; } canvas { width: 150px; height: 188px; } .word-display { font-size: 1.2rem; } .letter-slot { width: 14px; } .guess-input { width: 100%; max-width: 200px; padding: 15px; font-size: 1.2rem; text-align: center; } .stats { gap: 15px; flex-wrap: wrap; justify-content: center; } .stat-value { font-size: 1.2rem; } .guessed-chars { flex-wrap: wrap; justify-content: center; } .guessed-char { padding: 8px 12px; font-size: 1rem; } .message { position: fixed; bottom: 0; left: 0; right: 0; padding: 15px; font-size: 1rem; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); } }
+    </style>
+
+    <link rel="stylesheet" href="../css/00-fonts.css">
+    <link rel="stylesheet" href="../css/01-variables.css">
+    <link rel="stylesheet" href="../css/02-reset.css">
+    <link rel="stylesheet" href="../css/03-typography.css">
+    <link rel="stylesheet" href="../css/04-navigation.css">
+    <link rel="stylesheet" href="../css/05-layout.css">
+    <link rel="stylesheet" href="../css/06-buttons.css">
+    <link rel="stylesheet" href="../css/07-cards.css">
+    <link rel="stylesheet" href="../css/08-terminal.css">
+    <link rel="stylesheet" href="../css/09-quiz.css">
+    <link rel="stylesheet" href="../css/10-sections.css">
+    <link rel="stylesheet" href="../css/11-modals.css">
+    <link rel="stylesheet" href="../css/12-forms.css">
+    <link rel="stylesheet" href="../css/13-account.css">
+    <link rel="stylesheet" href="../css/14-animations.css">
+    <link rel="stylesheet" href="../css/15-responsive.css">
+    <link rel="stylesheet" href="../css/16-nojs.css">
+</head>
+<body>
+    <div class="section-links" style="background: var(--ivory); padding: 16px; text-align: center;">
+        <a href="../index.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Home</a>
+        <a href="../sections/guides.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Guides</a>
+        <a href="../sections/tests.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Tests</a>
+        <a href="../sections/games.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Games</a>
+        <a href="../sections/pathway.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Pathway</a>
+        <a href="../sections/foss.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Foss</a>
+        <a href="../sections/blog.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Blog</a>
+        <a href="../sections/account.html" id="accountBtn" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: none;">Account</a>
+        <button id="themeBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Light</button>
+        <button id="loginBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Login</button>
+    </div>
+
+    <script>
+        (function() {
+            var theme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            document.getElementById('themeBtn').style.display = 'inline-block';
+            document.getElementById('themeBtn').textContent = theme === 'dark' ? 'Light' : 'Dark';
+            if (theme === 'dark') {
+                document.getElementById('themeBtn').style.color = '#e0e0e0';
+            }
+            
+            document.getElementById('themeBtn').addEventListener('click', function() {
+                var current = document.documentElement.getAttribute('data-theme');
+                var next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                this.textContent = next === 'dark' ? 'Light' : 'Dark';
+                this.style.color = next === 'dark' ? '#e0e0e0' : '#000000';
+            });
+
+            var isLoggedIn = localStorage.getItem('auth') === 'true';
+            if (isLoggedIn) {
+                document.getElementById('accountBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('loginBtn').style.display = 'inline-block';
+            }
+        })();
+    </script>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="auth-modal">
+        <div class="auth-box">
+            <button class="close-auth" onclick="closeLoginModal()">×</button>
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="showAuthTab('login')">Login</button>
+                <button class="auth-tab" onclick="showAuthTab('register')">Register</button>
+            </div>
+            <div id="loginError" class="auth-error"></div>
+            <div id="loginSuccess" class="auth-success"></div>
+            <form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)">
+                <input type="email" id="loginEmail" placeholder="Email" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <input type="password" id="loginPassword" placeholder="Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <button type="submit" style="width:100%;padding:12px;background:var(--black);color:var(--white);border:none;font-family:'IBM Plex Mono',monospace;cursor:pointer;">Login</button>
+            </form>
+            <form id="registerForm" class="auth-form" onsubmit="handleRegister(event)">
+                <input type="email" id="registerEmail" placeholder="Email" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <input type="password" id="registerPassword" placeholder="Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <input type="password" id="registerConfirm" placeholder="Confirm Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);">
+                <button type="submit" style="width:100%;padding:12px;background:var(--black);color:var(--white);border:none;font-family:'IBM Plex Mono',monospace;cursor:pointer;">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('loginSuccess').classList.remove('show');
+            if (tab === 'login') {
+                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+            showAuthTab('login');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('active');
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('loginSuccess').classList.remove('show');
+        }
+
+        document.getElementById('loginBtn').addEventListener('click', openLoginModal);
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            const successDiv = document.getElementById('loginSuccess');
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'login');
+                formData.append('email', email);
+                formData.append('password', password);
+                
+                const response = await fetch('../api/auth.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('auth', 'true');
+                    successDiv.textContent = 'Login successful!';
+                    successDiv.classList.add('show');
+                    setTimeout(() => {
+                        window.location.href = '../account.html';
+                    }, 500);
+                } else {
+                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.classList.add('show');
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Connection error';
+                errorDiv.classList.add('show');
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirm').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (password !== confirm) {
+                errorDiv.textContent = 'Passwords do not match';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('action', 'register');
+                formData.append('email', email);
+                formData.append('password', password);
+                
+                const response = await fetch('../api/auth.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    localStorage.setItem('auth', 'true');
+                    document.getElementById('loginSuccess').textContent = 'Registration successful! Logging in...';
+                    document.getElementById('loginSuccess').classList.add('show');
+                    setTimeout(() => {
+                        window.location.href = '../account.html';
+                    }, 500);
+                } else {
+                    errorDiv.textContent = data.error || 'Registration failed';
+                    errorDiv.classList.add('show');
+                }
+            } catch (err) {
+                errorDiv.textContent = 'Connection error';
+                errorDiv.classList.add('show');
+            }
+        }
+
+        if (window.location.hash === '#login') {
+            openLoginModal();
+        }
+    </script>
+
+    <h1>HANGMAN: WIREGUARD</h1>
+    <p class="subtitle">Guess the WireGuard term from its definition</p>
+    <p class="difficulty" id="difficultyDisplay">Difficulty: Easy</p>
+    <div class="game-container">
+        <div class="hangman-area"><canvas id="hangmanCanvas" width="300" height="400"></canvas></div>
+        <div class="game-info">
+            <div class="definition-box">
+                <div class="definition-label">DEFINITION:</div>
+                <div class="definition-text" id="definition"></div>
+            </div>
+            <div class="word-display" id="wordDisplay"></div>
+            <div class="input-area"><input type="text" class="guess-input" id="guessInput" placeholder="type a-z" autocomplete="off" autofocus></div>
+            <div class="guesses-label">GUESSED:</div>
+            <div class="guessed-chars" id="guessedChars"></div>
+            <div class="stats">
+                <div class="stat"><div class="stat-value" id="wrongCount">0</div><div class="stat-label">Wrong</div></div>
+                <div class="stat"><div class="stat-value" id="score">0</div><div class="stat-label">Score</div></div>
+                <div class="stat"><div class="stat-value" id="streak">0</div><div class="stat-label">Streak</div></div>
+            </div>
+            <div class="message" id="messageBox" style="display: none;"></div>
+        </div>
+    </div>
+    <div class="back-link"><a href="hangman-main.html">&lt;&lt; back to hangman games</a></div>
+    <script>
+        const commands = {
+            easy: [
+                { command: 'wg', definition: 'WireGuard command-line tool' },
+                { command: 'peer', definition: 'Remote VPN client or server in WireGuard' },
+                { command: 'key', definition: 'Cryptographic key used in WireGuard' },
+                { command: 'vpn', definition: 'Virtual Private Network - encrypted tunnel' },
+                { command: 'udp', definition: 'Protocol WireGuard uses (User Datagram Protocol)' },
+                { command: 'port', definition: 'Network port number for connections' },
+                { command: 'dns', definition: 'Domain Name System server configuration' },
+                { command: 'ip', definition: 'Internet Protocol address' },
+                { command: 'nat', definition: 'Network Address Translation' },
+                { command: 'mtu', definition: 'Maximum Transmission Unit - packet size' },
+                { command: 'ping', definition: 'Test connectivity to peer' },
+                { command: 'route', definition: 'Network route configuration' }
+            ],
+            medium: [
+                { command: 'endpoint', definition: 'Remote peer address and port in config' },
+                { command: 'allowedips', definition: 'Networks to route through the VPN tunnel' },
+                { command: 'persistentkeepalive', definition: 'Keeps NAT mappings alive for peer' },
+                { command: 'privatekey', definition: 'Secret key kept locally, never shared' },
+                { command: 'publickey', definition: 'Shared key for peer authentication' },
+                { command: 'presharedkey', definition: 'Additional shared key for post-quantum security' },
+                { command: 'listenport', definition: 'Port for incoming peer connections' },
+                { command: 'chacha20', definition: 'Encryption cipher used by WireGuard' },
+                { command: 'poly1305', definition: 'Message authentication code algorithm' },
+                { command: 'curve25519', definition: 'Key exchange algorithm used by WireGuard' },
+                { command: 'wg-quick', definition: 'Wrapper script for easier WireGuard management' },
+                { command: 'wg0', definition: 'Common default WireGuard interface name' },
+                { command: 'socat', definition: 'Transfer WireGuard socket between processes' },
+                { command: 'FwMark', definition: 'Firewall mark for routing packets' }
+            ],
+            hard: [
+                { command: 'noiseprotocol', definition: 'Key exchange protocol based on Noise' },
+                { command: 'kernelmodule', definition: 'In-kernel WireGuard implementation (Linux 5.6+)' },
+                { command: 'userspace', definition: 'Userspace implementation of WireGuard' },
+                { command: 'PacketDrop', definition: 'WireGuard action to drop packets silently' },
+                { command: 'replacepeers', definition: 'Config option to replace existing peer list' },
+                { command: 'Table', definition: 'Routing table configuration directive' },
+                { command: 'SaveConfig', definition: 'Save runtime config back to file' },
+                { command: 'PostUp', definition: 'Command executed after interface comes up' },
+                { command: 'PreDown', definition: 'Command executed before interface goes down' },
+                { command: 'ip link', definition: 'Create WireGuard network interface' },
+                { command: 'wg set', definition: 'Modify WireGuard interface configuration' },
+                { command: 'wg show', definition: 'Display current WireGuard status' },
+                { command: 'wg genkey', definition: 'Generate WireGuard private key' },
+                { command: 'wg pubkey', definition: 'Generate public key from private key' }
+            ]
+        };
+        let difficultyLevels = ['easy', 'medium', 'hard'];
+        let currentDifficulty = 'easy';
+        let difficultyStreak = 0;
+        let minStreakForAdvance = 5;
+        let currentWord = '';
+        let guessedLetters = [];
+        let wrongCount = 0;
+        let score = 0;
+        let streak = 0;
+        let maxWrong = 8;
+        let isDead = false;
+        let twitchTimeout = null;
+        let deathTime = 0;
+        let limbsLimp = false;
+        const canvas = document.getElementById('hangmanCanvas');
+        const ctx = canvas.getContext('2d');
+        const definitionEl = document.getElementById('definition');
+        const wordDisplayEl = document.getElementById('wordDisplay');
+        const guessInput = document.getElementById('guessInput');
+        const guessedCharsEl = document.getElementById('guessedChars');
+        const wrongCountEl = document.getElementById('wrongCount');
+        const scoreEl = document.getElementById('score');
+        const streakEl = document.getElementById('streak');
+        const messageBox = document.getElementById('messageBox');
+        function init() { newGame(); }
+        function newGame() {
+            const currentCommands = commands[currentDifficulty];
+            const cmd = currentCommands[Math.floor(Math.random() * currentCommands.length)];
+            currentWord = cmd.command.toLowerCase();
+            guessedLetters = [];
+            wrongCount = 0;
+            score = Math.max(0, score);
+            messageBox.style.display = 'none';
+            messageBox.className = 'message';
+            guessInput.value = '';
+            isDead = false;
+            deathTime = 0;
+            limbsLimp = false;
+            if (twitchTimeout) { clearTimeout(twitchTimeout); twitchTimeout = null; }
+            updateDifficultyDisplay();
+            drawHangman();
+            updateDisplay();
+            guessInput.focus();
+        }
+        function updateDifficultyDisplay() {
+            const display = document.getElementById('difficultyDisplay');
+            if (display) { display.textContent = 'Difficulty: ' + currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1); }
+        }
+        function drawHangman() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const startColor = isDark ? '#000' : '#fff';
+            let faceFillColor = startColor;
+            let eyeMouthColor = isDark ? '#fff' : '#000';
+            let droopAmount = 0;
+            if (isDead) {
+                deathTime += 16;
+                const maxTime = 60000;
+                const progress = Math.min(deathTime / maxTime, 1);
+                const r = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
+                const g = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
+                const b = Math.floor(startColor === '#fff' ? 255 - 255 * progress : 0 + 255 * progress);
+                faceFillColor = `rgb(${r},${g},${b})`;
+                droopAmount = Math.sin(deathTime / 500) * 2;
+            }
+            ctx.fillStyle = faceFillColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = isDark ? '#fff' : '#000';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(50, 380); ctx.lineTo(250, 380);
+            ctx.moveTo(100, 380); ctx.lineTo(100, 50);
+            ctx.moveTo(100, 50); ctx.lineTo(220, 50);
+            ctx.moveTo(220, 50); ctx.lineTo(220, 90);
+            ctx.stroke();
+            if (wrongCount >= 1) {
+                ctx.beginPath(); ctx.arc(220, 115 + droopAmount, 30, 0, Math.PI * 2); ctx.fillStyle = faceFillColor; ctx.fill(); ctx.stroke();
+            }
+            if (wrongCount >= 2) {
+                ctx.beginPath(); ctx.moveTo(220, 145 + droopAmount); ctx.lineTo(220, 230); ctx.stroke();
+            }
+            if (wrongCount >= 3) {
+                ctx.beginPath(); ctx.moveTo(220, 160 + droopAmount); ctx.lineTo(190, 200); ctx.stroke();
+            }
+            if (wrongCount >= 4) {
+                ctx.beginPath(); ctx.moveTo(220, 160 + droopAmount); ctx.lineTo(250, 200); ctx.stroke();
+            }
+            if (wrongCount >= 5) {
+                ctx.beginPath(); ctx.moveTo(220, 230); ctx.lineTo(190, 280); ctx.stroke();
+            }
+            if (wrongCount >= 6) {
+                ctx.beginPath(); ctx.moveTo(220, 230); ctx.lineTo(250, 280); ctx.stroke();
+            }
+            if (wrongCount >= 7) {
+                ctx.beginPath(); ctx.fillStyle = isDark ? '#fff' : '#000';
+                ctx.arc(210, 105 + droopAmount, 3, 0, Math.PI * 2); ctx.arc(230, 105 + droopAmount, 3, 0, Math.PI * 2); ctx.fill();
+            }
+            if (wrongCount >= 8) {
+                ctx.beginPath();
+                ctx.strokeStyle = isDark ? '#fff' : '#000';
+                ctx.moveTo(210, 125 + droopAmount); ctx.lineTo(230, 125 + droopAmount);
+                ctx.stroke();
+            }
+            if (!isDead) {
+                ctx.fillStyle = isDark ? '#fff' : '#000';
+                ctx.font = '20px Courier New';
+                ctx.textAlign = 'center';
+            }
+        }
+        function updateDisplay() {
+            definitionEl.textContent = commands[currentDifficulty].find(c => c.command.toLowerCase() === currentWord)?.definition || '';
+            wordDisplayEl.innerHTML = '';
+            for (let i = 0; i < currentWord.length; i++) {
+                const letter = currentWord[i];
+                const slot = document.createElement('span');
+                slot.className = 'letter-slot';
+                if (guessedLetters.includes(letter)) {
+                    slot.textContent = letter;
+                    slot.classList.add('correct');
+                } else {
+                    slot.textContent = '_';
+                }
+                wordDisplayEl.appendChild(slot);
+            }
+            guessedCharsEl.innerHTML = '';
+            guessedLetters.forEach(letter => {
+                const char = document.createElement('span');
+                char.className = 'guessed-char';
+                char.textContent = letter;
+                guessedCharsEl.appendChild(char);
+            });
+            wrongCountEl.textContent = wrongCount;
+            scoreEl.textContent = score;
+            streakEl.textContent = streak;
+            checkWin();
+        }
+        function checkWin() {
+            const won = currentWord.split('').every(letter => guessedLetters.includes(letter));
+            if (won) {
+                messageBox.textContent = 'CORRECT! The word was: ' + currentWord.toUpperCase();
+                messageBox.className = 'message win';
+                messageBox.style.display = 'block';
+                score += 10 + (streak * 2);
+                streak++;
+                difficultyStreak++;
+                if (difficultyStreak >= minStreakForAdvance && currentDifficulty !== 'hard') {
+                    currentDifficulty = difficultyLevels[difficultyLevels.indexOf(currentDifficulty) + 1];
+                    difficultyStreak = 0;
+                }
+                setTimeout(newGame, 2000);
+            } else if (wrongCount >= maxWrong) {
+                isDead = true;
+                drawHangman();
+                messageBox.textContent = 'GAME OVER! The word was: ' + currentWord.toUpperCase();
+                messageBox.className = 'message lose';
+                messageBox.style.display = 'block';
+                streak = 0;
+                difficultyStreak = 0;
+                currentDifficulty = 'easy';
+                setTimeout(newGame, 3000);
+            }
+        }
+        guessInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const guess = guessInput.value.toLowerCase().trim();
+                if (guess && guess.length === 1 && guess.match(/[a-z]/)) {
+                    if (!guessedLetters.includes(guess)) {
+                        guessedLetters.push(guess);
+                        if (!currentWord.includes(guess)) {
+                            wrongCount++;
+                            streak = 0;
+                            difficultyStreak = 0;
+                        }
+                        updateDisplay();
+                        drawHangman();
+                    }
+                    guessInput.value = '';
+                }
+            }
+        });
+        init();
+    </script>
+    <footer id="site-footer" style="text-align: center; padding: 0 24px 24px;">
+        <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>
+        <div style="margin-bottom: 23px;">
+            <a href="site-map.html" style="color: var(--black);">Site Map</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion" style="color: var(--black);">Onion Site</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="https://github.com/cjboon/rebelwithlinux" style="color: var(--black);">GitHub</a>
+        </div>
+        <div>
+            <a href="../sections/about.html" style="color: var(--black);">About</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/contact.html" style="color: var(--black);">Contact</a>
+            <span style="color: var(--charcoal);"> | </span>
+            <a href="../sections/stats.html" style="color: var(--black);">Stats</a>
+        </div>
+    </footer>
+
+</body>
+</html>
