@@ -730,7 +730,7 @@ EOF</span></pre>
 
             document.getElementById('upload-status').textContent = 'Uploading...';
 
-            const response = await fetch('api/upload.php', {
+            const response = await fetch('../api/upload.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -766,7 +766,7 @@ EOF</span></pre>
             document.getElementById('download-section').style.display = 'block';
 
             // Get file info
-            fetch('api/info.php?id=' + encodeURIComponent(id))
+fetch('../api/info.php?id=' + encodeURIComponent(id))
                 .then(r => r.json())
                 .then(info => {
                     document.getElementById('filename-display').textContent = 
@@ -778,7 +778,7 @@ EOF</span></pre>
                 document.getElementById('download-status').textContent = 'Downloading & decrypting...';
 
                 // Download encrypted file
-                const response = await fetch('api/download.php?id=' + encodeURIComponent(id));
+                const response = await fetch('../api/download.php?id=' + encodeURIComponent(id));
                 if (!response.ok) {
                     document.getElementById('download-status').textContent = 'Error: ' + response.statusText;
                     return;
@@ -789,7 +789,7 @@ EOF</span></pre>
                 const encryptedBase64 = btoa(String.fromCharCode(...new Uint8Array(encryptedArray)));
 
                 // Get IV from info endpoint
-                const info = await fetch('api/info.php?id=' + encodeURIComponent(id)).then(r => r.json());
+                const info = await fetch('../api/info.php?id=' + encodeURIComponent(id)).then(r => r.json());
 
                 // Decrypt
                 const key = await importKey(keyBase64);

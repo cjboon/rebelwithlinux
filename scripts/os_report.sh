@@ -4,7 +4,7 @@
 SITE_NAME="rebelwithlinux.com"
 WEB_ROOT="/var/www/${SITE_NAME}"
 LOG_FILE="${1:-/var/log/apache2/${SITE_NAME}_access.log}"
-INDEX_FILE="${WEB_ROOT}/html/stats.html"
+INDEX_FILE="${WEB_ROOT}/sections/stats.html"
 # === END CONFIG ===
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

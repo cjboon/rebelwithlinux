@@ -7,7 +7,7 @@ DEFAULT_LOCATION="Unknown"
 # === END CONFIG ===
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HTML_FILE="${WEB_ROOT}/html/stats.html"
+HTML_FILE="${WEB_ROOT}/sections/stats.html"
 
 setup_systemd_timer() {
     local timer_name="server-report.timer"
@@ -67,7 +67,7 @@ import sys
 import json
 import re
 
-html_file = os.environ.get('HTML_FILE', '/var/www/rebelwithlinux.com/html/stats.html')
+html_file = os.environ.get('HTML_FILE', '/var/www/rebelwithlinux.com/sections/stats.html')
 default_location = os.environ.get('DEFAULT_LOCATION', 'Ogden, Utah')
 
 print(f"Checking file: {html_file}")

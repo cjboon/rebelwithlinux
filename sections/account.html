@@ -60,7 +60,7 @@
         <a href="../sections/pathway.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Pathway</a>
         <a href="../sections/foss.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Foss</a>
         <a href="../sections/blog.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Blog</a>
-        <a href="../sections/account.html" id="accountBtn" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: none;">Account</a>
+        <a href="account.html" id="accountBtn" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: none;">Account</a>
         <button id="themeBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Light</button>
         <button id="loginBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Login</button>
         <button id="logoutBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Logout</button>
@@ -91,7 +91,7 @@
                     try {
                         const formData = new FormData();
                         formData.append('action', 'logout');
-                        await fetch('api/auth.php', { method: 'POST', body: formData, credentials: 'include' });
+                        await fetch('../api/auth.php', { method: 'POST', body: formData, credentials: 'include' });
                         localStorage.removeItem('auth');
                         window.location.href = 'index.html';
                     } catch (e) {
@@ -206,7 +206,7 @@
     <a class="back-to-top" href="#top" aria-label="Back to top">↑</a>
 
         <footer id="site-footer" style="text-align: center; padding: 0 24px 24px;">
-        <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/sections/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>
+        <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>
         <div style="margin-bottom: 23px;">
             <a href="site-map.html" style="color: var(--black);">Site Map</a>
             <span style="color: var(--charcoal);"> | </span>
@@ -381,7 +381,7 @@
             
             try {
                 // First, let's verify the session
-                const sessionCheck = await fetch('api/auth.php?action=check&t=' + Date.now(), { 
+                const sessionCheck = await fetch('../api/auth.php?action=check&t=' + Date.now(), { 
                     credentials: 'include',
                     cache: 'no-store'
                 });
@@ -454,7 +454,7 @@
             // Load guide progress
             for (const guide of GUIDES) {
                 try {
-                    const response = await fetch(`api/progress.php?course=${guide.id}`, { credentials: 'include' });
+                    const response = await fetch(`../api/progress.php?course=${guide.id}`, { credentials: 'include' });
                     const progress = await response.json();
                     console.log(`Guide ${guide.id} progress:`, progress);
                     // Check if any lesson is completed (completed is returned as string "1" from PHP)
@@ -469,7 +469,7 @@
             // Load project progress
             for (const project of PROJECTS) {
                 try {
-                    const response = await fetch(`api/progress.php?course=${project.id}`, { credentials: 'include' });
+                    const response = await fetch(`../api/progress.php?course=${project.id}`, { credentials: 'include' });
                     const progress = await response.json();
                     console.log(`Project ${project.id} progress:`, progress);
                     // Check if any lesson is completed
@@ -484,7 +484,7 @@
             // Load game progress
             for (const game of GAMES) {
                 try {
-                    const response = await fetch(`api/progress.php?course=${game.id}`, { credentials: 'include' });
+                    const response = await fetch(`../api/progress.php?course=${game.id}`, { credentials: 'include' });
                     const progress = await response.json();
                     console.log(`Game ${game.id} progress:`, progress);
                     // Check if any lesson is completed
@@ -499,7 +499,7 @@
             // Load test progress
             for (const test of TESTS) {
                 try {
-                    const response = await fetch(`api/progress.php?course=${test.id}`, { credentials: 'include' });
+                    const response = await fetch(`../api/progress.php?course=${test.id}`, { credentials: 'include' });
                     const progress = await response.json();
                     console.log(`Test ${test.id} progress:`, progress);
                     if (progress.length > 0 && progress.some(p => p.completed == 1 || p.completed === true || p.completed === "1")) {
@@ -643,7 +643,7 @@
             try {
                 const formData = new FormData();
                 formData.append('action', 'logout');
-                await fetch('api/auth.php', {
+                await fetch('../api/auth.php', {
                     method: 'POST',
                     body: formData,
                     credentials: 'include'
@@ -676,6 +676,72 @@
 
         // Initialize page
         checkAuth();
+        
+        function showAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('loginSuccess').classList.remove('show');
+            if (tab === 'login') {
+                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+        function openLoginModal() { document.getElementById('loginModal').classList.add('active'); showAuthTab('login'); }
+        function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); document.getElementById('loginError').classList.remove('show'); document.getElementById('loginSuccess').classList.remove('show'); }
+        document.getElementById('loginBtn').addEventListener('click', openLoginModal);
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            const successDiv = document.getElementById('loginSuccess');
+            try {
+                const formData = new FormData();
+                formData.append('action', 'login');
+                formData.append('email', email);
+                formData.append('password', password);
+                const response = await fetch('../api/auth.php', { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.success) {
+                    localStorage.setItem('auth', 'true');
+                    successDiv.textContent = 'Login successful!';
+                    successDiv.classList.add('show');
+                    setTimeout(() => { window.location.href = 'account.html'; }, 500);
+                } else {
+                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.classList.add('show');
+                }
+            } catch (err) { errorDiv.textContent = 'Connection error'; errorDiv.classList.add('show'); }
+        }
+        async function handleRegister(e) {
+            e.preventDefault();
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirm').value;
+            const errorDiv = document.getElementById('loginError');
+            if (password !== confirm) { errorDiv.textContent = 'Passwords do not match'; errorDiv.classList.add('show'); return; }
+            try {
+                const formData = new FormData();
+                formData.append('action', 'register');
+                formData.append('email', email);
+                formData.append('password', password);
+                const response = await fetch('../api/auth.php', { method: 'POST', body: formData, credentials: 'include' });
+                const data = await response.json();
+                if (data.success) {
+                    localStorage.setItem('auth', 'true');
+                    document.getElementById('loginSuccess').textContent = 'Registration successful! Logging in...';
+                    document.getElementById('loginSuccess').classList.add('show');
+                    setTimeout(() => { window.location.href = 'account.html'; }, 500);
+                } else {
+                    errorDiv.textContent = data.error || 'Registration failed';
+                    errorDiv.classList.add('show');
+                }
+            } catch (err) { errorDiv.textContent = 'Connection error'; errorDiv.classList.add('show'); }
+        }
     </script>
 
     <div id="loginModal" class="auth-modal"><div class="auth-box"><button class="close-auth" onclick="closeLoginModal()">×</button><div class="auth-tabs"><button class="auth-tab active" onclick="showAuthTab('login')">Login</button><button class="auth-tab" onclick="showAuthTab('register')">Register</button></div><div id="loginError" class="auth-error"></div><div id="loginSuccess" class="auth-success"></div><form id="loginForm" class="auth-form active" onsubmit="handleLogin(event)"><input type="email" id="loginEmail" placeholder="Email" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);"><input type="password" id="loginPassword" placeholder="Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);"><button type="submit" style="width:100%;padding:12px;background:var(--black);color:var(--white);border:none;font-family:'IBM Plex Mono',monospace;cursor:pointer;">Login</button></form><form id="registerForm" class="auth-form" onsubmit="handleRegister(event)"><input type="email" id="registerEmail" placeholder="Email" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);"><input type="password" id="registerPassword" placeholder="Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);"><input type="password" id="registerConfirm" placeholder="Confirm Password" required style="width:100%;padding:12px;margin-bottom:12px;border:1px solid var(--charcoal);font-family:'IBM Plex Mono',monospace;background:var(--white);color:var(--black);"><button type="submit" style="width:100%;padding:12px;background:var(--black);color:var(--white);border:none;font-family:'IBM Plex Mono',monospace;cursor:pointer;">Register</button></form></div></div><script>function showAuthTab(tab){document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.auth-form').forEach(f=>f.classList.remove('active'));document.getElementById('loginError').classList.remove('show');document.getElementById('loginSuccess').classList.remove('show');if(tab==='login'){document.querySelector('.auth-tab:nth-child(1)').classList.add('active');document.getElementById('loginForm').classList.add('active');}else{document.querySelector('.auth-tab:nth-child(2)').classList.add('active');document.getElementById('registerForm').classList.add('active');}}function openLoginModal(){document.getElementById('loginModal').classList.add('active');showAuthTab('login');}function closeLoginModal(){document.getElementById('loginModal').classList.remove('active');document.getElementById('loginError').classList.remove('show');document.getElementById('loginSuccess').classList.remove('show');}document.getElementById('loginBtn').addEventListener('click',openLoginModal);async function handleLogin(e){e.preventDefault();const email=document.getElementById('loginEmail').value;const password=document.getElementById('loginPassword').value;const errorDiv=document.getElementById('loginError');const successDiv=document.getElementById('loginSuccess');try{const formData=new FormData();formData.append('action','login');formData.append('email',email);formData.append('password',password);const response=await fetch('api/auth.php',{method:'POST',body:formData,credentials:'include'});const data=await response.json();if(data.success){localStorage.setItem('auth','true');successDiv.textContent='Login successful!';successDiv.classList.add('show');setTimeout(()=>{window.location.href='account.html';},500);}else{errorDiv.textContent=data.error||'Login failed';errorDiv.classList.add('show');}}catch(err){errorDiv.textContent='Connection error';errorDiv.classList.add('show');}}async function handleRegister(e){e.preventDefault();const email=document.getElementById('registerEmail').value;const password=document.getElementById('registerPassword').value;const confirm=document.getElementById('registerConfirm').value;const errorDiv=document.getElementById('loginError');if(password!==confirm){errorDiv.textContent='Passwords do not match';errorDiv.classList.add('show');return;}try{const formData=new FormData();formData.append('action','register');formData.append('email',email);formData.append('password',password);const response=await fetch('api/auth.php',{method:'POST',body:formData,credentials:'include'});const data=await response.json();if(data.success){localStorage.setItem('auth','true');document.getElementById('loginSuccess').textContent='Registration successful! Logging in...';document.getElementById('loginSuccess').classList.add('show');setTimeout(()=>{window.location.href='account.html';},500);}else{errorDiv.textContent=data.error||'Registration failed';errorDiv.classList.add('show');}}catch(err){errorDiv.textContent='Connection error';errorDiv.classList.add('show');}}</script>
