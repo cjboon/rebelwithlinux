@@ -177,7 +177,7 @@ END {
         }
     }
     # Output top 5
-    if (n > 5) n = 5
+    if (n > 10) n = 10
     for (i = 1; i <= n; i++) {
         # Strip directory prefix - keep only filename
         n_parts = split(paths[i], parts, "/")
@@ -230,7 +230,7 @@ content = re.sub(pattern, replacement, content, flags=re.DOTALL)
 pattern2 = r'(<section id="stats"[^>]*>)' + r'.*?rebelled today.*?</ul>'
 replacement2 = r'\1' + f'''
         <p style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 8px;">Last updated: {timestamp}</p>
-        <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">{total} rebelled today.</h3>
+        <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">{total} Bots Today.</h3>
 {report_html}'''
 content = re.sub(pattern2, replacement2, content, flags=re.DOTALL)
 

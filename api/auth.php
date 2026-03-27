@@ -76,12 +76,11 @@ if ($method === 'GET') {
         }
     }
     
-    // Skip CSRF for now
-    // if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-    //     http_response_code(403);
-    //     echo json_encode(['error' => 'Invalid CSRF token']);
-    //     exit;
-    // }
+    if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Invalid CSRF token']);
+        exit;
+    }
     
     if ($action === 'register') {
         register();

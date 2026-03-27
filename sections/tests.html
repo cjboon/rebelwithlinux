@@ -560,6 +560,9 @@
                 formData.append('action', 'login');
                 formData.append('email', email);
                 formData.append('password', password);
+                const csrfRes = await fetch('../api/auth.php?action=csrf');
+                const csrfData = await csrfRes.json();
+                formData.append('csrf_token', csrfData.token);
                 const response = await fetch('../api/auth.php', { method: 'POST', body: formData, credentials: 'include' });
                 const data = await response.json();
                 if (data.success) {
@@ -585,6 +588,9 @@
                 formData.append('action', 'register');
                 formData.append('email', email);
                 formData.append('password', password);
+                const csrfRes = await fetch('../api/auth.php?action=csrf');
+                const csrfData = await csrfRes.json();
+                formData.append('csrf_token', csrfData.token);
                 const response = await fetch('../api/auth.php', { method: 'POST', body: formData, credentials: 'include' });
                 const data = await response.json();
                 if (data.success) {
