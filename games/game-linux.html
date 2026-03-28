@@ -9,60 +9,204 @@
         })();
     </script>
 
-    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/builders/builder-cicd.html" />
+    <meta http-equiv="onion-location" content="http://2wziokw2zpmrawplzbkowhrr6plc7wfebsdgrrnerbpebvhyhmqnxgad.onion/games/game-linux.html" />
     <meta charset="UTF-8">
     <meta name="author" content="cjboon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CICD Builder - CICD Basics</title>
+    <title>Linux Builder - Learn Linux Commands</title>
 <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--white); color: var(--black); font-family: 'Courier New', monospace; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0; position: relative; }
+
+        body {
+            background: var(--white);
+            color: var(--black);
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+            position: relative;
+        }
+
         .header { text-align: center; margin-bottom: 30px; padding: 20px; }
-        .header h1 { font-size: 28px; color: #fc6d26; margin-bottom: 8px; letter-spacing: 2px; }
+
+        .header h1 {
+            font-size: 28px;
+            color: #4c4c4c;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
         .header p { color: var(--charcoal); font-size: 14px; }
-        .stats-bar { display: flex; gap: 30px; margin-bottom: 30px; background: var(--beige); padding: 15px 30px; border-radius: 8px; border: 1px solid var(--charcoal); }
+
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            background: var(--beige);
+            padding: 15px 30px;
+            border-radius: 8px;
+            border: 1px solid var(--charcoal);
+        }
+
         .stat { text-align: center; }
         .stat-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; }
         .stat-value { font-size: 24px; font-weight: bold; color: #58a6ff; }
-        .stat-value.score { color: #fc6d26; }
-        .game-container { background: var(--beige); border-radius: 12px; padding: 30px; max-width: 800px; width: 100%; border: 1px solid var(--charcoal); display: none; }
+        .stat-value.score { color: #4c4c4c; }
+
+        .game-container {
+            background: var(--beige);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            border: 1px solid var(--charcoal);
+            display: none;
+        }
+
         .game-container.active { display: block; }
-        .level-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
-        .level-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--charcoal); }
-        .level-dot.completed { background: #fc6d26; }
-        .level-dot.current { background: #58a6ff; }
-        .question-box { background: var(--white); border-radius: 8px; padding: 20px; margin-bottom: 25px; border-left: 4px solid #fc6d26; }
+
+        .stage-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+        .stage-dot { width: 40px; height: 8px; border-radius: 4px; background: var(--charcoal); }
+        .stage-dot.completed { background: #4c4c4c; }
+        .stage-dot.current { background: #58a6ff; }
+
+        .question-box {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #4c4c4c;
+        }
+
         .question-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
         .question-text { font-size: 16px; color: var(--black); line-height: 1.6; }
         .hint-text { margin-top: 12px; font-size: 13px; color: #d29922; font-style: italic; }
-        .answer-area { background: var(--white); border-radius: 8px; padding: 20px; margin-bottom: 25px; min-height: 80px; border: 2px dashed var(--charcoal); }
+
+        .answer-area {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            min-height: 80px;
+            border: 2px dashed var(--charcoal);
+        }
+
         .answer-label { font-size: 11px; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+
         .letter-slots { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; min-height: 50px; align-items: center; }
-        .letter-slot { width: 46px; height: 46px; background: var(--white); border: 2px dashed var(--charcoal); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; color: var(--black); }
-        .letter-slot.filled { border-style: solid; border-color: #fc6d26; }
+
+        .letter-slot {
+            width: 46px;
+            height: 46px;
+            background: var(--white);
+            border: 2px dashed var(--charcoal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--black);
+        }
+
+        .letter-slot.filled { border-style: solid; border-color: #4c4c4c; }
         .letter-slot.correct { border-color: #3fb950; background: rgba(63, 185, 80, 0.1); }
         .letter-slot.incorrect { border-color: #f85149; background: rgba(248, 81, 73, 0.1); }
+
         .letter-pool { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 20px; background: var(--white); border-radius: 8px; min-height: 80px; }
-        .letter-tile { width: 46px; height: 46px; background: linear-gradient(135deg, #fc6d26, #d44d1a); background-color: #fc6d26; border-radius: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; color: var(--white); cursor: grab; transition: all 0.2s ease; user-select: none; -webkit-user-drag: element; box-sizing: border-box; }
+
+        .letter-tile {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, #4c4c4c, #333333);
+            background-color: #4c4c4c;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--white);
+            cursor: grab;
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-user-drag: element;
+            box-sizing: border-box;
+        }
+
         .letter-tile:active { cursor: grabbing; }
-        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(252, 109, 38, 0.3); }
+        .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(76, 76, 76, 0.3); }
         .letter-tile.dragging { opacity: 0.5; }
+
         .actions { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
-        .btn { padding: 12px 24px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s ease; border: none; }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
         .btn-primary { background: #238636; color: white; }
         .btn-primary:hover { background: #2ea043; }
         .btn-secondary { background: var(--charcoal); color: var(--black); border: 1px solid var(--charcoal); }
+        .btn-secondary:hover { background: var(--charcoal); }
+
         .feedback { padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; display: none; }
         .feedback.success { display: block; background: rgba(38, 77, 228, 0.1); border: 1px solid #264de4; color: #264de4; }
         .feedback.error { display: block; background: rgba(248, 81, 73, 0.1); border: 1px solid #f85149; color: #f85149; }
-        .completion-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; z-index: 1000; }
+
+        .completion-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
         .completion-modal.active { display: flex; }
-        .modal-content { background: var(--beige); padding: 40px; border-radius: 12px; text-align: center; border: 1px solid var(--charcoal); max-width: 400px; }
-        .modal-content h2 { color: #fc6d26; margin-bottom: 20px; }
+
+        .modal-content {
+            background: var(--beige);
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--charcoal);
+            max-width: 400px;
+        }
+
+        .modal-content h2 { color: #4c4c4c; margin-bottom: 20px; }
         .modal-content p { color: var(--charcoal); margin-bottom: 25px; }
+
         .back-link { display: inline-block; margin-top: 20px; color: #58a6ff; text-decoration: none; font-size: 14px; }
+        .back-link:hover { text-decoration: underline; }
+
         .progress-info { margin-top: 20px; text-align: center; color: var(--charcoal); font-size: 13px; }
-        @media (max-width: 600px) { body { padding: 10px; } .header h1 { font-size: 20px; } .letter-slot, .letter-tile { width: 38px; height: 38px; font-size: 12px; } }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .header { padding: 15px; margin-bottom: 15px; }
+            .header h1 { font-size: 20px; }
+            .header p { font-size: 12px; }
+            .stats-bar { flex-wrap: wrap; gap: 15px; padding: 10px 15px; }
+            .stat-value { font-size: 18px; }
+            .stat-label { font-size: 10px; }
+            .game-container { padding: 15px; }
+            .stage-indicator { gap: 5px; }
+            .stage-dot { width: 30px; height: 8px; }
+            .modal-content { padding: 20px; margin: 10px; }
+            .modal-content h2 { font-size: 18px; }
+        }
     </style>
 
     <link rel="stylesheet" href="../css/00-fonts.css">
@@ -86,9 +230,8 @@
 <body>
 <noscript>
     <style>
-        #themeBtn, .theme-btn { display: none !important; }
+        #themeBtn, #loginBtn { display: none !important; }
         .section-links a[href*="search.html"] { display: none !important; }
-
     </style>
 </noscript>
 
@@ -114,7 +257,7 @@
             if (theme === 'dark') {
                 document.getElementById('themeBtn').style.color = '#e0e0e0';
             }
-            
+
             document.getElementById('themeBtn').addEventListener('click', function() {
                 var current = document.documentElement.getAttribute('data-theme');
                 var next = current === 'dark' ? 'light' : 'dark';
@@ -190,13 +333,13 @@
             const password = document.getElementById('loginPassword').value;
             const errorDiv = document.getElementById('loginError');
             const successDiv = document.getElementById('loginSuccess');
-            
+
             try {
                 const formData = new FormData();
                 formData.append('action', 'login');
                 formData.append('email', email);
                 formData.append('password', password);
-                
+
                 const csrfRes = await fetch('../api/auth.php?action=csrf');
                 const csrfData = await csrfRes.json();
                 formData.append('csrf_token', csrfData.token);
@@ -206,7 +349,7 @@
                     credentials: 'include'
                 });
                 const data = await response.json();
-                
+
                 if (data.success) {
                     localStorage.setItem('auth', 'true');
                     successDiv.textContent = 'Login successful!';
@@ -230,22 +373,19 @@
             const password = document.getElementById('registerPassword').value;
             const confirm = document.getElementById('registerConfirm').value;
             const errorDiv = document.getElementById('loginError');
-            
+
             if (password !== confirm) {
                 errorDiv.textContent = 'Passwords do not match';
                 errorDiv.classList.add('show');
                 return;
             }
-            
+
             try {
                 const formData = new FormData();
                 formData.append('action', 'register');
                 formData.append('email', email);
                 formData.append('password', password);
-                
-                const csrfRes = await fetch('../api/auth.php?action=csrf');
-                const csrfData = await csrfRes.json();
-                formData.append('csrf_token', csrfData.token);
+
                 const csrfRes = await fetch('../api/auth.php?action=csrf');
                 const csrfData = await csrfRes.json();
                 formData.append('csrf_token', csrfData.token);
@@ -255,7 +395,7 @@
                     credentials: 'include'
                 });
                 const data = await response.json();
-                
+
                 if (data.success) {
                     localStorage.setItem('auth', 'true');
                     document.getElementById('loginSuccess').textContent = 'Registration successful! Logging in...';
@@ -279,92 +419,281 @@
     </script>
 
     <div class="header" style="padding-top: 20px;">
-        <h1>🔄 CICD BUILDER</h1>
-        <p>Drag & drop to learn CICD basics</p>
+        <h1>🐧 LINUX BUILDER</h1>
+        <p>Drag & drop to learn Linux commands</p>
     </div>
+
     <div class="stats-bar">
-        <div class="stat"><div class="stat-label">Level</div><div class="stat-value" id="levelNum">1</div></div>
+        <div class="stat"><div class="stat-label">Stage</div><div class="stat-value" id="stageNum">1</div></div>
         <div class="stat"><div class="stat-label">Score</div><div class="stat-value score" id="score">0</div></div>
         <div class="stat"><div class="stat-label">Streak</div><div class="stat-value" id="streak">0</div></div>
     </div>
+
     <div class="game-container active" id="gameContainer">
-        <div class="level-indicator" id="levelIndicator"></div>
+        <div class="stage-indicator" id="stageIndicator"></div>
+
         <div class="question-box">
             <div class="question-label">Challenge</div>
             <div class="question-text" id="questionText"></div>
             <div class="hint-text" id="hintText"></div>
         </div>
+
         <div class="answer-area">
             <div class="answer-label">Your Answer</div>
             <div class="letter-slots" id="letterSlots"></div>
         </div>
+
         <div class="letter-pool" id="letterPool"></div>
         <div class="feedback" id="feedback"></div>
+
         <div class="actions">
             <button class="btn btn-secondary" onclick="clearAnswer()">Clear</button>
-            <button class="btn btn-secondary" onclick="showAnswer()">Show Answer</button>
             <button class="btn btn-primary" onclick="checkAnswer()">Submit</button>
         </div>
+
         <div class="progress-info">Question <span id="currentQ">1</span> of <span id="totalQ">10</span></div>
     </div>
+
     <div class="completion-modal" id="completionModal">
         <div class="modal-content">
-            <h2>🎉 Level Complete!</h2>
+            <h2 id="completionTitle">🎉 Stage Complete!</h2>
             <p>You scored <span id="finalScore">0</span> points!</p>
-            <button class="btn btn-primary" onclick="nextLevel()">Next Level</button>
+            <button class="btn btn-primary" id="nextStageBtn" onclick="nextStage()">Next Stage</button>
         </div>
     </div>
+
     <a href="builder-main.html" class="back-link">&lt;&lt; back to builder games</a>
+
     <script>
-        const levels = [{ questions: [
-            { answer: "pipeline", hint: "CI/CD workflow", code: "Automated workflow process" },
-            { answer: "stage", hint: "Pipeline phase", code: "Step in the pipeline" },
-            { answer: "job", hint: "Task unit", code: "Smallest execution unit" },
-            { answer: "build", hint: "Compile code", code: "Compile and package" },
-            { answer: "test", hint: "Run tests", code: "Verify code works" },
-            { answer: "deploy", hint: "Deploy to env", code: "Release to environment" },
-            { answer: "trigger", hint: "Start pipeline", code: "Event that starts CI/CD" },
-            { answer: "artifact", hint: "Build output", code: "Generated files" },
-            { answer: "jenkins", hint: "CI/CD tool", code: "Popular automation server" },
-            { answer: "docker", hint: "Container platform", code: "Package with containers" }
-        ]}];
-        let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
-        function initLevel() { const level = levels[currentLevel]; document.getElementById('levelNum').textContent = currentLevel + 1; document.getElementById('totalQ').textContent = level.questions.length; renderLevelIndicator(); loadQuestion(); }
-        function renderLevelIndicator() { const level = levels[currentLevel]; const indicator = document.getElementById('levelIndicator'); indicator.innerHTML = ''; for (let i = 0; i < level.questions.length; i++) { const dot = document.createElement('div'); dot.className = 'level-dot'; if (i < currentQuestion) dot.classList.add('completed'); if (i === currentQuestion) dot.classList.add('current'); indicator.appendChild(dot); } }
-        function loadQuestion() { const q = levels[currentLevel].questions[currentQuestion]; document.getElementById('currentQ').textContent = currentQuestion + 1; document.getElementById('questionText').textContent = q.code; document.getElementById('hintText').textContent = q.hint; document.getElementById('feedback').className = 'feedback'; placedLetters = new Array(q.answer.length).fill(null); renderLetterSlots(); renderLetterPool(); renderLevelIndicator(); }
-        function renderLetterSlots() { const slotsContainer = document.getElementById('letterSlots'); slotsContainer.innerHTML = ''; placedLetters.forEach((item, index) => { const slot = document.createElement('div'); slot.className = 'letter-slot' + (item ? ' filled' : ''); slot.textContent = item ? item.letter : ''; slot.dataset.index = index; if (item) slot.addEventListener('click', () => removeLetter(index)); slot.addEventListener('dragover', handleDragOver); slot.addEventListener('dragleave', handleDragLeave); slot.addEventListener('drop', handleDrop); slotsContainer.appendChild(slot); }); }
-        function renderLetterPool() { const pool = document.getElementById('letterPool'); pool.innerHTML = ''; const answer = levels[currentLevel].questions[currentQuestion].answer; const letters = answer.split('').map((letter, i) => ({ letter, index: i })); letters.sort(() => Math.random() - 0.5); const placedIndices = placedLetters.map(l => l !== null ? l.index : -1).filter(i => i !== -1); letters.forEach((item) => { if (placedIndices.includes(item.index)) { return; } const tile = document.createElement('div'); tile.className = 'letter-tile'; tile.textContent = item.letter; tile.dataset.letter = item.letter; tile.dataset.originalIndex = item.index; tile.draggable = true; tile.addEventListener('dragstart', handleDragStart); tile.addEventListener('dragend', handleDragEnd); tile.addEventListener('click', () => clickToPlace(item.letter, item.index)); pool.appendChild(tile); }); }
-        function clickToPlace(letter, originalIndex) { const emptyIndex = placedLetters.findIndex(l => l === null); if (emptyIndex !== -1) { placedLetters[emptyIndex] = { letter: letter, index: originalIndex }; renderLetterSlots(); renderLetterPool(); if (!placedLetters.includes(null)) { setTimeout(checkAnswer, 300); } } }
-        function handleDragStart(e) { draggedLetter = e.target.dataset.letter; draggedOriginalIndex = parseInt(e.target.dataset.originalIndex); e.target.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; const canvas = document.createElement('canvas'); canvas.width = 46; canvas.height = 46; const ctx = canvas.getContext('2d'); ctx.fillStyle = '#fc6d26'; ctx.fillRect(0, 0, 46, 46); ctx.fillStyle = 'var(--white)'; ctx.font = 'bold 14px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(e.target.textContent, 23, 23); e.dataTransfer.setDragImage(canvas, 23, 23); }
+        const stages = [
+            {
+                name: "Stage 1",
+                questions: [
+                    { answer: "ls", hint: "List files", code: "List directory contents" },
+                    { answer: "cd", hint: "Change directory", code: "Navigate folders" },
+                    { answer: "pwd", hint: "Print working dir", code: "Show current path" },
+                    { answer: "mkdir", hint: "Make directory", code: "Create new folder" },
+                    { answer: "rmdir", hint: "Remove directory", code: "Delete empty folder" },
+                    { answer: "rm", hint: "Remove file", code: "Delete files" },
+                    { answer: "cp", hint: "Copy file", code: "Copy files" },
+                    { answer: "mv", hint: "Move file", code: "Rename or move" },
+                    { answer: "cat", hint: "Concatenate", code: "View file content" },
+                    { answer: "touch", hint: "Create file", code: "Create empty file" }
+                ]
+            },
+            {
+                name: "Stage 2",
+                questions: [
+                    { answer: "grep", hint: "Search pattern", code: "Search text in files" },
+                    { answer: "chmod", hint: "Change mode", code: "Change file permissions" },
+                    { answer: "chown", hint: "Change owner", code: "Change file owner" },
+                    { answer: "tar", hint: "Tape archive", code: "Compress files" },
+                    { answer: "zip", hint: "Compress", code: "Zip archive" },
+                    { answer: "unzip", hint: "Decompress", code: "Extract zip file" },
+                    { answer: "find", hint: "Search files", code: "Find files by name" },
+                    { answer: "head", hint: "First lines", code: "View file start" },
+                    { answer: "tail", hint: "Last lines", code: "View file end" },
+                    { answer: "diff", hint: "Compare files", code: "Show differences" }
+                ]
+            },
+            {
+                name: "Stage 3",
+                questions: [
+                    { answer: "sudo", hint: "Super user", code: "Run as admin" },
+                    { answer: "apt", hint: "Package tool", code: "Debian package manager" },
+                    { answer: "yum", hint: "Package tool", code: "RedHat package manager" },
+                    { answer: "systemctl", hint: "System control", code: "Manage services" },
+                    { answer: "ps", hint: "Process status", code: "List processes" },
+                    { answer: "kill", hint: "End process", code: "Terminate process" },
+                    { answer: "df", hint: "Disk free", code: "Show disk space" },
+                    { answer: "du", hint: "Disk usage", code: "Show folder size" },
+                    { answer: "ssh", hint: "Secure shell", code: "Remote connection" },
+                    { answer: "scp", hint: "Secure copy", code: "Transfer files remote" }
+                ]
+            }
+        ];
+
+        let currentStage = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
+
+        function initGame() {
+            const stage = stages[currentStage];
+            document.getElementById('stageNum').textContent = currentStage + 1;
+            document.getElementById('totalQ').textContent = stage.questions.length;
+            renderStageIndicator();
+            loadQuestion();
+        }
+
+        function renderStageIndicator() {
+            const indicator = document.getElementById('stageIndicator');
+            indicator.innerHTML = '';
+            for (let i = 0; i < stages.length; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'stage-dot';
+                if (i < currentStage) dot.classList.add('completed');
+                if (i === currentStage) dot.classList.add('current');
+                indicator.appendChild(dot);
+            }
+        }
+
+        function loadQuestion() {
+            const q = stages[currentStage].questions[currentQuestion];
+            document.getElementById('currentQ').textContent = currentQuestion + 1;
+            document.getElementById('questionText').textContent = q.code;
+            document.getElementById('hintText').textContent = q.hint;
+            document.getElementById('feedback').className = 'feedback';
+            placedLetters = new Array(q.answer.length).fill(null);
+            renderLetterSlots();
+            renderLetterPool();
+            renderStageIndicator();
+        }
+
+        function renderLetterSlots() {
+            const slotsContainer = document.getElementById('letterSlots');
+            slotsContainer.innerHTML = '';
+            placedLetters.forEach((item, index) => {
+                const slot = document.createElement('div');
+                slot.className = 'letter-slot' + (item ? ' filled' : '');
+                slot.textContent = item ? item.letter : '';
+                slot.dataset.index = index;
+                if (item) slot.addEventListener('click', () => removeLetter(index));
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('dragleave', handleDragLeave);
+                slot.addEventListener('drop', handleDrop);
+                slotsContainer.appendChild(slot);
+            });
+        }
+
+        function renderLetterPool() {
+            const pool = document.getElementById('letterPool');
+            pool.innerHTML = '';
+            const answer = stages[currentStage].questions[currentQuestion].answer;
+
+            const letters = answer.split('').map((letter, i) => ({ letter, index: i }));
+            letters.sort(() => Math.random() - 0.5);
+
+            const placedIndices = placedLetters.map(l => l !== null ? l.index : -1).filter(i => i !== -1);
+
+            letters.forEach((item) => {
+                if (placedIndices.includes(item.index)) {
+                    return;
+                }
+
+                const tile = document.createElement('div');
+                tile.className = 'letter-tile';
+                tile.textContent = item.letter;
+                tile.dataset.letter = item.letter;
+                tile.dataset.originalIndex = item.index;
+                tile.draggable = true;
+                tile.addEventListener('dragstart', handleDragStart);
+                tile.addEventListener('dragend', handleDragEnd);
+                tile.addEventListener('click', () => clickToPlace(item.letter, item.index));
+                pool.appendChild(tile);
+            });
+        }
+
+        function clickToPlace(letter, originalIndex) {
+            const emptyIndex = placedLetters.findIndex(l => l === null);
+            if (emptyIndex !== -1) {
+                placedLetters[emptyIndex] = { letter: letter, index: originalIndex };
+                renderLetterSlots();
+                renderLetterPool();
+
+                if (!placedLetters.includes(null)) {
+                    setTimeout(checkAnswer, 300);
+                }
+            }
+        }
+
+        function handleDragStart(e) {
+            draggedLetter = e.target.dataset.letter;
+            draggedOriginalIndex = parseInt(e.target.dataset.originalIndex);
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            const canvas = document.createElement('canvas');
+            canvas.width = 46; canvas.height = 46;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#4c4c4c';
+            ctx.fillRect(0, 0, 46, 46);
+            ctx.fillStyle = 'var(--white)';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(e.target.textContent, 23, 23);
+            e.dataTransfer.setDragImage(canvas, 23, 23);
+        }
+
         function handleDragEnd(e) { e.target.classList.remove('dragging'); }
         function handleDragOver(e) { e.preventDefault(); e.target.classList.add('drag-over'); }
         function handleDragLeave(e) { e.target.classList.remove('drag-over'); }
-        function handleDrop(e) { e.preventDefault(); const slotIndex = parseInt(e.target.dataset.index); if (placedLetters[slotIndex]) return; placedLetters[slotIndex] = { letter: draggedLetter, index: draggedOriginalIndex }; renderLetterSlots(); renderLetterPool(); if (!placedLetters.includes(null)) setTimeout(checkAnswer, 300); }
-        function removeLetter(index) { placedLetters[index] = null; renderLetterSlots(); renderLetterPool(); }
-        function clearAnswer() { placedLetters = new Array(placedLetters.length).fill(null); renderLetterSlots(); renderLetterPool(); }
-        function checkAnswer() { const q = levels[currentLevel].questions[currentQuestion]; const userAnswer = placedLetters.map(l => l ? l.letter : '').join(''); const slots = document.querySelectorAll('.letter-slot'); if (userAnswer === q.answer) { score += 10 + (streak * 2); streak++; document.getElementById('score').textContent = score; document.getElementById('streak').textContent = streak; slots.forEach(slot => slot.classList.add('correct')); document.getElementById('feedback').className = 'feedback success'; document.getElementById('feedback').textContent = '✓ Correct!'; setTimeout(() => { currentQuestion++; if (currentQuestion >= levels[currentLevel].questions.length) showCompletion(); else loadQuestion(); }, 1000); } else { streak = 0; document.getElementById('streak').textContent = streak; slots.forEach(slot => slot.classList.add('incorrect')); document.getElementById('feedback').className = 'feedback error'; document.getElementById('feedback').textContent = '✗ Try again!'; } }
-        
-        function showAnswer() {
-            const q = levels[currentLevel].questions[currentQuestion];
-            const answer = q.answer;
-            placedLetters = answer.split('').map((letter, index) => ({ letter: letter, index: index }));
-            streak = 0;
-            document.getElementById('streak').textContent = streak;
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const slotIndex = parseInt(e.target.dataset.index);
+            if (placedLetters[slotIndex]) return;
+            placedLetters[slotIndex] = { letter: draggedLetter, index: draggedOriginalIndex };
             renderLetterSlots();
             renderLetterPool();
-            const slots = document.querySelectorAll('.letter-slot');
-            slots.forEach(slot => slot.classList.add('incorrect'));
-            document.getElementById('feedback').className = 'feedback error';
-            document.getElementById('feedback').textContent = '✗ Answer: ' + answer;
-            setTimeout(() => {
-                currentQuestion++;
-                if (currentQuestion >= levels[currentLevel].questions.length) showCompletion();
-                else loadQuestion();
-            }, 2000);
+            if (!placedLetters.includes(null)) setTimeout(checkAnswer, 300);
         }
-function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
-        function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = 'builder-cicd-2.html'; }
-        document.addEventListener('keydown', function(e) { const key = e.key.toLowerCase(); if (key === 'backspace') {
+
+        function removeLetter(index) { placedLetters[index] = null; renderLetterSlots(); renderLetterPool(); }
+        function clearAnswer() { placedLetters = new Array(placedLetters.length).fill(null); renderLetterSlots(); renderLetterPool(); }
+
+        function checkAnswer() {
+            const q = stages[currentStage].questions[currentQuestion];
+            const userAnswer = placedLetters.map(l => l ? l.letter : '').join('');
+            const slots = document.querySelectorAll('.letter-slot');
+
+            if (userAnswer === q.answer) {
+                score += 10 + (streak * 2);
+                streak++;
+                document.getElementById('score').textContent = score;
+                document.getElementById('streak').textContent = streak;
+                slots.forEach(slot => slot.classList.add('correct'));
+                document.getElementById('feedback').className = 'feedback success';
+                document.getElementById('feedback').textContent = '✓ Correct!';
+                setTimeout(() => {
+                    currentQuestion++;
+                    if (currentQuestion >= stages[currentStage].questions.length) showCompletion();
+                    else loadQuestion();
+                }, 1000);
+            } else {
+                streak = 0;
+                document.getElementById('streak').textContent = streak;
+                slots.forEach(slot => slot.classList.add('incorrect'));
+                document.getElementById('feedback').className = 'feedback error';
+                document.getElementById('feedback').textContent = '✗ Try again!';
+            }
+        }
+
+        function showCompletion() {
+            document.getElementById('finalScore').textContent = score;
+            const isLastStage = currentStage >= stages.length - 1;
+            if (isLastStage) {
+                document.getElementById('completionTitle').textContent = '🏆 Linux Master!';
+                document.getElementById('nextStageBtn').textContent = 'Back to Menu';
+            } else {
+                document.getElementById('completionTitle').textContent = '🎉 ' + stages[currentStage].name + ' Complete!';
+                document.getElementById('nextStageBtn').textContent = 'Next Stage';
+            }
+            document.getElementById('completionModal').classList.add('active');
+        }
+
+        function nextStage() {
+            document.getElementById('completionModal').classList.remove('active');
+            const isLastStage = currentStage >= stages.length - 1;
+            if (isLastStage) {
+                window.location.href = 'builder-main.html';
+            } else {
+                currentStage++;
+                currentQuestion = 0;
+                initGame();
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            const key = e.key.toLowerCase();
+            if (key === 'backspace') {
                 for (let i = placedLetters.length - 1; i >= 0; i--) {
                     if (placedLetters[i] !== null) {
                         placedLetters[i] = null;
@@ -373,9 +702,31 @@ function showCompletion() { document.getElementById('finalScore').textContent = 
                         break;
                     }
                 }
-            } else if (key.length === 1 && /[a-z0-9_-]/.test(key)) { const emptyIndex = placedLetters.indexOf(null); if (emptyIndex !== -1) { const poolItems = document.querySelectorAll('.letter-tile'); for (let item of poolItems) { if (item.textContent.toLowerCase() === key) { placedLetters[emptyIndex] = { letter: item.textContent, index: parseInt(item.dataset.originalIndex) }; renderLetterSlots(); renderLetterPool(); if (!placedLetters.includes(null)) setTimeout(checkAnswer, 300); break; } } } } });
-        initLevel();
-        const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); } else if (savedTheme === 'light') { document.documentElement.setAttribute('data-theme', 'light'); }
+            } else if (key.length === 1 && /[a-z0-9_-]/.test(key)) {
+                const emptyIndex = placedLetters.indexOf(null);
+                if (emptyIndex !== -1) {
+                    const poolItems = document.querySelectorAll('.letter-tile');
+                    for (let item of poolItems) {
+                        if (item.textContent.toLowerCase() === key) {
+                            placedLetters[emptyIndex] = { letter: item.textContent, index: parseInt(item.dataset.originalIndex) };
+                            renderLetterSlots();
+                            renderLetterPool();
+                            if (!placedLetters.includes(null)) setTimeout(checkAnswer, 300);
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
+        initGame();
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else if (savedTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
     </script>
     <noscript>
         <style>
