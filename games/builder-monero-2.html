@@ -643,7 +643,26 @@
             }
         }
         
-        function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
+        
+        function showAnswer() {
+            const q = levels[currentLevel].questions[currentQuestion];
+            const answer = q.answer;
+            placedLetters = answer.split('').map((letter, index) => ({ letter: letter, index: index }));
+            streak = 0;
+            document.getElementById('streak').textContent = streak;
+            renderLetterSlots();
+            renderLetterPool();
+            const slots = document.querySelectorAll('.letter-slot');
+            slots.forEach(slot => slot.classList.add('incorrect'));
+            document.getElementById('feedback').className = 'feedback error';
+            document.getElementById('feedback').textContent = '✗ Answer: ' + answer;
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion >= levels[currentLevel].questions.length) showCompletion();
+                else loadQuestion();
+            }, 2000);
+        }
+function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
         function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = 'builder-monero-3.html'; }
         
         document.addEventListener('keydown', function(e) {

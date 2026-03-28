@@ -203,6 +203,7 @@ TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
 python3 - "$INDEX_FILE" "$TOTAL" "$REPORT_HTML" "$TOP_PAGES" "$TIMESTAMP" << 'PYEOF'
 import re
 import sys
+import traceback
 
 index_file = sys.argv[1]
 total = sys.argv[2]
@@ -210,51 +211,82 @@ report_html = sys.argv[3]
 top_pages = sys.argv[4]
 timestamp = sys.argv[5]
 
-with open(index_file, 'r') as f:
-    content = f.read()
+try:
+    with open(index_file, 'r') as f:
+        content = f.read()
 
-# Extract Live Server Stats section if it exists (to preserve it)
-live_server_stats = ''
-if '<!-- Live Server Stats -->' in content:
-    match = re.search(r'(<!-- Live Server Stats -->.*?)(?=<!--|$)', content, re.DOTALL)
-    if match:
-        live_server_stats = match.group(1)
+    if not content:
+        print("ERROR: index_file is empty", file=sys.stderr)
+        sys.exit(1)
 
-# Replace the OS stats section (the one with "rebelled today")
-# Match from the stats section start to just before Live Server Stats (or end of section)
-pattern = r'(<section id="stats"[^>]*>.*?)<!-- Live Server Stats -->'
-replacement = r'\1'
-content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+    original_content = content
 
-# Now replace the OS stats part
-pattern2 = r'(<section id="stats"[^>]*>)' + r'.*?rebelled today.*?</ul>'
-replacement2 = r'\1' + f'''
+    # Extract Live Server Stats section if it exists (to preserve it)
+    live_server_stats = ''
+    if '<!-- Live Server Stats -->' in content:
+        match = re.search(r'(<!-- Live Server Stats -->.*?)(?=<!--|$)', content, re.DOTALL)
+        if match:
+            live_server_stats = match.group(1)
+
+    # Replace the OS stats section (the one with "rebelled today")
+    # Match from the stats section start to just before Live Server Stats (or end of section)
+    pattern = r'(<section id="stats"[^>]*>.*?)<!-- Live Server Stats -->'
+    replacement = r'\1'
+    content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+
+    # Now replace the OS stats part
+    pattern2 = r'(<section id="stats"[^>]*>)' + r'.*?Bots and Rebels.*?</ul>'
+    if not re.search(pattern2, content, flags=re.DOTALL):
+        print("ERROR: Could not find OS stats section to replace", file=sys.stderr)
+        print("Content around stats section:", file=sys.stderr)
+        match = re.search(r'<section id="stats"[^>]*>.*', content, re.DOTALL)
+        if match:
+            print(match.group(0)[:500], file=sys.stderr)
+        sys.exit(1)
+
+    replacement2 = r'\1' + f'''
         <p style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 8px;">Last updated: {timestamp}</p>
-        <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">{total} Bots Today.</h3>
+        <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1.25rem; margin-bottom: 16px;">{total} Bots and Rebels</h3>
 {report_html}'''
-content = re.sub(pattern2, replacement2, content, flags=re.DOTALL)
+    content = re.sub(pattern2, replacement2, content, flags=re.DOTALL)
 
-# Replace top pages section - use tmpl markers around just the content
-inner_start = '<!-- tp_content_start -->'
-inner_end = '<!-- tp_content_end -->'
-if inner_start in content and inner_end in content:
-    s = content.find(inner_start)
-    e = content.find(inner_end) + len(inner_end)
-    content = content[:s] + top_pages + content[e:]
-else:
-    # Fallback: replace entire top-pages-list div content
-    start_marker = '<!-- Top Pages --><!-- tmpl_start -->'
-    end_marker = '<!-- tmpl_end -->'
-    s = content.find(start_marker)
-    e = content.find(end_marker) + len(end_marker)
-    if s != -1 and e != -1:
-        new_section = f'{top_pages}\n            '
-        content = content[:s] + start_marker + '\n        <div style="margin-top: 32px; padding-top: 24px;">\n            <h3 style="font-family: \'IBM Plex Mono\', monospace; font-size: 1.25rem; margin-bottom: 16px;">// PAGE VIEWS</h3>\n            <div id="top-pages-list" style="font-family: \'IBM Plex Mono\', monospace; font-size: 0.9rem; max-width: 400px; margin: 0 auto;">\n                ' + new_section + '</div>\n        </div>' + end_marker + content[e:]
+    # Replace top pages section - use tmpl markers around just the content
+    inner_start = '<!-- tp_content_start -->'
+    inner_end = '<!-- tp_content_end -->'
+    if inner_start in content and inner_end in content:
+        s = content.find(inner_start)
+        e = content.find(inner_end) + len(inner_end)
+        content = content[:s] + top_pages + content[e:]
+    else:
+        # Fallback: replace entire top-pages-list div content
+        start_marker = '<!-- Top Pages --><!-- tmpl_start -->'
+        end_marker = '<!-- tmpl_end -->'
+        s = content.find(start_marker)
+        e = content.find(end_marker) + len(end_marker)
+        if s != -1 and e != -1:
+            new_section = f'{top_pages}\n            '
+            content = content[:s] + start_marker + '\n        <div style="margin-top: 32px; padding-top: 24px;">\n            <h3 style="font-family: \'IBM Plex Mono\', monospace; font-size: 1.25rem; margin-bottom: 16px;">// PAGE VIEWS</h3>\n            <div id="top-pages-list" style="font-family: \'IBM Plex Mono\', monospace; font-size: 0.9rem; max-width: 400px; margin: 0 auto;">\n                ' + new_section + '</div>\n        </div>' + end_marker + content[e:]
 
-# Re-insert Live Server Stats if it existed
-if live_server_stats:
-    content = content.replace('</ul>\n    </section>', f'</ul>\n    {live_server_stats}\n    </section>')
+    # Re-insert Live Server Stats if it existed
+    if live_server_stats:
+        content = content.replace('</ul>\n    </section>', f'</ul>\n    {live_server_stats}\n    </section>')
 
-with open(index_file, 'w') as f:
-    f.write(content)
+    # Verify content changed
+    if content == original_content:
+        print("WARNING: Content was not modified", file=sys.stderr)
+
+    with open(index_file, 'w') as f:
+        f.write(content)
+
+    print(f"SUCCESS: Updated {index_file} with {total} total IPs")
+
+except Exception as e:
+    print(f"ERROR: Python exception: {e}", file=sys.stderr)
+    traceback.print_exc(file=sys.stderr)
+    sys.exit(1)
 PYEOF
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+    echo "$(date): Python script failed with exit code $RESULT"
+fi

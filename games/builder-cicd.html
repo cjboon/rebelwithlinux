@@ -342,7 +342,26 @@
         function removeLetter(index) { placedLetters[index] = null; renderLetterSlots(); renderLetterPool(); }
         function clearAnswer() { placedLetters = new Array(placedLetters.length).fill(null); renderLetterSlots(); renderLetterPool(); }
         function checkAnswer() { const q = levels[currentLevel].questions[currentQuestion]; const userAnswer = placedLetters.map(l => l ? l.letter : '').join(''); const slots = document.querySelectorAll('.letter-slot'); if (userAnswer === q.answer) { score += 10 + (streak * 2); streak++; document.getElementById('score').textContent = score; document.getElementById('streak').textContent = streak; slots.forEach(slot => slot.classList.add('correct')); document.getElementById('feedback').className = 'feedback success'; document.getElementById('feedback').textContent = '✓ Correct!'; setTimeout(() => { currentQuestion++; if (currentQuestion >= levels[currentLevel].questions.length) showCompletion(); else loadQuestion(); }, 1000); } else { streak = 0; document.getElementById('streak').textContent = streak; slots.forEach(slot => slot.classList.add('incorrect')); document.getElementById('feedback').className = 'feedback error'; document.getElementById('feedback').textContent = '✗ Try again!'; } }
-        function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
+        
+        function showAnswer() {
+            const q = levels[currentLevel].questions[currentQuestion];
+            const answer = q.answer;
+            placedLetters = answer.split('').map((letter, index) => ({ letter: letter, index: index }));
+            streak = 0;
+            document.getElementById('streak').textContent = streak;
+            renderLetterSlots();
+            renderLetterPool();
+            const slots = document.querySelectorAll('.letter-slot');
+            slots.forEach(slot => slot.classList.add('incorrect'));
+            document.getElementById('feedback').className = 'feedback error';
+            document.getElementById('feedback').textContent = '✗ Answer: ' + answer;
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion >= levels[currentLevel].questions.length) showCompletion();
+                else loadQuestion();
+            }, 2000);
+        }
+function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
         function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = 'builder-cicd-2.html'; }
         document.addEventListener('keydown', function(e) { const key = e.key.toLowerCase(); if (key === 'backspace') {
                 for (let i = placedLetters.length - 1; i >= 0; i--) {
