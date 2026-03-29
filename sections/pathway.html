@@ -26,24 +26,38 @@
         document.addEventListener('DOMContentLoaded', function() {
             var texts = [
                 { id: 'typewriter-1', text: 'Find a pathway below or build your own', delay: 500 },
-                { id: 'typewriter-2', text: 'Apply what you\'ve learned', delay: 2000 }
+                { id: 'typewriter-2', text: 'Apply what you\'ve learned', delay: 0 }
             ];
-            texts.forEach(function(item) {
+            
+            var charDelay = 60;
+            var linePause = 500;
+            var currentLine = 0;
+            
+            function typeLine(item) {
                 var el = document.getElementById(item.id);
-                if (el) {
-                    var i = 0;
-                    setTimeout(function() {
-                        function type() {
-                            if (i < item.text.length) {
-                                el.textContent += item.text.charAt(i);
-                                i++;
-                                setTimeout(type, 60);
-                            }
+                if (!el) return;
+                
+                var i = 0;
+                function type() {
+                    if (i < item.text.length) {
+                        el.textContent += item.text.charAt(i);
+                        i++;
+                        setTimeout(type, charDelay);
+                    } else {
+                        currentLine++;
+                        if (currentLine < texts.length && texts[currentLine].text) {
+                            setTimeout(function() {
+                                typeLine(texts[currentLine]);
+                            }, linePause);
                         }
-                        type();
-                    }, item.delay);
+                    }
                 }
-            });
+                setTimeout(type, item.delay);
+            }
+            
+            if (texts.length > 0) {
+                typeLine(texts[0]);
+            }
         });
     </script>
 
