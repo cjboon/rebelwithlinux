@@ -640,15 +640,9 @@
             { q: "What is 'lynis'?", a: ["Security auditing tool", "Linux system", "System scanner", "Security scanner"], correct: 0 }
         ];
 
-        let currentQuestions = [];
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let streak = 0;
-        let maxStreak = 0;
-        let difficulty = 'easy';
-        let currentLevel = 1;
-        let consecutiveCorrect = 0;
-        let totalAnswered = 0;
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0, userId = null;
+        async function checkLogin(){try{const r=await fetch('../api/auth.php?action=check');const d=await r.json();if(d.authenticated){userId=d.email;return true}}catch(e){}return false}
+        async function saveProgress(testScore){if(!userId)return;try{await fetch('../api/progress.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({course:'test-linux',lesson_id:1,completed:true,quiz_score:testScore})})}catch(e){}}
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -783,6 +777,7 @@
             resultScreen.classList.add('active');
             
             const pass = score >= 100;
+            if (pass) { saveProgress(score); }
             document.getElementById('resultIcon').textContent = pass ? '✓' : '✗';
             document.getElementById('resultText').textContent = pass ? 'PASS' : 'FAIL';
             document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail');
@@ -802,6 +797,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             initTest();
+            checkLogin();
         });
     </script>
 

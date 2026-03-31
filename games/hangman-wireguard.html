@@ -342,6 +342,36 @@
         let twitchTimeout = null;
         let deathTime = 0;
         let limbsLimp = false;
+        let userId = null;
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) {
+                    userId = data.email;
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+
+        async function saveProgress(gameScore) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        course: 'hangman-wireguard',
+                        lesson_id: 1,
+                        completed: true,
+                        quiz_score: gameScore
+                    })
+                });
+            } catch (e) {}
+        }
+
         const canvas = document.getElementById('hangmanCanvas');
         const ctx = canvas.getContext('2d');
         const definitionEl = document.getElementById('definition');
@@ -471,6 +501,7 @@
                 messageBox.className = 'message win';
                 messageBox.style.display = 'block';
                 score += 10 + (streak * 2);
+                saveProgress(score);
                 streak++;
                 difficultyStreak++;
                 if (difficultyStreak >= minStreakForAdvance && currentDifficulty !== 'hard') {
@@ -518,6 +549,7 @@
         }
 
         init();
+        checkLogin();
     </script>
     <footer id="site-footer" style="text-align: center; padding: 0 24px 24px;">
         <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>

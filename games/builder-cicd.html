@@ -328,7 +328,34 @@
             { answer: "jenkins", hint: "CI/CD tool", code: "Popular automation server" },
             { answer: "docker", hint: "Container platform", code: "Package with containers" }
         ]}];
-        let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
+        let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null, userId = null;
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) {
+                    userId = data.email;
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+
+        async function saveProgress(gameScore) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        course: 'builder-cicd',
+                        lesson_id: currentLevel + 1,
+                        completed: true,
+                        quiz_score: gameScore
+                    })
+                });
+            } catch (e) {}
+        }
         function initLevel() { const level = levels[currentLevel]; document.getElementById('levelNum').textContent = currentLevel + 1; document.getElementById('totalQ').textContent = level.questions.length; renderLevelIndicator(); loadQuestion(); }
         function renderLevelIndicator() { const level = levels[currentLevel]; const indicator = document.getElementById('levelIndicator'); indicator.innerHTML = ''; for (let i = 0; i < level.questions.length; i++) { const dot = document.createElement('div'); dot.className = 'level-dot'; if (i < currentQuestion) dot.classList.add('completed'); if (i === currentQuestion) dot.classList.add('current'); indicator.appendChild(dot); } }
         function loadQuestion() { const q = levels[currentLevel].questions[currentQuestion]; document.getElementById('currentQ').textContent = currentQuestion + 1; document.getElementById('questionText').textContent = q.code; document.getElementById('hintText').textContent = q.hint; document.getElementById('feedback').className = 'feedback'; placedLetters = new Array(q.answer.length).fill(null); renderLetterSlots(); renderLetterPool(); renderLevelIndicator(); }
@@ -362,7 +389,7 @@
                 else loadQuestion();
             }, 2000);
         }
-function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
+function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); saveProgress(score); }
         function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = 'builder-cicd-2.html'; }
         document.addEventListener('keydown', function(e) { const key = e.key.toLowerCase(); if (key === 'backspace') {
                 for (let i = placedLetters.length - 1; i >= 0; i--) {
@@ -375,6 +402,7 @@ function showCompletion() { document.getElementById('finalScore').textContent = 
                 }
             } else if (key.length === 1 && /[a-z0-9_-]/.test(key)) { const emptyIndex = placedLetters.indexOf(null); if (emptyIndex !== -1) { const poolItems = document.querySelectorAll('.letter-tile'); for (let item of poolItems) { if (item.textContent.toLowerCase() === key) { placedLetters[emptyIndex] = { letter: item.textContent, index: parseInt(item.dataset.originalIndex) }; renderLetterSlots(); renderLetterPool(); if (!placedLetters.includes(null)) setTimeout(checkAnswer, 300); break; } } } } });
         initLevel();
+        checkLogin();
         const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); } else if (savedTheme === 'light') { document.documentElement.setAttribute('data-theme', 'light'); }
     </script>
     <noscript>

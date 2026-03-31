@@ -524,6 +524,35 @@
         let twitchTimeout = null;
         let deathTime = 0;
         let limbsLimp = false;
+        let userId = null;
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) {
+                    userId = data.email;
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+
+        async function saveProgress(gameScore) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        course: 'hangman-cicd',
+                        lesson_id: 1,
+                        completed: true,
+                        quiz_score: gameScore
+                    })
+                });
+            } catch (e) {}
+        }
 
         const canvas = document.getElementById('hangmanCanvas');
         const ctx = canvas.getContext('2d');
@@ -890,6 +919,7 @@
                 }
                 
                 showMessage('win', `Correct! The term was: ${currentWord}${advanceMessage}`);
+                saveProgress(score);
             }
         }
 
@@ -943,6 +973,7 @@
         }
 
         init();
+        checkLogin();
     </script>
     <noscript>
         <style>

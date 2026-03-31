@@ -487,7 +487,35 @@
             { answer: "wq", hint: "Save & quit", code: "Write and quit" }
         ]}];
         
-        let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
+        let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null, userId = null;
+        
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) {
+                    userId = data.email;
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+
+        async function saveProgress(gameScore) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        course: 'builder-vim',
+                        lesson_id: currentLevel + 1,
+                        completed: true,
+                        quiz_score: gameScore
+                    })
+                });
+            } catch (e) {}
+        }
         
         function initLevel() {
             const level = levels[currentLevel];
@@ -660,7 +688,7 @@
                 else loadQuestion();
             }, 2000);
         }
-function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
+function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); saveProgress(score); }
         function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = 'builder-vim-2.html'; }
         
         document.addEventListener('keydown', function(e) {
@@ -692,6 +720,7 @@ function showCompletion() { document.getElementById('finalScore').textContent = 
         });
 
         initLevel();
+        checkLogin();
 
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {

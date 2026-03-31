@@ -779,6 +779,35 @@
         let currentAnswer = "";
         let placedLetters = [];
         let draggedLetter = null;
+        let userId = null;
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) {
+                    userId = data.email;
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+
+        async function saveProgress(gameScore) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        course: 'builder-javascript-2',
+                        lesson_id: currentLevel + 1,
+                        completed: true,
+                        quiz_score: gameScore
+                    })
+                });
+            } catch (e) {}
+        }
 
         function init() {
             currentLevel = 0;
@@ -1035,6 +1064,7 @@
             document.getElementById('gameContainer').classList.remove('active');
             document.getElementById('completeScreen').classList.add('active');
             document.getElementById('finalScore').textContent = score;
+            saveProgress(score);
         }
 
         function restartGame() {
@@ -1052,6 +1082,7 @@
             document.documentElement.setAttribute('data-theme', 'light');
         }
         init();
+        checkLogin();
     </script>
     <noscript>
         <style>

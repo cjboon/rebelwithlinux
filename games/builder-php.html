@@ -506,6 +506,25 @@
         ]}];
         
         let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, draggedOriginalIndex = null;
+        let userId = null;
+        async function saveProgress(score) {
+            if (!userId) return;
+            try {
+                await fetch('../api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, game: 'builder-php', score }),
+                    credentials: 'include'
+                });
+            } catch (e) {}
+        }
+        async function checkLogin() {
+            try {
+                const res = await fetch('../api/auth.php?action=check', { credentials: 'include' });
+                const data = await res.json();
+                if (data.userId) userId = data.userId;
+            } catch (e) {}
+        }
         
         function initLevel() {
             const level = levels[currentLevel];
@@ -678,7 +697,7 @@
                 else loadQuestion();
             }, 2000);
         }
-function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); }
+function showCompletion() { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); saveProgress(score); }
         function nextLevel() { document.getElementById('completionModal').classList.remove('active'); window.location.href = 'builder-php-2.html'; }
         
         document.addEventListener('keydown', function(e) {
@@ -710,6 +729,7 @@ function showCompletion() { document.getElementById('finalScore').textContent = 
         });
 
         initLevel();
+        checkLogin();
 
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {

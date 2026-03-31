@@ -382,7 +382,36 @@
         let streak = 0;
         let difficulty = 'easy';
         let isGameOver = false;
-        
+        let userId = null;
+
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) {
+                    userId = data.email;
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+
+        async function saveProgress(gameScore) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        course: 'hangman-php',
+                        lesson_id: 1,
+                        completed: true,
+                        quiz_score: gameScore
+                    })
+                });
+            } catch (e) {}
+        }
+
         const canvas = document.getElementById('hangmanCanvas');
         const ctx = canvas.getContext('2d');
         const definitionEl = document.getElementById('definition');
@@ -585,6 +614,7 @@
                 score += 50 * (streak || 1);
                 isGameOver = true;
                 showMessage('win', `You won! Score: ${score}`);
+                saveProgress(score);
             } else if (isLost) {
                 isGameOver = true;
                 showMessage('lose', `Game over! The word was: ${currentWord}`);
@@ -628,6 +658,7 @@ guessInput.addEventListener('keydown', (e) => {
         
 
         init();
+        checkLogin();
     </script>
     <noscript>
         <style>

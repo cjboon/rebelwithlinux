@@ -363,7 +363,9 @@
             { q: "How do you implement cloud security hardening?", a: ["IAM, network restrictions, encryption, monitoring", "Cloud config", "Security groups", "All used"], correct: 0 }
         ];
 
-        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0;
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0, userId = null;
+        async function checkLogin(){try{const r=await fetch('../api/auth.php?action=check');const d=await r.json();if(d.authenticated){userId=d.email;return true}}catch(e){}return false}
+        async function saveProgress(testScore){if(!userId)return;try{await fetch('../api/progress.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({course:'test-hardening',lesson_id:1,completed:true,quiz_score:testScore})})}catch(e){}}
 
         function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
         function shuffleAnswers(question) { const answers = [...question.a]; const correctAnswer = answers[question.correct]; const shuffled = shuffle(answers); const newCorrectIndex = shuffled.indexOf(correctAnswer); return { ...question, a: shuffled, correct: newCorrectIndex }; }
@@ -405,10 +407,11 @@
 
         function updateStats() { document.getElementById('questionNum').textContent = currentQuestionIndex + 1; document.getElementById('streakNum').textContent = streak; document.getElementById('scoreNum').textContent = score; document.getElementById('levelNum').textContent = currentLevel; document.getElementById('progressFill').style.width = ((currentQuestionIndex) / currentQuestions.length * 100) + '%'; }
 
-        function showResults() { document.getElementById('quiz').style.display = 'none'; document.getElementById('resultScreen').classList.add('active'); const pass = score >= 100; document.getElementById('resultIcon').textContent = pass ? '🎉' : '😔'; document.getElementById('resultText').textContent = pass ? 'Level Complete!' : 'Keep Practicing'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score} | Best Streak: ${maxStreak}`; document.getElementById('resultDetails').textContent = `You answered ${totalAnswered} questions at Level ${currentLevel}`; }
+        function showResults() { document.getElementById('quiz').style.display = 'none'; document.getElementById('resultScreen').classList.add('active'); const pass = score >= 100; if (pass) { saveProgress(score); } document.getElementById('resultIcon').textContent = pass ? '🎉' : '😔'; document.getElementById('resultText').textContent = pass ? 'Level Complete!' : 'Keep Practicing'; document.getElementById('resultText').className = 'result-text ' + (pass ? 'pass' : 'fail'); document.getElementById('resultScore').textContent = `Score: ${score} | Best Streak: ${maxStreak}`; document.getElementById('resultDetails').textContent = `You answered ${totalAnswered} questions at Level ${currentLevel}`; }
 
         function restartTest() { initTest(); }
         initTest();
+        checkLogin();
     </script>
     <footer id="site-footer" style="text-align: center; padding: 0 24px 24px;">
         <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>

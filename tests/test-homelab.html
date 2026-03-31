@@ -419,15 +419,9 @@
             { q: "What is 'Authelia'?", a: ["Multi-factor authentication portal", "Auth system", "Single sign-on", "Login portal"], correct: 0 }
         ];
 
-        let currentQuestions = [];
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let streak = 0;
-        let maxStreak = 0;
-        let difficulty = 'easy';
-        let currentLevel = 1;
-        let consecutiveCorrect = 0;
-        let totalAnswered = 0;
+        let currentQuestions = [], currentQuestionIndex = 0, score = 0, streak = 0, maxStreak = 0, difficulty = 'easy', currentLevel = 1, consecutiveCorrect = 0, totalAnswered = 0, userId = null;
+        async function checkLogin(){try{const r=await fetch('../api/auth.php?action=check');const d=await r.json();if(d.authenticated){userId=d.email;return true}}catch(e){}return false}
+        async function saveProgress(testScore){if(!userId)return;try{await fetch('../api/progress.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({course:'test-homelab',lesson_id:1,completed:true,quiz_score:testScore})})}catch(e){}}
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -536,6 +530,7 @@
             document.getElementById('resultScreen').classList.add('active');
             const percentage = (score / (currentQuestions.length * 10)) * 100;
             const passed = percentage >= 50;
+            if (passed) { saveProgress(score); }
             document.getElementById('resultIcon').textContent = passed ? '🏆' : '📚';
             document.getElementById('resultText').textContent = passed ? 'PASSED!' : 'KEEP LEARNING';
             document.getElementById('resultText').className = 'result-text ' + (passed ? 'pass' : 'fail');
@@ -548,6 +543,7 @@
         }
 
         initTest();
+        checkLogin();
     </script>
     <footer id="site-footer" style="text-align: center; padding: 0 24px 24px;">
         <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>

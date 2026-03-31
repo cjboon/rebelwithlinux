@@ -346,7 +346,33 @@
                 { answer: "template", hint: "Alert message", code: "Format notification" }
             ]}
         ];
-        let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null;
+        let currentLevel = 0, currentQuestion = 0, score = 0, streak = 0, placedLetters = [], draggedLetter = null, userId = null;
+        async function checkLogin() {
+            try {
+                const response = await fetch('/api/auth.php?action=check');
+                const data = await response.json();
+                if (data.authenticated) {
+                    userId = data.email;
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+        async function saveProgress(gameScore) {
+            if (!userId) return;
+            try {
+                await fetch('/api/progress.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        course: 'builder-prometheus',
+                        lesson_id: currentLevel + 1,
+                        completed: true,
+                        quiz_score: gameScore
+                    })
+                });
+            } catch (e) {}
+        }
         function initLevel() { const level = levels[currentLevel]; document.getElementById('levelNum').textContent = currentLevel + 1; document.getElementById('totalQ').textContent = level.questions.length; renderLevelIndicator(); loadQuestion(); }
         function renderLevelIndicator() { const level = levels[currentLevel]; const indicator = document.getElementById('levelIndicator'); indicator.innerHTML = ''; for (let i = 0; i < level.questions.length; i++) { const dot = document.createElement('div'); dot.className = 'level-dot'; if (i < currentQuestion) dot.classList.add('completed'); if (i === currentQuestion) dot.classList.add('current'); indicator.appendChild(dot); } }
         function loadQuestion() { const q = levels[currentLevel].questions[currentQuestion]; document.getElementById('currentQ').textContent = currentQuestion + 1; document.getElementById('questionText').textContent = q.code; document.getElementById('hintText').textContent = q.hint; document.getElementById('feedback').className = 'feedback'; placedLetters = new Array(q.answer.length).fill(null); renderLetterSlots(); renderLetterPool(); renderLevelIndicator(); }
@@ -356,7 +382,7 @@
         function handleDrop(slotIndex) { if (draggedLetter && placedLetters[slotIndex] === null) { placedLetters[slotIndex] = draggedLetter; renderLetterSlots(); renderLetterPool(); draggedLetter = null; } }
         function removeLetter(index) { placedLetters[index] = null; renderLetterSlots(); renderLetterPool(); }
         function clearAnswer() { placedLetters = placedLetters.map(() => null); renderLetterSlots(); renderLetterPool(); }
-        function checkAnswer() { const correct = levels[currentLevel].questions[currentQuestion].answer.toLowerCase(); const answer = placedLetters.map(l => l ? l.letter.toLowerCase() : '').join(''); const feedback = document.getElementById('feedback'); if (answer === correct) { feedback.className = 'feedback success'; feedback.textContent = '✓ Correct!'; score += 10 + (streak * 2); streak++; setTimeout(() => { currentQuestion++; if (currentQuestion >= levels[currentLevel].questions.length) { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); } else { loadQuestion(); } }, 1000); } else { feedback.className = 'feedback error'; feedback.textContent = '✗ Try again!'; streak = 0; } document.getElementById('score').textContent = score; document.getElementById('streak').textContent = streak; }
+        function checkAnswer() { const correct = levels[currentLevel].questions[currentQuestion].answer.toLowerCase(); const answer = placedLetters.map(l => l ? l.letter.toLowerCase() : '').join(''); const feedback = document.getElementById('feedback'); if (answer === correct) { feedback.className = 'feedback success'; feedback.textContent = '✓ Correct!'; score += 10 + (streak * 2); streak++; setTimeout(() => { currentQuestion++; if (currentQuestion >= levels[currentLevel].questions.length) { document.getElementById('finalScore').textContent = score; document.getElementById('completionModal').classList.add('active'); saveProgress(score); } else { loadQuestion(); } }, 1000); } else { feedback.className = 'feedback error'; feedback.textContent = '✗ Try again!'; streak = 0; } document.getElementById('score').textContent = score; document.getElementById('streak').textContent = streak; }
         
         function showAnswer() {
             const q = levels[currentLevel].questions[currentQuestion];
@@ -378,6 +404,7 @@
         }
 function nextLevel() { document.getElementById('completionModal').classList.remove('active'); currentLevel++; currentQuestion = 0; if (currentLevel >= levels.length) currentLevel = 0; initLevel(); }
         initLevel();
+        checkLogin();
     </script>
     <footer id="site-footer" style="text-align: center; padding: 0 24px 24px;">
         <div style="font-size: 1.2rem; margin-bottom: 20px;"><a href="https://rebelwithlinux.com/index.html" style="color: var(--black);">www.rebelwithlinux.com</a></div>
