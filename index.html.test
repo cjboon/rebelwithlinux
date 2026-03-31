@@ -49,14 +49,15 @@
     <div class="section-links" style="background: var(--ivory); padding: 16px; text-align: center;">
         <a href="index.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Home</a>
         <a href="sections/guides.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Guides</a>
-        <a href="sections/blog.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Blog</a>
         <a href="sections/tests.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Tests</a>
         <a href="sections/games.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Games</a>
         <a href="sections/pathway.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Pathway</a>
-        <button id="loginBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Login</button>
-        <a href="sections/account.html" id="accountBtn" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: none;">Account</a>
         <a href="sections/foss.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Foss</a>
-        <button id="themeBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Light</button></div>
+        <a href="sections/blog.html" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: inline-block;">Blog</a>
+        <button id="themeBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Light</button>
+        <a href="sections/account.html" id="accountBtn" style="color: var(--black); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border: 1px solid var(--charcoal); border-radius: 4px; margin: 4px; display: none;">Account</a>
+        <button id="loginBtn" style="background: transparent; border: 1px solid var(--charcoal); color: var(--black); cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; padding: 8px 16px; border-radius: 4px; margin: 4px; display: none;">Login</button>
+    </div>
     <script>
         (function() {
             var theme = localStorage.getItem('theme') || 'dark';
@@ -76,9 +77,29 @@
                 this.style.color = next === 'dark' ? '#e0e0e0' : '#000000';
             });
 
+            async function checkAuth() {
+                try {
+                    const sessionCheck = await fetch('api/auth.php?action=check&t=' + Date.now(), {
+                        credentials: 'include',
+                        cache: 'no-store'
+                    });
+                    const sessionData = await sessionCheck.json();
+                    if (sessionData.authenticated) {
+                        document.getElementById('accountBtn').style.display = 'inline-block';
+                    } else {
+                        localStorage.removeItem('auth');
+                        document.getElementById('loginBtn').style.display = 'inline-block';
+                    }
+                } catch (e) {
+                    localStorage.removeItem('auth');
+                    document.getElementById('loginBtn').style.display = 'inline-block';
+                }
+            }
+
             var isLoggedIn = localStorage.getItem('auth') === 'true';
             if (isLoggedIn) {
                 document.getElementById('accountBtn').style.display = 'inline-block';
+                checkAuth();
             } else {
                 document.getElementById('loginBtn').style.display = 'inline-block';
             }
@@ -106,7 +127,7 @@
                 </div>
             </div>
             <div id="penguin-container" style="display: none; text-align: center; padding: 32px 16px;">
-                <img src="img/machete_penguin.png" alt="Machete Penguin" id="penguin-img" style="height: 300px; width: auto; margin-bottom: 24px;">
+                <img src="img/machete_penguin.png" alt="Machete Penguin" id="penguin-img" style="height: 300px; width: auto; margin-bottom: 24px; transition: opacity 2s ease;" onmouseenter="this.style.opacity='0'" onmouseleave="this.style.opacity='1'">
             </div>
             <div id="home-content" style="display: none;">
                 <div style="text-align: center; padding: 0 16px;">
