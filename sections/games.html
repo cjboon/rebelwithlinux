@@ -120,7 +120,7 @@
                     <h3 style="font-family: 'IBM Plex Mono', monospace; font-size: 1rem; color: var(--charcoal); border-bottom: 2px solid var(--charcoal); padding-bottom: 4px;">Series</h3>
                 </div>
 
-                <a href="../games/builder-main.html" class="lesson-card" style="text-decoration: none; color: inherit;">
+                <a href="../games/builder-main.html" class="lesson-card" data-course-type="builder" data-course-ids="builder-linux,builder-linux-2,builder-linux-3,builder-vim,builder-vim-2,builder-vim-3,builder-bash,builder-bash-2,builder-bash-3,builder-html,builder-html-2,builder-html-3,builder-css,builder-css-2,builder-css-3,builder-javascript,builder-javascript-2,builder-javascript-3,builder-python,builder-python-2,builder-python-3,builder-go,builder-go-2,builder-go-3,builder-typescript,builder-typescript-2,builder-typescript-3,builder-php,builder-php-2,builder-php-3,builder-git,builder-git-2,builder-git-3,builder-github,builder-networking,builder-networking-2,builder-networking-3,builder-dns,builder-dns-2,builder-dns-3,builder-nginx,builder-nginx-2,builder-nginx-3,builder-apache2,builder-apache2-2,builder-apache2-3,builder-sql,builder-sql-2,builder-sql-3,builder-mariadb,builder-mariadb-2,builder-mariadb-3,builder-postgresql,builder-postgresql-2,builder-postgresql-3,builder-docker,builder-docker-2,builder-docker-3,builder-kubernetes,builder-kubernetes-2,builder-kubernetes-3,builder-helm,builder-terraform,builder-terraform-2,builder-terraform-3,builder-ansible,builder-ansible-2,builder-ansible-3,builder-cicd,builder-cicd-2,builder-cicd-3,builder-logging,builder-logging-2,builder-logging-3,builder-monitoring,builder-monitoring-2,builder-monitoring-3,builder-prometheus,builder-hardening,builder-hardening-2,builder-hardening-3,builder-vault,builder-vps,builder-vps-2,builder-vps-3,builder-monero,builder-wireguard,builder-homelab,builder-jenkins,builder-grafana,builder-pihole,builder-foss,builder-gpg,builder-aws" style="text-decoration: none; color: inherit;">
                     <article style="padding: 24px; background: var(--white); height: 100%;">
                         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🏗️ CODE BUILDER</div>
                         <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Code Builder</h3>
@@ -128,7 +128,7 @@
                     </article>
                 </a>
 
-                <a href="../games/hangman-main.html" class="lesson-card" style="text-decoration: none; color: inherit;">
+                <a href="../games/hangman-main.html" class="lesson-card" data-course-type="hangman" data-course-ids="hangman-linux,hangman-vim,hangman-bash,hangman-html,hangman-css,hangman-javascript,hangman-python,hangman-php,hangman-go,hangman-typescript,hangman-sql,hangman-git,hangman-github,hangman-network,hangman-networking,hangman-dns,hangman-apache2,hangman-nginx,hangman-mariadb,hangman-postgresql,hangman-docker,hangman-kubernetes,hangman-helm,hangman-terraform,hangman-ansible,hangman-cicd,hangman-logging,hangman-monitoring,hangman-prometheus,hangman-hardening,hangman-vault,hangman-gpg,hangman-vps,hangman-aws,hangman-monero,hangman-foss" style="text-decoration: none; color: inherit;">
                     <article style="padding: 24px; background: var(--white); height: 100%;">
                         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">🎯 HANGMAN</div>
                         <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Hangman Games</h3>
@@ -136,7 +136,7 @@
                     </article>
                 </a>
 
-                <a href="../games/term-main.html" class="lesson-card" style="text-decoration: none; color: inherit;">
+                <a href="../games/term-main.html" class="lesson-card" data-course-type="term" data-course-ids="linux,bash,vim,ps,df,mount,html,css,python,git,ssh,curl,iptables,nginx,apache2,sql,docker,kubectl,cron,journalctl,systemctl,chmod,ln,wireguard,regex,awk,jq,grep,find,wget,rsync,tar,gpg,foss,monero" style="text-decoration: none; color: inherit;">
                     <article style="padding: 24px; background: var(--white); height: 100%;">
                         <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--charcoal); margin-bottom: 12px;">💻 TERM GAMES</div>
                         <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Term Games</h3>
@@ -315,6 +315,24 @@
                 }
             } catch (err) { errorDiv.textContent = 'Connection error'; errorDiv.classList.add('show'); }
         }
+    </script>
+    <script>
+    (async function() {
+        if (localStorage.getItem('auth') !== 'true') return;
+        try {
+            const res = await fetch('api/progress.php', { credentials: 'include' });
+            if (!res.ok) return;
+            const progress = await res.json();
+            const completed = progress.filter(p => p.completed == 1 || p.completed === true || p.completed === "1");
+            const completedIds = completed.map(c => c.course);
+            document.querySelectorAll('.lesson-card[data-course-type]').forEach(card => {
+                const ids = card.getAttribute('data-course-ids').split(',');
+                if (ids.every(id => completedIds.includes(id))) {
+                    card.classList.add('completed');
+                }
+            });
+        } catch (e) {}
+    })();
     </script>
 </body>
 </html>
