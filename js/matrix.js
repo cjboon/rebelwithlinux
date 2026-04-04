@@ -8,6 +8,14 @@
     var cols, drops, fontSize = 14;
     var chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
 
+    function getThemeColors() {
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        return {
+            text: isDark ? '#00ff41' : '#006600',
+            bg: isDark ? 'rgba(0, 0, 0, 0.05)' : 'rgba(0, 0, 0, 0.1)'
+        };
+    }
+
     function resize() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -19,9 +27,10 @@
     }
 
     function draw() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        var colors = getThemeColors();
+        ctx.fillStyle = colors.bg;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#00ff41';
+        ctx.fillStyle = colors.text;
         ctx.font = fontSize + 'px monospace';
 
         for (var i = 0; i < drops.length; i++) {
@@ -37,4 +46,9 @@
     resize();
     window.addEventListener('resize', resize);
     setInterval(draw, 50);
+
+    var observer = new MutationObserver(function() {
+        resize();
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 }();
