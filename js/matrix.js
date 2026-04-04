@@ -1,7 +1,7 @@
 !function() {
     var canvas = document.createElement('canvas');
     canvas.id = 'matrix-canvas';
-    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;';
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;';
     document.body.insertBefore(canvas, document.body.firstChild);
 
     var ctx = canvas.getContext('2d');
@@ -10,10 +10,7 @@
 
     function getThemeColors() {
         var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        return {
-            text: isDark ? '#00ff41' : '#006600',
-            bg: isDark ? 'rgba(0, 0, 0, 0.05)' : 'rgba(0, 0, 0, 0.1)'
-        };
+        return isDark ? '#00ff41' : '#006600';
     }
 
     function resize() {
@@ -27,10 +24,8 @@
     }
 
     function draw() {
-        var colors = getThemeColors();
-        ctx.fillStyle = colors.bg;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = colors.text;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = getThemeColors();
         ctx.font = fontSize + 'px monospace';
 
         for (var i = 0; i < drops.length; i++) {
