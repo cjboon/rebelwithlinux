@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Origin: https://rebelwithlinux.com');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
@@ -12,7 +12,11 @@ function getDB() {
     static $pdo = null;
     if ($pdo === null) {
         try {
-            $pdo = new PDO('mysql:dbname=learning_platform;unix_socket=/run/mysqld/mysqld.sock', 'webuser', 'webpass');
+            $pdo = new PDO(
+                'mysql:dbname=' . getenv('DB_NAME') . ';unix_socket=' . getenv('DB_SOCKET'),
+                getenv('DB_USER'),
+                getenv('DB_PASS')
+            );
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             http_response_code(500);
@@ -21,6 +25,35 @@ function getDB() {
     }
     return $pdo;
 }
+
+function rateLimit($key, $maxRequests = 10, $windowSeconds = 60) {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $cacheFile = '/tmp/ratelimit_' . md5($key . $ip);
+    $now = time();
+    
+    if (file_exists($cacheFile)) {
+        $data = json_decode(file_get_contents($cacheFile), true);
+        if ($data['expires'] > $now) {
+            if ($data['count'] >= $maxRequests) {
+                http_response_code(429);
+                die(json_encode(['error' => 'Too many requests']));
+            }
+            $data['count']++;
+        } else {
+            $data = ['count' => 1, 'expires' => $now + $windowSeconds];
+        }
+    } else {
+        $data = ['count' => 1, 'expires' => $now + $windowSeconds];
+    }
+    
+    file_put_contents($cacheFile, json_encode($data));
+}
+
+function sanitize($str) {
+    return htmlspecialchars($str, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+}
+
+rateLimit('comments');
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -37,6 +70,8 @@ if ($method === 'GET') {
     $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     foreach ($comments as &$c) {
+        $c['author'] = sanitize($c['author']);
+        $c['content'] = sanitize($c['content']);
         $c['created_at'] = date('M j, Y', strtotime($c['created_at']));
     }
     
@@ -45,9 +80,11 @@ if ($method === 'GET') {
 }
 
 if ($method === 'POST') {
+    rateLimit('comments_post');
+    
     $input = json_decode(file_get_contents('php://input'), true);
     
-    $slug = $input['slug'] ?? '';
+    $slug = trim($input['slug'] ?? '');
     $author = trim($input['author'] ?? '');
     $email = trim($input['email'] ?? '');
     $content = trim($input['content'] ?? '');
@@ -64,9 +101,15 @@ if ($method === 'POST') {
         exit;
     }
     
-    if (strlen($content) > 5000) {
+    if (strlen($author) > 100 || strlen($content) > 5000) {
         http_response_code(400);
-        echo json_encode(['error' => 'Comment too long (max 5000 characters)']);
+        echo json_encode(['error' => 'Invalid field length']);
+        exit;
+    }
+    
+    if (preg_match('/[<>]/', $author) || preg_match('/[<>]/', $content)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Invalid characters detected']);
         exit;
     }
     

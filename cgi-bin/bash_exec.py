@@ -19,8 +19,8 @@ ALLOWED_COMMANDS = {
 
 ALLOWED_BUILTINS = {
     'echo', 'printf', 'read', 'cd', 'pwd', 'ls', 'type',
-    'alias', 'unalias', 'set', 'shopt', 'trap', 'eval', 'exec',
-    'source', '.', ':', 'mapfile',
+    'alias', 'unalias', 'set', 'shopt', 'trap',
+    'source', '.', ':',
 }
 
 ALLOWED_KEYWORDS = {
@@ -86,6 +86,7 @@ DANGEROUS_PATTERNS = [
     r'\|\|\s*\w+',
     r'\$\{',
     r'\$\w+',
+    r'\$\$',
     r'>\s*/',
     r'<\s*/',
 ]
@@ -97,7 +98,7 @@ def is_command_allowed(cmd):
         return False
     
     if cmd.startswith('#'):
-        return True
+        return False
     
     words = cmd.split()
     first_word = words[0]
@@ -128,12 +129,13 @@ def is_command_allowed(cmd):
 
 def sanitize_output(output):
     """Sanitize output for web display"""
-    # Limit output size
     if len(output) > 5000:
         output = output[:5000] + "\n... (output truncated)"
     return html.escape(output)
 
 def execute_bash(code):
+    import resource
+    import signal
     """Execute bash code and return output"""
     # Split by newlines but preserve multiline structures
     lines = code.split('\n')
@@ -156,7 +158,9 @@ def execute_bash(code):
     
     def get_session_dir(session_id):
         """Get or create session directory"""
-        return f'/tmp/linux_demo_{session_id}'
+        import hashlib
+        random_suffix = hashlib.sha256(session_id.encode()).hexdigest()[:16]
+        return f'/tmp/linux_demo_{random_suffix}'
     
     def cleanup_old_sessions():
         """Clean up sessions older than SESSION_TIMEOUT"""
@@ -280,14 +284,20 @@ def execute_bash(code):
                 'LANG': 'C.UTF-8',
             }
             
-            import resource
-            import signal
-            
             def timeout_handler(signum, frame):
                 raise TimeoutError("Command timed out")
             
-            signal.signal(signal.SIGALRM, timeout_handler)
+            old_sig = signal.signal(signal.SIGALRM, timeout_handler)
             signal.alarm(5)
+            
+            try:
+                resource.setrlimit(resource.RLIMIT_NPROC, (5, 5))
+                resource.setrlimit(resource.RLIMIT_NOFILE, (10, 10))
+                resource.setrlimit(resource.RLIMIT_FSIZE, (1024*1024, 1024*1024))
+                resource.setrlimit(resource.RLIMIT_CPU, (5, 5))
+                resource.setrlimit(resource.RLIMIT_AS, (64*1024*1024, 64*1024*1024))
+            except (ValueError, resource.error):
+                pass
             
             result = subprocess.run(
                 ['bash', '--norc', '--noprofile', '-c', code],
